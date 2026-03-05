@@ -16,5 +16,35 @@
       "deadlines": 70
     },
     "timestamp": "2025-12-04T19:56:22.843Z"
-  }
+  },
+  "deadlines": [
+    {
+      "date": "12-31",
+      "label": "Annual Financial Audit",
+      "type": "audit",
+      "description": "Annual Financial Audit for Higher Education Act – Disclosure of Foreign Gifts",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "03-31",
+      "label": "A-133 Single Audit (if applicable)",
+      "type": "audit",
+      "description": "A-133 Single Audit (if applicable) for Higher Education Act – Disclosure of Foreign Gifts",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Quarterly Financial Review",
+      "type": "review",
+      "description": "Quarterly Financial Review for Higher Education Act – Disclosure of Foreign Gifts",
+      "isRecurring": true,
+      "recurrenceFrequency": "quarterly"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Accounting"
+  ]
 }

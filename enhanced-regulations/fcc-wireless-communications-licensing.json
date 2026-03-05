@@ -16,5 +16,35 @@
       "deadlines": 70
     },
     "timestamp": "2025-12-04T18:47:32.549Z"
-  }
+  },
+  "deadlines": [
+    {
+      "date": "continuous",
+      "label": "Annual IT Security Assessment",
+      "type": "assessment",
+      "description": "Annual IT Security Assessment for FCC – Wireless Communications, Licensing",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Vulnerability Scan",
+      "type": "scan",
+      "description": "Vulnerability Scan for FCC – Wireless Communications, Licensing",
+      "isRecurring": true,
+      "recurrenceFrequency": "quarterly"
+    },
+    {
+      "date": "continuous",
+      "label": "Disaster Recovery Plan Test",
+      "type": "test",
+      "description": "Disaster Recovery Plan Test for FCC – Wireless Communications, Licensing",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Information Technology"
+  ]
 }

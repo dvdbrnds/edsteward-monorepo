@@ -16,5 +16,19 @@
       "deadlines": 70
     },
     "timestamp": "2025-12-04T18:20:13.183Z"
-  }
+  },
+  "deadlines": [
+    {
+      "date": "12-31",
+      "label": "Annual Compliance Review",
+      "type": "review",
+      "description": "Annual Compliance Review for Employee Retirement Income Security Act of 1974 (ERISA)",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Retirement"
+  ]
 }

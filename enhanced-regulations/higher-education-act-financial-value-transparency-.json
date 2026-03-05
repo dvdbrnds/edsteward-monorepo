@@ -16,5 +16,19 @@
       "deadlines": 70
     },
     "timestamp": "2025-12-04T20:03:41.866Z"
-  }
+  },
+  "deadlines": [
+    {
+      "date": "12-31",
+      "label": "Annual Compliance Review",
+      "type": "review",
+      "description": "Annual Compliance Review for Higher Education Act Financial Value Transparency & Gainful Employment",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Program Integrity Rules"
+  ]
 }

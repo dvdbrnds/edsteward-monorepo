@@ -16,5 +16,51 @@
       "deadlines": 70
     },
     "timestamp": "2025-12-05T18:00:00.000Z"
-  }
+  },
+  "deadlines": [
+    {
+      "date": "continuous",
+      "label": "annual",
+      "type": "annual",
+      "description": "Beginning of each academic year",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "annual",
+      "type": "annual",
+      "description": "Review annually",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "within-45-days",
+      "type": "within-45-days",
+      "description": "Respond to access requests within 45 days",
+      "isRecurring": true,
+      "recurrenceFrequency": "within-45-days"
+    },
+    {
+      "date": "continuous",
+      "label": "ongoing",
+      "type": "ongoing",
+      "description": "Log each disclosure",
+      "isRecurring": true,
+      "recurrenceFrequency": "ongoing"
+    },
+    {
+      "date": "continuous",
+      "label": "ongoing",
+      "type": "ongoing",
+      "description": "Upon hire and periodically",
+      "isRecurring": true,
+      "recurrenceFrequency": "ongoing"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Family Educational Rights and Privacy Act"
+  ]
 }

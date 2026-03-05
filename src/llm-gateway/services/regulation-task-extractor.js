@@ -13,6 +13,10 @@
  */
 
 import crypto from 'crypto';
+import { callLLM } from '../../regulatory-sources/llm-processing.js';
+
+// Always use AI extraction when we have enough text — produces structured sections with subtasks
+const AI_TASK_MIN_THRESHOLD = 999;
 
 // ============================================================================
 // REQUIREMENT LANGUAGE PATTERNS
@@ -565,40 +569,31 @@ function extractPenalties(text) {
 /**
  * Match regulation to known template
  * 
- * Priority: exact slug match > slug partial match > text match
- * Requires at least 2 search term hits to prevent false positives
- * (e.g., PA Act 55 accidentally matching Title IX because the text contains "sexual")
+ * STRICT: Only matches on slug. Text-only matches caused severe cross-contamination
+ * (e.g., NJ Accreditation mentioning "FERPA" → matched FERPA template).
+ * Templates are only for regulations we have explicit, curated task structures for.
  */
 function matchToTemplate(regulationSlug, regulationText) {
   const lowerSlug = regulationSlug.toLowerCase();
-  const lowerText = (regulationText || '').toLowerCase();
   
   let bestMatch = null;
   let bestScore = 0;
   
   for (const [key, template] of Object.entries(REGULATION_TEMPLATES)) {
     let slugScore = 0;
-    let textScore = 0;
     
-    // Exact slug match gets massive bonus (prevents cross-contamination)
     if (lowerSlug.includes(key) || key.includes(lowerSlug.substring(0, 15))) {
       slugScore = 100;
     }
     
     for (const term of template.searchTerms) {
       if (lowerSlug.includes(term)) slugScore += 10;
-      if (lowerText.includes(term)) textScore += 1;
     }
     
-    const totalScore = slugScore + textScore;
-    
-    // Require either a slug match or at least 2 text matches
-    // This prevents "sexual violence" in PA Act 55 text from matching the Title IX template
-    const meetsThreshold = slugScore >= 10 || textScore >= 2;
-    
-    if (meetsThreshold && totalScore > bestScore) {
-      bestScore = totalScore;
-      bestMatch = { templateKey: key, template, matchScore: totalScore };
+    // SLUG MATCH ONLY — text mentions of other regulations must not trigger templates
+    if (slugScore >= 10 && slugScore > bestScore) {
+      bestScore = slugScore;
+      bestMatch = { templateKey: key, template, matchScore: slugScore };
     }
   }
   
@@ -615,6 +610,76 @@ function generateTaskId(prefix = 'task') {
 // ============================================================================
 // MAIN EXTRACTION FUNCTION
 // ============================================================================
+
+/**
+ * AI-powered compliance task extraction via Claude.
+ * Generates structured, hierarchical tasks when regex extraction is insufficient.
+ */
+async function extractTasksWithAI(regulationSlug, regulationText, regulationMetadata) {
+  const regName = regulationMetadata.name || regulationSlug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+  const statute = regulationMetadata.statute || '';
+  const cfr = regulationMetadata.cfr || '';
+  
+  const prompt = `You are a higher education compliance expert. Analyze the regulation below and extract ONLY the compliance tasks that come DIRECTLY from THIS SPECIFIC regulation.
+
+REGULATION: ${regName}
+${statute ? `STATUTE: ${statute}` : ''}
+${cfr ? `CFR: ${cfr}` : ''}
+
+REGULATION TEXT:
+${regulationText.substring(0, 6000)}
+
+Return a JSON object with this EXACT structure (no markdown, no code fences):
+{
+  "sections": [
+    {
+      "title": "Section title (e.g., 'Annual Reporting Requirements')",
+      "description": "What this compliance area covers under ${regName}",
+      "category": "One of: Reporting, Documentation, Training, Monitoring, Policy Development, Risk Management, Governance, Partnerships, Student Services, Employee Compliance, Financial Compliance, Data Management, Safety & Security",
+      "priority": "critical|high|medium",
+      "assignedRole": "Title of responsible person (e.g., Compliance Officer, Registrar, HR Director)",
+      "deadline": { "type": "annual|quarterly|monthly|event-triggered|one-time", "date": "MM-DD or null", "description": "When this is due" },
+      "subtasks": [
+        { "title": "Specific action item", "description": "Details", "priority": "critical|high|medium" }
+      ]
+    }
+  ],
+  "penalties": [
+    { "type": "monetary|administrative|funding|criminal", "description": "Penalty description", "amount": "$X or null" }
+  ]
+}
+
+CRITICAL RULES:
+- ONLY extract tasks that are DIRECTLY required by "${regName}" (${statute || 'this regulation'})
+- DO NOT include tasks from other regulations (FERPA, Title IV, Title IX, OSHA, HIPAA, ADA, etc.) even if the text mentions them in passing
+- If the text references another regulation, do NOT generate tasks for that other regulation
+- Every task title and description must be traceable to specific language in the regulation text above
+- Generate 4-8 top-level sections with 2-5 subtasks each (15-30 total tasks)
+- Include realistic deadlines based on the regulation's actual requirements
+- Include penalties if specifically mentioned in this regulation
+- Every task must be specific and verifiable, not vague
+- Use real compliance language and cite specific sections when possible`;
+
+  try {
+    const response = await callLLM(prompt, { 
+      temperature: 0.2, 
+      maxTokens: 3000,
+      model: process.env.LLM_DEFAULT_MODEL || 'claude-sonnet-4-20250514'
+    });
+    
+    let cleaned = response.trim();
+    if (cleaned.startsWith('```json')) cleaned = cleaned.slice(7);
+    else if (cleaned.startsWith('```')) cleaned = cleaned.slice(3);
+    if (cleaned.endsWith('```')) cleaned = cleaned.slice(0, -3);
+    cleaned = cleaned.trim();
+    
+    const parsed = JSON.parse(cleaned);
+    return parsed;
+  } catch (err) {
+    console.error(`   ❌ AI task extraction failed: ${err.message}`);
+    return null;
+  }
+}
 
 /**
  * Extract compliance tasks and deadlines from regulation text
@@ -654,71 +719,9 @@ export async function extractComplianceRequirements(regulationSlug, regulationTe
     }
   };
   
-  // Step 1: Try to match to known template
-  const templateMatch = matchToTemplate(regulationSlug, regulationText);
-  
-  if (templateMatch && templateMatch.template) {
-    console.log(`✅ Matched to template: ${templateMatch.templateKey} (score: ${templateMatch.matchScore})`);
-    result.analysis.method = 'template_match';
-    result.analysis.templateMatched = templateMatch.templateKey;
-    result.analysis.confidence = 95;
-    
-    // Build tasks from template
-    let sortOrder = 0;
-    for (const section of templateMatch.template.sections) {
-      const parentTempId = generateTaskId('section');
-      
-      // Parent task (section)
-      result.tasks.push({
-        tempId: parentTempId,
-        title: section.title,
-        description: section.description,
-        category: section.category,
-        priority: section.priority,
-        assignedRole: section.assignedRole,
-        deadline: section.deadline,
-        evidenceRequired: true,
-        evidenceType: 'document',
-        sortOrder: sortOrder++
-      });
-      
-      // Subtasks
-      if (section.subtasks) {
-        for (const subtask of section.subtasks) {
-          result.tasks.push({
-            tempId: generateTaskId('task'),
-            parentTempId: parentTempId,
-            title: subtask.title,
-            description: subtask.description,
-            category: section.category,
-            priority: subtask.priority || 'medium',
-            assignedRole: subtask.assignedRole || section.assignedRole,
-            evidenceRequired: subtask.evidenceRequired !== false,
-            evidenceType: subtask.evidenceType || 'document',
-            sortOrder: sortOrder++
-          });
-        }
-      }
-      
-      // Add deadline
-      if (section.deadline) {
-        result.deadlines.push({
-          type: section.deadline.type,
-          date: section.deadline.date || null,
-          description: section.deadline.description,
-          relatedTask: section.title,
-          frequency: section.deadline.type
-        });
-      }
-    }
-    
-    // Add penalties from template
-    if (templateMatch.template.penalties) {
-      result.penalties = templateMatch.template.penalties;
-    }
-    
-  } else {
-    console.log(`ℹ️  No template match - performing text analysis`);
+  {
+    // Every regulation gets virgin AI extraction from its own text — no templates
+    console.log(`🧠 Virgin extraction — analyzing regulation text directly`);
     result.analysis.method = 'text_analysis';
     
     // Step 2: Extract from raw text
@@ -778,6 +781,82 @@ export async function extractComplianceRequirements(regulationSlug, regulationTe
       (penalties.length > 0 ? 10 : 0) +
       (regulationText && regulationText.length > 5000 ? 10 : 0)
     );
+    
+    // AI FALLBACK: If regex produced insufficient tasks and we have enough text, use Claude
+    if (result.tasks.length < AI_TASK_MIN_THRESHOLD && regulationText && regulationText.length > 300) {
+      console.log(`   📡 Regex produced ${result.tasks.length} tasks (< ${AI_TASK_MIN_THRESHOLD}) — invoking AI extraction...`);
+      
+      const aiResult = await extractTasksWithAI(regulationSlug, regulationText, regulationMetadata);
+      
+      if (aiResult && aiResult.sections && aiResult.sections.length > 0) {
+        result.tasks = [];
+        result.deadlines = [];
+        result.penalties = [];
+        let sortOrder = 0;
+        
+        for (const section of aiResult.sections) {
+          const parentTempId = generateTaskId('ai-section');
+          
+          result.tasks.push({
+            tempId: parentTempId,
+            title: section.title,
+            description: section.description,
+            category: section.category || 'Compliance Requirement',
+            priority: section.priority || 'high',
+            assignedRole: section.assignedRole || 'Compliance Officer',
+            deadline: section.deadline || null,
+            evidenceRequired: true,
+            evidenceType: 'document',
+            sortOrder: sortOrder++,
+            extractedFrom: 'ai_analysis'
+          });
+          
+          if (section.subtasks) {
+            for (const subtask of section.subtasks) {
+              result.tasks.push({
+                tempId: generateTaskId('ai-task'),
+                parentTempId,
+                title: subtask.title,
+                description: subtask.description || '',
+                category: section.category || 'Compliance Requirement',
+                priority: subtask.priority || 'medium',
+                assignedRole: subtask.assignedRole || section.assignedRole || 'Compliance Officer',
+                evidenceRequired: true,
+                evidenceType: 'document',
+                sortOrder: sortOrder++,
+                extractedFrom: 'ai_analysis'
+              });
+            }
+          }
+          
+          if (section.deadline) {
+            result.deadlines.push({
+              type: section.deadline.type || 'annual',
+              date: section.deadline.date || null,
+              description: section.deadline.description || `${section.title} deadline`,
+              relatedTask: section.title,
+              frequency: section.deadline.type || 'annual'
+            });
+          }
+        }
+        
+        if (aiResult.penalties) {
+          for (const pen of aiResult.penalties) {
+            result.penalties.push({
+              type: pen.type || 'administrative',
+              amount: pen.amount || null,
+              description: pen.description || ''
+            });
+          }
+        }
+        
+        result.analysis.method = 'ai_extraction';
+        result.analysis.confidence = Math.min(90, 60 + result.tasks.length);
+        console.log(`   ✅ AI extraction produced ${result.tasks.length} tasks, ${result.deadlines.length} deadlines, ${result.penalties.length} penalties`);
+      } else {
+        console.log(`   ⚠️ AI extraction returned no results — keeping regex results`);
+      }
+    }
   }
   
   const duration = Date.now() - startTime;

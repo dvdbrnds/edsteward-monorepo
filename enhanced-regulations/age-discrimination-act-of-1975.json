@@ -16,5 +16,35 @@
       "deadlines": 70
     },
     "timestamp": "2025-12-04T16:03:34.548Z"
-  }
+  },
+  "deadlines": [
+    {
+      "date": "03-31",
+      "label": "EEO-1 Report",
+      "type": "filing",
+      "description": "EEO-1 Report for Age Discrimination Act of 1975",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "01-31",
+      "label": "Affirmative Action Plan Update",
+      "type": "plan",
+      "description": "Affirmative Action Plan Update for Age Discrimination Act of 1975",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "09-30",
+      "label": "VETS-4212 Report",
+      "type": "filing",
+      "description": "VETS-4212 Report for Age Discrimination Act of 1975",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Diversity/Affirmative Action"
+  ]
 }

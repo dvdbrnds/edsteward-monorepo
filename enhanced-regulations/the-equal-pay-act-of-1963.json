@@ -16,5 +16,19 @@
       "deadlines": 70
     },
     "timestamp": "2025-12-04T16:00:30.033Z"
-  }
+  },
+  "deadlines": [
+    {
+      "date": "12-31",
+      "label": "Annual Compliance Review",
+      "type": "review",
+      "description": "Annual Compliance Review for The Equal Pay Act of 1963",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Discrimination"
+  ]
 }

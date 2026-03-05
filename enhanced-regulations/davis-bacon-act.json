@@ -16,5 +16,27 @@
       "deadlines": 70
     },
     "timestamp": "2025-12-04T15:45:35.284Z"
-  }
+  },
+  "deadlines": [
+    {
+      "date": "continuous",
+      "label": "Vendor Compliance Review",
+      "type": "review",
+      "description": "Vendor Compliance Review for Davis-Bacon Act",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "SAM.gov Registration Renewal",
+      "type": "registration",
+      "description": "SAM.gov Registration Renewal for Davis-Bacon Act",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Contracts & Procurement"
+  ]
 }

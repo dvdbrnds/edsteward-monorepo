@@ -16,5 +16,43 @@
       "deadlines": 70
     },
     "timestamp": "2025-12-05T01:47:36.824Z"
-  }
+  },
+  "deadlines": [
+    {
+      "date": "05-15",
+      "label": "Form 990 Filing",
+      "type": "filing",
+      "description": "Form 990 Filing for Public Disclosure of Material",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "05-15",
+      "label": "Form 990-T Filing (if applicable)",
+      "type": "filing",
+      "description": "Form 990-T Filing (if applicable) for Public Disclosure of Material",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "01-31",
+      "label": "Form 1099 Filing",
+      "type": "filing",
+      "description": "Form 1099 Filing for Public Disclosure of Material",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "01-31",
+      "label": "W-2 Distribution",
+      "type": "distribution",
+      "description": "W-2 Distribution for Public Disclosure of Material",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Tax"
+  ]
 }

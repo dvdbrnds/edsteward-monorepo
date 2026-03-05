@@ -1,18 +1,126 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import styled from 'styled-components';
-import { Input, List, Typography, Spin, Tag } from 'antd';
+import { Input, Typography, Spin } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-import api from '../api/api';
-
 const { Text } = Typography;
 
 const SearchContainer = styled.div`
   padding: 0;
 `;
 
-const SearchInput = styled(Input)`
+const FilterBar = styled.div`
+  display: flex;
+  gap: 10px;
   margin-bottom: 16px;
+  align-items: stretch;
+`;
+
+const SearchInput = styled(Input)`
+  flex: 1;
+`;
+
+const DropdownWrapper = styled.div`
+  position: relative;
+`;
+
+const DropdownButton = styled.button`
+  height: 40px;
+  padding: 0 14px;
+  background: #fff;
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #1a1a1a;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+
+  &:hover {
+    border-color: #4096ff;
+    color: #4096ff;
+  }
+`;
+
+const DropdownPanel = styled.div`
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  min-width: 220px;
+  background: #fff;
+  border: 1px solid #e1e5e9;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  z-index: 200;
+  padding: 8px 0;
+  animation: dropIn 0.12s ease-out;
+
+  @keyframes dropIn {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+`;
+
+const DropdownItem = styled.label`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 13px;
+  color: #374151;
+  transition: background 0.1s;
+
+  &:hover {
+    background: #f3f4f6;
+  }
+
+  input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: #4096ff;
+    cursor: pointer;
+  }
+`;
+
+const DropdownDivider = styled.div`
+  height: 1px;
+  background: #e5e7eb;
+  margin: 4px 0;
+`;
+
+const DropdownAction = styled.button`
+  display: block;
+  width: calc(100% - 16px);
+  margin: 4px 8px;
+  padding: 6px 8px;
+  background: none;
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+  color: #6b7280;
+  cursor: pointer;
+  text-align: center;
+
+  &:hover {
+    background: #f3f4f6;
+    color: #374151;
+  }
+`;
+
+const FilterBadge = styled.span`
+  background: #4096ff;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 10px;
+  min-width: 18px;
+  text-align: center;
 `;
 
 const ResultItem = styled.div`
@@ -36,15 +144,7 @@ const ResultTitle = styled.h4`
   color: #1a1a1a;
 `;
 
-const ResultId = styled.span`
-  font-size: 0.8rem;
-  color: #6c757d;
-  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-`;
-
-const ResultsContainer = styled.div`
-  /* Removed max-height to show full list without truncation */
-`;
+const ResultsContainer = styled.div``;
 
 const StatsText = styled(Text)`
   display: block;
@@ -66,20 +166,42 @@ const SimpleRegulationSearch = ({ onRegulationSelect, placeholder = "Search regu
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Jurisdiction filter
+  const [availableJurisdictions, setAvailableJurisdictions] = useState([]);
+  const [selectedJurisdictions, setSelectedJurisdictions] = useState(new Set()); // empty = show all
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const getJurisdictionKey = useCallback((regulation) => {
+    const js = regulation.jurisdiction_source || regulation.jurisdictionSource || 'federal';
+    if (js === 'state') {
+      return regulation.state_code || regulation.stateCode || 'State';
+    }
+    return 'Federal';
+  }, []);
+
   // Load all regulations on component mount
   useEffect(() => {
     const loadAllRegulations = async () => {
-    setLoading(true);
-    setError(null);
+      setLoading(true);
+      setError(null);
 
-    try {
-        console.log('🔍 Loading all regulations...');
+      try {
         const response = await fetch('http://localhost:3010/api/regulations/all');
         const data = await response.json();
         
         if (data && data.data) {
-          console.log(`✅ Loaded ${data.data.length} regulations`);
-          // Sort by reg_key (REG-001, REG-002, etc.)
           const sortByRegKey = (a, b) => {
             const aNum = parseInt((a.reg_key || a.regKey || 'REG-999').replace(/\D/g, '')) || 999;
             const bNum = parseInt((b.reg_key || b.regKey || 'REG-999').replace(/\D/g, '')) || 999;
@@ -87,54 +209,82 @@ const SimpleRegulationSearch = ({ onRegulationSelect, placeholder = "Search regu
           };
           const sortedData = [...data.data].sort(sortByRegKey);
           setAllRegulations(sortedData);
-          setFilteredRegulations(sortedData); // Show all initially
-      } else {
+          setFilteredRegulations(sortedData);
+
+          // Build jurisdiction list from data
+          const counts = {};
+          for (const reg of sortedData) {
+            const key = getJurisdictionKey(reg);
+            counts[key] = (counts[key] || 0) + 1;
+          }
+          // Sort: Federal first, then states alphabetically
+          const jurisdictions = Object.entries(counts)
+            .sort(([a], [b]) => {
+              if (a === 'Federal') return -1;
+              if (b === 'Federal') return 1;
+              return a.localeCompare(b);
+            })
+            .map(([key, count]) => ({ key, count }));
+          setAvailableJurisdictions(jurisdictions);
+        } else {
           throw new Error('No regulation data returned');
-      }
-    } catch (err) {
+        }
+      } catch (err) {
         console.error('Error loading regulations:', err);
-      setError(err.message);
+        setError(err.message);
         setAllRegulations([]);
         setFilteredRegulations([]);
-    } finally {
-      setLoading(false);
-    }
+      } finally {
+        setLoading(false);
+      }
     };
 
     loadAllRegulations();
-  }, []);
+  }, [getJurisdictionKey]);
 
-  // Filter regulations as user types
+  // Filter regulations by text search AND jurisdiction
   useEffect(() => {
-    if (!searchQuery.trim()) {
-      // Show all regulations when search is empty
-      setFilteredRegulations(allRegulations);
-      return;
+    let results = allRegulations;
+
+    // Jurisdiction filter
+    if (selectedJurisdictions.size > 0) {
+      results = results.filter(reg => selectedJurisdictions.has(getJurisdictionKey(reg)));
     }
 
-    const query = searchQuery.toLowerCase();
-    const filtered = allRegulations.filter(regulation => 
-      regulation.name?.toLowerCase().includes(query) ||
-      regulation.topic?.toLowerCase().includes(query) ||
-      regulation.slug?.toLowerCase().includes(query) ||
-      regulation.reg_key?.toLowerCase().includes(query) ||
-      regulation.regKey?.toLowerCase().includes(query)
-    );
+    // Text search
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      results = results.filter(regulation => 
+        regulation.name?.toLowerCase().includes(query) ||
+        regulation.topic?.toLowerCase().includes(query) ||
+        regulation.slug?.toLowerCase().includes(query) ||
+        regulation.reg_key?.toLowerCase().includes(query) ||
+        regulation.regKey?.toLowerCase().includes(query)
+      );
+    }
 
-    // Sort filtered results by reg_key
     const sortByRegKey = (a, b) => {
       const aNum = parseInt((a.reg_key || a.regKey || 'REG-999').replace(/\D/g, '')) || 999;
       const bNum = parseInt((b.reg_key || b.regKey || 'REG-999').replace(/\D/g, '')) || 999;
       return aNum - bNum;
     };
-    const sortedFiltered = [...filtered].sort(sortByRegKey);
+    setFilteredRegulations([...results].sort(sortByRegKey));
+  }, [searchQuery, allRegulations, selectedJurisdictions, getJurisdictionKey]);
 
-    console.log(`🔍 Filtered ${sortedFiltered.length} regulations for "${searchQuery}"`);
-    setFilteredRegulations(sortedFiltered);
-  }, [searchQuery, allRegulations]);
+  const toggleJurisdiction = (key) => {
+    setSelectedJurisdictions(prev => {
+      const next = new Set(prev);
+      if (next.has(key)) {
+        next.delete(key);
+      } else {
+        next.add(key);
+      }
+      return next;
+    });
+  };
 
-  const handleSearch = (query) => {
-    setSearchQuery(query);
+  const clearJurisdictionFilter = () => {
+    setSelectedJurisdictions(new Set());
   };
 
   const handleRegulationClick = (regulation) => {
@@ -153,16 +303,58 @@ const SimpleRegulationSearch = ({ onRegulationSelect, placeholder = "Search regu
     }
   };
 
+  const filterActive = selectedJurisdictions.size > 0;
+  const filterLabel = filterActive
+    ? [...selectedJurisdictions].join(', ')
+    : 'Jurisdiction';
+
   return (
     <SearchContainer>
-      <SearchInput
-        size="large"
-        placeholder={placeholder}
-        value={searchQuery}
-        onChange={(e) => handleSearch(e.target.value)}
-        prefix={<SearchOutlined />}
-        allowClear
-      />
+      <FilterBar>
+        <SearchInput
+          size="large"
+          placeholder={placeholder}
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          prefix={<SearchOutlined />}
+          allowClear
+        />
+
+        <DropdownWrapper ref={dropdownRef}>
+          <DropdownButton onClick={() => setDropdownOpen(!dropdownOpen)}>
+            <span style={{ fontSize: '15px' }}>🏛</span>
+            <span>{filterActive ? filterLabel : 'Jurisdiction'}</span>
+            {filterActive && <FilterBadge>{selectedJurisdictions.size}</FilterBadge>}
+            <span style={{ fontSize: '10px', marginLeft: '2px' }}>{dropdownOpen ? '▲' : '▼'}</span>
+          </DropdownButton>
+
+          {dropdownOpen && (
+            <DropdownPanel>
+              {availableJurisdictions.map(({ key, count }) => (
+                <DropdownItem key={key}>
+                  <input
+                    type="checkbox"
+                    checked={selectedJurisdictions.has(key)}
+                    onChange={() => toggleJurisdiction(key)}
+                  />
+                  <span style={{ flex: 1 }}>
+                    {key === 'Federal' ? '🇺🇸 Federal' : `🏛 ${key}`}
+                  </span>
+                  <span style={{ fontSize: '11px', color: '#9ca3af' }}>{count}</span>
+                </DropdownItem>
+              ))}
+              {filterActive && (
+                <>
+                  <DropdownDivider />
+                  <DropdownAction onClick={clearJurisdictionFilter}>
+                    Clear filter
+                  </DropdownAction>
+                </>
+              )}
+            </DropdownPanel>
+          )}
+        </DropdownWrapper>
+      </FilterBar>
 
       {loading && (
         <div style={{ textAlign: 'center', padding: '20px' }}>
@@ -180,8 +372,8 @@ const SimpleRegulationSearch = ({ onRegulationSelect, placeholder = "Search regu
       {!loading && !error && (
         <>
           <StatsText>
-            {searchQuery ? 
-              `${filteredRegulations.length} results` :
+            {(searchQuery || filterActive) ? 
+              `${filteredRegulations.length} of ${allRegulations.length} regulations` :
               `${allRegulations.length} regulations`
             }
           </StatsText>
@@ -296,7 +488,4 @@ const SimpleRegulationSearch = ({ onRegulationSelect, placeholder = "Search regu
 };
 
 export default SimpleRegulationSearch;
-
-
-
 

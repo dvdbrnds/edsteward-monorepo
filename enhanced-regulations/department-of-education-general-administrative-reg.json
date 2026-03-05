@@ -16,5 +16,35 @@
       "deadlines": 70
     },
     "timestamp": "2025-12-04T18:00:25.970Z"
-  }
+  },
+  "deadlines": [
+    {
+      "date": "continuous",
+      "label": "Federal Grant Financial Reports",
+      "type": "report",
+      "description": "Federal Grant Financial Reports for Department of Education General Administrative Regulations and Other Applicable Grant Regulations",
+      "isRecurring": true,
+      "recurrenceFrequency": "quarterly"
+    },
+    {
+      "date": "continuous",
+      "label": "Annual Progress Report",
+      "type": "report",
+      "description": "Annual Progress Report for Department of Education General Administrative Regulations and Other Applicable Grant Regulations",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Closeout Report",
+      "type": "report",
+      "description": "Closeout Report for Department of Education General Administrative Regulations and Other Applicable Grant Regulations",
+      "isRecurring": false,
+      "recurrenceFrequency": null
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Grants Management"
+  ]
 }

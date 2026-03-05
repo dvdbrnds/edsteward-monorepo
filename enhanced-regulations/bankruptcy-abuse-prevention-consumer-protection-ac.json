@@ -16,5 +16,35 @@
       "deadlines": 70
     },
     "timestamp": "2025-12-04T15:36:39.011Z"
-  }
+  },
+  "deadlines": [
+    {
+      "date": "12-31",
+      "label": "Annual Financial Audit",
+      "type": "audit",
+      "description": "Annual Financial Audit for Bankruptcy Abuse Prevention & Consumer Protection Act of 2005",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "03-31",
+      "label": "A-133 Single Audit (if applicable)",
+      "type": "audit",
+      "description": "A-133 Single Audit (if applicable) for Bankruptcy Abuse Prevention & Consumer Protection Act of 2005",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Quarterly Financial Review",
+      "type": "review",
+      "description": "Quarterly Financial Review for Bankruptcy Abuse Prevention & Consumer Protection Act of 2005",
+      "isRecurring": true,
+      "recurrenceFrequency": "quarterly"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Accounting"
+  ]
 }

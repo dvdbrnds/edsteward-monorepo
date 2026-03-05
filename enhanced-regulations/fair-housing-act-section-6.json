@@ -16,5 +16,19 @@
       "deadlines": 70
     },
     "timestamp": "2025-12-04T15:56:20.546Z"
-  }
+  },
+  "deadlines": [
+    {
+      "date": "12-31",
+      "label": "Annual Compliance Review",
+      "type": "review",
+      "description": "Annual Compliance Review for Fair Housing Act, Section 6",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Disabilities"
+  ]
 }

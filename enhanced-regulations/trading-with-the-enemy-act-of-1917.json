@@ -16,5 +16,27 @@
       "deadlines": 70
     },
     "timestamp": "2025-12-05T02:34:53.672Z"
-  }
+  },
+  "deadlines": [
+    {
+      "date": "continuous",
+      "label": "Deemed Export Assessment",
+      "type": "assessment",
+      "description": "Deemed Export Assessment for Trading with the Enemy Act of 1917",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Export License Application (if applicable)",
+      "type": "application",
+      "description": "Export License Application (if applicable) for Trading with the Enemy Act of 1917",
+      "isRecurring": true,
+      "recurrenceFrequency": "as-needed"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Export Controls"
+  ]
 }

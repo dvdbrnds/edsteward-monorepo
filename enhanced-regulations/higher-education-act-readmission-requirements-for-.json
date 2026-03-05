@@ -16,5 +16,19 @@
       "deadlines": 70
     },
     "timestamp": "2025-12-04T15:42:45.976Z"
-  }
+  },
+  "deadlines": [
+    {
+      "date": "12-31",
+      "label": "Annual Compliance Review",
+      "type": "review",
+      "description": "Annual Compliance Review for Higher Education Act: Readmission Requirements for Servicemembers",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Admissions"
+  ]
 }

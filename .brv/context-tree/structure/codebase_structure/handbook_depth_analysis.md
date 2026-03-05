@@ -1,0 +1,1 @@
+BYTEROVER_MCP_HANDBOOK.md with structural depth analysis

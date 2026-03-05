@@ -16,5 +16,35 @@
       "deadlines": 70
     },
     "timestamp": "2025-12-04T16:19:49.378Z"
-  }
+  },
+  "deadlines": [
+    {
+      "date": "continuous",
+      "label": "IRB Protocol Annual Review",
+      "type": "review",
+      "description": "IRB Protocol Annual Review for Protection of Human Subjects Regulations (Common Rule)",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "01-31",
+      "label": "Conflict of Interest Disclosure",
+      "type": "disclosure",
+      "description": "Conflict of Interest Disclosure for Protection of Human Subjects Regulations (Common Rule)",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Export Control Assessment",
+      "type": "assessment",
+      "description": "Export Control Assessment for Protection of Human Subjects Regulations (Common Rule)",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Research"
+  ]
 }

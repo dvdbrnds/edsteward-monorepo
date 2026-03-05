@@ -1,5 +1,17 @@
 {
   "regulationId": "new-jersey-hazing-prevention",
+  "schemaVersion": "2.0",
+  "jurisdiction": {
+    "source": "state",
+    "countryCode": "US",
+    "stateCodes": [
+      "NJ"
+    ],
+    "label": "New Jersey",
+    "regulatoryBody": "NJ Office of the Secretary of Higher Education",
+    "actNumber": null,
+    "applicability": "all"
+  },
   "enhanced": {
     "fullText": "The New Jersey Anti-Hazing Law (N.J.S.A. 2C:40-3 et seq.) establishes comprehensive protections against hazing activities in educational institutions and organizations throughout the state. This legislation defines hazing as any action or situation created intentionally, whether on or off campus, to produce mental or physical discomfort, embarrassment, harassment, or ridicule. The law applies to all educational institutions, including elementary and secondary schools, colleges, universities, and any student organizations, athletic teams, fraternities, sororities, or similar groups.\n\nUnder this statute, hazing is classified as a criminal offense, with penalties varying based on the severity of harm caused. Actions that result in serious bodily injury constitute a crime of the third degree, punishable by three to five years imprisonment and fines up to $15,000. Lesser forms of hazing are classified as crimes of the fourth degree, carrying penalties of up to 18 months imprisonment and fines up to $10,000. Additionally, disorderly persons offenses may apply to certain hazing activities, resulting in up to six months imprisonment and fines up to $1,000.\n\nEducational institutions bear significant responsibilities under this law. Schools must establish clear anti-hazing policies that explicitly prohibit hazing activities and outline consequences for violations. These policies must be distributed annually to all students, faculty, staff, and relevant organization members. Institutions must provide educational programming about hazing prevention, including information about the physical, psychological, and legal consequences of hazing activities.\n\nThe law requires institutional officials to take immediate action upon receiving reports of hazing. This includes conducting thorough investigations, implementing appropriate disciplinary measures, and cooperating with law enforcement when criminal activity is suspected. Failure to properly address hazing incidents may result in institutional liability and potential loss of state funding or accreditation.\n\nStudent organizations, including athletic teams, clubs, fraternities, and sororities, must implement specific safeguards. These groups cannot engage in, encourage, or condone hazing activities as part of initiation ceremonies, team bonding, or any other organizational activities. Organization leaders and members who participate in, witness, or have knowledge of hazing activities have legal obligations to report such incidents to institutional authorities.\n\nThe statute provides strong whistleblower protections for individuals who report hazing activities in good faith. Students, faculty, staff, and community members who report suspected hazing are protected from retaliation, including academic penalties, employment actions, or social ostracism. Educational institutions must establish anonymous reporting mechanisms to encourage disclosure of hazing activities.\n\nConsent is explicitly not a defense under this law. Even if participants willingly engage in hazing activities, such consent does not absolve perpetrators of criminal liability or institutional responsibility. This provision recognizes the inherent power imbalances and psychological pressures present in hazing situations that may compromise genuine consent.\n\nThe law extends beyond traditional educational settings to include off-campus activities, social events, training camps, retreats, and any situation involving student organization members. Geographic location does not limit the application of anti-hazing provisions, ensuring comprehensive protection for students regardless of where activities occur.\n\nInstitutional reporting requirements mandate that schools document hazing incidents and maintain records of investigations, disciplinary actions, and preventive measures implemented. Annual reporting to state education authorities may be required, including statistics on hazing incidents, institutional responses, and prevention program effectiveness.\n\nLaw enforcement agencies have authority to investigate hazing complaints and pursue criminal charges when appropriate. Police departments and prosecutor's offices are encouraged to work collaboratively with educational institutions to address hazing while ensuring thorough criminal investigations when warranted.\n\nParental notification requirements may apply when minors are involved in hazing incidents, either as victims or perpetrators. Schools must balance student privacy rights with parental notification obligations and legal reporting requirements.\n\nThe legislation emphasizes prevention through education, encouraging institutions to develop comprehensive awareness programs that address hazing myths, promote positive team-building alternatives, and create cultures of respect and inclusion. These programs should target both potential victims and perpetrators, providing clear guidance on recognizing and reporting hazing activities.\n\nCivil liability provisions allow hazing victims to pursue monetary damages against perpetrators, organizations, and potentially institutions that fail to adequately prevent or respond to hazing. These civil remedies complement criminal penalties and provide additional accountability mechanisms.\n\nRegular policy review and updates are essential to maintain compliance with evolving legal standards and best practices in hazing prevention. Institutions must stay current with legal developments and adjust policies accordingly to ensure continued effectiveness and legal compliance.\n\nThe New Jersey Anti-Hazing Law reflects the state's commitment to protecting students from harmful traditional practices while promoting positive organizational cultures based on mutual respect, safety, and genuine team building that enhances rather than undermines individual dignity and wellbeing.",
     "summary": "The New Jersey Anti-Hazing Law criminalizes hazing activities in educational institutions and student organizations, defining hazing as intentional actions causing mental or physical discomfort, embarrassment, or harassment. The law establishes criminal penalties ranging from disorderly persons offenses to third-degree crimes depending on severity. Educational institutions must implement anti-hazing policies, provide prevention education, investigate incidents, and maintain reporting procedures. The statute includes whistleblower protections, extends to off-campus activities, and explicitly states that consent is not a defense for hazing activities.",
@@ -14,6 +26,46 @@
       "timeline": "Immediate reporting to institutional authorities upon knowledge of hazing activities; law enforcement notification within 24 hours for incidents involving serious bodily injury or criminal activity; parental notification for minor students within 48 hours; comprehensive incident documentation within 5 business days; annual policy distribution and prevention program implementation at the beginning of each academic year"
     }
   },
+  "deadlines": [
+    {
+      "date": "10-01",
+      "label": "Annual Security Report (Clery)",
+      "type": "report",
+      "description": "Annual Security Report (Clery) for New Jersey Hazing Prevention",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "08-01",
+      "label": "Emergency Response Plan Review",
+      "type": "review",
+      "description": "Emergency Response Plan Review for New Jersey Hazing Prevention",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "10-01",
+      "label": "Fire Safety Report",
+      "type": "report",
+      "description": "Fire Safety Report for New Jersey Hazing Prevention",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "09-01",
+      "label": "Campus Security Authority Training",
+      "type": "training",
+      "description": "Campus Security Authority Training for New Jersey Hazing Prevention",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Student Safety",
+    "Hazing Prevention",
+    "Student Conduct"
+  ],
   "audit": {
     "score": 95,
     "certainty": "A",

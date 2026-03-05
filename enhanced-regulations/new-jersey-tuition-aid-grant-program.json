@@ -1,5 +1,17 @@
 {
   "regulationId": "new-jersey-tuition-aid-grant-program",
+  "schemaVersion": "2.0",
+  "jurisdiction": {
+    "source": "state",
+    "countryCode": "US",
+    "stateCodes": [
+      "NJ"
+    ],
+    "label": "New Jersey",
+    "regulatoryBody": "NJ Higher Education Student Assistance Authority",
+    "actNumber": null,
+    "applicability": "all"
+  },
   "enhanced": {
     "fullText": "The New Jersey Tuition Aid Grant (TAG) Program, codified under N.J.A.C. 9A:9-2, establishes comprehensive compliance requirements for institutions participating in New Jersey's premier state financial aid program. This regulation ensures that eligible New Jersey residents receive appropriate financial assistance while maintaining program integrity and institutional accountability.\n\nEligibility Requirements: Students must be legal residents of New Jersey for at least 12 consecutive months prior to receiving an award. Recipients must be enrolled in an approved degree or certificate program at a participating New Jersey institution of higher education. Full-time enrollment of at least 12 credit hours per semester is required for maximum awards, with part-time students eligible for prorated assistance based on enrollment intensity. Students must demonstrate financial need through completion of the Free Application for Federal Student Aid (FAFSA) and meet federal Title IV eligibility requirements. Academic progress standards require maintenance of satisfactory academic progress as defined by the institution's published policy, typically requiring a minimum cumulative GPA of 2.0 and completion of at least 67% of attempted credit hours.\n\nInstitutional Responsibilities: Participating institutions must maintain current approval status with the New Jersey Office of the Secretary of Higher Education and comply with all state authorization requirements. Institutions are responsible for accurate calculation and timely disbursement of TAG awards based on student enrollment status and financial need. Proper certification of student eligibility, including residency verification and academic standing confirmation, must be completed before each disbursement. Institutions must maintain detailed records of all TAG recipients, including award amounts, disbursement dates, and any adjustments or refunds processed.\n\nAward Calculations and Limits: TAG awards are calculated using a standardized formula considering Expected Family Contribution (EFC), cost of attendance, and other financial aid received. Maximum annual awards are established by the state legislature and vary by institution type and student dependency status. For academic year 2023-2024, maximum awards range from $1,012 to $13,815 depending on institutional sector and student circumstances. Awards are prorated for students enrolled less than full-time, with minimum enrollment of six credit hours required for eligibility. Summer session enrollment may qualify for additional awards subject to annual limits and available funding.\n\nCompliance Monitoring and Auditing: The Higher Education Student Assistance Authority (HESAA) conducts regular compliance reviews of participating institutions, including on-site visits and documentation audits. Institutions must provide access to student records, financial aid files, and system data upon request. Common audit findings include improper residency determinations, incorrect award calculations, and inadequate documentation retention. Institutions failing to meet compliance standards may face corrective action requirements, funding restrictions, or program suspension.\n\nRefund and Repayment Requirements: When students withdraw or reduce enrollment, institutions must calculate appropriate TAG refunds using federal Return to Title IV methodology. Unearned portions of TAG awards must be returned to HESAA within 45 days of the withdrawal determination. Students who receive TAG overpayments due to enrollment changes, grade changes, or other circumstances may be required to repay excess amounts. Institutions are responsible for notifying HESAA of required repayments and may be held liable for uncollected overpayments in cases of institutional error.\n\nDocumentation and Record Retention: Institutions must maintain comprehensive records for all TAG recipients for a minimum of five years following the award year. Required documentation includes completed FAFSA forms, residency verification, enrollment certifications, academic transcripts, and disbursement records. Electronic storage systems must include appropriate backup and security measures to protect student privacy and ensure data integrity. Records must be readily accessible for state audit purposes and comply with federal privacy regulations.\n\nSpecial Circumstances and Appeals: Institutions may request special consideration for students experiencing unusual circumstances affecting financial need or academic progress. Professional judgment decisions must be thoroughly documented with supporting evidence and rationale. Students have the right to appeal TAG eligibility determinations through their institution's established appeals process. Institutions must provide clear information about appeal procedures and ensure timely resolution of disputes.\n\nProgram Changes and Updates: HESAA provides annual updates regarding program parameters, award amounts, and procedural changes through official communications to financial aid administrators. Institutions must implement required changes by specified deadlines and ensure staff training on updated procedures. Failure to implement program changes may result in processing delays or compliance violations.\n\nPenalties for Non-Compliance: Violations of TAG program requirements may result in various sanctions including warning letters, required corrective action plans, financial penalties, or temporary suspension from program participation. Serious or repeated violations may lead to permanent removal from the TAG program. Institutions may appeal adverse actions through established administrative procedures, but must continue compliance efforts during the appeal process.",
     "summary": "N.J.A.C. 9A:9-2 governs New Jersey's Tuition Aid Grant Program compliance, requiring participating institutions to verify student eligibility, maintain detailed records, accurately calculate and disburse awards, and submit regular compliance reports. The regulation establishes residency requirements, academic progress standards, refund procedures, and documentation retention requirements. Institutions must undergo periodic audits and face penalties for non-compliance including program suspension.",
@@ -14,6 +26,38 @@
       "timeline": "Annual enrollment and disbursement reports due October 31st following each award year, with quarterly enrollment updates due within 30 days of each term census date, overpayment notifications within 45 days of determination, and immediate reporting of significant compliance issues or program violations to HESAA"
     }
   },
+  "deadlines": [
+    {
+      "date": "10-01",
+      "label": "FISAP Annual Report",
+      "type": "filing",
+      "description": "FISAP Annual Report for New Jersey Tuition Aid Grant Program",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "06-30",
+      "label": "Annual Financial Aid Audit",
+      "type": "audit",
+      "description": "Annual Financial Aid Audit for New Jersey Tuition Aid Grant Program",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "07-01",
+      "label": "Gainful Employment Disclosure Update",
+      "type": "disclosure",
+      "description": "Gainful Employment Disclosure Update for New Jersey Tuition Aid Grant Program",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Financial Aid",
+    "Tuition Assistance",
+    "Student Finance"
+  ],
   "audit": {
     "score": 95,
     "certainty": "A",

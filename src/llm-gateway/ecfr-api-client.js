@@ -11,6 +11,121 @@ import fetch from 'node-fetch';
 
 const ECFR_API_BASE = 'https://www.ecfr.gov/api/versioner/v1';
 
+const XML_ENTITIES = {
+  '&#xA7;': '§', '&#x2014;': '—', '&#x2013;': '–', '&#x201C;': '\u201C',
+  '&#x201D;': '\u201D', '&#x2018;': '\u2018', '&#x2019;': '\u2019',
+  '&amp;': '&', '&lt;': '<', '&gt;': '>', '&quot;': '"', '&#39;': "'",
+  '&apos;': "'", '&#xA0;': ' ',
+};
+
+function decodeXmlEntities(text) {
+  let decoded = text;
+  for (const [entity, char] of Object.entries(XML_ENTITIES)) {
+    decoded = decoded.split(entity).join(char);
+  }
+  decoded = decoded.replace(/&#x([0-9A-Fa-f]+);/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)));
+  decoded = decoded.replace(/&#(\d+);/g, (_, dec) => String.fromCharCode(parseInt(dec, 10)));
+  return decoded;
+}
+
+function xmlToCleanText(xml) {
+  let text = xml;
+  text = text.replace(/<HEAD>([\s\S]*?)<\/HEAD>/g, (_, content) => {
+    const clean = content.replace(/<[^>]+>/g, '').trim();
+    return `\n\n${clean}\n`;
+  });
+  text = text.replace(/<P>([\s\S]*?)<\/P>/g, (_, content) => {
+    const clean = content.replace(/<[^>]+>/g, '').trim();
+    return `${clean}\n`;
+  });
+  text = text.replace(/<[^>]+>/g, '');
+  text = decodeXmlEntities(text);
+  text = text.replace(/\n{3,}/g, '\n\n').trim();
+  return text;
+}
+
+/**
+ * Fetch FULL authoritative text from eCFR versioner API
+ * Uses /api/versioner/v1/full/{date}/title-{title}.xml?part={part}
+ * This returns the COMPLETE, OFFICIAL regulation text — not search snippets
+ * 
+ * @param {string} title - CFR title number (e.g., "34")
+ * @param {string} part - CFR part number (e.g., "99")
+ * @param {object} options - { section, name }
+ * @returns {Promise<object>} - Full authoritative CFR text
+ */
+export async function fetchCFRFullText(title, part, options = {}) {
+  const { section, name } = options;
+  const ecfrDate = '2025-01-01';
+
+  let apiUrl = `${ECFR_API_BASE}/full/${ecfrDate}/title-${title}.xml?part=${part}`;
+  if (section) {
+    apiUrl += `&section=${part}.${section}`;
+  }
+
+  const citationStr = section
+    ? `${title} CFR ${part}.${section}`
+    : `${title} CFR Part ${part}`;
+
+  console.log(`📖 Fetching FULL TEXT from eCFR versioner: ${citationStr} (${name || 'regulation'})...`);
+  console.log(`   URL: ${apiUrl}`);
+
+  try {
+    const response = await fetch(apiUrl, {
+      headers: {
+        'Accept': 'application/xml',
+        'User-Agent': 'MCP-Engine-Compliance-Platform/2.0'
+      },
+      timeout: 30000
+    });
+
+    if (!response.ok) {
+      throw new Error(`eCFR versioner API returned ${response.status}: ${response.statusText}`);
+    }
+
+    const xmlText = await response.text();
+    const fullText = xmlToCleanText(xmlText);
+
+    const sectionMatches = fullText.match(/§\s*[\d.]+/g) || [];
+    const uniqueSections = [...new Set(sectionMatches)];
+
+    const humanUrl = section
+      ? `https://www.ecfr.gov/current/title-${title}/part-${part}/section-${part}.${section}`
+      : `https://www.ecfr.gov/current/title-${title}/part-${part}`;
+
+    console.log(`✅ Fetched FULL TEXT: ${citationStr} (${fullText.length} chars, ${uniqueSections.length} sections)`);
+
+    return {
+      success: true,
+      sourceType: 'ecfr_full_text',
+      title,
+      part,
+      section: section || null,
+      regulationName: name || null,
+      fullText,
+      sections: uniqueSections,
+      date: ecfrDate,
+      source: 'ecfr.gov (versioner full text)',
+      citation: citationStr,
+      url: humanUrl,
+      apiUrl,
+      length: fullText.length,
+      sectionCount: uniqueSections.length,
+    };
+  } catch (error) {
+    console.error(`❌ Failed to fetch full text for ${citationStr}:`, error.message);
+    return {
+      success: false,
+      sourceType: 'ecfr_full_text',
+      title,
+      part,
+      section: section || null,
+      error: error.message,
+      fullText: '',
+    };
+  }
+}
+
 /**
  * Fetch full text for a CFR part (or specific section)
  * @param {string} title - CFR title (e.g., "34")
@@ -283,6 +398,7 @@ export async function fetchMultipleCitations(citations) {
 }
 
 export default {
+  fetchCFRFullText,
   fetchCFRPart,
   fetchCFRSection,
   fetchByCitation,

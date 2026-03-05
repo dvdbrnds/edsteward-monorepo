@@ -16,5 +16,35 @@
       "deadlines": 70
     },
     "timestamp": "2025-12-05T00:51:44.073Z"
-  }
+  },
+  "deadlines": [
+    {
+      "date": "continuous",
+      "label": "Annual IT Security Assessment",
+      "type": "assessment",
+      "description": "Annual IT Security Assessment for Junk Fax Prevention Act of 2005",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Vulnerability Scan",
+      "type": "scan",
+      "description": "Vulnerability Scan for Junk Fax Prevention Act of 2005",
+      "isRecurring": true,
+      "recurrenceFrequency": "quarterly"
+    },
+    {
+      "date": "continuous",
+      "label": "Disaster Recovery Plan Test",
+      "type": "test",
+      "description": "Disaster Recovery Plan Test for Junk Fax Prevention Act of 2005",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Information Technology"
+  ]
 }

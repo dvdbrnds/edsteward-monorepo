@@ -16,5 +16,43 @@
       "deadlines": 70
     },
     "timestamp": "2025-12-04T17:26:34.249Z"
-  }
+  },
+  "deadlines": [
+    {
+      "date": "10-01",
+      "label": "Annual Security Report Publication",
+      "type": "report",
+      "description": "Publish Annual Security Report containing CSCPA required statement by October 1",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "07-01",
+      "label": "Policy Annual Review",
+      "type": "review",
+      "description": "Conduct annual review of sex offender registry access and notification policies",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "08-15",
+      "label": "Law Enforcement Coordination Meeting",
+      "type": "meeting",
+      "description": "Annual meeting with local law enforcement to review sex offender notification procedures",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Website Information Verification",
+      "type": "verification",
+      "description": "Verify accuracy of sex offender registry links and information on institution website",
+      "isRecurring": true,
+      "recurrenceFrequency": "semi-annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Campus Sex Crimes Prevention Act (§ 1601 of the Victims of Trafficking and Violence Protection Act of 2000)"
+  ]
 }

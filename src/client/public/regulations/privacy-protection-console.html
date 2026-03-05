@@ -153,6 +153,32 @@
             padding-right: 24px;
         }
         
+        
+        .btn-home {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 7px 12px;
+            background: #f1f5f9;
+            color: #475569;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            white-space: nowrap;
+        }
+        .btn-home:hover {
+            background: #e2e8f0;
+            color: #1e293b;
+            border-color: #cbd5e1;
+        }
+        .btn-home .icon {
+            font-size: 14px;
+        }
+
         .toolbar-primary {
             display: flex;
             align-items: center;
@@ -1275,6 +1301,10 @@
             <!-- Action Toolbar - Sticky at top -->
             <div class="action-toolbar">
                 <div class="toolbar-primary">
+                    <a href="/" class="btn-home" title="Back to Dashboard">
+                        <span class="icon">←</span>
+                        <span>Dashboard</span>
+                    </a>
                     <button id="runButton" class="btn-execute" onclick="runLinearEngine()">
                         <span class="icon">▶</span>
                         <span>Execute Workflow</span>

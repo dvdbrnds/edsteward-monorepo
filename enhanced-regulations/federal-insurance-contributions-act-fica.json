@@ -16,5 +16,27 @@
       "deadlines": 70
     },
     "timestamp": "2025-12-04T15:36:41.498Z"
-  }
+  },
+  "deadlines": [
+    {
+      "date": "continuous",
+      "label": "Minimum Wage Compliance Review",
+      "type": "review",
+      "description": "Minimum Wage Compliance Review for Federal Insurance Contributions Act (FICA)",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Pay Equity Analysis",
+      "type": "analysis",
+      "description": "Pay Equity Analysis for Federal Insurance Contributions Act (FICA)",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Wages"
+  ]
 }

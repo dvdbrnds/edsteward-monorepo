@@ -16,5 +16,83 @@
       "deadlines": 70
     },
     "timestamp": "2025-12-04T20:29:50.329Z"
-  }
+  },
+  "deadlines": [
+    {
+      "date": "continuous",
+      "label": "Annual Risk Analysis",
+      "type": "assessment",
+      "description": "Conduct comprehensive security risk analysis",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Annual HIPAA Training",
+      "type": "training",
+      "description": "Complete workforce HIPAA training",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Breach Notification (Individual)",
+      "type": "notification",
+      "description": "Notify affected individuals within 60 days of breach discovery",
+      "isRecurring": true,
+      "recurrenceFrequency": "as-needed"
+    },
+    {
+      "date": "continuous",
+      "label": "HHS Annual Breach Report",
+      "type": "report",
+      "description": "Submit annual breach report to HHS for breaches affecting <500 individuals",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "HHS Immediate Breach Report",
+      "type": "report",
+      "description": "Report breaches affecting 500+ individuals within 60 days",
+      "isRecurring": true,
+      "recurrenceFrequency": "as-needed"
+    },
+    {
+      "date": "continuous",
+      "label": "Policy Review",
+      "type": "review",
+      "description": "Review and update HIPAA policies and procedures",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "BAA Review",
+      "type": "review",
+      "description": "Review business associate agreements for compliance",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Contingency Plan Testing",
+      "type": "testing",
+      "description": "Test data backup and disaster recovery procedures",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "12-31",
+      "label": "Annual Compliance Review",
+      "type": "review",
+      "description": "Annual Compliance Review for Health Insurance Portability and Accountability Act",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Health Insurance Portability and Accountability Act (HIPAA)"
+  ]
 }

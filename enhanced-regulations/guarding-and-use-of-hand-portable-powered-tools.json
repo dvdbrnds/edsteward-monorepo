@@ -16,5 +16,35 @@
       "deadlines": 70
     },
     "timestamp": "2025-12-04T16:12:55.617Z"
-  }
+  },
+  "deadlines": [
+    {
+      "date": "02-01",
+      "label": "OSHA 300 Log Posting",
+      "type": "posting",
+      "description": "OSHA 300 Log Posting for Guarding and Use of Hand & Portable Powered Tools",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "01-31",
+      "label": "Annual Safety Training",
+      "type": "training",
+      "description": "Annual Safety Training for Guarding and Use of Hand & Portable Powered Tools",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Hazardous Waste Manifest Submission",
+      "type": "filing",
+      "description": "Hazardous Waste Manifest Submission for Guarding and Use of Hand & Portable Powered Tools",
+      "isRecurring": true,
+      "recurrenceFrequency": "as-needed"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Environmental Health and Safety"
+  ]
 }

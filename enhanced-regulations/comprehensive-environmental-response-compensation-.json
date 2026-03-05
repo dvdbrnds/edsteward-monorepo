@@ -16,5 +16,35 @@
       "deadlines": 70
     },
     "timestamp": "2025-12-04T16:11:44.358Z"
-  }
+  },
+  "deadlines": [
+    {
+      "date": "02-01",
+      "label": "OSHA 300 Log Posting",
+      "type": "posting",
+      "description": "OSHA 300 Log Posting for Comprehensive Environmental Response, Compensation, and Liability Act (CERCLA)",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "01-31",
+      "label": "Annual Safety Training",
+      "type": "training",
+      "description": "Annual Safety Training for Comprehensive Environmental Response, Compensation, and Liability Act (CERCLA)",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Hazardous Waste Manifest Submission",
+      "type": "filing",
+      "description": "Hazardous Waste Manifest Submission for Comprehensive Environmental Response, Compensation, and Liability Act (CERCLA)",
+      "isRecurring": true,
+      "recurrenceFrequency": "as-needed"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Environmental Health and Safety"
+  ]
 }

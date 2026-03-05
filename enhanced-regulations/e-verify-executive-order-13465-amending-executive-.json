@@ -16,5 +16,27 @@
       "deadlines": 70
     },
     "timestamp": "2025-12-04T15:46:09.345Z"
-  }
+  },
+  "deadlines": [
+    {
+      "date": "continuous",
+      "label": "Vendor Compliance Review",
+      "type": "review",
+      "description": "Vendor Compliance Review for E-Verify Executive Order 13465-Amending Executive Order 12989",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "SAM.gov Registration Renewal",
+      "type": "registration",
+      "description": "SAM.gov Registration Renewal for E-Verify Executive Order 13465-Amending Executive Order 12989",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Contracts & Procurement"
+  ]
 }

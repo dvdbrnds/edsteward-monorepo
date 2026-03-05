@@ -16,5 +16,35 @@
       "deadlines": 70
     },
     "timestamp": "2025-12-04T18:26:17.459Z"
-  }
+  },
+  "deadlines": [
+    {
+      "date": "02-01",
+      "label": "OSHA 300 Log Posting",
+      "type": "posting",
+      "description": "OSHA 300 Log Posting for Energy Reorganization Act of 1974, as amended",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "01-31",
+      "label": "Annual Safety Training",
+      "type": "training",
+      "description": "Annual Safety Training for Energy Reorganization Act of 1974, as amended",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Hazardous Waste Manifest Submission",
+      "type": "filing",
+      "description": "Hazardous Waste Manifest Submission for Energy Reorganization Act of 1974, as amended",
+      "isRecurring": true,
+      "recurrenceFrequency": "as-needed"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Environmental Health and Safety"
+  ]
 }

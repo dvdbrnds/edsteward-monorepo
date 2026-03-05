@@ -16,5 +16,27 @@
       "deadlines": 70
     },
     "timestamp": "2025-12-04T16:36:30.333Z"
-  }
+  },
+  "deadlines": [
+    {
+      "date": "continuous",
+      "label": "Annual Ethics Training",
+      "type": "training",
+      "description": "Annual Ethics Training for Acts Affecting a Personal Financial Interest",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "01-31",
+      "label": "Conflict of Interest Disclosure Review",
+      "type": "review",
+      "description": "Conflict of Interest Disclosure Review for Acts Affecting a Personal Financial Interest",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Ethics"
+  ]
 }

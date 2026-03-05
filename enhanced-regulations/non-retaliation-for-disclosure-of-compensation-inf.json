@@ -16,5 +16,27 @@
       "deadlines": 70
     },
     "timestamp": "2025-12-04T15:53:27.723Z"
-  }
+  },
+  "deadlines": [
+    {
+      "date": "continuous",
+      "label": "Vendor Compliance Review",
+      "type": "review",
+      "description": "Vendor Compliance Review for Non-Retaliation for Disclosure of Compensation Information",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "SAM.gov Registration Renewal",
+      "type": "registration",
+      "description": "SAM.gov Registration Renewal for Non-Retaliation for Disclosure of Compensation Information",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Contracts & Procurement,Recruitment Hiring & Termination"
+  ]
 }

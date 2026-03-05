@@ -16,5 +16,35 @@
       "deadlines": 70
     },
     "timestamp": "2025-12-05T00:59:12.869Z"
-  }
+  },
+  "deadlines": [
+    {
+      "date": "07-31",
+      "label": "Form 5500 Filing",
+      "type": "filing",
+      "description": "Form 5500 Filing for Medicare, Medicaid, and SCHIP Extension Act of 2007",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Summary Annual Report Distribution",
+      "type": "distribution",
+      "description": "Summary Annual Report Distribution for Medicare, Medicaid, and SCHIP Extension Act of 2007",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "COBRA Notice (as needed)",
+      "type": "notice",
+      "description": "COBRA Notice (as needed) for Medicare, Medicaid, and SCHIP Extension Act of 2007",
+      "isRecurring": true,
+      "recurrenceFrequency": "as-needed"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Employee Benefits"
+  ]
 }

@@ -16,5 +16,35 @@
       "deadlines": 70
     },
     "timestamp": "2025-12-05T02:21:26.821Z"
-  }
+  },
+  "deadlines": [
+    {
+      "date": "10-01",
+      "label": "FISAP Annual Report",
+      "type": "filing",
+      "description": "FISAP Annual Report for Student Loan Default Prevention Initiative Act of 1990",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "06-30",
+      "label": "Annual Financial Aid Audit",
+      "type": "audit",
+      "description": "Annual Financial Aid Audit for Student Loan Default Prevention Initiative Act of 1990",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "07-01",
+      "label": "Gainful Employment Disclosure Update",
+      "type": "disclosure",
+      "description": "Gainful Employment Disclosure Update for Student Loan Default Prevention Initiative Act of 1990",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Financial Aid"
+  ]
 }

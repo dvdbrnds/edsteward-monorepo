@@ -310,6 +310,72 @@ class DeliveryServer {
         }
       }
 
+      // Overlay bespoke config when available — audited tasks/deadlines/penalties/roles
+      const slug = regulationContent?.regulationId || regulationContent?.item_id || regulationId;
+      if (slug) {
+        try {
+          const cfgPath = path.join(__dirname, '..', 'client', 'public', 'regulations', `${slug}-config.js`);
+          if (fs.existsSync(cfgPath)) {
+            const cfgText = fs.readFileSync(cfgPath, 'utf-8');
+            const cfgMatch = cfgText.match(/window\.REGULATION_CONFIG\s*=\s*(\{[\s\S]*\});?\s*$/m);
+            if (cfgMatch) {
+              const bespokeCfg = eval('(' + cfgMatch[1] + ')');
+              console.log(`📦 Bespoke config overlay for ${slug}: ${bespokeCfg.tasks?.length || 0} tasks, ${bespokeCfg.penalties?.length || 0} penalties, ${bespokeCfg.responsibleRoles?.length || 0} roles`);
+              if (bespokeCfg.tasks?.length > 0) {
+                // Flatten bespoke tasks into the format this code path expects
+                const flatTasks = [];
+                bespokeCfg.tasks.forEach((task, idx) => {
+                  const parentId = idx + 1;
+                  flatTasks.push({
+                    id: parentId,
+                    title: task.title,
+                    description: task.description || task.title,
+                    priority: task.priority || 'medium',
+                    category: task.category || 'Uncategorized',
+                    statutoryCitation: task.statutoryCitation || '',
+                    statutoryLanguage: task.statutoryLanguage || '',
+                    assignedRole: task.assignedRole || '',
+                    evidenceRequired: task.evidenceRequired || '',
+                    sortOrder: idx
+                  });
+                  if (task.subtasks) {
+                    task.subtasks.forEach((st, si) => {
+                      flatTasks.push({
+                        id: parentId * 1000 + si,
+                        parentTaskId: parentId,
+                        parent_task_id: parentId,
+                        title: st.title,
+                        description: st.description || st.title,
+                        priority: st.priority || 'medium',
+                        category: task.category || 'Uncategorized',
+                        statutoryCitation: st.statutoryCitation || '',
+                        sortOrder: idx * 100 + si
+                      });
+                    });
+                  }
+                });
+                regulationContent.complianceTasks = flatTasks;
+              }
+              if (bespokeCfg.deadlines?.length > 0) {
+                regulationContent.filingDeadlines = bespokeCfg.deadlines;
+              }
+              if (bespokeCfg.penalties?.length > 0) {
+                regulationContent.penalties = bespokeCfg.penalties;
+              }
+              if (bespokeCfg.responsibleRoles?.length > 0) {
+                regulationContent.responsibleRoles = bespokeCfg.responsibleRoles;
+              }
+              if (bespokeCfg.relatedRegulations?.length > 0) {
+                regulationContent.relatedRegulations = bespokeCfg.relatedRegulations;
+              }
+              regulationContent._bespokeSource = true;
+            }
+          }
+        } catch (cfgErr) {
+          console.warn(`⚠️ Could not load bespoke config for ${slug}:`, cfgErr.message);
+        }
+      }
+
       // Push to each customer
       const results = [];
       for (const customer of targetCustomers) {
@@ -438,7 +504,8 @@ class DeliveryServer {
               statutoryRole: task.statutory_role || task.statutoryRole || '',
               statutoryCitation: task.statutory_citation || task.statutoryCitation || '',
               assignedRole: this.normalizeRole(task.assignedRole || task.assigned_role) || '',
-              evidenceRequired: task.evidenceRequired || task.evidence_required || false,
+              evidenceRequired: typeof task.evidenceRequired === 'string' ? true : (typeof task.evidence_required === 'string' ? true : !!(task.evidenceRequired || task.evidence_required)),
+              evidenceDescription: (typeof task.evidenceRequired === 'string' ? task.evidenceRequired : '') || (typeof task.evidence_required === 'string' ? task.evidence_required : '') || '',
               evidenceType: task.evidenceType || task.evidence_type || 'document',
               sortOrder: task.sortOrder || task.sort_order || 0,
               estimatedEffort: task.estimatedEffort || task.estimated_effort || '',
@@ -563,8 +630,28 @@ class DeliveryServer {
             relatedRegulations: Array.isArray(regulationContent.relatedRegulations) ? regulationContent.relatedRegulations : [],
 
             // ═══════════════════════════════════════════════════════════
+            // PENALTIES & RESPONSIBLE ROLES (from bespoke config)
+            // ═══════════════════════════════════════════════════════════
+            penalties: (regulationContent.penalties || []).map(p => ({
+              type: p.type || 'administrative',
+              description: p.description || '',
+              statutoryCitation: p.statutoryCitation || p.statutory_citation || '',
+              statutoryLanguage: p.statutoryLanguage || p.statutory_language || '',
+              severity: p.severity || 'high',
+              amount: p.amount || null,
+              enforcingAgency: p.enforcingAgency || p.enforcing_agency || ''
+            })),
+            responsibleRoles: (regulationContent.responsibleRoles || []).map(r => ({
+              role: r.role || '',
+              statutoryCitation: r.statutoryCitation || '',
+              responsibilities: r.responsibilities || ''
+            })),
+
+            // ═══════════════════════════════════════════════════════════
             // ADDITIONAL METADATA
             // ═══════════════════════════════════════════════════════════
+            bespokeSource: !!regulationContent._bespokeSource,
+            taskSyncMode: regulationContent._bespokeSource ? 'replace' : 'merge',
             agencyDepartment: regulationContent.agencyDepartment || regulationContent.agency_department || '',
             regulationUrl: regulationContent.regulationUrl || regulationContent.regulation_url || '',
             applicableInstitutions: regulationContent.applicableInstitutions || regulationContent.applicable_institutions || '',
@@ -576,7 +663,9 @@ class DeliveryServer {
             mcpEngineTimestamp: new Date().toISOString()
           };
           
-          console.log(`   📋 Sending ${hierarchicalTasks.length} tasks (hierarchy preserved)`);
+          const penaltyCount = payload.penalties?.length || 0;
+          const roleCount = payload.responsibleRoles?.length || 0;
+          console.log(`   📋 Sending ${hierarchicalTasks.length} tasks${penaltyCount ? ', ' + penaltyCount + ' penalties' : ''}${roleCount ? ', ' + roleCount + ' roles' : ''} ${regulationContent._bespokeSource ? '[BESPOKE replace]' : '(hierarchy preserved)'}`);
 
           const headers = { 'Content-Type': 'application/json' };
           const mcpApiKey = process.env.MCP_API_KEY || '';
@@ -950,6 +1039,14 @@ class DeliveryServer {
           WHERE regulation_id = $1
         `, [regulation.id]);
         
+        // Fetch penalties from database
+        const penaltiesResult = await this.pool.query(`
+          SELECT penalty_type, description, statutory_citation, statutory_language, severity, amount, enforcing_agency
+          FROM regulation_penalties 
+          WHERE regulation_id = $1
+          ORDER BY sort_order
+        `, [regulation.id]);
+        
         // Fetch executive orders affecting this regulation
         const eoResult = await this.pool.query(`
           SELECT 
@@ -988,15 +1085,120 @@ class DeliveryServer {
           confidenceScore: eo.confidence_score || 0.7
         }));
         
-        // Format compliance tasks for EdSteward
-        const complianceTasks = tasksResult.rows.map((task, index) => ({
-          taskId: task.task_id || `task-${regulation.reg_key}-${index}`,
-          title: task.title,
-          description: task.description || task.title,
-          priority: task.priority || 'medium',
-          requirementType: task.requirement_type || 'requirement'
+        // Check for bespoke config file — hand-audited data with statutory citations
+        let bespokeConfig = null;
+        const configDir = path.join(__dirname, '..', 'client', 'public', 'regulations');
+        const configPath = path.join(configDir, `${regulationSlug}-config.js`);
+        try {
+          if (fs.existsSync(configPath)) {
+            const configText = fs.readFileSync(configPath, 'utf-8');
+            const configMatch = configText.match(/window\.REGULATION_CONFIG\s*=\s*(\{[\s\S]*\});?\s*$/m);
+            if (configMatch) {
+              bespokeConfig = eval('(' + configMatch[1] + ')');
+              console.log(`📦 Bespoke config loaded for ${regulationSlug}: ${bespokeConfig.tasks?.length || 0} tasks, ${bespokeConfig.penalties?.length || 0} penalties, ${bespokeConfig.responsibleRoles?.length || 0} roles`);
+            }
+          }
+        } catch (cfgErr) {
+          console.warn(`⚠️ Could not load bespoke config for ${regulationSlug}:`, cfgErr.message);
+        }
+
+        // Format compliance tasks — prefer bespoke config over DB
+        let complianceTasks;
+        if (bespokeConfig?.tasks?.length > 0) {
+          complianceTasks = bespokeConfig.tasks.map((task, index) => ({
+            taskId: `task-${regulation.reg_key}-${index}`,
+            title: task.title,
+            description: task.description || task.title,
+            priority: task.priority || 'medium',
+            category: task.category || 'Uncategorized',
+            requirementType: 'requirement',
+            statutoryCitation: task.statutoryCitation || '',
+            statutoryLanguage: task.statutoryLanguage || '',
+            assignedRole: task.assignedRole || '',
+            evidenceRequired: task.evidenceRequired || '',
+            deadline: task.deadline || null,
+            subtasks: (task.subtasks || []).map((st, si) => ({
+              taskId: `task-${regulation.reg_key}-${index}-sub-${si}`,
+              title: st.title,
+              description: st.description || st.title,
+              priority: st.priority || 'medium',
+              statutoryCitation: st.statutoryCitation || ''
+            }))
+          }));
+        } else {
+          complianceTasks = tasksResult.rows.map((task, index) => ({
+            taskId: task.task_id || `task-${regulation.reg_key}-${index}`,
+            title: task.title,
+            description: task.description || task.title,
+            priority: task.priority || 'medium',
+            category: task.category || 'Uncategorized',
+            requirementType: task.requirement_type || 'requirement',
+            statutoryCitation: task.statutory_citation || '',
+            statutoryLanguage: '',
+            assignedRole: task.assigned_role || '',
+            evidenceRequired: task.evidence_required || '',
+            deadline: null,
+            subtasks: []
+          }));
+        }
+
+        // Deadlines — prefer bespoke config
+        const deadlines = bespokeConfig?.deadlines?.length > 0
+          ? bespokeConfig.deadlines.map(d => ({
+              name: d.name,
+              description: d.description,
+              frequency: d.frequency,
+              statutoryCitation: d.statutoryCitation || '',
+              recurringMonth: d.recurringMonth || null,
+              recurringDay: d.recurringDay || null
+            }))
+          : deadlinesResult.rows.map(d => ({
+              name: d.name,
+              description: d.description,
+              frequency: d.frequency,
+              statutoryCitation: '',
+              recurringMonth: d.recurring_month,
+              recurringDay: d.recurring_day
+            }));
+
+        // Penalties — prefer bespoke config
+        const penalties = bespokeConfig?.penalties?.length > 0
+          ? bespokeConfig.penalties.map(p => ({
+              type: p.type,
+              description: p.description,
+              statutoryCitation: p.statutoryCitation || '',
+              statutoryLanguage: p.statutoryLanguage || '',
+              severity: p.severity || 'high',
+              amount: p.amount || null,
+              enforcingAgency: p.enforcingAgency || ''
+            }))
+          : penaltiesResult.rows.map(p => ({
+              type: p.penalty_type,
+              description: p.description,
+              statutoryCitation: p.statutory_citation || '',
+              statutoryLanguage: p.statutory_language || '',
+              severity: p.severity || 'high',
+              amount: p.amount || null,
+              enforcingAgency: p.enforcing_agency || ''
+            }));
+
+        // Responsible roles — from bespoke config only
+        const responsibleRoles = (bespokeConfig?.responsibleRoles || []).map(r => ({
+          role: r.role,
+          statutoryCitation: r.statutoryCitation || '',
+          responsibilities: r.responsibilities || ''
         }));
-        
+
+        // Related regulations — from bespoke config only (informational cross-links)
+        const relatedRegulations = (bespokeConfig?.relatedRegulations || []).map(r => ({
+          id: r.id,
+          relationship: r.relationship || '',
+          type: r.type || 'related'
+        }));
+
+        // Count totals including subtasks
+        const subtaskTotal = complianceTasks.reduce((n, t) => n + (t.subtasks ? t.subtasks.length : 0), 0);
+
         // Build payload with real data
         const payload = {
           regulationId: regulation.id,
@@ -1008,34 +1210,34 @@ class DeliveryServer {
           topic: regulation.topic,
           summary: regulation.summary,
           effectiveDate: regulation.effective_date,
+          bespokeSource: !!bespokeConfig,
           complianceTasks,
-          deadlines: deadlinesResult.rows.map(d => ({
-            name: d.name,
-            description: d.description,
-            frequency: d.frequency,
-            recurringMonth: d.recurring_month,
-            recurringDay: d.recurring_day
-          })),
+          deadlines,
+          penalties,
+          responsibleRoles,
+          relatedRegulations,
           taskStats: {
-            total: tasksResult.rows.length,
-            requirements: tasksResult.rows.filter(t => t.requirement_type === 'requirement').length,
-            bestPractices: tasksResult.rows.filter(t => t.requirement_type === 'best_practice').length
+            total: complianceTasks.length + subtaskTotal,
+            sections: complianceTasks.length,
+            subtasks: subtaskTotal,
+            penalties: penalties.length,
+            roles: responsibleRoles.length,
+            deadlines: deadlines.length
           },
-          taskSyncMode: 'merge',  // Preserves completed tasks, updates pending, adds new
+          taskSyncMode: bespokeConfig ? 'replace' : 'merge',
           status: 'pending',
           metadata: {
-            source: 'MCP_ENGINE_GOLD_CERTIFIED',
+            source: bespokeConfig ? 'MCP_ENGINE_BESPOKE_AUDITED' : 'MCP_ENGINE_GOLD_CERTIFIED',
             timestamp: new Date().toISOString(),
             mcpEngineId: regulationSlug,
-            syncType: 'gold-certified-push',
-            // Executive Order data for EdSteward
+            syncType: bespokeConfig ? 'bespoke-audited-push' : 'gold-certified-push',
             executiveOrders,
             eo_count: executiveOrders.length,
             eo_critical_count: executiveOrders.filter(eo => eo.impactSeverity === 'critical').length
           }
         };
         
-        console.log(`📋 Sending ${regulation.reg_key}: ${complianceTasks.length} tasks (${payload.taskStats.requirements} req, ${payload.taskStats.bestPractices} best), ${executiveOrders.length} EOs`);
+        console.log(`📋 Sending ${regulation.reg_key}${bespokeConfig ? ' [BESPOKE]' : ''}: ${complianceTasks.length} tasks (${subtaskTotal} subtasks), ${penalties.length} penalties, ${responsibleRoles.length} roles, ${deadlines.length} deadlines, ${executiveOrders.length} EOs`);
         
         // Use local EdSteward for dev, production URL for prod
         const edstewardUrl = process.env.EDSTEWARD_URL || 'http://localhost:3000';

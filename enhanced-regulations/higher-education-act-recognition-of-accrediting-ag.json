@@ -1,11 +1,47 @@
 {
   "regulationId": "higher-education-act-recognition-of-accrediting-ag",
+  "schemaVersion": "2.0",
+  "jurisdiction": {
+    "source": "state",
+    "countryCode": "US",
+    "stateCodes": [
+      "PA"
+    ],
+    "label": "Pennsylvania",
+    "regulatoryBody": "Pennsylvania Department of Education",
+    "actNumber": null,
+    "applicability": "all"
+  },
   "enhanced": {
     "fullText": "The Higher Education Act's Recognition of Accrediting Agency or Association provision, codified at 20 U.S.C. § 1099b(a)(4)(A), establishes critical standards that accrediting agencies must enforce to maintain federal recognition and enable institutions to participate in Title IV federal student aid programs. This regulation requires accrediting agencies to enforce standards that respect institutional missions, including religious missions, while ensuring educational program quality meets stated objectives throughout the accreditation period.\n\nUnder 20 U.S.C. § 1099b(a)(4)(A) and implementing regulations at 34 CFR § 602.16, accrediting agencies must demonstrate they enforce standards requiring institutions to clearly define their missions and educational objectives, then maintain program quality sufficient to achieve those objectives. This applies to all instructional modalities, including traditional classroom instruction, distance education, and correspondence programs.\n\nThe Department of Education evaluates accrediting agencies against these criteria during initial recognition proceedings under 34 CFR § 602.31 and periodic review cycles under 34 CFR § 602.32. Agencies must provide evidence their standards address curriculum content, faculty qualifications, student achievement outcomes, and institutional resources adequate to support program delivery across all offered modalities.\n\nKey provisions include mission-based evaluation standards that allow institutions flexibility in defining educational objectives while requiring measurable outcomes. Accrediting agencies must enforce standards ensuring distance education and correspondence programs meet the same quality thresholds as traditional programs, addressing concerns about program integrity across delivery methods under 34 CFR § 602.17.\n\nEnforcement mechanisms include Department of Education authority to limit, suspend, or terminate accrediting agency recognition under 34 CFR § 602.36 for failure to meet statutory requirements. Institutions accredited by non-recognized agencies lose Title IV eligibility, creating significant financial consequences. The Department conducts compliance reviews and may impose conditions on recognition requiring corrective actions within specified timeframes.\n\nRecent regulatory updates through the 2020 accreditation regulations strengthened requirements for outcome-based standards and clarified agency obligations for distance education oversight, emphasizing student achievement measures and institutional capacity assessments.",
     "summary": "Requires federal recognized accrediting agencies to enforce standards respecting institutional missions while ensuring all educational programs, including distance education, maintain sufficient quality to achieve stated objectives throughout accreditation periods.",
     "requirements": "## Mission-Based Standards Enforcement\n- Develop and enforce standards that respect institutional stated missions, including religious missions\n- Require institutions to clearly articulate educational objectives for all programs\n- Ensure evaluation criteria align with institutional mission and program goals\n\n## Program Quality Assurance\n- Enforce standards ensuring sufficient program quality to achieve stated objectives\n- Apply consistent quality thresholds across all instructional modalities\n- Require adequate curriculum, faculty, and resources for program delivery\n- Monitor student achievement outcomes relative to program objectives\n\n## Distance Education Oversight\n- Apply equivalent standards to distance education and correspondence programs\n- Verify institutional capacity for effective distance education delivery\n- Ensure appropriate student authentication and academic integrity measures\n- Assess technology infrastructure and student support services\n\n## Documentation and Evidence\n- Maintain records demonstrating standard enforcement throughout accreditation periods\n- Provide evidence of institutional compliance with mission-based objectives\n- Document remedial actions for institutions failing to meet quality standards",
     "reportingRequirements": "Accrediting agencies must submit annual reports to the Department of Education demonstrating enforcement of mission-based quality standards by March 31st each year. Agencies must report accreditation actions, institutional compliance findings, and corrective measures taken within 30 days of formal decisions per 34 CFR § 602.28."
   },
+  "deadlines": [
+    {
+      "date": "continuous",
+      "label": "Accreditation Self-Study Preparation",
+      "type": "preparation",
+      "description": "Accreditation Self-Study Preparation for Higher Education Act: Recognition of Accrediting Agency or Association",
+      "isRecurring": true,
+      "recurrenceFrequency": "periodic"
+    },
+    {
+      "date": "continuous",
+      "label": "Substantive Change Notification",
+      "type": "notification",
+      "description": "Substantive Change Notification for Higher Education Act: Recognition of Accrediting Agency or Association",
+      "isRecurring": true,
+      "recurrenceFrequency": "as-needed"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Accreditation",
+    "Institutional Standards",
+    "Quality Assurance"
+  ],
   "audit": {
     "score": 96,
     "certainty": "A",
@@ -16,5 +52,7 @@
       "deadlines": 70
     },
     "timestamp": "2025-12-04T20:23:05.358Z"
-  }
+  },
+  "statute": "24 P.S. § 6803 et seq.",
+  "topic": "General"
 }

@@ -153,6 +153,32 @@
             padding-right: 24px;
         }
         
+        
+        .btn-home {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 7px 12px;
+            background: #f1f5f9;
+            color: #475569;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            white-space: nowrap;
+        }
+        .btn-home:hover {
+            background: #e2e8f0;
+            color: #1e293b;
+            border-color: #cbd5e1;
+        }
+        .btn-home .icon {
+            font-size: 14px;
+        }
+
         .toolbar-primary {
             display: flex;
             align-items: center;
@@ -1479,9 +1505,23 @@
                 </div>
             </div>
             
+            <!-- STATE REGULATION BANNER (hidden for federal, shown for state via JS) -->
+            <div id="state-regulation-banner" style="display: none; background: linear-gradient(135deg, #1e3a5f, #2563eb); color: white; padding: 12px 20px; border-radius: 8px; margin-bottom: 12px; align-items: center; gap: 12px; box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);">
+                <div style="font-size: 24px;">🏛️</div>
+                <div style="flex: 1;">
+                    <div id="state-banner-title" style="font-weight: 700; font-size: 13px; letter-spacing: 0.5px;">STATE REGULATION</div>
+                    <div id="state-banner-note" style="font-size: 11px; opacity: 0.85; margin-top: 2px;">Primary source: State legislature / State Dept. of Education &mdash; Federal sources shown below are cross-references only.</div>
+                </div>
+                <div id="state-banner-statute" style="background: rgba(255,255,255,0.15); padding: 4px 12px; border-radius: 4px; font-size: 11px; font-weight: 600; white-space: nowrap;"></div>
+            </div>
+
             <!-- Action Toolbar - Sticky at top -->
             <div class="action-toolbar">
                 <div class="toolbar-primary">
+                    <a href="/" class="btn-home" title="Back to Dashboard">
+                        <span class="icon">←</span>
+                        <span>Dashboard</span>
+                    </a>
                     <button id="runButton" class="btn-execute" onclick="runLinearEngine()">
                         <span class="icon">▶</span>
                         <span>Execute Workflow</span>
@@ -1526,7 +1566,7 @@
                 <div class="regulation-header">
                     <h3>Complete Regulation Text & Analysis</h3>
                     <div class="regulation-meta">
-                        <span class="regulation-cite">Regulation: Junk Fax Prevention Act of 2005 (Junk Fax Prevention Act of) and Violence Against Women Act (VAWA)</span>
+                        <span class="regulation-cite">Regulation: Jeanne Clery Disclosure of Campus Security Policy and Campus Crime Statistics Act (Clery Act) and Violence Against Women Act (VAWA)</span>
                         <span class="regulation-status">Active</span>
                         <span class="regulation-template">Sexual Misconduct</span>
                     </div>
@@ -1560,13 +1600,17 @@
                                             <div id="data-reg-key" style="font-size: 18px; font-weight: 600;">--</div>
                                     </div>
                                         <div>
-                                            <div style="font-size: 11px; text-transform: uppercase; opacity: 0.7; margin-bottom: 4px;">USC Citation</div>
+                                            <div id="citation-label" style="font-size: 11px; text-transform: uppercase; opacity: 0.7; margin-bottom: 4px;">USC Citation</div>
                                             <div id="data-usc" style="font-size: 16px;">--</div>
                                         </div>
-                                        <div>
+                                        <div id="cfr-field">
                                             <div style="font-size: 11px; text-transform: uppercase; opacity: 0.7; margin-bottom: 4px;">CFR Citation</div>
                                             <div id="data-cfr" style="font-size: 16px;">--</div>
-                                    </div>
+                                        </div>
+                                        <div id="agency-field" style="display: none;">
+                                            <div style="font-size: 11px; text-transform: uppercase; opacity: 0.7; margin-bottom: 4px;">Enforcing Agency</div>
+                                            <div id="data-agency" style="font-size: 14px;">--</div>
+                                        </div>
                                         <div>
                                             <div style="font-size: 11px; text-transform: uppercase; opacity: 0.7; margin-bottom: 4px;">L.O.V.V. Level</div>
                                             <div id="data-lovv" style="font-size: 16px;">--</div>
@@ -1664,7 +1708,7 @@
                                         </div>
                             </div>
                                     <div style="margin-top: 12px; font-size: 11px; opacity: 0.8;">
-                                        Also includes: name, summary, requirements, statute, cfr, filingDeadlines JSON, complianceTasks JSON
+                                        <span id="payload-description-text">Also includes: name, summary, requirements, statute, cfr, filingDeadlines JSON, complianceTasks JSON</span>
                         </div>
                     </div>
                     
@@ -1849,7 +1893,7 @@
             <div class="console-output" id="consoleOutput" style="display: none;">
                 <div class="log-entry">
                     <span class="log-timestamp">[SYSTEM]</span>
-                    <span class="log-level-success">Junk Fax Prevention Act of 2005 (Junk Fax Prevention Act of) and Violence Against Women Act (VAWA) Console Initialized</span>
+                    <span class="log-level-success">Jeanne Clery Disclosure of Campus Security Policy and Campus Crime Statistics Act (Clery Act) and Violence Against Women Act (VAWA) Console Initialized</span>
                 </div>
                 <div class="log-entry">
                     <span class="log-timestamp">[CONFIG]</span>
@@ -1963,11 +2007,47 @@
                 </div>
             </div>
             <div class="step-indicator" id="stepIndicator">
-                <!-- STEP 1: Government Sources -->
+                <!-- STEP 0: STATE SOURCES (hidden for federal, shown for state via JS) -->
+                <div class="step-item pending" id="step0" style="display: none;">
+                    <div class="step-main">
+                    <span class="step-icon">○</span>
+                    <span id="step0-label">State Sources</span>
+                    </div>
+                    <div id="step0-primary-note" style="margin-left: 28px; font-size: 0.7em; color: #1e40af; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 4px; padding: 4px 8px; margin-top: 4px; margin-bottom: 4px;">
+                        🏛️ Primary authoritative sources for this state law
+                    </div>
+                    <div class="step-substeps" style="margin-left: 28px; font-size: 0.85em; color: #666; margin-top: 6px; line-height: 1.8;">
+                        <div class="substep" id="substep-enhanced-json" style="display: flex; align-items: center; gap: 10px;">
+                            <span class="substep-icon" style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #ccc; flex-shrink: 0;"></span>
+                            <span class="substep-name" style="flex: 1;">Enhanced Regulation JSON</span>
+                            <span class="substep-confidence" id="conf-enhanced-json" style="color: #22c55e; font-weight: 500;"></span>
+                        </div>
+                        <div class="substep" id="substep-openstates" style="display: flex; align-items: center; gap: 10px;">
+                            <span class="substep-icon" style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #ccc; flex-shrink: 0;"></span>
+                            <span class="substep-name" style="flex: 1;">Open States API</span>
+                            <span class="substep-confidence" id="conf-openstates" style="color: #22c55e; font-weight: 500;"></span>
+                        </div>
+                        <div class="substep" id="substep-state-legislature" style="display: flex; align-items: center; gap: 10px;">
+                            <span class="substep-icon" style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #ccc; flex-shrink: 0;"></span>
+                            <span class="substep-name" id="substep-state-legislature-name" style="flex: 1;">State Legislature</span>
+                            <span class="substep-confidence" id="conf-state-legislature" style="color: #22c55e; font-weight: 500;"></span>
+                        </div>
+                        <div class="substep" id="substep-state-code" style="display: flex; align-items: center; gap: 10px;">
+                            <span class="substep-icon" style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #ccc; flex-shrink: 0;"></span>
+                            <span class="substep-name" id="substep-state-code-name" style="flex: 1;">State Code &amp; Bulletin</span>
+                            <span class="substep-confidence" id="conf-state-code" style="color: #22c55e; font-weight: 500;"></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- STEP 1: Government Sources (federal) / Federal Cross-References (state) -->
                 <div class="step-item pending" id="step1">
                     <div class="step-main">
                     <span class="step-icon">○</span>
-                    <span>Government Sources</span>
+                    <span id="step1-label">Government Sources</span>
+                    </div>
+                    <div id="step1-crossref-note" style="display: none; margin-left: 28px; font-size: 0.7em; color: #b45309; background: #fffbeb; border: 1px solid #fde68a; border-radius: 4px; padding: 4px 8px; margin-top: 4px; margin-bottom: 4px;">
+                        ⚠️ Informational only &mdash; not authoritative for this state law
                     </div>
                     <div class="step-substeps" style="margin-left: 28px; font-size: 0.85em; color: #666; margin-top: 6px; line-height: 1.8;">
                         <div class="substep" id="substep-ecfr" style="display: flex; align-items: center; gap: 10px;">
@@ -2460,15 +2540,28 @@
             if (isRunning) return;
             
             // ⚠️ CONFIRMATION REQUIRED - Workflow can overwrite curated data
-            const confirmed = confirm(
-                '⚠️ EXECUTE COMPREHENSIVE WORKFLOW?\n\n' +
-                'This will:\n' +
-                '• Fetch data from government sources (eCFR, Federal Register)\n' +
-                '• Run AI analysis on regulation text\n' +
-                '• Update the database with new data\n\n' +
-                '🔒 Protected fields (regulation_text, requirements) on locked regulations will NOT be overwritten.\n\n' +
-                'Click OK to proceed or Cancel to abort.'
-            );
+            const isStateWorkflow = JURISDICTION_SOURCE === 'state';
+            const confirmMsg = isStateWorkflow
+                ? '⚠️ EXECUTE COMPREHENSIVE WORKFLOW?\n\n' +
+                  `🏛️ STATE REGULATION: ${REGULATION_NAME}\n` +
+                  `Primary source: ${STATE_CODE} State Legislature\n\n` +
+                  'This will:\n' +
+                  '• Check federal sources for cross-references\n' +
+                  '• Run AI analysis on regulation text\n' +
+                  '• Extract compliance tasks, deadlines, and penalties\n' +
+                  '• Update the database with new data\n\n' +
+                  'NOTE: Federal source results are cross-references only,\n' +
+                  'not authoritative validation of this state law.\n\n' +
+                  '🔒 Protected fields on locked regulations will NOT be overwritten.\n\n' +
+                  'Click OK to proceed or Cancel to abort.'
+                : '⚠️ EXECUTE COMPREHENSIVE WORKFLOW?\n\n' +
+                  'This will:\n' +
+                  '• Fetch data from government sources (eCFR, Federal Register)\n' +
+                  '• Run AI analysis on regulation text\n' +
+                  '• Update the database with new data\n\n' +
+                  '🔒 Protected fields (regulation_text, requirements) on locked regulations will NOT be overwritten.\n\n' +
+                  'Click OK to proceed or Cancel to abort.';
+            const confirmed = confirm(confirmMsg);
             
             if (!confirmed) {
                 console.log('Workflow execution cancelled by user');
@@ -2502,7 +2595,7 @@
             try {
                 addConsoleLog('🚀 MCP ENGINE COMPREHENSIVE WORKFLOW', 'step');
                 addConsoleLog('═══════════════════════════════════════════════════════════════════', 'info');
-                addConsoleLog('📋 Regulation: Junk Fax Prevention Act of (REG-117)', 'info');
+                addConsoleLog(`📋 Regulation: ${REGULATION_NAME} (${REG_KEY})`, 'info');
                 addConsoleLog('⚠️  NO MOCK DATA - All API calls are REAL government sources', 'info');
                 addConsoleLog('', 'info');
                 
@@ -2535,16 +2628,125 @@
                 addConsoleLog(`✅ Workflow ${result.workflowId} initiated`, 'success');
                 addConsoleLog('', 'info');
                 
+                const govSources = result.steps?.governmentSources?.data || result.compliancePackage?.sourceValidation;
+                const crossRef = result.steps?.legalValidation?.data;
+                
                 // ═══════════════════════════════════════════════════════════════
-                // STEP 1: GOVERNMENT SOURCES - Show EACH source individually
+                // STEP 0: STATE SOURCE COLLECTION (only for state regulations)
+                // ═══════════════════════════════════════════════════════════════
+                if (JURISDICTION_SOURCE === 'state') {
+                    currentStep = 0;
+                    const step0El = document.getElementById('step0');
+                    if (step0El) {
+                        step0El.className = 'step-item running';
+                        const icon = step0El.querySelector('.step-icon');
+                        if (icon) icon.textContent = '◉';
+                    }
+                    addConsoleLog(`🏛️  STEP 0: ${STATE_CODE} STATE SOURCE COLLECTION (PRIMARY)`, 'step');
+                    addConsoleLog('───────────────────────────────────────────────────────────────────', 'info');
+                    addConsoleLog(`   This is a ${STATE_CODE} STATE law. Fetching from state sources.`, 'info');
+                    addConsoleLog('', 'info');
+                    
+                    const stateSources = govSources?.stateSources?.sources || {};
+                    const stateValidation = govSources?.stateSources?.sourceValidation || result.compliancePackage?.sourceValidation?.stateSources || {};
+                    
+                    // Enhanced Regulation JSON
+                    const enhJson = stateSources.enhancedJson || stateValidation.enhancedJson;
+                    if (enhJson) {
+                        const ok = enhJson.success || enhJson.status === 'verified';
+                        addConsoleLog(`   ${ok ? '✅' : '❌'} Enhanced Regulation JSON (curated statute text)`, ok ? 'success' : 'info');
+                        if (ok) {
+                            addConsoleLog(`      └─ Full text: ${enhJson.length || 'loaded'} chars`, 'debug');
+                            addConsoleLog(`      └─ Citation: ${enhJson.citation || govSources?.stateSources?.citation || ''}`, 'debug');
+                        } else {
+                            addConsoleLog(`      └─ Error: ${enhJson.error || 'unavailable'}`, 'debug');
+                        }
+                        updateSubstep('enhanced-json', ok ? 'completed' : 'failed', ok ? 95 : 0, ok ? null : enhJson.error);
+                        metrics.apiCalls++;
+                    } else {
+                        updateSubstep('enhanced-json', 'failed', 0, 'Not returned');
+                    }
+                    
+                    // Open States API
+                    const openStates = stateSources.openStates || stateValidation.openStates;
+                    if (openStates) {
+                        const ok = openStates.success || openStates.status === 'verified';
+                        const unconfigured = openStates.error === 'No API key configured' || openStates.status === 'unconfigured';
+                        addConsoleLog(`   ${ok ? '✅' : (unconfigured ? '🔑' : '⚠️ ')} Open States API (bill tracking)`, ok ? 'success' : 'info');
+                        if (ok) {
+                            addConsoleLog(`      └─ Bill: ${openStates.billId || ''} (${openStates.session || ''})`, 'debug');
+                            addConsoleLog(`      └─ Actions: ${openStates.actions?.length || 0} legislative actions tracked`, 'debug');
+                        } else {
+                            addConsoleLog(`      └─ ${unconfigured ? 'API key not configured (OPEN_STATES_API_KEY)' : openStates.error || 'unavailable'}`, 'debug');
+                        }
+                        updateSubstep('openstates', ok ? 'completed' : (unconfigured ? 'requires_key' : 'failed'), ok ? 80 : 0, ok ? null : openStates.error);
+                        metrics.apiCalls++;
+                    } else {
+                        updateSubstep('openstates', 'failed', 0, 'Not returned');
+                    }
+                    
+                    // State Legislature
+                    const stateLeg = stateSources.legislature || stateValidation.legislature;
+                    if (stateLeg) {
+                        const ok = stateLeg.success || stateLeg.status === 'verified';
+                        addConsoleLog(`   ${ok ? '✅' : '⚠️ '} ${STATE_CODE} Legislature`, ok ? 'success' : 'info');
+                        if (ok) {
+                            addConsoleLog(`      └─ Statute text: ${stateLeg.length || 'loaded'} chars`, 'debug');
+                            addConsoleLog(`      └─ URL: ${stateLeg.url || ''}`, 'debug');
+                        } else {
+                            addConsoleLog(`      └─ ${stateLeg.error || 'unavailable'}`, 'debug');
+                        }
+                        updateSubstep('state-legislature', ok ? 'completed' : 'failed', ok ? 90 : 0, ok ? null : stateLeg.error);
+                        metrics.apiCalls++;
+                    } else {
+                        updateSubstep('state-legislature', 'failed', 0, 'Not returned');
+                    }
+                    
+                    // State Code & Bulletin
+                    const stateCode = stateSources.adminCode || stateValidation.adminCode;
+                    if (stateCode) {
+                        const ok = stateCode.success || stateCode.status === 'verified';
+                        addConsoleLog(`   ${ok ? '✅' : '⚠️ '} ${STATE_CODE} Code & Bulletin (admin regulations)`, ok ? 'success' : 'info');
+                        if (ok) {
+                            addConsoleLog(`      └─ Code text: ${stateCode.length || 'loaded'} chars`, 'debug');
+                        } else {
+                            addConsoleLog(`      └─ ${stateCode.error || 'Not yet codified'}`, 'debug');
+                        }
+                        updateSubstep('state-code', ok ? 'completed' : 'failed', ok ? 85 : 0, ok ? null : stateCode.error);
+                        metrics.apiCalls++;
+                    } else {
+                        updateSubstep('state-code', 'failed', 0, 'No admin code mapping');
+                    }
+                    
+                    // State sources summary
+                    const stateSuccessful = govSources?.stateSources?.successfulSources || [];
+                    addConsoleLog('', 'info');
+                    addConsoleLog(`   📊 State Sources: ${stateSuccessful.length}/4 successful`, stateSuccessful.length > 0 ? 'success' : 'warning');
+                    addConsoleLog(`   📊 Primary text: ${govSources?.stateSources?.length || 0} chars loaded`, 'info');
+                    
+                    if (step0El) {
+                        step0El.className = 'step-item completed';
+                        const icon = step0El.querySelector('.step-icon');
+                        if (icon) icon.textContent = '✓';
+                    }
+                    updateProgress(10);
+                    addConsoleLog('', 'info');
+                }
+                
+                // ═══════════════════════════════════════════════════════════════
+                // STEP 1: GOVERNMENT SOURCES (federal) / FEDERAL CROSS-REFERENCES (state)
                 // ═══════════════════════════════════════════════════════════════
                 currentStep = 1;
                 updateStepStatus(1, 'running');
-                addConsoleLog('📖 STEP 1: GOVERNMENT SOURCE COLLECTION', 'step');
-                addConsoleLog('───────────────────────────────────────────────────────────────────', 'info');
-                
-                const govSources = result.steps?.governmentSources?.data || result.compliancePackage?.sourceValidation;
-                const crossRef = result.steps?.legalValidation?.data;
+                if (JURISDICTION_SOURCE === 'state') {
+                    addConsoleLog('🔗 STEP 1: FEDERAL CROSS-REFERENCE COLLECTION (informational)', 'step');
+                    addConsoleLog('───────────────────────────────────────────────────────────────────', 'info');
+                    addConsoleLog('⚠️  Federal sources below are cross-references only.', 'warning');
+                    addConsoleLog('', 'info');
+                } else {
+                    addConsoleLog('📖 STEP 1: GOVERNMENT SOURCE COLLECTION', 'step');
+                    addConsoleLog('───────────────────────────────────────────────────────────────────', 'info');
+                }
                 
                 // eCFR (Code of Federal Regulations)
                 const ecfr = crossRef?.governmentSources?.ecfr || govSources?.ecfr;
@@ -2896,7 +3098,7 @@
                 addConsoleLog('───────────────────────────────────────────────────────────────────', 'info');
                 
                 addConsoleLog(`   📦 Package ID: ${result.workflowId}`, 'info');
-                addConsoleLog(`   📦 Regulation: ${pkg?.regKey || 'REG-117'} - Junk Fax Prevention Act of`, 'info');
+                addConsoleLog(`   📦 Regulation: ${pkg?.regKey || REG_KEY} - ${REGULATION_NAME}`, 'info');
                 addConsoleLog(`   📦 Status: ${result.status?.toUpperCase() || 'READY'}`, 'success');
                 addConsoleLog('', 'info');
                 
@@ -3032,7 +3234,7 @@
                 const changeType = data.data?.changeType || data.data?.after?.summary?.changeType || 'update';
                 const impact = data.data?.after?.summary?.impact || 'medium';
                 
-                addConsoleLog(`📋 REAL-TIME UPDATE: Junk Fax Prevention Act of 2005 (Junk Fax Prevention Act of) and Violence Against Women Act (VAWA) regulation updated (v${version})`, 'update');
+                addConsoleLog(`📋 REAL-TIME UPDATE: Jeanne Clery Disclosure of Campus Security Policy and Campus Crime Statistics Act (Clery Act) and Violence Against Women Act (VAWA) regulation updated (v${version})`, 'update');
                 addConsoleLog(`   - Change type: ${changeType}`, 'info');
                 addConsoleLog(`   - Impact level: ${impact}`, 'debug');
                 addConsoleLog(`   - Timestamp: ${new Date(data.timestamp).toLocaleString()}`, 'debug');
@@ -3108,7 +3310,7 @@
                     animation: slideIn 0.3s ease-out;
                 ">
                     <div style="font-weight: bold; margin-bottom: 8px;">
-                        📋 Junk Fax Prevention Act of 2005 (Junk Fax Prevention Act of) and Violence Against Women Act (VAWA) REGULATION UPDATED
+                        📋 Jeanne Clery Disclosure of Campus Security Policy and Campus Crime Statistics Act (Clery Act) and Violence Against Women Act (VAWA) REGULATION UPDATED
                     </div>
                     <div style="font-size: 13px; opacity: 0.9;">
                         Version: ${updateData.data?.after?.version || updateData.version || 'unknown'}<br>
@@ -3476,8 +3678,8 @@
         setTimeout(() => {
             addConsoleLog('🔧 System diagnostics initialized', 'info');
             addConsoleLog('📡 Monitoring API endpoints...', 'debug');
-            addConsoleLog('📋 Regulation preview loaded: Jeanne junk Disclosure Of Campus Security Policy ', 'info');
-            addConsoleLog('🎯 Jeanne junk Disclosure Of Campus Security Policy  LinearEngine ready for execution', 'info');
+            addConsoleLog('📋 Regulation preview loaded: Jeanne Clery Disclosure Of Campus Security Policy ', 'info');
+            addConsoleLog('🎯 Jeanne Clery Disclosure Of Campus Security Policy  LinearEngine ready for execution', 'info');
             
             // Initialize real-time updates
             addConsoleLog('🔗 Initializing real-time regulation updates...', 'info');
@@ -3551,9 +3753,12 @@
         
         const REGULATION_SLUG = 'junk-fax-prevention-act-of-2005';
         const REG_KEY = 'REG-117';  // Canonical regulation key for version control
+        const JURISDICTION_SOURCE = 'federal';  // 'federal' or 'state'
+        const STATE_CODE = '';  // 'PA', 'NJ', etc. (empty for federal)
+        const ENFORCING_AGENCY = '';  // State enforcing agency (empty for federal)
         let cachedRegulationData = null;
         let currentVersionData = null;
-        let REGULATION_NAME = 'Loading...';  // Will be set dynamically
+        let REGULATION_NAME = 'Junk Fax Prevention Act of 2005';  // Will be set dynamically
         
         // ============================================
         // DYNAMIC PAGE INITIALIZATION
@@ -3586,6 +3791,79 @@
                 }
             } catch (err) {
                 console.error('Failed to initialize regulation page:', err);
+            }
+        }
+        
+        /**
+         * Configure UI based on jurisdiction (federal vs state)
+         * Called once on page load — shows/hides elements, updates labels
+         */
+        function initializeJurisdictionUI() {
+            const isState = JURISDICTION_SOURCE === 'state';
+            const sc = STATE_CODE || '';
+            
+            const STATE_NAMES = { PA: 'Pennsylvania', NJ: 'New Jersey' };
+            const STATE_AGENCIES = {
+                PA: 'PA General Assembly / PA Dept. of Education',
+                NJ: 'NJ Office of the Secretary of Higher Education'
+            };
+            const STATE_LEGISLATURE_NAMES = {
+                PA: 'PA General Assembly',
+                NJ: 'NJ State Legislature'
+            };
+            const STATE_CODE_NAMES = {
+                PA: 'PA Code &amp; Bulletin',
+                NJ: 'NJ Administrative Code'
+            };
+            
+            // State Regulation Banner
+            const banner = document.getElementById('state-regulation-banner');
+            if (banner) {
+                if (isState) {
+                    banner.style.display = 'flex';
+                    const title = document.getElementById('state-banner-title');
+                    const note = document.getElementById('state-banner-note');
+                    if (title) title.textContent = `${(STATE_NAMES[sc] || sc).toUpperCase()} STATE REGULATION`;
+                    if (note) note.textContent = `Primary source: ${STATE_AGENCIES[sc] || 'State legislature'} — Federal sources shown below are cross-references only.`;
+                }
+            }
+            
+            // Legal Foundation: citation label + CFR vs Agency field
+            if (isState) {
+                const citLabel = document.getElementById('citation-label');
+                if (citLabel) citLabel.textContent = 'Statute Citation';
+                const cfrField = document.getElementById('cfr-field');
+                if (cfrField) cfrField.style.display = 'none';
+                const agencyField = document.getElementById('agency-field');
+                if (agencyField) agencyField.style.display = '';
+            }
+            
+            // Sidebar: STEP 0 (state sources)
+            const step0 = document.getElementById('step0');
+            if (step0) {
+                if (isState) {
+                    step0.style.display = '';
+                    const step0Label = document.getElementById('step0-label');
+                    if (step0Label) step0Label.textContent = `${sc} State Sources`;
+                    const legName = document.getElementById('substep-state-legislature-name');
+                    if (legName) legName.innerHTML = STATE_LEGISLATURE_NAMES[sc] || 'State Legislature';
+                    const codeName = document.getElementById('substep-state-code-name');
+                    if (codeName) codeName.innerHTML = STATE_CODE_NAMES[sc] || 'State Code &amp; Bulletin';
+                }
+            }
+            
+            // Sidebar: STEP 1 label for state = "Federal Cross-References"
+            if (isState) {
+                const step1Label = document.getElementById('step1-label');
+                if (step1Label) step1Label.textContent = 'Federal Cross-References';
+                const crossRefNote = document.getElementById('step1-crossref-note');
+                if (crossRefNote) crossRefNote.style.display = '';
+            }
+            
+            // Payload description
+            if (isState) {
+                const payloadDesc = document.getElementById('payload-description-text');
+                if (payloadDesc) payloadDesc.textContent = `Also includes: name, summary, requirements, statute, filingDeadlines JSON, complianceTasks JSON, jurisdictionSource: state, stateCode: ${sc}`;
             }
         }
         
@@ -3996,14 +4274,20 @@
                 const regKeyEl = document.getElementById('data-reg-key');
                 const uscEl = document.getElementById('data-usc');
                 const cfrEl = document.getElementById('data-cfr');
+                const agencyEl = document.getElementById('data-agency');
                 const lovvEl = document.getElementById('data-lovv');
-                
-                console.log('Section 1 elements:', { regKeyEl: !!regKeyEl, uscEl: !!uscEl, cfrEl: !!cfrEl, lovvEl: !!lovvEl });
                 
                 if (regKeyEl) regKeyEl.textContent = reg.reg_key || reg.regKey || '--';
                 if (uscEl) uscEl.textContent = reg.statute || '--';
                 if (cfrEl) cfrEl.textContent = reg.cfr || '--';
+                if (agencyEl) agencyEl.textContent = reg.agencyName || reg.agency_name || ENFORCING_AGENCY || '--';
                 if (lovvEl) lovvEl.textContent = reg.lovv_level || reg.lovvLevel || 'A';
+                
+                // Update state banner statute badge if state regulation
+                if (JURISDICTION_SOURCE === 'state') {
+                    const statuteBadge = document.getElementById('state-banner-statute');
+                    if (statuteBadge) statuteBadge.textContent = reg.statute || '';
+                }
                 
                 // SECTION 2: Risk Assessment
                 const riskAssessment = reg.risk_assessment || reg.riskAssessment || {};
@@ -4427,7 +4711,7 @@
                 const reg = await fetchRegulationData();
                 if (!reg) throw new Error('No regulation data');
                 
-                // IRS Score (junk is 96 - CRITICAL)
+                // IRS Score (Clery is 96 - CRITICAL)
                 const risk = reg.riskAssessment || { riskScore: 96, riskLevel: 'CRITICAL' };
                 const score = risk.riskScore || risk.risk_score || 96;
                 const level = risk.riskLevel || risk.risk_level || 'CRITICAL';
@@ -4445,7 +4729,7 @@
                     banner.style.background = 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)';
                 }
                 
-                // Risk factors (junk defaults)
+                // Risk factors (Clery defaults)
                 const factors = risk.riskFactors || {};
                 document.getElementById('rf-financial').textContent = factors.financialPenalty?.score || 30;
                 document.getElementById('rf-funding').textContent = factors.federalFunding?.score || 25;
@@ -4460,7 +4744,7 @@
                 
                 // Enforcement history
                 document.getElementById('enforcement-history').innerHTML = `
-                    <div style="margin-bottom: 8px;"><strong>Liberty University (2016):</strong> $14M fine - largest junk penalty ever</div>
+                    <div style="margin-bottom: 8px;"><strong>Liberty University (2016):</strong> $14M fine - largest Clery penalty ever</div>
                     <div style="margin-bottom: 8px;"><strong>Penn State (2012):</strong> $2.4M fine</div>
                     <div><strong>Average settlement:</strong> $500K-$2M</div>
                 `;
@@ -4484,16 +4768,19 @@
                 const riskFactors = riskAssessment.riskFactors || riskAssessment.risk_factors || {};
                 
                 // Build the EXACT EdSteward payload (matches delivery-server.js)
+                const regJurisdiction = reg.jurisdictionSource || reg.jurisdiction_source || JURISDICTION_SOURCE || 'federal';
+                const regStateCode = reg.stateCode || reg.state_code || STATE_CODE || '';
                 const payload = {
                     // Core Identity
-                    regKey: reg.reg_key || reg.regKey || 'REG-117',
+                    regKey: reg.reg_key || reg.regKey || REG_KEY,
                     regulationId: reg.regulationId || reg.id,
                     name: reg.name,
                     statute: reg.statute,
                     cfr: reg.cfr,
                     category: reg.category,
                     topic: reg.topic,
-                    jurisdictionSource: reg.jurisdictionSource || reg.jurisdiction_source || 'federal',
+                    jurisdictionSource: regJurisdiction,
+                    ...(regJurisdiction === 'state' ? { stateCode: regStateCode, countryCode: reg.countryCode || reg.country_code || 'US' } : {}),
                     
                     // Content
                     summary: reg.summary,
@@ -4897,7 +5184,7 @@
             // Add academic consensus note
             const consensusItem = document.createElement('li');
             const validationRate = Math.round((universities.filter(u => u.status === 'validated').length / universities.length) * 100);
-            consensusItem.innerHTML = `<strong>Academic Consensus:</strong> ${validationRate}% validation rate on Jeanne junk Disclosure Of Campus Security Policy  interpretation`;
+            consensusItem.innerHTML = `<strong>Academic Consensus:</strong> ${validationRate}% validation rate on Jeanne Clery Disclosure Of Campus Security Policy  interpretation`;
             list.appendChild(consensusItem);
             
             card.appendChild(titleElement);
@@ -4917,9 +5204,9 @@
             errorDiv.style.display = 'none';
             
             try {
-                console.log('📖 Fetching real Junk Fax Prevention Act of 2005 (Junk Fax Prevention Act of) and Violence Against Women Act (VAWA) CFR Implementation text from API...');
+                console.log('📖 Fetching real Jeanne Clery Disclosure of Campus Security Policy and Campus Crime Statistics Act (Clery Act) and Violence Against Women Act (VAWA) CFR Implementation text from API...');
                 
-                const response = await fetch('http://localhost:3004/api/llm/cfr/jeanne-junk-disclosure-of-campus-security-policy-');
+                const response = await fetch('http://localhost:3004/api/llm/cfr/jeanne-clery-disclosure-of-campus-security-policy-');
                 const result = await response.json();
                 
                 if (result.success && result.data) {
@@ -5027,7 +5314,7 @@
             try {
                 console.log('📋 Fetching real compliance guidance from API...');
                 
-                const response = await fetch('http://localhost:3004/api/llm/cfr/jeanne-junk-disclosure-of-campus-security-policy-');
+                const response = await fetch('http://localhost:3004/api/llm/cfr/jeanne-clery-disclosure-of-campus-security-policy-');
                 const result = await response.json();
                 
                 if (result.success && result.data) {
@@ -5228,11 +5515,11 @@
                 
                 // For demo purposes, use our generated requirements
                 const enhancedRequirements = {
-                    title: 'Jeanne junk Disclosure Of Campus Security Policy  Enhanced Requirements',
+                    title: 'Jeanne Clery Disclosure Of Campus Security Policy  Enhanced Requirements',
                     qualityScore: '100/100',
                     generatedAt: new Date().toISOString(),
                     apiKey: 'Requirements API Key (Second Key)',
-                    requirements: `**Key Compliance Requirements for Jeanne junk Disclosure Of Campus Security Policy :**
+                    requirements: `**Key Compliance Requirements for Jeanne Clery Disclosure Of Campus Security Policy :**
 
 1. **Technology Infrastructure Requirements**
    - IT Department must implement access control systems limiting content to enrolled students
@@ -5398,7 +5685,7 @@
                                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
                                     <div style="text-align: center;">
                                         <div style="font-size: 14px; font-weight: 600; color: #28a745;">${data.regulationSources.usc17_110.status.toUpperCase()}</div>
-                                        <div style="font-size: 12px; color: #6e7681;">Junk Fax Prevention Act of 2005 (Junk Fax Prevention Act of) and Violence Against Women Act (VAWA) CFR Implementation</div>
+                                        <div style="font-size: 12px; color: #6e7681;">Jeanne Clery Disclosure of Campus Security Policy and Campus Crime Statistics Act (Clery Act) and Violence Against Women Act (VAWA) CFR Implementation</div>
                                         <div style="font-size: 11px; color: #8b949e;">${data.regulationSources.usc17_110.source}</div>
                                     </div>
                                     <div style="text-align: center;">
@@ -5448,7 +5735,7 @@
             try {
                 console.log('📡 Fetching enhanced Regulation data for EdSteward preview...');
                 
-                const response = await fetch('http://localhost:3004/api/llm/cfr/enhanced/jeanne-junk-disclosure-of-campus-security-policy-?federal_register=true');
+                const response = await fetch('http://localhost:3004/api/llm/cfr/enhanced/jeanne-clery-disclosure-of-campus-security-policy-?federal_register=true');
                 const data = await response.json();
                 
                 if (!data.success) {
@@ -5640,7 +5927,7 @@
                 console.log('📡 Fetching complete Federal Register document list via LLM Gateway...');
                 
                 // Use our LLM Gateway endpoint to get all documents with debug info
-                const response = await fetch('http://localhost:3004/api/llm/cfr/enhanced/jeanne-junk-disclosure-of-campus-security-policy-?federal_register=true&debug=true&show_all_documents=true');
+                const response = await fetch('http://localhost:3004/api/llm/cfr/enhanced/jeanne-clery-disclosure-of-campus-security-policy-?federal_register=true&debug=true&show_all_documents=true');
                 const data = await response.json();
                 
                 console.log('📋 Full API response:', data);
@@ -5839,6 +6126,9 @@
         document.addEventListener('DOMContentLoaded', async function() {
             addConsoleLog('📋 MCP Engine Console Loading...', 'info');
             
+            // Configure UI for federal vs state jurisdiction
+            initializeJurisdictionUI();
+            
             // Initialize page with dynamic regulation data
             await initializeRegulationPage();
             
@@ -5875,11 +6165,11 @@
                     // Subscribe to updates for this specific regulation
                     const subscriptionMessage = {
                         type: 'subscribe',
-                        regulationIds: ['jeanne-junk-disclosure-of-campus-security-policy-'] // This will be replaced by console generator
+                        regulationIds: ['jeanne-clery-disclosure-of-campus-security-policy-'] // This will be replaced by console generator
                     };
                     
                     regulationWebSocket.send(JSON.stringify(subscriptionMessage));
-                    addConsoleLog('📋 Subscribed to Junk Fax Prevention Act of 2005 (Junk Fax Prevention Act of) and Violence Against Women Act (VAWA) updates', 'info');
+                    addConsoleLog('📋 Subscribed to Jeanne Clery Disclosure of Campus Security Policy and Campus Crime Statistics Act (Clery Act) and Violence Against Women Act (VAWA) updates', 'info');
                 };
                 
                 regulationWebSocket.onmessage = function(event) {

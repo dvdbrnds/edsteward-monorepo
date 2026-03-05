@@ -16,5 +16,43 @@
       "deadlines": 70
     },
     "timestamp": "2025-12-04T15:43:20.342Z"
-  }
+  },
+  "deadlines": [
+    {
+      "date": "10-01",
+      "label": "Annual Security Report (Clery)",
+      "type": "report",
+      "description": "Annual Security Report (Clery) for Higher Education Act: Drug and Alcohol Abuse Prevention",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "08-01",
+      "label": "Emergency Response Plan Review",
+      "type": "review",
+      "description": "Emergency Response Plan Review for Higher Education Act: Drug and Alcohol Abuse Prevention",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "10-01",
+      "label": "Fire Safety Report",
+      "type": "report",
+      "description": "Fire Safety Report for Higher Education Act: Drug and Alcohol Abuse Prevention",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "09-01",
+      "label": "Campus Security Authority Training",
+      "type": "training",
+      "description": "Campus Security Authority Training for Higher Education Act: Drug and Alcohol Abuse Prevention",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Campus Safety"
+  ]
 }

@@ -1,0 +1,2370 @@
+{
+  "createdAt": "2026-01-27T16:40:48.307Z",
+  "files": {
+    "code_style/react_hooks_linting/conditional_rendering_fix.md": {
+      "hash": "a6d797b95fe4c9e42bb56f523ef0e49cdacd3e32bd726c503a0abdd9ea7e632b",
+      "size": 1131
+    },
+    "structure/ci_cd_configuration/github_actions_removal.md": {
+      "hash": "668987a3a9731cc2ce8a252339eab6c41887bf64073d957283d49556f892eb96",
+      "size": 1129
+    },
+    "structure/aws_ecs_saml_deployment/step_by_step_process.md": {
+      "hash": "92fa5ff0e2ddba6a98833791a2a83061053b5e411a3dcc34c041a1540b04b27c",
+      "size": 812
+    },
+    "structure/codebase_structure/handbook_depth_analysis.md": {
+      "hash": "c0067147c0ecd7782a904696d970f3b2f84c8512202e8f363efabed15bbeb59a",
+      "size": 56
+    },
+    "structure/compliance_data_modeling/regulation_topics.md": {
+      "hash": "dc74780dc25af9155f0dc38258bbe778ef62981ed6553b59f2c8b72c5e9ccecc",
+      "size": 1531
+    },
+    "structure/dev_container_setup/mcp_engine_boot_process.md": {
+      "hash": "0db722398eb7171744f0f1048603d7d3443e707b455c386cd0b9c71e0c45d230",
+      "size": 1382
+    },
+    "structure/data_cleanup/mcp_alignment.md": {
+      "hash": "48272e57b05f963769de2e86b76dc23a1913f5a64297341917f552d0dcfbf71e",
+      "size": 1466
+    },
+    "structure/database_schema/project_overview.md": {
+      "hash": "10855702349b87d903fceae57ae32d069d68692f5cb6fbeda2eba4685c2aa1e0",
+      "size": 1184
+    },
+    "structure/database_schema/neon_db_regulation_data.md": {
+      "hash": "13ba01ecbafbe98588b7ef19b4a7f855078062f0d07e1b2d0235b6ef0d4f6e31",
+      "size": 1159
+    },
+    "structure/deployment/edsteward_ecs_deployment.md": {
+      "hash": "a794d736f24b3ca45ed081252ff9216aebf79738428eba9a4ca14a4ffe2624fe",
+      "size": 737
+    },
+    "structure/deployment/saml_production_setup.md": {
+      "hash": "bd6bb8040ddf1e6995b3f0fb8b773c77120c82ec12eb45025ac79895251a1b14",
+      "size": 590
+    },
+    "structure/deployment/saas_reboot_procedure.md": {
+      "hash": "ed55a5b50684b74b9e78d0fcbf564f2806f16f829fe3102742f8417c46a46e61",
+      "size": 1190
+    },
+    "structure/deployment/system_overview.md": {
+      "hash": "81a474604705144262796bf1ca9cfc69c2664b4a3e51f676dee27fcbb485afc7",
+      "size": 1141
+    },
+    "structure/database_migration/mcp_engine_data_store.md": {
+      "hash": "06f2a481267511440b0daa75b1ae8610c89e7b47a213a0f9d97dafe7efdd8bc4",
+      "size": 1226
+    },
+    "structure/database_migration/mcp_engine_postgresql_migration_prompt.md": {
+      "hash": "3dead29694a873fd8850b375f782d3b8c83145c49c110086bf823e753cc4b2e6",
+      "size": 1212
+    },
+    "structure/dev_environment/docker_transition.md": {
+      "hash": "90161ce28534cf44a737fb210b3acf94e1498d4a8fa2e2c01bca7f0f2bd48181",
+      "size": 3285
+    },
+    "structure/devcontainer_setup/mcp_engine_transition.md": {
+      "hash": "027cb42df1b5e19f5f479df0256d415eae848022cafe75e59771604c9c4eb033",
+      "size": 853
+    },
+    "structure/dev_environment/working_baseline.md": {
+      "hash": "bcd29f6b59a63915d0ffce2ec8f8ce5869463041dd4dcda5aa4d8992ad819d43",
+      "size": 1044
+    },
+    "structure/development_environment/docker_port_mapping.md": {
+      "hash": "502c3cdd273d6ca50237220d56d67de3835526146b183f8112b2e17aea81e46d",
+      "size": 1424
+    },
+    "structure/development_environment/devcontainer_alternatives.md": {
+      "hash": "81f79aa860c4a5d4652a7dfe3327aef70275d03f8aae6041f51b77a5c89fa784",
+      "size": 1596
+    },
+    "structure/documentation_workflow/merge_strategy_manual_preservation.md": {
+      "hash": "d1d5c1e6e529a7c8f85224ab462f8d21e4ae8c39df0e3c4b24f13418f1fdfc8a",
+      "size": 138
+    },
+    "structure/development_server_startup/edsteward_system_verification.md": {
+      "hash": "08666e6129b7a77cd3f1ca3a5b9a7ed3a0dfab862545a16615801f3370f97363",
+      "size": 534
+    },
+    "structure/docker_compose/mcp_engine_setup.md": {
+      "hash": "4fa57950ac0536679f024914cc7e9867fde2adabc33a7139ed74b9dafe5d239d",
+      "size": 1550
+    },
+    "structure/government_api_keys/configuration.md": {
+      "hash": "45eaa1bc4c793fa64febec83ee2f0bbcd7fdc4759f521efe09bb14799594a75e",
+      "size": 1012
+    },
+    "structure/handbook_codebase/sync_analysis.md": {
+      "hash": "3ff39b88ae19f05d89833756283bc6abb9edb2fb7880afc52a2dbe817c17681c",
+      "size": 202
+    },
+    "structure/documentation_workflow/handbook_update_merge.md": {
+      "hash": "d1d5c1e6e529a7c8f85224ab462f8d21e4ae8c39df0e3c4b24f13418f1fdfc8a",
+      "size": 138
+    },
+    "structure/handbook_codebase_sync/handbook_sync_analysis.md": {
+      "hash": "d52ab9f8a8a86ed5ca05616c39eff1776384394dcda1177bf82b055cfc838832",
+      "size": 228
+    },
+    "structure/handbook_codebase_sync/analysis_phases.md": {
+      "hash": "d52ab9f8a8a86ed5ca05616c39eff1776384394dcda1177bf82b055cfc838832",
+      "size": 228
+    },
+    "structure/handbook_codebase_analysis/sync_gap_detection.md": {
+      "hash": "d52ab9f8a8a86ed5ca05616c39eff1776384394dcda1177bf82b055cfc838832",
+      "size": 228
+    },
+    "structure/networking/mcp_port_coordination.md": {
+      "hash": "ab4eff1074f39185333d7b9787a9d39e21adf3ede0dd4e3a34beb65b8d237913",
+      "size": 1053
+    },
+    "structure/federal_register_metadata/migration_completed.md": {
+      "hash": "7d8853d3229847dde1a27fb231fd1f024e0ef8e70ba5a413ed39022698678321",
+      "size": 1595
+    },
+    "structure/handbook_workflow/merge_strategy.md": {
+      "hash": "d1d5c1e6e529a7c8f85224ab462f8d21e4ae8c39df0e3c4b24f13418f1fdfc8a",
+      "size": 138
+    },
+    "structure/local_development/startup_procedure.md": {
+      "hash": "bfcf818077f34800c3ad417bcb1e4358a1b75fa22e7c96cadf00855047f1d170",
+      "size": 591
+    },
+    "structure/monorepo_organization/repository_overview.md": {
+      "hash": "5c3c22a62813ab07a2696a85c5d9c5ddbc382f41bda5fc7fc35474d800ea5567",
+      "size": 1546
+    },
+    "structure/port_configuration/service_port_allocation.md": {
+      "hash": "d9f112ca28eb010bca851e856603c449d04641c1958dd025488a4d21a7de7e63",
+      "size": 1110
+    },
+    "structure/postgresql_migration/mcp_engine_details.md": {
+      "hash": "650fbe96b1155214b62b93eaa33e28c8f354bce5b4a5e36a46b26c644c5ab27c",
+      "size": 1698
+    },
+    "structure/okta_saml_configuration/development_app_setup.md": {
+      "hash": "86f296415558712cd5dfcef0c94ee3e905acb457e67b7649435e0685626ac9c2",
+      "size": 390
+    },
+    "structure/port_management/system_port_coordination.md": {
+      "hash": "b1cc8b8dda0ee7b88e72f29add79fe55b94c23a2fa31bcf5f07e9de143c09936",
+      "size": 1300
+    },
+    "structure/project_management/acquisition_readiness.md": {
+      "hash": "06832e7e8ebbcb15c7637bcc563318bdf60f563ad27df5e0237b8e2383699d2b",
+      "size": 504
+    },
+    "structure/project_organization/project_structure_and_files.md": {
+      "hash": "18f57b6009cf88f0572b0ef102e6efd9077933029f7c50d011302334745051f6",
+      "size": 1143
+    },
+    "structure/process_management/dev_server_startup.md": {
+      "hash": "d876304a86b5308e6c3d706992e17c50fdcdad3f0c4dc3d0c20da77eeed73ca9",
+      "size": 861
+    },
+    "structure/saml_setup/development_environment.md": {
+      "hash": "e451ec030e980e0c91bc9fde72c2df6dc4f5855ac3896ee612e8f5678de565df",
+      "size": 543
+    },
+    "structure/server_startup/operational_readiness.md": {
+      "hash": "00329ed07a19589016f3eb833f08ea15616ca2efc239c709801ae216aecd33ea",
+      "size": 384
+    },
+    "structure/process_management/pm2_implementation.md": {
+      "hash": "2ce8c9425ad2f7d8abf2559e93b028064d22896f451446a8f2a98e4ef86e904e",
+      "size": 2041
+    },
+    "structure/structural_analysis/handbook_sync_analysis.md": {
+      "hash": "3ff39b88ae19f05d89833756283bc6abb9edb2fb7880afc52a2dbe817c17681c",
+      "size": 202
+    },
+    "testing/bulk_actions/regulation_updates_delete.md": {
+      "hash": "48fca02f37ca80e6da86f3afc90332783e92932a367e0d0ffda22c6a6daeba7a",
+      "size": 2643
+    },
+    "structure/system_startup/operational_status.md": {
+      "hash": "7b3d6832c206a6a0cd6c1a210822410a381a141e8215c5af954658946f269c93",
+      "size": 1837
+    },
+    "testing/integration_tests/edsteward_compliance_task_generation.md": {
+      "hash": "d0159bf502c6d1d217953f9725de03afd4adacc1fd770f81ed650ed052a62dc4",
+      "size": 938
+    },
+    "structure/tenant_configuration/wossamotta_university_demo_tenant.md": {
+      "hash": "aff7e7222a9a201d1fb6173a921f8738bbef8fa458a63b65c6b4adf5485e1ca7",
+      "size": 1062
+    },
+    "testing/integration_tests/mcp_engine_websocket.md": {
+      "hash": "3acb8d33cef6b6dd5a2289ed6788de74cb537a9fd5ebf61b168493b341af5522",
+      "size": 478
+    },
+    "testing/manual_testing/comprehensive_script.md": {
+      "hash": "728518dfded66fae0a35428784dc224510b8ae6f602dee8c247124f13e228ae8",
+      "size": 2490
+    },
+    "structure/websocket_integration/mcp_engine_port_update.md": {
+      "hash": "81f4ab65a48d50051fd7a3bcdd06564d4705563b2c4474b3dac27f26d0f33c6a",
+      "size": 1317
+    },
+    "testing/merge_mechanic/validation_report.md": {
+      "hash": "8ef8752d6e7089fadf9e4510253b0bf64fe6e6ac68663ae77d1c6c249674f523",
+      "size": 3341
+    },
+    "testing/quality_assurance/assessment_framework_thresholds.md": {
+      "hash": "a5fa7cd3a2828f9235427ee956a248d518bdc629a0a20641645981026e362918",
+      "size": 127
+    },
+    "testing/mcp_edsteward_integration/websocket_realtime_updates.md": {
+      "hash": "320d1ebce1177a585cfd685f3a08109cb70fe7fe2433eb59c38831e6b655337f",
+      "size": 1859
+    },
+    "testing/parallel_regulatory_testing/coordinated_ide_prompts.md": {
+      "hash": "66ed36047ac30136dae729056a621ccc5bdc64eef8d9405ce54ca3e65f3a0ea5",
+      "size": 1764
+    },
+    "testing/websocket_integration/regulation_updates_verification.md": {
+      "hash": "12cb8c76d0a1af150c224be00d0fa732cf34ba05730f76f2b577e1694042469c",
+      "size": 1089
+    },
+    "testing/regulatory_compliance/complete_testing_manual.md": {
+      "hash": "00bf92b42e8944718bef13b00e80def8c4a01d31139106eb9f91be8c2ac29e7d",
+      "size": 1195
+    },
+    "testing/websocket_cdc_integration/mcp_engine_edsteward_verification.md": {
+      "hash": "b27cd1c2e7bf4e1c570e59c0c516304d960b5a6e5867360c440b7addd00124a8",
+      "size": 1694
+    },
+    "testing/test_coverage/vitest_setup.md": {
+      "hash": "0e1dca0b3b6d85450a95fe1bb4631b2e6b2ed2f911e6ece1ee8733f04236e512",
+      "size": 1108
+    },
+    "compliance/accessibility/wcag_2_1_aa_compliance.md": {
+      "hash": "ee59e94fdcd97e1d4c5883d3914ad7e4eca7727dea95664d69fa667f47092c74",
+      "size": 5639
+    },
+    "compliance/accessibility_attributes/edsteward_accessibility.md": {
+      "hash": "06680927099f27202b0d5abd0d9a01e371d20b25c4f7675930895c604b0f67e4",
+      "size": 1080
+    },
+    "compliance/admin_account_security/secret_admin_account.md": {
+      "hash": "122a38b6830945222f31099785f3f96b00a2b364c7340d870fa70f0a92378ec0",
+      "size": 1773
+    },
+    "compliance/api_rate_limiting/implementation.md": {
+      "hash": "4882360bb767143713b12f7be9ba987ee9f4e877cd0249914df7ae757b2c34f9",
+      "size": 1236
+    },
+    "compliance/acquisition_readiness/business_model_clarification.md": {
+      "hash": "3030491695fda6aced0bf8dd43d357b93f21b3dac81d29804ee792619235a941",
+      "size": 2537
+    },
+    "compliance/attestation_system/enhancements.md": {
+      "hash": "fae7572cc312ce73fc44c9c30d74f0d604ae44ab2deec7ef88ee2247bfaa823b",
+      "size": 1909
+    },
+    "compliance/ai_orchestration/cco_experience_analysis.md": {
+      "hash": "44ddaa17606f1f49b182f9bf216d91946e1ce470a2098ac2485200c7a5b09b55",
+      "size": 2054
+    },
+    "compliance/audit_trail/automatic_signature_generation.md": {
+      "hash": "b0243d81c6d750e33989be9dbb4e587af2dbe8becbc90acb53bac193e83cd6d1",
+      "size": 1996
+    },
+    "compliance/audit_trail/system_implementation.md": {
+      "hash": "a7f9d4e298615399fbb0a4d7e2939211dd4a02eafb8c290f03385b00d97c0fa0",
+      "size": 623
+    },
+    "compliance/audit_readiness/audit_committee_demo.md": {
+      "hash": "6fb2730fe490eefce9527faa8a4c0a129da8bc77ed01571b7c2fcf34c2fc4983",
+      "size": 1145
+    },
+    "compliance/audit_readiness/demo_script.md": {
+      "hash": "7a015542da2693032852d597f007c5f8796a680dcab20d8a7c6767cdf22c578d",
+      "size": 1102
+    },
+    "compliance/beta_deployment/moravian_university_readiness.md": {
+      "hash": "44dd166e04d8b30a779e537064cb164a2c6c5acb3fa9879aa08742a2bd1955ad",
+      "size": 1462
+    },
+    "compliance/authentication/okta_saml_setup.md": {
+      "hash": "faad2c3a1ae4e50099685709d78eaf6483f883d9d75a0f341458e13b8168fc3f",
+      "size": 473
+    },
+    "compliance/authentication/saml_sso_analysis.md": {
+      "hash": "2f7b9ec354ef5fda7f9cb8d6e50ca75d23ac4c0aa98b92dfb38c8f30652bafc5",
+      "size": 708
+    },
+    "compliance/beta_launch/mcp_system_playbook.md": {
+      "hash": "b31fac7eef693f689c982fc968ce114964576c2087b26caa602f46932ee9147b",
+      "size": 601
+    },
+    "compliance/code_analysis_quality_gates/standard_thresholds.md": {
+      "hash": "5e0440c9c5c2bd78e641a77c978e0d5ab5ad352ea26962c6ee9daa9a98e6ff2a",
+      "size": 126
+    },
+    "compliance/clery_act_task_generation/hierarchical_tasks.md": {
+      "hash": "2d6e5ac3c500a33fc58a9b7c526a2ca5662e373a44164fe788359d2b4be550a5",
+      "size": 1107
+    },
+    "compliance/board_audit_committee/report_system_pdf.md": {
+      "hash": "08dbc6030ba68d8cf64505f123bf27492bba6fb6f0b690567363928fa9d29c44",
+      "size": 1200
+    },
+    "compliance/console_version_registry/implementation.md": {
+      "hash": "18e4f198b2eff681a2da4f463257534143e04e2adff4c80532935d9960b85b57",
+      "size": 1438
+    },
+    "compliance/coppa_compliance/coppa_requirements.md": {
+      "hash": "6452d3fd75db0875eaa12afb737dc1cb5442ef058cb6b2007347cfda70a00452",
+      "size": 701
+    },
+    "compliance/codebase_verification/ai_agent_prompt.md": {
+      "hash": "71e7d27a8c9ca6c864fe8553e122cbe99c3794bf1e6d11b9fa641051d6209557",
+      "size": 1146
+    },
+    "compliance/compliance_tracker/system_analysis.md": {
+      "hash": "cd1bca6bd2ac6cad666c15b0808a69a93f3b240a16414cbf6ecfe1fe52e4df7e",
+      "size": 11854
+    },
+    "compliance/data_transfer_integrity/verification_system.md": {
+      "hash": "c69ef7f2251972b6df7965157a33ae74c99a6956226533450c02dd6b357c81b5",
+      "size": 2057
+    },
+    "compliance/data_protection/triple_backup_strategy.md": {
+      "hash": "1e759c0b5506a6fd6762623b804cdf5fd343904f500ebe065bc4e2e0e574d19d",
+      "size": 1140
+    },
+    "compliance/data_enrichment/mcp_engine_pre_alignment.md": {
+      "hash": "9834422b6aed1bf7b9cd54cd686135b47757f73f2abdeb612380b98f7b5ec460",
+      "size": 1362
+    },
+    "compliance/data_validation/audit_committee_demo.md": {
+      "hash": "4c28a12d0ad4b1831b9895f0aca2b2e3bef5a70d6b42668e536980c8c7a92cb6",
+      "size": 1079
+    },
+    "compliance/deadline_management/notification_timeline.md": {
+      "hash": "9efb0a6164324e1feccf1d94ae8eab2660c7603c49132d6a94f87a507883eab1",
+      "size": 1923
+    },
+    "compliance/data_validation/source_data_validator.md": {
+      "hash": "2ba1142757b0f707c07d68af53aef24dfbe5a44a727520f0a9c94638e558699d",
+      "size": 1961
+    },
+    "compliance/ecpa_compliance/ecpa_policy.md": {
+      "hash": "951df1812bd41c440973b6c84c6acda100b63fc6ada48a5222ed29d1951c656b",
+      "size": 692
+    },
+    "compliance/drug_free_schools_act/data_contamination.md": {
+      "hash": "4fa56c974172826cde086bbbe224cf82f2b52f5c142fe51c874fde2ee46fa152",
+      "size": 731
+    },
+    "compliance/drug_free_schools_act/policy.md": {
+      "hash": "06071b987a4f4f8d50bc84db658a88a6d90feca5261cf25df911da9f35d73700",
+      "size": 837
+    },
+    "compliance/disaster_recovery/code_backup_strategy.md": {
+      "hash": "17d5d666a3a52679f2cdbce73faa445851b12dd65b5ce79c485ccb67b4670cf6",
+      "size": 873
+    },
+    "compliance/disaster_recovery/saml_rollback.md": {
+      "hash": "0d75779cf8f355078c6199db6e28dac348d5c300070e9dea7a5cf595ce312bcd",
+      "size": 600
+    },
+    "compliance/edsteward_audit_system/comprehensive_implementation.md": {
+      "hash": "3657adcaf63f8adda3c34540cb91041ff2fdfca8d8c942e6ab8561f0db380991",
+      "size": 766
+    },
+    "compliance/edsteward_regulations/api_endpoints.md": {
+      "hash": "54075b6ee177a494b01a20cbc2d140cf3c30c3e0af0f6a0da6f52186443813e1",
+      "size": 1326
+    },
+    "compliance/edsteward_integration/compliance_task_generation.md": {
+      "hash": "9ae775b146deb0265c8c47960c40404f4802debf9164dd78edced40143a543dd",
+      "size": 1403
+    },
+    "compliance/edsteward_regulations/emergency_delivery.md": {
+      "hash": "917ebf20df87c5eae7e648271d0db71dcc33e17315d3336267cb825413837d35",
+      "size": 2126
+    },
+    "compliance/edsteward_integration/regulatory_data_transmission.md": {
+      "hash": "fd48fb56340f9ac1d056d8f9fc59471046b89bafd23e3d34c929cadd104f6108",
+      "size": 2338
+    },
+    "compliance/edsteward_regulatory_console/tab_refactor.md": {
+      "hash": "3309705fc02924b3f4c57110f1dd3075e427b004a4ed9eea9b178be3904ebee3",
+      "size": 1370
+    },
+    "compliance/executive_order_regulation_management/executive_order_integration.md": {
+      "hash": "24f3c9fd002c2e8c8eb5ffa799ba184a84beeb58fe6a9c79eac8ad7cef2edac9",
+      "size": 2903
+    },
+    "compliance/equity_in_athletics_disclosure_act/eada_requirements.md": {
+      "hash": "58a95d08c814b181233166b462d08453edcf6ab4d2acae803a3b32a8d61a526b",
+      "size": 699
+    },
+    "compliance/epcra_regulations/reg_019_epcra.md": {
+      "hash": "9f8e051770c28cf8d7439adaa912abc3b0b4795f937de6af103c4d36599fcac0",
+      "size": 796
+    },
+    "compliance/email_attestation/one_click_attestation.md": {
+      "hash": "5c7a2267e9c602eaf3c40ddbb80b57ac16bd920648ee4c49ee8b209c0f1b7134",
+      "size": 1847
+    },
+    "compliance/email_attestation/feature_implementation.md": {
+      "hash": "a6e2a16a4c15223382b65302d7a13ee8a21a0c668b8de115e20be53bac0aa1ba",
+      "size": 1584
+    },
+    "compliance/export_compliance/export_regulations_update.md": {
+      "hash": "3becc12d3471208dad14d40005b0df56d001fc2ce081d214689e0ee8664c29c0",
+      "size": 647
+    },
+    "compliance/executive_order_tracking/ai_summarization.md": {
+      "hash": "fdfd571cb22cc9db40ad6fea102e84b356f081f2413b5547a0f14964614e2206",
+      "size": 1045
+    },
+    "compliance/executive_orders_integration/edsteward_executive_orders.md": {
+      "hash": "3b091cb2294ffdec3ef059b742f0e8579cdeb0b9d0aa2869d3cc41f667ff41ac",
+      "size": 847
+    },
+    "compliance/ferpa_certification/gold_standard_certification.md": {
+      "hash": "ff712ea5ebb7800f4f12252897b9ad27e06473a4572aba73f188dbf7cf0ba657",
+      "size": 1124
+    },
+    "compliance/flight_training_agreements/university_adaptation.md": {
+      "hash": "9889484e6c1c5c0aab9a0dc2483fc2f51213d6188653dd98304a691cb87a3a26",
+      "size": 836
+    },
+    "compliance/gold_standard_certification/console_version_control_gui.md": {
+      "hash": "1b9b264ba2d2c0c954957554cf03b3e940a76ac706ed1cee1702a7f196759f60",
+      "size": 1477
+    },
+    "compliance/gdpr_compliance/regulation_package_delivery.md": {
+      "hash": "cded4e8e0baef77814d53e8f4ae5d33c8dce4ef40d835d4c3f46e57bb053819e",
+      "size": 1351
+    },
+    "compliance/hecvat_4_0/mfa_disable_compliance.md": {
+      "hash": "719046a7307f10d99714c1aea2c0f0df8a4543898e59e5fd4aa1249e2bb2f17e",
+      "size": 1120
+    },
+    "compliance/hecvat_implementation/strategy_overview.md": {
+      "hash": "c1a50d3f0e5beb9c9db5f5b748462541a0bcddf844e5634645401fd26ccd55c2",
+      "size": 1230
+    },
+    "compliance/hecvat_requirements/edsteward_integration.md": {
+      "hash": "9c20228e87a0cd1c17c54245f8724a518cd820e718176f0486ffe8aecd508d2f",
+      "size": 1640
+    },
+    "compliance/hecvat_compliance/edsteward_frontend_strategy.md": {
+      "hash": "64e1c913ebe8252dabc4770f509e14ba4bcd3e084c9f8a59ba75b1c3ac259016",
+      "size": 1069
+    },
+    "compliance/higher_education_regulations/hea_regulations_fixed.md": {
+      "hash": "9deee8356449b983be9fbd0205343d074e6b01e9280de7cb2154a2ee990c14e9",
+      "size": 1230
+    },
+    "compliance/higher_education_accreditation/higher_education_act_accreditation.md": {
+      "hash": "f02d9e8243a79b6cc80c0d734a1c0bbb4ae3d963a861efd1ee5501e171616c5c",
+      "size": 784
+    },
+    "compliance/identity_theft_prevention/facta_requirements.md": {
+      "hash": "e7e7ead99bb1932cc131171f4da5b5270d0e50e3f2640da9c32f6467994cb796",
+      "size": 659
+    },
+    "compliance/management_briefing/gmm_report.md": {
+      "hash": "05a36a1a813230626ee7daf7d6a48076b9a3b2ec6490557e06e9f60ac0456874",
+      "size": 2545
+    },
+    "compliance/mcp_engine_regulation_creation/new_regulation_creation_endpoint.md": {
+      "hash": "f24dcd355582c828feda70b6ea279dba62034b5382dfd89972dc8f544ce6b480",
+      "size": 1681
+    },
+    "compliance/institutional_risk_scoring/framework_implementation.md": {
+      "hash": "36b8014fefdb417d11aae6ae2473be723b7dad2017a2be3fe2906f2295ae6734",
+      "size": 1625
+    },
+    "compliance/mcp_engine_task_generation/task_generator_design.md": {
+      "hash": "72046de4f68f32b473f4fdae40ebfcaa80fe1bbe434c427ca0ccb36e24c0bf4c",
+      "size": 1715
+    },
+    "compliance/mcp_engine_integration/engine_integration_update.md": {
+      "hash": "e8dd21bf312e8aba6b1139a433c23cdce7700aa0083ab4d462d685514b17feff",
+      "size": 3613
+    },
+    "compliance/mcp_protocol/mvp_deployment.md": {
+      "hash": "b72d1908ffb4ee47cc9b4a1fcdeec3070cadd96397ca3ed2429d7dd651381bdf",
+      "size": 3368
+    },
+    "compliance/mcp_system/ai_analysis_export.md": {
+      "hash": "b5da1f73121e0b61463703d756762e1883d57678eaa2e551cffa1610ba02af6e",
+      "size": 192
+    },
+    "compliance/mcp_turnkey_deployment/aws_infrastructure_setup.md": {
+      "hash": "9643edd41d71f605db465b4f95e4b5cceb42d2973a8b283ea7f623947f4e8944",
+      "size": 65
+    },
+    "compliance/mfa_management/hecvat_disable_fix.md": {
+      "hash": "6e8126229529436653fcc9caa49d1f6320f1f5a7a34b2be264cbbd95e862b636",
+      "size": 2970
+    },
+    "compliance/mfa/hecvat_4_implementation.md": {
+      "hash": "33a9207cfce0461d6e56d2bf9a85f76cbfca80200715bef77f91abcc77c4e258",
+      "size": 2162
+    },
+    "compliance/network_configuration/mcp_port_coordination.md": {
+      "hash": "a9350bfde497f7fc11b81db6f41b0ad8de50b080bddef5993cfa25cc9fe62e53",
+      "size": 1569
+    },
+    "compliance/nj_hazing_prevention/policy_details.md": {
+      "hash": "407f700cee0d06267048497b9b6623974e5ff0294f65e1be139cdd3d4efe932f",
+      "size": 715
+    },
+    "compliance/new_jersey_licensure_accreditation/nj_licensure_standards.md": {
+      "hash": "0ea67b347ca3d37edc3a9a6804404f4ac7c6edf885c56cb246ebad669365d181",
+      "size": 327
+    },
+    "compliance/multi_tenant_database_isolation/multi_tenant_database_architecture.md": {
+      "hash": "7c47e101d8cd20ce737016a6fb107c6c26a6a783d06362ac866569ad4d45e513",
+      "size": 1217
+    },
+    "compliance/okta_saml/development_setup.md": {
+      "hash": "1c601a3e02ac4a70a73a9fde1983ba3bcd21e2fa343c4fdb42e3a798ff7f3820",
+      "size": 389
+    },
+    "compliance/pennsylvania_higher_education/regulations_tracking_system.md": {
+      "hash": "c0649629734aff322fa750775c04d7b21cd0b13f97f268df44ddbbc349ebab13",
+      "size": 6477
+    },
+    "compliance/pa_regulations/integration_complete.md": {
+      "hash": "471c6c43cd4f9a25fd5a3455d54011d96423fd5fc54dbf2bd20dec5606c5a070",
+      "size": 480
+    },
+    "compliance/notification_override/system_implementation.md": {
+      "hash": "807ace65273571cb6a91c737e0e65441dd21af008c6342df7fa46e8975b7a938",
+      "size": 2457
+    },
+    "compliance/pa_regulations/implementation_complete.md": {
+      "hash": "f3d5331afea27740299426798072b57f62d2b57c0f86cb45555e81d17b6ed052",
+      "size": 4781
+    },
+    "compliance/pennsylvania_institutional_accreditation/pennsylvania_institutional_accreditation.md": {
+      "hash": "bd35b285a5a514cacc5ba5344a20671f14b0c45854060b928140013ee004430f",
+      "size": 194
+    },
+    "compliance/production_readiness/ai_codebase_analysis.md": {
+      "hash": "1fc8b99b53deca704725501970b982286d0a4a4ee79cce1deb82790825e085d9",
+      "size": 321
+    },
+    "compliance/production_readiness/docker_resilience.md": {
+      "hash": "bd847247f2ad302692d88db2cdb80898408ebd5dc8efa5d678a9999951a19024",
+      "size": 4219
+    },
+    "compliance/production_readiness/demo_ready_status.md": {
+      "hash": "877e6c6be0d02c6d58bcf0e94bf54768fb4c79e62d6253ee5a9546f21d03f26d",
+      "size": 1014
+    },
+    "compliance/production_readiness/edsteward_bulk_import.md": {
+      "hash": "f731412869e41becd8c16a62d1eeb6a70ad7da17558925b1962fece863af1db6",
+      "size": 1518
+    },
+    "compliance/production_readiness/mcp_engine_status.md": {
+      "hash": "19b7870bbf0d7ecc321d890308d408d5933000b929fe9f2b4a2559e4b38f62d8",
+      "size": 1697
+    },
+    "compliance/production_readiness/websocket_integration_validation.md": {
+      "hash": "fed97e49043e6ca51d51c90c38b4beb678ae7762fdd04e9ad2d0bd0fb3791079",
+      "size": 2115
+    },
+    "compliance/production_readiness/saml_sso_configuration.md": {
+      "hash": "d39e4e90a29a8759554fdb5d1db13ae15a3274162812f72d09038ffde08208f8",
+      "size": 428
+    },
+    "compliance/pennsylvania_regulations/integration_complete.md": {
+      "hash": "f416af905c3b33d81b550c6ef3cf856bd332383fa706a26b1ef6228710e6f836",
+      "size": 3620
+    },
+    "compliance/real_data_integration/zero_mock_data.md": {
+      "hash": "d4d2de9ffd430ae4e56092eef3ab2bf92e1376d90c65998d6fd40f147da46780",
+      "size": 4563
+    },
+    "compliance/regulation_engine/sprint_summary.md": {
+      "hash": "5b48be48620d3b3ca804d2a864336aec2bca3032df3c93ab722eabe5a4bd30c1",
+      "size": 2578
+    },
+    "compliance/regulation_auditing/inquisitor_mcp_server.md": {
+      "hash": "14aabcc0b8b24e8856c724931a1662948e2e84a43c1eb5b5d5e06fc116d7497b",
+      "size": 1675
+    },
+    "compliance/regulation_alignment/edsteward_id_mapping.md": {
+      "hash": "02e5d8f4aaef70d1810af42cf331c8b754f9460fac0ef86ce44f5b9dd5eca762",
+      "size": 1889
+    },
+    "compliance/regulation_data/full_text_separation.md": {
+      "hash": "dd9114d655955e3aad37bc610644f11219215518b414babee7232604cf92d859",
+      "size": 1057
+    },
+    "compliance/regulation_alignment/mcp_edsteward_alignment_complete.md": {
+      "hash": "8b35115f6a9385393262ebfae7f4c6348eef51f792f23ca0dc09c7ef663a73c5",
+      "size": 2145
+    },
+    "compliance/regulation_monitoring/production_expansion.md": {
+      "hash": "9ac5c1970145e46dc9b792b99f5cece5f0493f2602d9028152184c426dcad268",
+      "size": 1572
+    },
+    "compliance/regulation_task_categorization/task_type_classification.md": {
+      "hash": "9dd43312476d1a8ca9fe76be53178d41f6d119ffe1b7e7d715b6f90db7e87a65",
+      "size": 2153
+    },
+    "compliance/regulation_key_risk_scoring/edsteward_universal_regulation_key_system.md": {
+      "hash": "90a9d7748dd876932b52cb918d6b1cbf3428beb2cd36d8d90eee0fcda7727db6",
+      "size": 1648
+    },
+    "compliance/regulation_management/demo_readiness.md": {
+      "hash": "46c5a7ab947f697f60be06ec6e65243a9e96c5eebd87a8f27702276871ee5193",
+      "size": 1511
+    },
+    "compliance/regulation_management/update_system.md": {
+      "hash": "2e79e905c0389ca1a0482dabb1290e3dda197fc242828f25cfa3b21c041de8b2",
+      "size": 2096
+    },
+    "compliance/regulation_management/osha_engine_expansion.md": {
+      "hash": "a4d5676f54f889ad5c2ba91b29e1243365eec844dd4f975421a56828a46684e7",
+      "size": 2429
+    },
+    "compliance/regulation_management/status_card_layout.md": {
+      "hash": "2fcec85bde3e0f2e3402cc7f33e87f6aab33cb9c6516c42b40898a41fc481e16",
+      "size": 581
+    },
+    "compliance/regulation_management/version_control_system.md": {
+      "hash": "d069a48eb0e294465afc417a3d6d4610601a952ae591abf447d1e970cb997f40",
+      "size": 3372
+    },
+    "compliance/regulation_transmission/edsteward_integration.md": {
+      "hash": "c1a84dd8695a12f93b54459cde2f1298eca344339eff922a02c55b8bba900bf0",
+      "size": 1663
+    },
+    "compliance/regulation_testing/framework_overview.md": {
+      "hash": "433934e4eea9e36e48ba8aafcfa52d55120c1705bc8bfe0c9d814ea98038a3f5",
+      "size": 1645
+    },
+    "compliance/regulation_testing/clery_act_template.md": {
+      "hash": "10d698037ab7ab2222935ff29262f5eb5d8166359d5fc3765dc33eb55b11de1a",
+      "size": 2000
+    },
+    "compliance/regulation_validation/law_library_protocols.md": {
+      "hash": "c23d0dadcd94553acf5eca24dd9348e002f57c7df580bf33b5517c4a18e22603",
+      "size": 3297
+    },
+    "compliance/regulation_validation/manual_testing_script.md": {
+      "hash": "c78f92fb35bc8546837b90e7c590cbfeeb6dbad0fa1734a159d6a395ff288ad2",
+      "size": 1682
+    },
+    "compliance/regulation_updates/system_operational.md": {
+      "hash": "c21f51842b50b72664a2481ce53df6556905b2d83d71cf015ab2f05c74d14eb8",
+      "size": 1836
+    },
+    "compliance/regulation_updates/edsteward_integration.md": {
+      "hash": "816dcebec08fb06a2aa466294811f43c8844d048cd2a084db0cbb4a6293cd1ff",
+      "size": 1812
+    },
+    "compliance/regulatory_audit/inquisitor_ai_auditor.md": {
+      "hash": "7cdad05365b7d7a0780507e33010402519b9357032ee5a6c05537d14af38e4b9",
+      "size": 1506
+    },
+    "compliance/regulatory_compliance_cleanup/completion_report.md": {
+      "hash": "5c1920cc13e3e18282f37778afa84f6ac4249b52e6a80e0e73776973cd38922f",
+      "size": 981
+    },
+    "compliance/regulations_dashboard/last_updated_column.md": {
+      "hash": "39ef5fbe89c232ad794ed9b2cec029140cb7cbde9ebbccbb9a4ff3a670ecd0a9",
+      "size": 1043
+    },
+    "compliance/regulatory_compliance/mcp_engine_demo_validation.md": {
+      "hash": "f0e3365b26db9eceff23a22e74271b98dfa2d81000f44f0f7e152509bb14fef1",
+      "size": 1074
+    },
+    "compliance/regulatory_compliance/bulk_update.md": {
+      "hash": "f817f464c8153b1d670568cd49569249420e9d09af5faaabc37db96fee824f86",
+      "size": 3718
+    },
+    "compliance/regulatory_compliance/platform_comparison.md": {
+      "hash": "99cbc2ca365e700be4606c14dedbb4df481b2753734a8a7bb74da9d78dfd7028",
+      "size": 1010
+    },
+    "compliance/regulatory_compliance/regulatory_requirements.md": {
+      "hash": "d3cdd02d80b976577a5ddd0bf16bee0b33cdefead61a46ee4375d9fa1d4960c5",
+      "size": 1029
+    },
+    "compliance/regulatory_compliance_demo/trustee_demo_script.md": {
+      "hash": "477d5c121f5e5be38e1b644e3c510d54767646704d3a59de5483ebc86ff6213a",
+      "size": 1135
+    },
+    "compliance/regulatory_compliance_validation/mcp_template_scaling.md": {
+      "hash": "c502b23816ae6a4b3d9878a9dafd1dfab444cc174b77759644a416c96d7899b7",
+      "size": 468
+    },
+    "compliance/regulatory_compliance_workflow/demo_script.md": {
+      "hash": "11f8702c21ea1c1d8fcf9441ce5f51980002b11f9a40b06debf969b38d09e022",
+      "size": 1295
+    },
+    "compliance/regulatory_compliance_management/efficiency_mechanisms.md": {
+      "hash": "7b02b8f713e03d6a5d94d1faf78f25819637f0c806faffbc5693936229fc4198",
+      "size": 2675
+    },
+    "compliance/regulatory_data_alignment/mcp_edsteward_alignment.md": {
+      "hash": "ff3ba614daf44a4b476955dce72882c3c306e0b4da61868c7254dfcf658db0b6",
+      "size": 1280
+    },
+    "compliance/regulatory_context/mcp_engine_llm_stage_2.md": {
+      "hash": "cfa50cbaf41fa56e51a527947aabca4b9bfcf994a71fa42b40b499c1d2c74ea2",
+      "size": 190
+    },
+    "compliance/regulatory_data_certification/gold_certification_complete.md": {
+      "hash": "9a181c341ec268c825fb6a7c979f0d8711ff8d0f3a14cc5241b627a4c54f92db",
+      "size": 1076
+    },
+    "compliance/regulatory_data/federal_register_structure.md": {
+      "hash": "5ab8bccc55dcdb44efecfe6d3e43aacada193bd58984d5c2f3e9774a9fbc1866",
+      "size": 1656
+    },
+    "compliance/regulatory_data/pennsylvania_integration.md": {
+      "hash": "0f6b7cfeacf4b738f35b305d304bba7bb23c58e1820cdbd7f053af8f389f0701",
+      "size": 2327
+    },
+    "compliance/regulatory_data_cleanup/cleanup_complete.md": {
+      "hash": "ad86ce06b0ec9781e7bc9524e8a456867215722680ec4904856048ec421aa1b3",
+      "size": 1267
+    },
+    "compliance/regulatory_engine/production_readiness.md": {
+      "hash": "74eb406c311409f8165dcfcc118c2bd23a06379d02ca1a6bb9cd371e79fe4013",
+      "size": 463
+    },
+    "compliance/regulatory_data_deduplication/deduplication_logic.md": {
+      "hash": "3b712764293973107f95430bfe53eb0f1ce5d90c31b332cf97154969f895d247",
+      "size": 1275
+    },
+    "compliance/regulatory_enhancement/ai_automation.md": {
+      "hash": "9cb6c9b6b94214616ae98c3f0b125a1d4d83db4a7ab99f0ffe3499658cf81f58",
+      "size": 2319
+    },
+    "compliance/regulatory_management/demo_script_summary.md": {
+      "hash": "3568bd4dc95c3482c3f0b81cc5b72826a5c2c77e460fc561fb735793efbe7e27",
+      "size": 1403
+    },
+    "compliance/regulatory_guidance/llm_enhancement_system.md": {
+      "hash": "877263ce3be724320ed16a9cd7e0c115e369334a1617a7748df99296dce70780",
+      "size": 3331
+    },
+    "compliance/regulatory_identification/reg_key_field_implementation.md": {
+      "hash": "aa678b9e93f85926d3d4190400e378f67ac7a736c81a3988d1861550e050bb6c",
+      "size": 1152
+    },
+    "compliance/regulatory_key_alignment/mcp_edsteward_reg_key_alignment.md": {
+      "hash": "77906f3c1fd43ec09c379584cc710e8a86dbfb0a11581c0279267f30d31d16e2",
+      "size": 1139
+    },
+    "compliance/regulatory_mapping/master_key_system.md": {
+      "hash": "377531341b59117cd113beb7373b7cba89daefc99f9bd32f6037e2f1c3ee8b1e",
+      "size": 2418
+    },
+    "compliance/regulatory_readiness/deployment_troubleshooting.md": {
+      "hash": "44d03c261de889cb5ff763b610f364170535d13f4124dbbe7bae94b8a2442855",
+      "size": 1264
+    },
+    "compliance/regulatory_summaries/customer_focused_generation.md": {
+      "hash": "792319d902dd7c597359beebb9addffab38da0629a3add1931c0e2c0a01fc6e2",
+      "size": 2253
+    },
+    "compliance/regulatory_risk_assessment/institutional_risk_scoring_framework.md": {
+      "hash": "98c9b4e669d6b83472a2765726016e4fe70aa27f5fe3c2a88ad69faff8dde2a9",
+      "size": 1248
+    },
+    "compliance/regulatory_text/cfr_universal_conversion.md": {
+      "hash": "d7075c73f842812163133dec0666f8f0430bbcf49e7b9a5923390ea0a0634eb9",
+      "size": 3497
+    },
+    "compliance/regulatory_task_templates/expansion.md": {
+      "hash": "62fdb6d6a758a25b306a320ae326353588e76ede0bc7b31c0a305ab5923196b9",
+      "size": 1337
+    },
+    "compliance/regulatory_tasks/system_overview.md": {
+      "hash": "78ddd1053a1367a5a21591c6719917f6a547a32b2ed690eb45de6adb629a7a4b",
+      "size": 2158
+    },
+    "compliance/risk_scoring/mcp_engine_system_prompt.md": {
+      "hash": "a898fdc86960e773f7f30fd61237a828edf11b399988e0a2336f6a7ca94563b1",
+      "size": 1283
+    },
+    "compliance/regulatory_templates/console_generation_system.md": {
+      "hash": "4284d20082a71a16f789cda34fca101aed9ba4d102fc924f2149763c198f9bcf",
+      "size": 1132
+    },
+    "compliance/regulatory_transmission/mcp_engine_pipeline.md": {
+      "hash": "30b1215a127498ef78d84e9a577816e8cec0162a877668f0dd44ed292be709f3",
+      "size": 446
+    },
+    "compliance/regulatory_workflow_automation/board_presentation_demo.md": {
+      "hash": "f03100564062347edec0166af487d56578409002135483a3c8b601a72df9c9f9",
+      "size": 1290
+    },
+    "compliance/regulatory_validation/government_api_cross_reference.md": {
+      "hash": "0d57cfcaba2a110fd2356a5a1df516feb3169fe4c689f0407963946399aa02c5",
+      "size": 1626
+    },
+    "compliance/regulatory_validation/mcp_engine_world_premiere.md": {
+      "hash": "facde84a8c954d8dbcbd7c7d396a1412b53477eb34ecde5ea95988c01611c54d",
+      "size": 1228
+    },
+    "compliance/service_isolation/port_management_policy.md": {
+      "hash": "e7d81e57560f0113754e69bf3cc735ea3407e9586b93f293a9f5fedbc6cdc9f3",
+      "size": 365
+    },
+    "compliance/section_504_rehabilitation_act/section_504_requirements.md": {
+      "hash": "d32292cac36714cd38ac852a064bedfd44511237943ce965da3c237ff6993093",
+      "size": 494
+    },
+    "compliance/saml_authentication/environment_setup.md": {
+      "hash": "a137941e483bfcad7349ec7e71a9ad7090fff4bf69dbca50dd1ce4c04c597059",
+      "size": 544
+    },
+    "compliance/roadmap_audit/status_report.md": {
+      "hash": "3804d4aeb0f36d7171a858c91ca529db2f3e807f99bda1705db23ef491d1599e",
+      "size": 1193
+    },
+    "compliance/system_status/mcp_engine_analysis.md": {
+      "hash": "f6e5fcabada1c2839f28dc2b7d81067b2bfb6391b31fb39c5e533b99eec417a8",
+      "size": 1317
+    },
+    "compliance/tenant_provisioning/statutory_role_integration.md": {
+      "hash": "2890fb820f043c4018416d3bd97a701839ff11fb17b825e68723a19d514ea71d",
+      "size": 1687
+    },
+    "compliance/state_regulations/pa_compliance_gap.md": {
+      "hash": "942916e0fe270bb4b4d311292790b2a5b12cdfecd2f7bc93e59d0c06338f30bb",
+      "size": 1919
+    },
+    "compliance/task_management/clery_act_workflow.md": {
+      "hash": "b038d1e3a2e41c8063a39e57d4fe663994bd149dae585025b6882f286aa65991",
+      "size": 2001
+    },
+    "compliance/task_management/email_links_and_evidence.md": {
+      "hash": "d9e9eccdd6ac002115ef31159aa1781db7e26db9d531cd5c05c55c0dc2c8eb98",
+      "size": 2064
+    },
+    "compliance/title_ix_audit/perfect_score_achievement.md": {
+      "hash": "d47fb9cc6ffba8de8d6c43bcbf779263cc4915b00e1a78502deaa32c598e23be",
+      "size": 1255
+    },
+    "bug_fixes/admin_settings/branding_crash.md": {
+      "hash": "cf62dcdf4a730ffcec9b74f9a457ed0205ce8df0db8a1d36e4077b323e8ad8c8",
+      "size": 618
+    },
+    "compliance/title_ix_compliance/task_implementation.md": {
+      "hash": "aa0bee9bce16af42b002f02566651157bc27b3c8536f2b075d292c4589b45e78",
+      "size": 1339
+    },
+    "bug_fixes/ai_summary_quality/heca_integration_fix.md": {
+      "hash": "e8d8b1261269ae6b76b950f525f04d4ccd3288655a720c381d422d9afe43afc0",
+      "size": 1828
+    },
+    "bug_fixes/ai_discovery/email_cleaning_fixes.md": {
+      "hash": "cd846a3c3f1cbc6fe7520165f425309dcfab16a83ecea066f1959ac4382b585f",
+      "size": 1961
+    },
+    "bug_fixes/api_response_structure/missing_array_fix.md": {
+      "hash": "b6157737255c89f1714afd73867261e045d76e1a7e2e0bced5d40e72413ede35",
+      "size": 2405
+    },
+    "bug_fixes/api_response_structure/regulation_engine_template.md": {
+      "hash": "b50d2beba867806d76196e6361b24b0fc2f58ef8979360a5666baaee77c51301",
+      "size": 3178
+    },
+    "bug_fixes/ai_quality_auditor/css_and_data_fixes.md": {
+      "hash": "94a0fb27f216557f812d47c729f749b493d3b1cf9b3910b6801a9bbc2b40efe2",
+      "size": 1445
+    },
+    "bug_fixes/api_data_shape/versioning_regulation_sources.md": {
+      "hash": "488d9a056d36d4aa2606bc80064b3641c373002877cfd193a15924f441511b0f",
+      "size": 1646
+    },
+    "bug_fixes/audit_trail/reference_type_errors.md": {
+      "hash": "4ad971d5ee2d8314ade7555b124eb9101e436a0eda42534dd306ff5f6dd6f19d",
+      "size": 471
+    },
+    "bug_fixes/audit_trail_rbac/permission_mapping_fix.md": {
+      "hash": "020d5953e516aa3c25632d81aa010ee81cb4d17833374e690459de537ab851a7",
+      "size": 435
+    },
+    "bug_fixes/authentication/hydration_mismatch.md": {
+      "hash": "3e12f6b8e46f6bc96282fc96fe37c56f9214af75217cb052dd02127dea4fd038",
+      "size": 993
+    },
+    "bug_fixes/authentication/public_dashboard_hydration.md": {
+      "hash": "8221decb878012f6564eeb511658246c20d2332e327f1ef30cb16040d94c806c",
+      "size": 1087
+    },
+    "bug_fixes/audit_logs/drizzle_orm_syntax.md": {
+      "hash": "3985fbf22c00757202bf5cea76ed3714df58e8fcb29ece8a7a33c358fb0826c0",
+      "size": 623
+    },
+    "bug_fixes/authentication_system/critical_fix.md": {
+      "hash": "bbae1241a2ec2b883f1d0a359e9ee963fd8128648c291c392cf6fffcda7ca6b3",
+      "size": 2622
+    },
+    "bug_fixes/audit_logs/sql_syntax_error.md": {
+      "hash": "804650c1d3895bfd593afdeb95b65dc0c787f34510399346ad371fc693205736",
+      "size": 1357
+    },
+    "bug_fixes/auto_restart/system_stability_fix.md": {
+      "hash": "5537457cace4d69d6380b1e9c47c36cf237f1dd7d99c99806106036b4fe99523",
+      "size": 2982
+    },
+    "bug_fixes/branding/ui_display_and_persistence.md": {
+      "hash": "8e005acf8bd251b5682fac6838b1ee945a305d2f054616cfcfa96071549f3328",
+      "size": 890
+    },
+    "bug_fixes/branding_configuration/crisis_recovery.md": {
+      "hash": "3d4cfe6609a56ae14be6f76af3d085e15b987f25b85ecb99684176884a2ba2e9",
+      "size": 2996
+    },
+    "bug_fixes/branding_configuration/save_persistence_fix.md": {
+      "hash": "ee63932c39f24f3af895c82151006f31dc7c2d40e53de0869ba83feaa577af40",
+      "size": 745
+    },
+    "bug_fixes/branding_configuration/favicon_display_error.md": {
+      "hash": "3a27fe7d92b232ef37e7d390744adba93a74983bf9c2c91da71ba5cca55bd9be",
+      "size": 653
+    },
+    "bug_fixes/branding_settings/logo_upload_fix.md": {
+      "hash": "6461eb638a4a3a5bba82899419f4e9da28fe3fb318de44cbb71c584ed2571c83",
+      "size": 1371
+    },
+    "bug_fixes/build_cache/frontend_build_cache_resolution.md": {
+      "hash": "a6c460e1e0fcf9fc69dac40381f19498f231064da69278cb26985a1a73ce7fdb",
+      "size": 1109
+    },
+    "bug_fixes/branding_uploads/logo_upload_cache.md": {
+      "hash": "653b710b6c07910c0657b9b8b95c23cde172fbba7a9b9ceac8eb53bd076d6de0",
+      "size": 713
+    },
+    "bug_fixes/branding_field_mapping/disappearing_branding.md": {
+      "hash": "1dbee844299ca23ea9c4e0b4d2a0938f4f3c127948b0694e87809941f1663da9",
+      "size": 4082
+    },
+    "bug_fixes/build_errors/swiftui_button_style_conflict.md": {
+      "hash": "02be661b5da2b8101de4bdd5b7a86dcdde9b5eddc8f2e2e2fbe1b22a22d14388",
+      "size": 1561
+    },
+    "bug_fixes/byterover_memory_retrieval/api_errors_and_search_strategy.md": {
+      "hash": "57bc3d811bb230021e62ca3611948a5e7ee02dd630ca4a9ac520359129996fcf",
+      "size": 599
+    },
+    "bug_fixes/cfr_summary_source/heca_priority_fix.md": {
+      "hash": "fe2da333ac41d9005c3079425b05d54b3f378039ccd8bd8b1125fd30f52e888a",
+      "size": 1859
+    },
+    "bug_fixes/byterover_memory_retrieval/retrieval_issue.md": {
+      "hash": "7da538fc65ac697de926b367fc34f46ba62a83d6b7862fff3dc56355de1ac9df",
+      "size": 135
+    },
+    "bug_fixes/cfr_usc_routing/regulation_content_fix.md": {
+      "hash": "66f52034a35e29bf11f0248a7b0d8dcdc9ddf3c9eab598a8c83b1b750f5dedfe",
+      "size": 1899
+    },
+    "bug_fixes/clery_act/full_text_display.md": {
+      "hash": "8382e5593a7441fbe0b3cf2d0e26cd158e8295350f9f2b237b8eb3d561d0e7ad",
+      "size": 2274
+    },
+    "bug_fixes/compliance_data/deadline_transmission_fix.md": {
+      "hash": "b080654ad17e23e1c1a24db939dc9bea48fdea23d0c957db06d1a272a5080b52",
+      "size": 3247
+    },
+    "bug_fixes/clery_act_regulation_restoration/missing_regulation_restore.md": {
+      "hash": "069e323aaac68255000c8f1c98e16a0eee6f84995236d19b7ef2918e4049d8d4",
+      "size": 1529
+    },
+    "bug_fixes/console_task_category_grouping/complete_fix.md": {
+      "hash": "64c2e1c432cc37a6f75c4a8ddd3c2f73f7f80f2251d8a325825a8b3e65e388d7",
+      "size": 1384
+    },
+    "bug_fixes/configuration_priority/branding_settings_fix.md": {
+      "hash": "175fecfd63e3302b4ce1532cc7c37f4bcc56b99a5ab280e45b3f933b1581f1e7",
+      "size": 974
+    },
+    "bug_fixes/crash_prevention/server_stability_improvements.md": {
+      "hash": "1b11d6eec51823976827e7eca72a22719ea4f94ec4b3eb29afcc561e3e4fc3e2",
+      "size": 738
+    },
+    "bug_fixes/compliance_statistics/data_structure_fix.md": {
+      "hash": "04cd918c7b51b01efbda9a06b443795f31746a8da4707927ac43334d3f8d0951",
+      "size": 1900
+    },
+    "bug_fixes/cors_configuration/osha_console_fetch_error.md": {
+      "hash": "c99712a39364d01cbb3726bb145ec2bebf7443bd2b30ba0ad7a33d4e0800810e",
+      "size": 1159
+    },
+    "bug_fixes/critical_issues/post_demo_blockers.md": {
+      "hash": "1325a40726a7ba508eceff08b0467a573848ad59acc962b6cd93131d7e22df15",
+      "size": 1193
+    },
+    "bug_fixes/content_delivery_field_priority/full_regulation_text.md": {
+      "hash": "01a69f23af244e2d01d873bae21533d26765cf2d7cf43e27bc9587d9a1ce299b",
+      "size": 1848
+    },
+    "bug_fixes/customer_delivery_dashboard/frontend_errors.md": {
+      "hash": "1bce1208904a0ab6488697a923a5e13efb52787656899eb0b03420d490c55843",
+      "size": 1709
+    },
+    "bug_fixes/customer_delivery_dashboard/progress_polling_fix.md": {
+      "hash": "af0869bb4cd64ce53ed7638641bda34cd161184398956d8da66ae2dc548afc3d",
+      "size": 1930
+    },
+    "bug_fixes/dashboard_server_stats/replacement.md": {
+      "hash": "890915998f2a20876bf742d8bcb358deabcd1bbdcf19b1a65408f9f45831a60b",
+      "size": 1153
+    },
+    "bug_fixes/dashboard_ui/server_registry_removal.md": {
+      "hash": "9ba22b2032216b20e039a57952fa633532ea48a8316922cf07e990a7e3963e40",
+      "size": 1918
+    },
+    "bug_fixes/customer_management_api/customer_loading_error.md": {
+      "hash": "cac978d4faadfced43c0ff976ca61b4a732ad44503309d94d0ae09941e87a286",
+      "size": 1905
+    },
+    "bug_fixes/customer_management_api/loading_error_resolution.md": {
+      "hash": "f8fedd4741004091de4d6d226f7065d4b39becd3ed0a755dadeb94b442d98962",
+      "size": 1693
+    },
+    "bug_fixes/data_alignment_deduplication/edsteward_cleanup.md": {
+      "hash": "7f4ec81d64ac4140d7fcee2d83e3e7f7f2cf7d4b865a5beffe74a801480b7ac2",
+      "size": 1311
+    },
+    "bug_fixes/data_mapping/note_creation_fields.md": {
+      "hash": "1c7fe90a8f812b38dd651976f7e1cb9cf842e2e0bd74c97b73a487e85aa17576",
+      "size": 967
+    },
+    "bug_fixes/data_mapping/teach_act_console_fix.md": {
+      "hash": "fefeeb7098dcbf87add38fcfeba7d2489f934f1e0b4e83e72eadff5e171b25cb",
+      "size": 2793
+    },
+    "bug_fixes/data_sources/fake_sources_removed.md": {
+      "hash": "277b2bfc31f2185b8f511800b0bc63b039e4b10689c294d93185da86f813fa07",
+      "size": 1059
+    },
+    "bug_fixes/database_connection_timeout/logo_save_revert.md": {
+      "hash": "ee73f2f88d5871e1b30de2bc8fae4275b28cf0249df3759a9207a6e222746769",
+      "size": 893
+    },
+    "bug_fixes/data_mapping/university_library_structure.md": {
+      "hash": "91f58564a166345d63940edb6353f49d404350609e66a1fa3aa11e77dfd40262",
+      "size": 1687
+    },
+    "bug_fixes/docker_dev_environment/startup_script_formatting.md": {
+      "hash": "46d9a828f131d4db3375b22ec0536f033ddbd82ab9593d82eeaed546e1b71f98",
+      "size": 819
+    },
+    "bug_fixes/devcontainer_configuration/mcp_filesystem_paths.md": {
+      "hash": "4acabfd7707f37d2171f108f4a3c3791882bb7c02ef646045e397be19a6f82f2",
+      "size": 1121
+    },
+    "bug_fixes/demo_preparation/january_2026_fixes.md": {
+      "hash": "aaace0cddbb9db48d573433e4261b54fb4636a9cf293da7a1b1509860abd7603",
+      "size": 1422
+    },
+    "bug_fixes/dev_server/hot_reload_issue.md": {
+      "hash": "bcf55114cedeabe151a794b505bc7dfc460e727763473241366acaff7716b0bd",
+      "size": 568
+    },
+    "bug_fixes/docker_resilience/crash_prevention_transition.md": {
+      "hash": "842514e297d0b32f59a16903f8fdbfb0df912e39581cd7dfefc63fbdacba0602",
+      "size": 3622
+    },
+    "bug_fixes/docker_resilience/prevent_crashes.md": {
+      "hash": "22a262c3d5406afb9654c392eea35b46f9c231f38a928bb5c5032f982832e4e3",
+      "size": 2242
+    },
+    "bug_fixes/ecs_deployment/latest_image_not_used.md": {
+      "hash": "da78e287e847f7d9cce5df07ef488465a4d9079c7d9698c918cc27b6fbed5b67",
+      "size": 1503
+    },
+    "bug_fixes/edsteward_authentication/authentication_issue_resolution.md": {
+      "hash": "27621768966a028e884bbc08826c69aae31ffe1d1cf24a878e331c8dfb097032",
+      "size": 1694
+    },
+    "bug_fixes/ecs_deployment/react_hydration_error.md": {
+      "hash": "a64820eb495fc0223c4994d69709bcc43a5303e9ee236ba464a0bfb2cf839a52",
+      "size": 1486
+    },
+    "bug_fixes/ecs_deployment/task_definition_update.md": {
+      "hash": "5a403a096470dec18d90dcff6e83c4055e0dbb652bfb8db30892684072cf6fe2",
+      "size": 1330
+    },
+    "bug_fixes/docker_environment/startup_recovery.md": {
+      "hash": "c1975bf4a9cf733e559b12c133662e553d20efda2c646cc1fcd88c86b985aabf",
+      "size": 903
+    },
+    "bug_fixes/docker_environment/edsteward_recovery.md": {
+      "hash": "34c1ec9b7d4a72280a2f46e4e140f2d67f1e1b65652778e6c5a5f93c1f41d67d",
+      "size": 836
+    },
+    "bug_fixes/edsteward_delivery_frontend/critical_errors_fix.md": {
+      "hash": "266ee5fd6de5c0c90dea76ff15b28d06c22d5ad7507d78d19bdf87b36154b871",
+      "size": 2766
+    },
+    "bug_fixes/edsteward_delivery_integration/bulk_delivery_working.md": {
+      "hash": "ae6815fbf975d593c70bde8679bf6d8ffe1582af5201ad6d9cc3c1fe5ff1456c",
+      "size": 2172
+    },
+    "bug_fixes/edsteward_data_integrity/master_checklist.md": {
+      "hash": "fa210c9e0b6346393db3bfb0732842a9429e4009408ca071a5a7911269d1c71e",
+      "size": 1221
+    },
+    "bug_fixes/edsteward_delivery/authentication_url_fix.md": {
+      "hash": "d86f40e21799e8b083a29206f18c4f85b1d5abd963613dc3e9a4d300d95cbdcb",
+      "size": 1572
+    },
+    "bug_fixes/edsteward_sso_saml/saml_not_enabled.md": {
+      "hash": "c4a4644dca1fa4c4636dd4cedf5ddeb147585dca3748cb81f1daf9326ae3da60",
+      "size": 571
+    },
+    "bug_fixes/edsteward_stability/authentication_tuf_fix.md": {
+      "hash": "948bf8f4635e2cb8077f3f2583a06379f5f5f878258837f6c1728e3922644390",
+      "size": 1541
+    },
+    "bug_fixes/federal_register_full_text/integration_fix.md": {
+      "hash": "86b9e26ff6610788507cfe9dc150f70b0ff78c1e3b2e6860a04c732da929580b",
+      "size": 4571
+    },
+    "bug_fixes/edsteward_integration/config_auth_real_time_fix.md": {
+      "hash": "68022a6b9ae46f065f8ce563cc34fcc512f8965378b7cc3adb5bc816552f8114",
+      "size": 2304
+    },
+    "bug_fixes/edsteward_integration/master_key_field_fix.md": {
+      "hash": "88f07c53c034473e9b000aa6836fc1d054c4f40d91309b7c0b36d47dc5a161de",
+      "size": 2820
+    },
+    "bug_fixes/edsteward_integration/master_key_mapping_fix.md": {
+      "hash": "e5217fdb0df12297d36b670b05d576f246745283e4ac31e9c29b51942a177a53",
+      "size": 3872
+    },
+    "bug_fixes/edsteward_integration/regulation_delivery_issues.md": {
+      "hash": "7675e908ab5b6c54fe1ff0c99e3516ea0937ef0831db26e378a4745414b2d859",
+      "size": 5998
+    },
+    "bug_fixes/edsteward_integration/osha_delivery_fix.md": {
+      "hash": "7675e908ab5b6c54fe1ff0c99e3516ea0937ef0831db26e378a4745414b2d859",
+      "size": 5998
+    },
+    "bug_fixes/frontend_api_caching/failed_to_fetch_fix.md": {
+      "hash": "8890e172af0a4d617f6e0c875f781e0ec59cda73c42eb7516cf883d17af61438",
+      "size": 789
+    },
+    "bug_fixes/frontend_filter/pennsylvania_regulations_search.md": {
+      "hash": "411e5b900c39ed9406acb98235f3f8b2325ae2b85462be70137edeb04bd11c05",
+      "size": 1682
+    },
+    "bug_fixes/frontend_build/dropdown_formatting_fix.md": {
+      "hash": "eb525c1cd78d0f1fd72bd8d89f5f75c7d5febf5f5f6bb9bbed81619f31e66c4f",
+      "size": 2505
+    },
+    "bug_fixes/frontend_api_contract/llm_gateway_analysis.md": {
+      "hash": "684cd6a75246a6ae17f79e83b62bdbc32df9f486516c2ee8ec7238da8d856f07",
+      "size": 1771
+    },
+    "bug_fixes/git_corruption/index_lock_fix.md": {
+      "hash": "7ab10b755189b358233b15f569630458192b988cb17b693ae1e74f2d76c88198",
+      "size": 1532
+    },
+    "bug_fixes/frontend_loading/parsing_runtime_errors.md": {
+      "hash": "9575040945a5918f6d796c931456ecf5a3e5c4a6b719ad17d25cacf529c482a9",
+      "size": 727
+    },
+    "bug_fixes/game_loop_timing/cancellation_error_fix.md": {
+      "hash": "33a5a772132ddf0a45b6d166ca334a38ec9a4eb3cc29bb5724969b456a54d90c",
+      "size": 1407
+    },
+    "bug_fixes/frontend_search_api_integration/search_filter_button_fix.md": {
+      "hash": "8683cb381a17fc8cd7dac8adb554ecee76fe15e5bf93a782f18a2c40a6212199",
+      "size": 2823
+    },
+    "bug_fixes/git_index_corruption/index_corruption_fix.md": {
+      "hash": "b4516a1acefb2f257c0c397590361251b96d6a329aff31d754f6fca395ab959d",
+      "size": 629
+    },
+    "bug_fixes/github_authentication/connection_error_fix.md": {
+      "hash": "be55ae4557057ae6d3935be7c27376cfa13925ac7667b25fb6052e2c198d67ef",
+      "size": 1098
+    },
+    "bug_fixes/git_detached_head/state_resolution.md": {
+      "hash": "7bbd1af7164ee7ccca2b4aead13ce8ee544765ad274d14f33c5c1db8fcdfe3c5",
+      "size": 1133
+    },
+    "bug_fixes/git_resource_deadlock/git_deadlock_fix.md": {
+      "hash": "26e9385e23f246b22648cae14b26f46f869034b64ebfa70c3558823753c94902",
+      "size": 1278
+    },
+    "bug_fixes/integration_configuration/websocket_port_mismatch.md": {
+      "hash": "45b0d4158808e91f2e29a50098aa75b25fead08169dbd58ba9a006c2a21e0d3c",
+      "size": 1121
+    },
+    "bug_fixes/https_authentication/login_restored.md": {
+      "hash": "74adea9dbc966eb0731c0874879234f3cd4e14ceb0377a42494eb2034d2d17ae",
+      "size": 1217
+    },
+    "bug_fixes/heca_summaries/quality_issue_resolution.md": {
+      "hash": "f86ff8cae4cd07fcb4aa2394e8dd263286195d023ccbcd2c4c8b7c005e30d0c2",
+      "size": 1129
+    },
+    "bug_fixes/javascript_syntax_error/missing_semicolon_fix.md": {
+      "hash": "898c494efd07ed7a1e885c0621c5f51de863816bd00b7d7a99fc01f0c2597fad",
+      "size": 402
+    },
+    "bug_fixes/law_library_content_fetching/404_resolution.md": {
+      "hash": "e25b9db9b8e4550b7d7344fdd27819fc82e518abca665a84f14cd33e271ab590",
+      "size": 1296
+    },
+    "bug_fixes/llm_gateway_analysis/mock_data_removal.md": {
+      "hash": "bb0ee227110ea23a39cb4b561916eae6a6bf1940c59cb0d9f7f0d84f8794ab76",
+      "size": 1287
+    },
+    "bug_fixes/integration_regulation_data/full_payload_transfer.md": {
+      "hash": "41e70627f073006aa38c2f77d5bb95d34afeb2f0680f61ec28d0b9bfb32687ab",
+      "size": 1351
+    },
+    "bug_fixes/llm_gateway/configuration_and_data.md": {
+      "hash": "a5b69c2c7613ea4fe8f14ce83c3f31eab7472f7bfc73e8d974b366c8537eacb0",
+      "size": 2543
+    },
+    "bug_fixes/llm_gateway/regulation_content_mapping.md": {
+      "hash": "8a90cd628058a890a797db237963c1f73b5dde5a25b87f128e4e2e9c82c7218e",
+      "size": 4478
+    },
+    "bug_fixes/mcp_edsteward_alignment/alignment_workflow_troubleshooting.md": {
+      "hash": "18c5e85b5c64388ce1f219af05c738b9cff78aa2df484894e0a529a500692c4e",
+      "size": 1568
+    },
+    "bug_fixes/llm_gateway_error_handling/crash_resolution.md": {
+      "hash": "ea7ba5681ab625b7f17f58859a7e9561d5dfcf9cc2ab945ae401cc28cd314e35",
+      "size": 2601
+    },
+    "bug_fixes/mcp_edsteward_integration/data_alignment_analysis.md": {
+      "hash": "b6025c2bc58435e719f19fcd1fa72b365474f2665e1be65d4ad1b88284988d04",
+      "size": 1852
+    },
+    "bug_fixes/llm_gateway_api/metadata_structure.md": {
+      "hash": "1f3e4075b2788b0aa78308eb97c80ee696eb517ae0497d0185eb2f79f7aa9cf6",
+      "size": 2819
+    },
+    "bug_fixes/llm_gateway_api/missing_endpoints_fix.md": {
+      "hash": "8208d39f317f34c9afee19789182a3dcba9c500b418217b150f35a5f9aad4824",
+      "size": 5155
+    },
+    "bug_fixes/mcp_engine_cfr_parsing/reference_regex_fix.md": {
+      "hash": "6f9b5561e6d1443609bec83c7bd03174f96ffd69b4d8c218018efed37ee807c3",
+      "size": 1752
+    },
+    "bug_fixes/mfa_disable/storage_initialization.md": {
+      "hash": "1dae80dd326de6fe6c1088792006d305c08815198ed3029ddf276bfc1fd0b970",
+      "size": 1442
+    },
+    "bug_fixes/mcp_engine_sync/session_summary.md": {
+      "hash": "0adc6b054ab232ddc7ec17b892bf24b9187ac41883438144b3b07a0497f20de5",
+      "size": 2442
+    },
+    "bug_fixes/mfa_authentication/field_name_mismatch.md": {
+      "hash": "1e19e81d4f5d2781efd1d0075064d7a2f8e0b19049526e5c71745b72a337439c",
+      "size": 1887
+    },
+    "bug_fixes/okta_saml_certificate/formatting_fix.md": {
+      "hash": "3b7e4506d1e951d5155d578a8ed03a9695830f1a0306975dfdf8d07c46323b61",
+      "size": 508
+    },
+    "bug_fixes/mfa_qr_code_data_mapping/qr_code_display_fix.md": {
+      "hash": "cf64031ccfed0a2927937ec609907049880bc3b7e1f794f0ffc9cff7005bf947",
+      "size": 1162
+    },
+    "bug_fixes/navigation_branding/logo_update_fix.md": {
+      "hash": "2eee78130335a5b92427b6afc7cf793b930cb92c803afeac66de3e28f19b26e0",
+      "size": 620
+    },
+    "bug_fixes/okta_saml_authentication/signature_validation_fix.md": {
+      "hash": "34e3bb8a2d3ea94d2f9c559fc9f59298823d3454619837c034f87bc632e1d37b",
+      "size": 554
+    },
+    "bug_fixes/okta_saml_configuration/production_rebuild.md": {
+      "hash": "f437f1d7af517724572fedcf86cbe2919436e9af31bb512b66370203824b74c8",
+      "size": 496
+    },
+    "bug_fixes/operational_recovery/system_startup_verification.md": {
+      "hash": "f82a59da8d3bf6bb05d9fc88c644ab2034f87693f9f6e909b6a563d50825e8ef",
+      "size": 657
+    },
+    "bug_fixes/okta_saml_authentication/callback_url_error_handler_fix.md": {
+      "hash": "ad072548190a66803406bd026c37ce7de8e6015ce75f9039cb1e5b611150c438",
+      "size": 357
+    },
+    "bug_fixes/okta_saml_sso/url_update.md": {
+      "hash": "378380d707cb3c93414fbe137e22a5f7a969e22d5777850bc462c5e589957aad",
+      "size": 796
+    },
+    "bug_fixes/outage_recovery/saas_reboot.md": {
+      "hash": "d33cd3cea1d51dc0f1eb263055d822881d5dae1244461853d5c70b1820fe9991",
+      "size": 543
+    },
+    "bug_fixes/pa_regulatory_content/problem_scope_clarification.md": {
+      "hash": "6435d0ebe748bea7c56f4fa4072c3fb7b8b41ff526eb5b51e944856209789e9f",
+      "size": 836
+    },
+    "bug_fixes/pennsylvania_regulations/compliance_gap_fix.md": {
+      "hash": "7a51018e596bfde388a822c073e5bc525ef423a1d71cc0d5c9adc660e44e6bf7",
+      "size": 1728
+    },
+    "bug_fixes/pa_regulations/incorrect_content_display.md": {
+      "hash": "74b0660aeb4ce0fb8d449ebc6f01b2a7e1f8f3032ce5711e9b1f32060447c06d",
+      "size": 1328
+    },
+    "bug_fixes/password_hashing/emergency_admin_fix.md": {
+      "hash": "6f60ccd661cc1f1b30c5bb924e4b5fe4f7af740816dd4d65a7abe50106aa274c",
+      "size": 1006
+    },
+    "bug_fixes/port_allocation/edsteward_mcp_engine.md": {
+      "hash": "b36b35dae6526ec87bb57079fc1b5f43f957875f44f5f9ee4004c6f1d5c285c8",
+      "size": 421
+    },
+    "bug_fixes/port_conflicts/mcp_engine_reboot.md": {
+      "hash": "b3da11a25672739c7cce3515ee71a3baae8ad63a6cbed7f02219ba705458e787",
+      "size": 1483
+    },
+    "bug_fixes/postgresql_audit_trail/sql_syntax_error.md": {
+      "hash": "02858f28c0144d69524287890c2f578a2fc54443d9c3fcbc6b73bdef2420f91e",
+      "size": 442
+    },
+    "bug_fixes/port_configuration/macos_airplay_conflict.md": {
+      "hash": "0ef426ac1f38930af8171285e22868e27e3c3e4f7437e3181684e24f084ab72a",
+      "size": 1819
+    },
+    "bug_fixes/pre_commit_hooks/eslint_blocking_commits.md": {
+      "hash": "0e80a35c77e42a0f216195a11c60350d3e024eb70f8f34db0e501ce36c178db4",
+      "size": 1485
+    },
+    "bug_fixes/postgresql_migration_data_discrepancy/missing_federal_regulations.md": {
+      "hash": "b149677d27ed4cbd77575af4685fad26a5e5daf8dee8b52afb6299b0587f99e1",
+      "size": 1467
+    },
+    "bug_fixes/react_hydration/trustees_dashboard_fix.md": {
+      "hash": "6c2cb62513ddfa0c1bd0ad0c42693cd7e2c9087ed3dc4eee9d94a7fdb7dd624c",
+      "size": 1599
+    },
+    "bug_fixes/react_ssr/hydration_mismatch_fix.md": {
+      "hash": "0aaa7e9096c570fcfea8e5fc1d9f8904d2de8aaee579bbf4479ab50e7546da21",
+      "size": 1197
+    },
+    "bug_fixes/regulation_delivery/content_priority_fix.md": {
+      "hash": "54617d657bae710d74f4eddbe182396c0b7a7091952c594532fe96c8451bd92e",
+      "size": 2428
+    },
+    "bug_fixes/regulation_content_mapping/legal_content_accuracy.md": {
+      "hash": "aceea8209574472908b0c7db156719bf296c2e9b517c4d8198216baf556a1e1e",
+      "size": 6345
+    },
+    "bug_fixes/regulation_delivery/full_content_transmission.md": {
+      "hash": "385bc69ba9af73cf1d15db79ed4a7495dd014fa05018a85ab2764cccb43db197",
+      "size": 2423
+    },
+    "bug_fixes/regulation_content_retrieval/teach_act_template_fallback.md": {
+      "hash": "545662b88a88f3ee2b3bd9058c44299d8b11de8290f33181d572ca582706e9b9",
+      "size": 1067
+    },
+    "bug_fixes/regulation_content/api_endpoint_mapping.md": {
+      "hash": "c1597b431ec529a2487c016511552708f6771d176feb0c887c1998e4bac280a8",
+      "size": 4381
+    },
+    "bug_fixes/regulation_content/clery_act_display_fix.md": {
+      "hash": "f6450b5b97b2b04687bcc1d00a8f0c1d5bfb809c3eb91823e501f372f956a7ef",
+      "size": 1552
+    },
+    "bug_fixes/regulation_engine/content_and_error_fixes.md": {
+      "hash": "34152444bad7f31a9276b9d54b24c647e8ba8e4fdf2542d228b2c62999668337",
+      "size": 2450
+    },
+    "bug_fixes/regulation_engine/multi_regulation_failure.md": {
+      "hash": "3b9dd3bc78dd4551bcc4d5f30a7355c327e3a2e4aa78509882ecf774ce6f77e6",
+      "size": 2295
+    },
+    "bug_fixes/regulation_id_resolution/api_validation_fix.md": {
+      "hash": "f6258ba890e59e422a2d3d475efc001f242a47e06cb04a6aec31c9165ffcd332",
+      "size": 1438
+    },
+    "bug_fixes/regulation_notifications/override_toggle_fix.md": {
+      "hash": "eabc33e4bb421067c9254e46da212328e70d3d11b2c766b7833a4254e8b7e78e",
+      "size": 1769
+    },
+    "bug_fixes/regulation_delivery_progress/progress_indicators_fixed.md": {
+      "hash": "86fda6c6be6fdb321f42d4c1db6ddc606451bbd5cd1f175067a4ab347d3148c7",
+      "size": 2107
+    },
+    "bug_fixes/regulations_evidence_upload/missing_post_endpoint.md": {
+      "hash": "c7d619a6cb0cce355f76d68569d64b60a17515c74fb788689b468008227e2475",
+      "size": 2485
+    },
+    "bug_fixes/regulation_versioning/api_data_structure.md": {
+      "hash": "fa5f644f1a098d629d968786599a6da12caa9dc2efe2615db1d99ea63f2d84b8",
+      "size": 2518
+    },
+    "bug_fixes/regulation_routing/cfr_usc_content.md": {
+      "hash": "3e5f0b5e487b7dd733ffaf0265c450b7a24f39e10eb33c5be8f08be8fcda2da2",
+      "size": 2153
+    },
+    "bug_fixes/regulations_full_text/field_update_error.md": {
+      "hash": "19c46e23f0574798ee2e2cb3258cff86b67e35accb0d44079560e85b4f298a49",
+      "size": 1112
+    },
+    "bug_fixes/regulations_gov_api_content_type/real_cross_reference.md": {
+      "hash": "29b63d32d9f0a8e60f7019b1bd607022b0721a5305395cdb4654bae6e5965f78",
+      "size": 910
+    },
+    "bug_fixes/regulatory_compliance_cleanup/regulation_cleanup_batch_2.md": {
+      "hash": "c850a625f1edd75d97ebad6965e8fa5f7863cca8098f52f98005e6c9021bc488",
+      "size": 1161
+    },
+    "bug_fixes/regulatory_content/teach_act_template_fallback.md": {
+      "hash": "8b8c6718f913e826cd74af6990ef2e43c69f014b904e70e5825e60a66cb127cb",
+      "size": 753
+    },
+    "bug_fixes/regulatory_compliance/data_structure_fix.md": {
+      "hash": "74f8886750a144476ec23c159361ed19b16dd77a3e84f177ff5f3084ce71eda3",
+      "size": 2332
+    },
+    "bug_fixes/regulatory_compliance/regulation_cleanup.md": {
+      "hash": "0fe0658a2d8586fb6212bcb93643c2885d58e9b60453cfa48c1f62c3fa9f44eb",
+      "size": 1404
+    },
+    "bug_fixes/regulatory_task_contamination/epcra_data_contamination.md": {
+      "hash": "55fcfdc4877ecc46e49b3f67df2852e180a3a37dc1f3a55d3b13d39542dd7461",
+      "size": 792
+    },
+    "bug_fixes/regulatory_data_contamination/template_bulk_insert_fix.md": {
+      "hash": "efba968579ad051971f4a197b1ed3c85928e3f8ea67664b5e5646934bc6b73b3",
+      "size": 944
+    },
+    "bug_fixes/regulatory_content_routing/content_engine_restoration.md": {
+      "hash": "a45b725ed3dcf2ce0a21e4a3542815d8d0ef3bd5ecca56b15fcd880f78f2d5ef",
+      "size": 2055
+    },
+    "bug_fixes/regulatory_task_assignment/data_contamination_error.md": {
+      "hash": "cd16e82b3fd270c2ee7d594460e21f92c4a025a12ebf3aaa30832640dc13a568",
+      "size": 873
+    },
+    "bug_fixes/responsive_layout/notifications_page_formatting.md": {
+      "hash": "06a8bf8fd06c7d9ae0fb33f2eb907aa86f5a1e645505a6e692b2d56397c20635",
+      "size": 608
+    },
+    "bug_fixes/role_mapping_permissions/array_type_error.md": {
+      "hash": "7aa8d501825003e2b006b8c0c3d849fded34380149b5758e70ef2cbf48b4f692",
+      "size": 444
+    },
+    "bug_fixes/saml_authentication/asn1_encoding_error.md": {
+      "hash": "408ad382f662d3d60e1363355061b20206b3a3a6bb21023449ba18e7de1ba224",
+      "size": 438
+    },
+    "bug_fixes/sales_environment/port_coordination_integration.md": {
+      "hash": "aee67dc30ac212fc3c5d4df3c68a82e5acb978f31fa7ade2e851f203ba1c9ef1",
+      "size": 955
+    },
+    "bug_fixes/saml_authentication/auto_provisioning_error.md": {
+      "hash": "306a5ad72cfe67c1d53393eac2dc58aed9b752e3ae883478d53f8478bcd1f800",
+      "size": 530
+    },
+    "bug_fixes/saml_authentication/certificate_error.md": {
+      "hash": "e92a287b0ec0f771d4820774b09e98832a485dce6fb9e7467867837ed007387f",
+      "size": 613
+    },
+    "bug_fixes/saml_authentication/certificate_formatting_fix.md": {
+      "hash": "5de99007afe5467710a4eefafcaa5b69968269b3e69870049878de60ddeb2782",
+      "size": 363
+    },
+    "bug_fixes/saml_authentication/certificate_parameter_error.md": {
+      "hash": "504c9b3b16ffb16c3c889291c448f2604f25a248ab4b66f05f8a01bbcb7d8b1a",
+      "size": 483
+    },
+    "bug_fixes/saml_authentication/certificate_validation_error.md": {
+      "hash": "5d1e6bd2ac223e11d720b2615685c9356823f6cb8591c0044f6ac98784618d37",
+      "size": 335
+    },
+    "bug_fixes/saml_authentication/redirect_path_fix.md": {
+      "hash": "1e8ec784b2a206a5971c1a9145a1858eee9e8b90c3a47aced318e89feab213dd",
+      "size": 451
+    },
+    "bug_fixes/saml_certificate/format_cleaning.md": {
+      "hash": "6e4c154fd19549721dd9c71c70574066c6614e2151aec3b1bb167d92aeed4885",
+      "size": 452
+    },
+    "bug_fixes/saml_auto_provisioning/debug_logging.md": {
+      "hash": "ca08481b67e7f3388efa8866e37cbf3397add5af37cd34d185bf440828077e68",
+      "size": 457
+    },
+    "bug_fixes/saml_deployment/production_outage.md": {
+      "hash": "97d72f79776e2632f3c2a76bab92a3bc75b7c7561162a495d8f6633341d487c0",
+      "size": 821
+    },
+    "bug_fixes/saml_certificate_validation/certificate_cleaning_fix.md": {
+      "hash": "a160f921873281b618697206dfac24bd1109353242b4f8a61b13deaf07e3d836",
+      "size": 1092
+    },
+    "bug_fixes/saml_certificate_validation/certificate_required_error.md": {
+      "hash": "9427500bd4cb1d0782e020ec111e42581ca4674633dbeda4fab6f87ea1feb7d4",
+      "size": 460
+    },
+    "bug_fixes/saml_certificate_validation/signature_validation_workaround.md": {
+      "hash": "93acd6c4bfd944285ce8cb08fe4e4c6210b3562f0af997028a5bc30ebfc666db",
+      "size": 565
+    },
+    "bug_fixes/saml_okta_deployment/production_url_redirection.md": {
+      "hash": "e1b99c1a59f721c1ab8b483cb677dc034703ebb076b73efb98e6d7ebf710a3d9",
+      "size": 413
+    },
+    "bug_fixes/saml_okta_auto_provisioning/auto_provisioning_fix.md": {
+      "hash": "f9b4e9012fd20347e4d0061eb044b76c35ba7f9fe287754f3f1b622926e20835",
+      "size": 978
+    },
+    "bug_fixes/saml_sso/production_success.md": {
+      "hash": "52656f84cd215b3da02a3035bd3f8ac7fc0fe66c86367f71122e796968baeb85",
+      "size": 634
+    },
+    "bug_fixes/saml_signature_validation/certificate_format_fix.md": {
+      "hash": "1d17b4c6f15d992c6076f887eb9a0c6e9ac0afceac6d100ecd9898bd411c452a",
+      "size": 442
+    },
+    "bug_fixes/saml_signature_validation/library_update.md": {
+      "hash": "24bce823be852abd857ea9604498b97640e9f88ac4ca2521a07ab5c0ab329f65",
+      "size": 503
+    },
+    "bug_fixes/saml_signature_validation/fake_certificate_bypass.md": {
+      "hash": "1e6f639f729064c4ca6c614a37b2757d45e945a7d3aec8cb011faa7e5952f382",
+      "size": 715
+    },
+    "bug_fixes/saml_signature_validation/workaround.md": {
+      "hash": "7ef8ad91c4e0b170ee42f8b0814889a39a1cfa0712a9128324ec7d9e7c8cc340",
+      "size": 453
+    },
+    "bug_fixes/server_registry_search/data_source_mismatch.md": {
+      "hash": "a3217386904d7752f8b551a2cd47fbb2fa4fbb147879b103f8c9718e934a0155",
+      "size": 2610
+    },
+    "bug_fixes/saml_sso_certificate_format/production_pem_certificate_failure.md": {
+      "hash": "474a8b5a81d7db0db0ff153f7cb38508ff8df2ac91feec6add550c1e93314d7d",
+      "size": 556
+    },
+    "bug_fixes/schema_validation/note_creation_error.md": {
+      "hash": "74176c82548ee85b95094ae712f542120d0180e7a0c6a000fdac0b8ace91b111",
+      "size": 1846
+    },
+    "bug_fixes/server_resilience/login_stability_fix.md": {
+      "hash": "a589d30b9bbbe5393cd4136f26ce3ae8f78ebdf8343d52aa05e89fb7afc426d9",
+      "size": 2903
+    },
+    "bug_fixes/service_recovery/console_recovery_status.md": {
+      "hash": "b62ee58fca2808800cca9ee6758b0aa0fd1458202b6926a084fbbc1bda28ee16",
+      "size": 1165
+    },
+    "bug_fixes/service_initialization/health_check_commands.md": {
+      "hash": "07820568ab3f7d8647328c849ea41cf1997405c78bff3b3b16b9bec6fbff66f3",
+      "size": 935
+    },
+    "bug_fixes/sso_certificate_parsing/env_format_error.md": {
+      "hash": "de54770a9d85441cb75a01d338d063fbe62a0c7f46111696f932451aa7300c7b",
+      "size": 459
+    },
+    "bug_fixes/server_stability/crash_prevention.md": {
+      "hash": "a2b72aeff5cac5814f61f6fdcca73c202ca0d80ca4361b772a3759a0af2a6ffd",
+      "size": 1675
+    },
+    "bug_fixes/server_stability/crash_prevention_and_ui_fix.md": {
+      "hash": "f3b92bd0a236e17d6aa7faeedcea6419e0ee3439f30b969f547a099551d9d4cf",
+      "size": 963
+    },
+    "bug_fixes/sso_integration/critical_priority_fix.md": {
+      "hash": "fadf7394b0f1c598c57321784421a8de719100526e8d3f253451e234b4a8456e",
+      "size": 1083
+    },
+    "bug_fixes/sso_saml_authentication/registration_failure.md": {
+      "hash": "9ea313f477b4083a869880c137653113e19cead246e8d090d98353f3fb189a07",
+      "size": 555
+    },
+    "bug_fixes/syntax_error/orphaned_literals.md": {
+      "hash": "838a44647fcc5cd28cb8ae91427b4f57d10263b58be4c6937a6385f5b3298f1d",
+      "size": 834
+    },
+    "bug_fixes/swift_concurrency_cancellation/task_sleep_try_bug.md": {
+      "hash": "b7112608a3a0e9add858bffb572ab1365bdc3e8c6ad7948516d79a6591bac3c3",
+      "size": 800
+    },
+    "bug_fixes/system_recovery/beta_sprint_blockers.md": {
+      "hash": "a08561359eb4de00c43e3283bddc13bca2977808e96ca3fa60d95919ee6fe0ec",
+      "size": 1756
+    },
+    "bug_fixes/task_category_grouping/category_grouping_fix.md": {
+      "hash": "235f9bd15640abf17c0b062a5c71c728544e20f3c360d8d83685db6a72e6b60e",
+      "size": 1446
+    },
+    "bug_fixes/teach_act_console/content_api_parsing_error.md": {
+      "hash": "8664c0c35e06dbaa91e70aec877e9c093fedfd309c9dad597b398bbcfeed4195",
+      "size": 2455
+    },
+    "bug_fixes/tuf_repository/health_check_log_spam.md": {
+      "hash": "e9bb0df89ead304bffa5f2c5890b05c274040ae660ddbbdbe041fc3631dfb419",
+      "size": 1179
+    },
+    "bug_fixes/teach_act_compliance/api_data_structure.md": {
+      "hash": "85ca54bfe6aa0910cae64490a40013c37b6095daa046e8968c1b26ee7c8aff0a",
+      "size": 2290
+    },
+    "bug_fixes/typescript_react_conflict/user_icon_reference_error.md": {
+      "hash": "58da152677e82c933ed065f485c6072162aecb944f45dcd107bdd6c645060588",
+      "size": 646
+    },
+    "bug_fixes/validation_context/api_error_toast.md": {
+      "hash": "353f2c403db570c9ab48e53cba8afec22c1fbde3f926832b49bf9568a28f22c1",
+      "size": 2084
+    },
+    "bug_fixes/versioning_data_structure/endpoint_structure_fix.md": {
+      "hash": "8951f26520ec6195d467a1cf9367073989c25db3442d6a205d546f769c76f8d0",
+      "size": 2637
+    },
+    "bug_fixes/websocket_startup/non_blocking_fix.md": {
+      "hash": "3f81e46a4cef79ec1bc23b97e56e9563defffe7dc02f9c6cbdc0ec58bfaee877",
+      "size": 3419
+    },
+    "design/agent_file_search/handbook_existence_check.md": {
+      "hash": "8e0c1c821962a775ea4ba4faa73ed8899d35e7e2ce743579571e98bfb8f65b79",
+      "size": 105
+    },
+    "design/agent_search/handbook_existence_check.md": {
+      "hash": "8e0c1c821962a775ea4ba4faa73ed8899d35e7e2ce743579571e98bfb8f65b79",
+      "size": 105
+    },
+    "design/access_control/okta_rbac_implementation.md": {
+      "hash": "e3fc18e849e039c54dee1f82e3a4c09e730167bf8bbda24c57a12bdd1e3c0348",
+      "size": 3052
+    },
+    "design/academic_equivalency_system/project_status.md": {
+      "hash": "59f083455dd6849303c6b2b6f22cc1de381679910902c999d60f249daee5041d",
+      "size": 1737
+    },
+    "design/ai_auditor/progress_bar_enhancement.md": {
+      "hash": "09fd60b5c026a3bd9b748f98992100e19817507774ab64c23afe4182d5bb23da",
+      "size": 2008
+    },
+    "design/ai_discovery_system/system_implementation.md": {
+      "hash": "bd2afcb1f554bd8b40e4ad645bc745ffd534f9da2944292fb1d05f43da4696ba",
+      "size": 6707
+    },
+    "design/agent_tooling/handbook_existence_check.md": {
+      "hash": "8e0c1c821962a775ea4ba4faa73ed8899d35e7e2ce743579571e98bfb8f65b79",
+      "size": 105
+    },
+    "design/agent_tooling/handbook_file_search.md": {
+      "hash": "8e0c1c821962a775ea4ba4faa73ed8899d35e7e2ce743579571e98bfb8f65b79",
+      "size": 105
+    },
+    "design/ai_equivalency_generator/admin_portal_features.md": {
+      "hash": "c140acc3ad4db4cffedd94bbccd1566f1b8ec720639c7ef7646858618c5a5059",
+      "size": 1420
+    },
+    "design/agent_tooling/handbook_search_patterns.md": {
+      "hash": "8e0c1c821962a775ea4ba4faa73ed8899d35e7e2ce743579571e98bfb8f65b79",
+      "size": 105
+    },
+    "design/architecture_cleanup/january_2026.md": {
+      "hash": "15a6bafd0be82e1fb2b03e23a575511d116483b43719d117ca2a8280817ffd93",
+      "size": 1432
+    },
+    "design/algorithms/quicksort_implementations.md": {
+      "hash": "fcad97025def1a669815203490926df5cdb2485c4aab32b6198b560b39d325a0",
+      "size": 2008
+    },
+    "design/ai_systems_networking/port_coordination.md": {
+      "hash": "def6f0471676b7b6ba3845618c3217a5564381270b6eb359be61873c3a2fd688",
+      "size": 580
+    },
+    "design/api_integration/edsteward_package.md": {
+      "hash": "ba67c1ab69744b69f9dafbce7f07836ef86c9bdf2bcdf900296a707d6ae11dac",
+      "size": 1378
+    },
+    "design/asset_management/art_generation_system.md": {
+      "hash": "0876465a92158a18a1bc86ebc15d313f8e66e3ca23b1e5168d09597dfdeae3ba",
+      "size": 1526
+    },
+    "design/api_integration/bulk_regulation_import.md": {
+      "hash": "242c9e72cde347a5e836e5d3fb22e21b765bcfe23a4386f67614c71f0a74e208",
+      "size": 1330
+    },
+    "design/athletic_association/hybrid_url_discovery.md": {
+      "hash": "4b7f842964e4d592b8d8843898edd9f45513e59a1d18460aa5d53d188ae0b333",
+      "size": 7720
+    },
+    "design/athletic_association_platform/project_overview.md": {
+      "hash": "6302417b4a1f5f05f00b760c073d655f78d466275342e019f7e43d930d3ae1dc",
+      "size": 1988
+    },
+    "design/architecture_mismatch/mcp_engine_analysis.md": {
+      "hash": "0f3f2e391160215547e60cc1f079061b547c0e950a7ea6e6a7ef4ff7c3b1b4d5",
+      "size": 3703
+    },
+    "design/automation/handbook_existence_check.md": {
+      "hash": "8e0c1c821962a775ea4ba4faa73ed8899d35e7e2ce743579571e98bfb8f65b79",
+      "size": 105
+    },
+    "design/authentication_contact_management/platform_features_implementation.md": {
+      "hash": "7bc8e0923d9eb84f3c25dd82c96a807dbe7e865358e05544d5ca4548ed61cab7",
+      "size": 6939
+    },
+    "design/byterover_layered_generation/handbook_phases.md": {
+      "hash": "c4b2b45007af1544da33157d3e954265898cef199fc3108a209abee0dbebf6f4",
+      "size": 185
+    },
+    "design/compliance_analytics_dashboard/executive_dashboard_implementation.md": {
+      "hash": "dfb089e893924cd643171a217f921f054640a03a2fb1c55edbb2a4dbc70eee9f",
+      "size": 1178
+    },
+    "design/beta_launch/critical_tasks_completion.md": {
+      "hash": "ffa08d9cb55ed09cedd4253e87e18791663f6230c400380d441d6a18cffb8ed7",
+      "size": 3428
+    },
+    "design/cco_dashboard/dashboard_experience.md": {
+      "hash": "82c1d36e01bed5389abdae0899ca164319acafd4e774c0bdeda8c4dfefa76504",
+      "size": 4104
+    },
+    "design/combat_system/implementation_details.md": {
+      "hash": "f41f7d59fecda07f6f6d73758a7d53b2817ebffb6fb8bb95bbb300a9dd85915e",
+      "size": 4479
+    },
+    "design/compliance_deadline_notifications/system_implementation.md": {
+      "hash": "b221aca452cb416ad30732241e5202ffd5642386ecb2e19d2081c6cb6bd8b251",
+      "size": 1687
+    },
+    "design/console_gold_standard/bulk_update.md": {
+      "hash": "c5be2f22ab51d4e5b8f2deb85b285b5295b53bb01a75671a43c9665e78e692d8",
+      "size": 1033
+    },
+    "design/compliance_task_management/dri_assignment_attestation.md": {
+      "hash": "bf17cf884bcf4887757bd8431eaa304f7cde94511b1d5f023c8897428a1d5504",
+      "size": 4168
+    },
+    "design/contact_discovery/system_enhancements.md": {
+      "hash": "5780a2d2292ed5346aae11b4bccc5d84681b01ab7cd1feceb835d35383f894af",
+      "size": 3877
+    },
+    "design/customer_frontend_improvements/january_2026_update.md": {
+      "hash": "5c4934f3fa9164c1bdd8f8fd61bba3513c04aaed0c3587b9244eeebbd026a08b",
+      "size": 1005
+    },
+    "design/compliance_tracker/architecture_lovv.md": {
+      "hash": "c64e6b575971b97490b535b52d99b6c5d0569c23a21c2fa2d6d98fb3bec41c10",
+      "size": 1564
+    },
+    "design/content_quality_scoring/teach_act_scoring_algorithm.md": {
+      "hash": "77050661b8e6ab94646fdd582affc4b555ad49ebc531bfe470c9648858f3c6f9",
+      "size": 911
+    },
+    "design/contact_management/advanced_features.md": {
+      "hash": "ff1cdd7c0c44ea7349fc8e64c08694b2cd0c5000a24822feb921626a3f7da7b2",
+      "size": 6129
+    },
+    "design/cross_reference_system/api_integration.md": {
+      "hash": "75de7a0d99b72be3a797ab13e697646318ec3b9aa4e8c236729c1ef58f57f2ed",
+      "size": 1384
+    },
+    "design/dark_mode/implementation.md": {
+      "hash": "66eea5064147d4e42a6d1b0c6e3ba196c8ef74e5f87650c369f654f6fce2e08a",
+      "size": 1509
+    },
+    "design/dashboard_analytics/dashboard_implementation.md": {
+      "hash": "30dad2e7dbd29d2c81cec975d774d083c84d4a959d3f91070658e32673093092",
+      "size": 7757
+    },
+    "design/dashboard/centralized_controls.md": {
+      "hash": "ff2967cd5db782060eb48c38d6ed180ba26809f8e3ace4b2c64c5f8b23aeafea",
+      "size": 3752
+    },
+    "design/dashboard/kpi_cards.md": {
+      "hash": "2d182614e4e6ddce6f49e6b1bd2a43ff1d4638ec11b3f80bfa9f4d73e356a70f",
+      "size": 1092
+    },
+    "design/dashboard/regulation_counters.md": {
+      "hash": "c189dddca84ab5f3ee5a421baf0303850412818a6244f7f4855db5c09cf2cd06",
+      "size": 4108
+    },
+    "design/dashboard_widget_customization/widget_customization.md": {
+      "hash": "7342d2c1425b0ddce91f0f42701278c988aec7ac01b67830c22a05ad4744547a",
+      "size": 1330
+    },
+    "design/data_architecture/mcp_engine_issue.md": {
+      "hash": "8303c8769bda1465e0db52686ccb4950907ef441440021cefa24a115cacd32f2",
+      "size": 1319
+    },
+    "design/dashboard_widget_reordering/implementation.md": {
+      "hash": "8e88375141992dd38bc72e4ae5530b34a0764ecf46b98eb8f621bec1921c68c2",
+      "size": 1289
+    },
+    "design/deadline_extraction/mcp_engine_implementation.md": {
+      "hash": "e78c0b61c5bfd40ea884ffaa0416751030b3a5849fb1e9a9b5b8a83f766003bd",
+      "size": 3273
+    },
+    "design/data_pipeline/cfr_federal_register_enrichment.md": {
+      "hash": "977e254ba11ffe48de701f8bcc50ec6bf4333fccbebc379a9b73d95277dd5663",
+      "size": 1037
+    },
+    "design/developer_workflow/checkpoint_system.md": {
+      "hash": "71db5360ff61680326d8dc3875ce9b2f8e0f45a97cae1d86aeee8704b56f40a8",
+      "size": 1102
+    },
+    "design/documentation_codebase_sync/analysis_workflow.md": {
+      "hash": "d52ab9f8a8a86ed5ca05616c39eff1776384394dcda1177bf82b055cfc838832",
+      "size": 228
+    },
+    "design/documentation_sync/handbook_codebase_analysis.md": {
+      "hash": "d52ab9f8a8a86ed5ca05616c39eff1776384394dcda1177bf82b055cfc838832",
+      "size": 228
+    },
+    "design/documentation_workflow/manual_merge_strategy.md": {
+      "hash": "d1d5c1e6e529a7c8f85224ab462f8d21e4ae8c39df0e3c4b24f13418f1fdfc8a",
+      "size": 138
+    },
+    "design/dungeon_room_system/room_placement_connectivity.md": {
+      "hash": "d080879dceb87abbd0883a779018a379221970a2eb3f31093ebbcc5f1ffb3fda",
+      "size": 2512
+    },
+    "design/edsteward_id_mapping/regulation_id_conversion.md": {
+      "hash": "10edf4b35a2d480e3811a59bf5c8ec7a84070069e588f255f7d48b89cd29717d",
+      "size": 718
+    },
+    "design/ecfr_api_integration/cfr_parts_fetching.md": {
+      "hash": "8c435a362cdccc647a8f98fe6b00a71e7e19514725064efb163ebc99ace811bb",
+      "size": 935
+    },
+    "design/drag_and_drop_file_upload/implementation.md": {
+      "hash": "5ac84f6a265bad950940e754e16681997f4bc3a3b90db1985139395d310f61e0",
+      "size": 1344
+    },
+    "design/edsteward_mcp_communication/shared_protocol.md": {
+      "hash": "bdee4fe12969ff203b7d02bf075ec8f00d51cda83e992a2201921ee0314460a4",
+      "size": 1744
+    },
+    "design/edsteward_regulations/differential_view_demo.md": {
+      "hash": "ea9fbd766abd8cac8f7a959c661f9309d083023ea9a0fe4e3888460fbad93713",
+      "size": 2435
+    },
+    "design/email_campaigns/sendgrid_integration.md": {
+      "hash": "a822db75367421d7a03a03145359f17cd145854d53948e3695cbea325adb0116",
+      "size": 10258
+    },
+    "design/email_verification_system/zerobounce_integration.md": {
+      "hash": "fbaf373612e412d78218e1af3f590e1813e2aa428df04cadfcab6e614a582dee",
+      "size": 8623
+    },
+    "design/edsteward_notifications/send_feature.md": {
+      "hash": "865c6eae40e79be04a5fc524a232b04667fe3f2c7599824c49da3aa251614747",
+      "size": 2276
+    },
+    "design/embeddable_widget_system/implementation.md": {
+      "hash": "105dce76999acd9530b945d53273d80f25f8884221ea40c085dc787b8394fcd4",
+      "size": 2155
+    },
+    "design/engine_startup/service_initialization_order.md": {
+      "hash": "c1b958912b42014d5a235d060918b8249375a4d12aae30c30979e65d490d1274",
+      "size": 121
+    },
+    "design/equivalency_management/bulk_actions_and_forms.md": {
+      "hash": "b321cb35e2671fb417225b83bdcff8577fb1808962e762b31887cf618b53344a",
+      "size": 1259
+    },
+    "design/executive_order_impact_summarization/mcp_engine.md": {
+      "hash": "314cc2f54fba5433e126171899b44313658475a7fb5bbfa8c7beb28d0227f51f",
+      "size": 1180
+    },
+    "design/escalation_feature/regulation_detail_improvements.md": {
+      "hash": "7d322200a04f7d855b9af2346e91e17dae51613d0a99f7a4fe1f4e5afef37ebc",
+      "size": 1821
+    },
+    "design/engine_updates/january_2026_updates.md": {
+      "hash": "2fca5ca5c536c7b116eebe53c9cd4a38e08da19df78d0f312382eafaf31ce3de",
+      "size": 1848
+    },
+    "design/executive_orders_integration/complete_implementation.md": {
+      "hash": "3521ac0e63ee0d8e164733ce38f123608e9a6281e07db2d40676075c6bf406f0",
+      "size": 2062
+    },
+    "design/federal_register/integration_implementation.md": {
+      "hash": "4d18cb3a1fea49c4ea2224341400b45efcaff0fac8f977a700e32ca1ed11c9fc",
+      "size": 1921
+    },
+    "design/federal_register_api_integration/implementation_complete.md": {
+      "hash": "28db314777b4cdf8585acd0dd259b9946c8b0f79bc9fa94211d46716c2c87be1",
+      "size": 1205
+    },
+    "design/feature_implementation/edsteward_features.md": {
+      "hash": "3fe0be50d3dac25923fe59767f0352e135335d85f860f49587d6382f539d6b37",
+      "size": 1595
+    },
+    "design/feature_development/session_update.md": {
+      "hash": "fdaf4571756831f891aaffb25d0b7656cfc17390aca0f359bb17353f0267d140",
+      "size": 2021
+    },
+    "design/frontend_architecture/single_tenant_focus.md": {
+      "hash": "3f56fe6a4b9420879551debdb340ebdada02c77ffcc0959f6f1ed4d5c3e50bc6",
+      "size": 662
+    },
+    "design/game_art_styles/cultivation_grade_themes.md": {
+      "hash": "2a8fe3b2bb06e67a53f3f06a8f97a4458d3dd581f68aec156548bb24f33322bf",
+      "size": 1837
+    },
+    "design/file_search/handbook_existence_check.md": {
+      "hash": "8e0c1c821962a775ea4ba4faa73ed8899d35e7e2ce743579571e98bfb8f65b79",
+      "size": 105
+    },
+    "design/game_systems/dungeon_core_cultivation.md": {
+      "hash": "ae958380b86635bcfc7862775dc282aef8868f52397ef9aac08c27a9e07e923b",
+      "size": 2189
+    },
+    "design/federal_register_document_cache/system_implementation.md": {
+      "hash": "536a88e14172b130e8912c7e31b286bb6033a5524d4c1c3bbacc21b1cc95fbe3",
+      "size": 599
+    },
+    "design/game_features/skill_tree_and_progression.md": {
+      "hash": "7b4469a695e64caa4d3904701238e429c34e6a04a14346a18c02ca21f4fed2c8",
+      "size": 1728
+    },
+    "design/gameplay_systems/dungeon_core_cultivation.md": {
+      "hash": "49ea4c1554fc5dd5c4f2ab03b0bde769393fd2bca46201e0e65226d8d0d559ea",
+      "size": 1472
+    },
+    "design/game_mechanics/core_systems_overview.md": {
+      "hash": "40962555fda2710bed8632062251645ce62e38871671589228454f922ccf56fc",
+      "size": 7503
+    },
+    "design/game_mechanics/drag_and_drop_merge.md": {
+      "hash": "762375e526cef26636197e24a8f6d09648a3b6e0af0759be0c51894a9c7d853e",
+      "size": 1565
+    },
+    "design/handbook_search/existence_check.md": {
+      "hash": "8e0c1c821962a775ea4ba4faa73ed8899d35e7e2ce743579571e98bfb8f65b79",
+      "size": 105
+    },
+    "design/gaming_generation_theming/visual_evolution_system.md": {
+      "hash": "a0fba5e2589f5870094e4743cab41a070cc789a7f8c956291d469ea5f78c1ead",
+      "size": 1745
+    },
+    "design/granular_workflow_feedback/implementation.md": {
+      "hash": "447e0afdf531e4e70db171dddb70e16b7c991e2d14c3154c3226835d23367e17",
+      "size": 1968
+    },
+    "design/godot_ui/drag_and_drop_pattern.md": {
+      "hash": "cf9fdab42b50ea09567b27930ccfc5217aae8bb6f480318d2ddad5f132d90a9c",
+      "size": 1371
+    },
+    "design/heca_csv_integration/content_quality_improvement.md": {
+      "hash": "70ad1152ec59b265059136e4cc7d5a9c7601d05c4d2e2a054a0f766f7fa3db63",
+      "size": 1330
+    },
+    "design/hybrid_deployment/architectural_clarification.md": {
+      "hash": "2d1e5bdbb63da2ad50d331d454cc1e2df67114a1c5c384d213bcd9975ae6c6f0",
+      "size": 1763
+    },
+    "design/id_mapping/mcp_engine_regulation_ids.md": {
+      "hash": "1c6ff3652c7fc4a20fb74afc4835ef3a1236be1efb1a11f89b139a157f9b387c",
+      "size": 853
+    },
+    "design/handbook_workflow/merge_strategy_preservation.md": {
+      "hash": "d1d5c1e6e529a7c8f85224ab462f8d21e4ae8c39df0e3c4b24f13418f1fdfc8a",
+      "size": 138
+    },
+    "design/idle_game_dashboard/unified_split_view.md": {
+      "hash": "148fc47b5f227aac4906e3dc3ce497c68903aaaf560f7ab22ec2ca0dbc356db7",
+      "size": 1465
+    },
+    "design/idle_game_combat/auto_looping_system.md": {
+      "hash": "6b6aea885f0deefffbb97d9c5fe742b8908b892c6f4cd22fe8f5225492848e9d",
+      "size": 1827
+    },
+    "design/ide_integration/byterover_cursor_sync.md": {
+      "hash": "7a0c28a4541a31cf5ede7a85fb329d0afbe7c6d3917e6472e1c29df94447fbdc",
+      "size": 1184
+    },
+    "design/idle_game_balance/progression_tuning.md": {
+      "hash": "fe997285fddcdb3d58a1f4bc220493d2b2e482679325cd5a4289c55091cf6bf1",
+      "size": 2168
+    },
+    "design/idle_game_mechanics/rest_healing_system.md": {
+      "hash": "924d2b620db210e7bf3cf3c8dd09d093105d99e7345ed5a935173e9947b4047a",
+      "size": 1649
+    },
+    "design/inquisitor_quality_inspection/gui_integration.md": {
+      "hash": "82a714aed8bc4e430e4090c0b0f74bebb18366774c950f73e4414ef195026030",
+      "size": 1976
+    },
+    "design/inquisitor_mcp_server/ai_validation_plan.md": {
+      "hash": "d28e734c4ade77dc4c96d3093b9bbb9bf805fd13a83c015704d67c19f93a5420",
+      "size": 1319
+    },
+    "design/layered_architecture_generation/handbook_phases.md": {
+      "hash": "c4b2b45007af1544da33157d3e954265898cef199fc3108a209abee0dbebf6f4",
+      "size": 185
+    },
+    "design/integration/mcp_edsteward_workflow.md": {
+      "hash": "e48919d9c77c0771e7df0803901b4691ef11b04c547d739a55eed73c86fe1bd5",
+      "size": 522
+    },
+    "design/internal_tools/suite_implementation.md": {
+      "hash": "528fb5fa5a03aeabcfdbc2b8ee07431a312d8ffe08b3d71068591d54895b8903",
+      "size": 11370
+    },
+    "design/keyboard_shortcuts/implementation.md": {
+      "hash": "3e24502ffc4acdd36b82d150afcbb02ea416e6e83bffaf5d1eceeb749203613d",
+      "size": 585
+    },
+    "design/integration_architecture/byterover_cursor_orchestration.md": {
+      "hash": "37ea6adcabaad0e2cfe1d17da62ea9184c6631423005e9dc65499e26e925e717",
+      "size": 1148
+    },
+    "design/layered_generation/byterover_handbook.md": {
+      "hash": "c4b2b45007af1544da33157d3e954265898cef199fc3108a209abee0dbebf6f4",
+      "size": 185
+    },
+    "design/legal_research_apis/mcp_engine_integration.md": {
+      "hash": "83e232763ac066c4004f881d5cfe1da29807d3a846f3bb4d57eb508b8d313950",
+      "size": 1919
+    },
+    "design/legal_api_integration/api_integration_status_jan_2026.md": {
+      "hash": "ea3bbb3b3737335ea034bf2a2d451d91611798b9094bacf46bfba0e220ca5356",
+      "size": 857
+    },
+    "design/legal_data_sources/api_integration_update.md": {
+      "hash": "41cbf797aaf1a75a6c0ba5321226b4ce4d79ee89e648dd272cb8a78103f3a8e8",
+      "size": 693
+    },
+    "design/llm_regulatory/summary_generation.md": {
+      "hash": "a645dd86eb4820ed0d3835042426942f22b1fcc0b164de84b794d45ea279cb65",
+      "size": 2304
+    },
+    "design/llm_compliance_workflow_engine/workflow_engine_implementation.md": {
+      "hash": "8f81f5a8d7994a68cae8705f462bb02c18ace50d1ee4fab9e9ec5408230df2cd",
+      "size": 1652
+    },
+    "design/mcp_edsteward_delivery/workflow.md": {
+      "hash": "d23d894011167c306d94a877b5ae53f9b094a7ff4c40096df84d6e55e3677869",
+      "size": 1133
+    },
+    "design/mcp_engine_dashboard/complete_redesign.md": {
+      "hash": "74bd0e1ebc78454e22907237d7e5027e688a5a1ad5f7f1e40736b24af8c58a74",
+      "size": 1947
+    },
+    "design/mcp_edsteward_integration/real_time_regulation_updates.md": {
+      "hash": "1490cca42e1256b553e907c8be681a434739bd49341a75c7efac0948eacaad1e",
+      "size": 1111
+    },
+    "design/mcp_engine_edsteward_alignment/verification_system.md": {
+      "hash": "35b04e57a7b5733f6703e15f349fed71305321871b2fab27b57c9cfa53a5ed12",
+      "size": 1744
+    },
+    "design/logic_visualization/svg_simplification.md": {
+      "hash": "4b0cd59d818ed57f2308512218d44e9bdbf1d7a022f50897eab33e663bb5762f",
+      "size": 1422
+    },
+    "design/mcp_system/implementation_plan.md": {
+      "hash": "472470e5078e6f637ce77959dae79f697c111336b6293098d6646d97e2d81747",
+      "size": 1373
+    },
+    "design/mfa_setup/qr_code_generation.md": {
+      "hash": "87b85e892da25d7437b15d6688f6b13e1433f5426554f4fd437f0dad07c37966",
+      "size": 3179
+    },
+    "design/middleware_model/transferiq_architecture.md": {
+      "hash": "cb04d910edad44dd9ba6dfed0153140f7602427012616dcc2b956ff3338aef49",
+      "size": 1292
+    },
+    "design/multi_tenancy/consortium_strategy.md": {
+      "hash": "8605bdaeb92efaddf7808af267d70314f57de7f6bf11a99683d3598ccea5ee80",
+      "size": 444
+    },
+    "design/multi_state_regulations/system_architecture.md": {
+      "hash": "1611ad27b92fb92cd95ecc2dfcde150b643b5e27edfddb1b2e3a9b27fec15d76",
+      "size": 1952
+    },
+    "design/multi_tenant_architecture/isolated_deployment_strategy.md": {
+      "hash": "ba11d17d9501d5b6855e464b4f29780dd822b8da3e434524db2be4b1a9bb9ad1",
+      "size": 1100
+    },
+    "design/multi_state_architecture/emergency_pa_regulations.md": {
+      "hash": "cc5a2094983ff83565952d532a1ff34d53f343bff09a52d12293d57ebdc4bd62",
+      "size": 5484
+    },
+    "design/navigation/regulation_console_pages.md": {
+      "hash": "cc0c1f9435f65509d0374193ef58d9f0248886f149b78d0bf414aea7ce0aff07",
+      "size": 3193
+    },
+    "design/multi_tenant_database_isolation/implementation.md": {
+      "hash": "c3397ea2cb48b12dd70e21c13400da1dc75ffda0bc18979383217d7c9e7c6d70",
+      "size": 1453
+    },
+    "design/multi_tenant_database/wossamotta_dedicated_project.md": {
+      "hash": "c9c67ee2b6458c2e277714ee78edfe1922e940231151b73c340c00854b6504e6",
+      "size": 1640
+    },
+    "design/network_port_allocation/mcp_engine_ports.md": {
+      "hash": "dc6cfa8422c4432e4b86ddb778dcec0114aee51f3eaedd33e1d8baecd974a78f",
+      "size": 1502
+    },
+    "design/notification_management/system_implementation.md": {
+      "hash": "6f944982041fef5edd83a90d967b93e4048bbbbb0864f5b93aa3dd40852091e5",
+      "size": 1487
+    },
+    "design/nes_style_combat_feedback/impact_visuals.md": {
+      "hash": "b714a5e63adef177b0bacefc8c3f657dffefb1267ddd11d7e35500769f5bc24f",
+      "size": 2265
+    },
+    "design/notification_history/system_rebuild.md": {
+      "hash": "a9aa1f46617a49ff0b817c912cc843add89e5d15cd6c1b269a4ef0e38b316d64",
+      "size": 2045
+    },
+    "design/notifications_management/missing_interactive_controls.md": {
+      "hash": "c8038dedc1706bcf58a28f6317956c80255b6083c618ee3381c91106c24e3323",
+      "size": 976
+    },
+    "design/page_layout/regulation_detail_page.md": {
+      "hash": "518120ff3b6ff10322d0fffd3e737088f2a36623b2ce4b96b8f88e5c9a7008b2",
+      "size": 1897
+    },
+    "design/platform_features/launch_features.md": {
+      "hash": "797bb43cda38bbbbfbe0c380527c276263f816498afdc44d77722a2a8b390b37",
+      "size": 1851
+    },
+    "design/platform_overview/edsteward_analysis.md": {
+      "hash": "1f7a09682c0d1e930b0eafeee24abae5a1d9c2ce5af83f98438d74c4c4d3d979",
+      "size": 3352
+    },
+    "design/performance_optimization/llm_gateway_speedup.md": {
+      "hash": "826d1faf4b417c5cb4f76e289ebdb1ead06947612c2a338b8e62293a5a78226c",
+      "size": 1217
+    },
+    "design/product_roadmap/transferiq_features.md": {
+      "hash": "a9d3790bb3678210c113ee715054616581ef9d3ce9d020c6ca5967ef7cdb8ab4",
+      "size": 849
+    },
+    "design/postgresql_backup/backup_management.md": {
+      "hash": "ca4e033c002f2af2416b1c90fe6deb4c0d53342b46d1e25e5367f0633ba71f88",
+      "size": 1021
+    },
+    "design/progression_system/rank_system.md": {
+      "hash": "34037f4f915df71d66ece3f3850775788912c2b8da7e9025fadf29b293d8319b",
+      "size": 1978
+    },
+    "design/project_architecture/project_status_checkpoint.md": {
+      "hash": "42ab9b2371723d844198178410fce6662c3403f1f851e8784e1dbe34c05cd7dd",
+      "size": 1945
+    },
+    "design/pricing_strategy/value_based_pricing.md": {
+      "hash": "2334f4e912f5492704e861ea9d8ef0a1b5800682e307d6a13ce42047db421266",
+      "size": 2540
+    },
+    "design/project_generation/generation_phases.md": {
+      "hash": "c4b2b45007af1544da33157d3e954265898cef199fc3108a209abee0dbebf6f4",
+      "size": 185
+    },
+    "design/regulation_assignment_notifications/regulation_assignment_notifications.md": {
+      "hash": "905ac92b03c64815fe17efbd8081660648cccd997955ea44bf965cf804279eb3",
+      "size": 1151
+    },
+    "design/regulation_engine/universal_update_system.md": {
+      "hash": "8d59854c6e93ea1c98c7de487f824a53842eadcf0f464f8e2aaaf649bb969659",
+      "size": 3751
+    },
+    "design/project_management/byterover_cursor_integration.md": {
+      "hash": "7a0c28a4541a31cf5ede7a85fb329d0afbe7c6d3917e6472e1c29df94447fbdc",
+      "size": 1184
+    },
+    "design/regulation_data/id_mapping_system.md": {
+      "hash": "636821dae8dab5be3712aab45e2764ecc6f85cf14137ea1bfe82063a5c60dca8",
+      "size": 1510
+    },
+    "design/regulation_console/enhanced_features.md": {
+      "hash": "6fc9af8389974ac1620b41e93b458cc86d05539de4ac2d858264d54f07681c0d",
+      "size": 1643
+    },
+    "design/regulation_data_sync/mcp_edsteward_challenge.md": {
+      "hash": "db9690f738c61fd152aa509b2938c0276f2f72eb3898e0a0bde3fed65421d33b",
+      "size": 902
+    },
+    "design/regulation_management/ownership_visibility.md": {
+      "hash": "5b4281acb833f133cea3e42c53ad34ba1e906e23e6a2cda3c1f0fb866153eba2",
+      "size": 1265
+    },
+    "design/regulation_search/client_side_filtering.md": {
+      "hash": "fae886fcb573614c703fa7fb2f9fea0f0435d3cd5b0f0b762cff1721735fc15a",
+      "size": 2558
+    },
+    "design/regulation_search/dashboard_search.md": {
+      "hash": "4916f4d9ca827f1ca6b86cf8ba2f8fe9879117b4819b6a9a00d5a92998e9f72b",
+      "size": 2780
+    },
+    "design/regulation_status_timeline/compliance_history.md": {
+      "hash": "a320c28236c0bf82318664676b182f0d9980333af42f3ea1b072515e8cc83fa2",
+      "size": 737
+    },
+    "design/regulation_summaries/source_priority_integration.md": {
+      "hash": "fca700eaef6468b9e26c6610270fee915528e79bacbffe7db8272b9c7ca9ac71",
+      "size": 2143
+    },
+    "design/regulation_updates/bulk_accept_all.md": {
+      "hash": "9692f932e63e4687bc56d2c49653eea495fe415546988737c0290a99062f5ee5",
+      "size": 1634
+    },
+    "design/regulation_updates/mcp_engine_integration.md": {
+      "hash": "172be752643bf73254aaf26a6eb3e7881b021001a7e7176033035491a5846d7c",
+      "size": 1342
+    },
+    "design/regulations_dashboard/last_updated_column.md": {
+      "hash": "2be52b75879a5bc1633649fafb644858f7121dbe2080787d6181aeab9476f585",
+      "size": 878
+    },
+    "design/regulatory_compliance/session_summary.md": {
+      "hash": "f25a1f99e5f3fad46dc92382120e90d88a1d9840323290cfa184214c6d52b883",
+      "size": 2567
+    },
+    "design/regulations_management/system_analysis.md": {
+      "hash": "6c2d66d46ddfa78987d23d909565affbfe5018539aeac2e4669b1f0d932c814e",
+      "size": 2609
+    },
+    "design/regulatory_compliance_workflow/mcp_engine_implementation.md": {
+      "hash": "b3bff2e1dccfac9a928c84cd16a169d86bb110f57ce745d6d0119bfd4fe89343",
+      "size": 1790
+    },
+    "design/regulatory_data_alignment/edsteward_mcp_engine_alignment.md": {
+      "hash": "fc14489e8ba7a8d562d221ce797134ec875974ca2477df04b8acb380903d3b5f",
+      "size": 2806
+    },
+    "design/routing/regulation_detail_navigation.md": {
+      "hash": "e28539ee032e5add3d8a0c08442d390331758fe9a6bd269d12c05a73c3683d2b",
+      "size": 2274
+    },
+    "design/regulatory_data_pipeline/cfr_federal_register_integration.md": {
+      "hash": "977e254ba11ffe48de701f8bcc50ec6bf4333fccbebc379a9b73d95277dd5663",
+      "size": 1037
+    },
+    "design/saml_authentication/okta_integration.md": {
+      "hash": "2b83ec613846be56f79e5453924518ca272cdc26d40d1a40b160406ec4108ba9",
+      "size": 618
+    },
+    "design/session_summary/mcp_engine_updates.md": {
+      "hash": "63185e61e9ca8c9a99eb0f067f6fc15331c33546f0f6deae43ef09d853f065f4",
+      "size": 1582
+    },
+    "design/service_coordination/ai_system_port_coordination.md": {
+      "hash": "def6f0471676b7b6ba3845618c3217a5564381270b6eb359be61873c3a2fd688",
+      "size": 580
+    },
+    "design/service_orchestration/devcontainer_startup.md": {
+      "hash": "bb1bb220aa8bd89982acea5e34dcaeb1cfc01b0090319a1880fe06243f629c21",
+      "size": 1384
+    },
+    "design/service_orchestration/mcp_engine_startup.md": {
+      "hash": "338d46532e1709c7ad17ae3e642560eef8a2b167af2b2bfce5e78fff8e1e4fb9",
+      "size": 372
+    },
+    "design/skill_tree_system/skill_tree_system_design.md": {
+      "hash": "c7339aa11aa847a633f84478b24fbc5b72477b4c996151be63c51b910daa23af",
+      "size": 1837
+    },
+    "design/software_development_lifecycle/phased_layered_development.md": {
+      "hash": "c4b2b45007af1544da33157d3e954265898cef199fc3108a209abee0dbebf6f4",
+      "size": 185
+    },
+    "design/stakeholder_presentation/visual_excellence_priority.md": {
+      "hash": "9d54fa60c184f5b7ad31f03f9d80a6df71b168039097cd865e6093949cdb42f2",
+      "size": 1121
+    },
+    "design/sso_development/dev_first_container_approach.md": {
+      "hash": "7a89a285b175bc57799cb86ca01d52b44d213591341c0db7397850d287dbcd65",
+      "size": 1320
+    },
+    "design/static_site_generation/regulation_console_pages.md": {
+      "hash": "e38995fd14ed9528cd751e1175fe01d754970e7dc8e999943a4e820abfda42e2",
+      "size": 4576
+    },
+    "design/system_lifecycle/mcp_startup_script.md": {
+      "hash": "5e753894065225b9ac518dd8a783eecc0b29cd18a28fd073a0a9f2d629def3bd",
+      "size": 1174
+    },
+    "design/system_overview/edsteward_project_status.md": {
+      "hash": "518b76534145b844f6f360311281c52b628f93f351056f11dfe4bbd4717e6386",
+      "size": 2329
+    },
+    "design/system_architecture/initial_platform_setup.md": {
+      "hash": "b3870a312e7ea0894f27c81e060ac913c09197e3ef61f29b2c13e7daf996d45f",
+      "size": 4958
+    },
+    "design/technical_debt_strategy/database_migration_postponement.md": {
+      "hash": "29c27ab722373b6e824f11d27f120f7fc6e5a4c67d0851288f366bb740b53c86",
+      "size": 1067
+    },
+    "design/transcript_learning_flywheel/implementation.md": {
+      "hash": "772deb3f9405a09b528104de3d9877f86e5c709e10c5e95a13ae5dcae468f126",
+      "size": 1624
+    },
+    "design/transfer_credit_evaluation/initial_context.md": {
+      "hash": "c4559dda6480db93e70c2060848a65eebf42fb99901187c1e5e025efd5559d8a",
+      "size": 1210
+    },
+    "design/system_architecture/mcp_engine_edsteward_api.md": {
+      "hash": "45903da51b799cd175062017c40a21ef6525a52002eba602c80f7bebc36a18df",
+      "size": 574
+    },
+    "design/transferiq_network_effect/data_flywheel_feature.md": {
+      "hash": "31468d7ce3171ad09384525e0a3268e437bfdd6703a71fdf55c009975a0fc997",
+      "size": 1666
+    },
+    "design/transferiq_middleware/business_model_overview.md": {
+      "hash": "9323cdd26e5cf730d3575dd8371c80cdd77f813bb159d2e150654f8a83a0b9dc",
+      "size": 1141
+    },
+    "design/ui_components/evidence_hover_preview.md": {
+      "hash": "b416c319c8ccfac83afc03daefe56f2e8a66b643646cc5bdf62a2e72dcce1c3c",
+      "size": 1886
+    },
+    "design/ui_components/evidence_upload_dialog.md": {
+      "hash": "e6f1f228ace0b9636edbcd40b123afca4a84797193e3aeac236725498dc1f675",
+      "size": 2231
+    },
+    "design/ui_cleanup/navigation_elements_removal.md": {
+      "hash": "2eec4b6d7729340b0707717291698592187916c56f0d61f4e30aa9351aa3474c",
+      "size": 709
+    },
+    "design/ui_enhancements/edsteward_cleanup_polish.md": {
+      "hash": "09f10bbc9ca81462aed2f3c4e5be81bd6c5c4ceb366e9f1c2efd7972e028e431",
+      "size": 637
+    },
+    "design/user_management/system_implementation.md": {
+      "hash": "798169881026ad104c2d5f27d5df139ffa9176014124bcfc03395ab161efdd62",
+      "size": 9283
+    },
+    "design/web_app_architecture/layer_generation_phases.md": {
+      "hash": "c4b2b45007af1544da33157d3e954265898cef199fc3108a209abee0dbebf6f4",
+      "size": 185
+    },
+    "design/ui_polish/showcase_ready_ui.md": {
+      "hash": "6f3b1d376bab362f5fd210cc473292adf6e4e4ee2f478a3281cd1a8ee85b6390",
+      "size": 1264
+    },
+    "design/web_scraping_geolocation/contact_discovery_import.md": {
+      "hash": "99a4bde645adefc6c144e848ec0e32fc4dc44cee71d38e2d4c685d41ae703af4",
+      "size": 6425
+    },
+    "design/workflow_data_protection/mcp_engine_data_protection.md": {
+      "hash": "83e3056871bf5f390ddaa91654d19673c7a443d527e6dfac253174a8e464cd09",
+      "size": 1581
+    }
+  },
+  "version": 1
+}

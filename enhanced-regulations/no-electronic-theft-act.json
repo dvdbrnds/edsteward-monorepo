@@ -16,5 +16,35 @@
       "deadlines": 70
     },
     "timestamp": "2025-12-05T01:12:04.932Z"
-  }
+  },
+  "deadlines": [
+    {
+      "date": "continuous",
+      "label": "Disaster Recovery Plan Test",
+      "type": "test",
+      "description": "Disaster Recovery Plan Test for No Electronic Theft Act",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Annual IT Security Assessment",
+      "type": "assessment",
+      "description": "Annual IT Security Assessment for No Electronic Theft Act",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Vulnerability Scan",
+      "type": "scan",
+      "description": "Vulnerability Scan for No Electronic Theft Act",
+      "isRecurring": true,
+      "recurrenceFrequency": "quarterly"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Information Technology"
+  ]
 }

@@ -21,6 +21,12 @@ import { FederalRegisterAPIClient } from '../federal-register-api-client.js';
 import { fetchCFRPart } from '../ecfr-api-client.js';
 import { fetchStateStatute, getStateMapping, isStateRegulation, detectStateCode } from '../state-legislature-api-client.js';
 import ConsistentSummaryService from '../../services/consistent-summary-service.js';
+import { readFileSync } from 'fs';
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 // Initialize the AI summary service
 const summaryService = new ConsistentSummaryService();
@@ -117,6 +123,71 @@ function getCFRMapping(slug) {
   return null;
 }
 
+/**
+ * Parse a CFR citation string into title/part/section components.
+ * Handles formats like "34 CFR 668.46", "29 CFR Part 1910", "45 CFR 164"
+ */
+function parseCFRCitation(cfrString) {
+  if (!cfrString || typeof cfrString !== 'string') return null;
+  const match = cfrString.match(/(\d+)\s*CFR\s*(?:Part\s*)?(\d+)(?:\.(\d+))?/i);
+  if (!match) return null;
+  return {
+    title: match[1],
+    part: match[2],
+    section: match[3] || null,
+    name: cfrString.trim()
+  };
+}
+
+/**
+ * Try to derive a CFR mapping from existing database data.
+ * Falls back through: existingData.cfr → existingData.cfrCitation → existingData.statute USC-to-CFR heuristic
+ */
+function deriveCFRFromExistingData(existingData) {
+  if (!existingData) return null;
+  
+  const cfrField = existingData.cfr || existingData.cfrCitation || existingData.cfr_citation || '';
+  const parsed = parseCFRCitation(cfrField);
+  if (parsed) return parsed;
+  
+  const citations = existingData.citations;
+  if (citations) {
+    const cfrFromCitations = parseCFRCitation(
+      typeof citations === 'string' ? citations : (citations.cfr || '')
+    );
+    if (cfrFromCitations) return cfrFromCitations;
+  }
+  
+  return null;
+}
+
+/**
+ * Load enhanced regulation JSON from the filesystem.
+ * Returns { fullText, requirements, summary, reportingRequirements } or null.
+ */
+function loadEnhancedJSON(regulationSlug) {
+  const projectRoot = join(__dirname, '..', '..', '..');
+  const jsonPath = join(projectRoot, 'enhanced-regulations', `${regulationSlug}.json`);
+  
+  try {
+    const raw = readFileSync(jsonPath, 'utf-8');
+    const data = JSON.parse(raw);
+    const enhanced = data.enhanced || {};
+    
+    return {
+      fullText: enhanced.fullText || '',
+      requirements: enhanced.requirements || '',
+      summary: enhanced.summary || '',
+      reportingRequirements: enhanced.reportingRequirements || '',
+      deadlines: data.deadlines || [],
+      relationships: data.relationships || [],
+      tags: data.tags || []
+    };
+  } catch (err) {
+    return null;
+  }
+}
+
 // Initialize API clients
 const federalRegisterClient = new FederalRegisterAPIClient();
 
@@ -173,6 +244,12 @@ export async function executeComprehensiveWorkflow(regulationSlug, existingData 
   };
   
   try {
+    // Pre-load enhanced JSON (available for all steps)
+    const enhancedJson = loadEnhancedJSON(regulationSlug);
+    if (enhancedJson) {
+      console.log(`📄 Enhanced JSON pre-loaded: ${enhancedJson.fullText.length} chars fullText`);
+    }
+    
     // ========================================================================
     // STEP 1: FETCH FROM GOVERNMENT SOURCES
     // ========================================================================
@@ -215,20 +292,40 @@ export async function executeComprehensiveWorkflow(regulationSlug, existingData 
       console.log(`      - Federal cross-refs: ${federalRegisterData?.count || 0} documents`);
       
     } else {
-      // ---- FEDERAL REGULATION: Original eCFR + Federal Register pipeline ----
-      const cfrMapping = getCFRMapping(regulationSlug);
+      // ---- FEDERAL REGULATION: eCFR + Federal Register + Enhanced JSON pipeline ----
+      let cfrMapping = getCFRMapping(regulationSlug);
+      let cfrSource = cfrMapping ? 'hardcoded' : null;
+      
+      // Dynamic CFR lookup: if no hardcoded mapping, try database fields
+      if (!cfrMapping && existingData) {
+        cfrMapping = deriveCFRFromExistingData(existingData);
+        if (cfrMapping) {
+          cfrSource = 'database';
+          console.log(`   📊 Dynamic CFR mapping from database: ${cfrMapping.title} CFR ${cfrMapping.part}${cfrMapping.section ? '.' + cfrMapping.section : ''}`);
+        }
+      }
       
       if (cfrMapping) {
         const citation = cfrMapping.section 
           ? `${cfrMapping.title} CFR ${cfrMapping.part}.${cfrMapping.section}`
           : `${cfrMapping.title} CFR ${cfrMapping.part}`;
-        console.log(`   Fetching ${citation} (${cfrMapping.name || regulationSlug})...`);
+        console.log(`   Fetching ${citation} (${cfrMapping.name || regulationSlug}) [source: ${cfrSource}]...`);
         
-        ecfrData = await fetchCFRPart(cfrMapping.title, cfrMapping.part, {
-          section: cfrMapping.section,
-          searchTerms: cfrMapping.searchTerms,
-          name: cfrMapping.name
-        });
+        try {
+          ecfrData = await fetchCFRPart(cfrMapping.title, cfrMapping.part, {
+            section: cfrMapping.section,
+            searchTerms: cfrMapping.searchTerms,
+            name: cfrMapping.name
+          });
+        } catch (ecfrError) {
+          console.log(`   ⚠️ eCFR fetch failed: ${ecfrError.message}`);
+        }
+      } else {
+        console.log(`   ⚠️ No CFR mapping available — will use enhanced JSON and Federal Register`);
+      }
+      
+      if (enhancedJson) {
+        console.log(`   📄 Enhanced JSON available: ${enhancedJson.fullText.length} chars fullText, ${enhancedJson.requirements.length} chars requirements`);
       }
       
       const searchTerm = regulationSlug.replace(/-/g, ' ').substring(0, 50);
@@ -240,11 +337,18 @@ export async function executeComprehensiveWorkflow(regulationSlug, existingData 
         jurisdiction: 'federal',
         ecfr: ecfrData,
         federalRegister: federalRegisterData,
+        enhancedJson: enhancedJson ? { 
+          loaded: true,
+          fullTextLength: enhancedJson.fullText.length,
+          requirementsLength: enhancedJson.requirements.length
+        } : null,
+        cfrSource: cfrSource || 'none',
         timestamp: new Date().toISOString()
       };
       
       console.log(`   ✅ Federal sources fetched`);
       console.log(`      - eCFR: ${ecfrData?.success ? 'SUCCESS' : 'N/A'}`);
+      console.log(`      - Enhanced JSON: ${enhancedJson ? 'LOADED' : 'N/A'}`);
       console.log(`      - Federal Register: ${federalRegisterData?.count || 0} documents`);
     }
     
@@ -255,9 +359,10 @@ export async function executeComprehensiveWorkflow(regulationSlug, existingData 
     result.steps.differentialAnalysis.status = 'running';
     
     // Build incoming data from government sources (state or federal)
+    // For federal: eCFR text → enhanced JSON fullText → empty
     const primaryRegulationText = isState
       ? (stateData?.fullText || '')
-      : (ecfrData?.fullText || '');
+      : (ecfrData?.fullText || enhancedJson?.fullText || '');
     
     const incomingData = {
       regulationText: primaryRegulationText,
@@ -313,17 +418,25 @@ export async function executeComprehensiveWorkflow(regulationSlug, existingData 
     result.steps.taskExtraction.status = 'running';
     
     // Combine all text sources for analysis (state-aware)
+    // Both pipelines layer enhanced JSON as supplemental source
     const combinedText = isState
       ? [
           stateData?.fullText || '',
           stateData?.requirements || '',
           stateData?.adminCode?.fullText || '',
+          enhancedJson?.fullText || '',
+          enhancedJson?.requirements || '',
           federalRegisterData?.results?.map(d => d.abstract || d.title).join('\n') || ''
         ].filter(Boolean).join('\n\n')
       : [
           ecfrData?.fullText || '',
+          enhancedJson?.fullText || '',
+          enhancedJson?.requirements || '',
+          enhancedJson?.reportingRequirements || '',
           federalRegisterData?.results?.map(d => d.abstract || d.title).join('\n') || ''
-        ].join('\n\n');
+        ].filter(Boolean).join('\n\n');
+    
+    console.log(`   📊 Combined text for extraction: ${combinedText.length} chars`);
     
     // Extract compliance requirements
     const extractionResult = await extractComplianceRequirements(
@@ -398,12 +511,14 @@ export async function executeComprehensiveWorkflow(regulationSlug, existingData 
       regulationId: regulationSlug,
       itemId: regulationSlug,
       
-      // Basic info (state regulations use mapping name to avoid cross-ref contamination)
+      // Basic info — ALWAYS prefer existing DB data to prevent cross-ref contamination
       name: isState
-        ? (stateMapping?.name || stateData?.sources?.enhancedJson?.regulatoryBody || regulationSlug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()))
-        : (crossRefResult.fullName || crossRefResult.regulationName || regulationSlug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())),
-      statute: isState ? (stateData?.citation || crossRefResult.citations?.usc || existingData?.statute || '') : (crossRefResult.citations?.usc || existingData?.statute || ''),
-      cfrCitation: isState ? '' : (crossRefResult.citations?.cfr || existingData?.cfrCitation || ''),
+        ? (existingData?.name || stateMapping?.name || stateData?.sources?.enhancedJson?.regulatoryBody || regulationSlug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()))
+        : (existingData?.name || crossRefResult.fullName || crossRefResult.regulationName || regulationSlug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())),
+      statute: isState 
+        ? (existingData?.statute || stateData?.citation || crossRefResult.citations?.usc || '') 
+        : (existingData?.statute || crossRefResult.citations?.usc || ''),
+      cfrCitation: isState ? '' : (existingData?.cfrCitation || existingData?.cfr || crossRefResult.citations?.cfr || ''),
       
       // Jurisdiction metadata
       jurisdiction: isState ? {

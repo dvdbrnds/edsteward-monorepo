@@ -1,0 +1,1 @@
+Handbook existence check initiated. Agent will search for handbook files using search_file tool patterns.

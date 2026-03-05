@@ -16,5 +16,35 @@
       "deadlines": 70
     },
     "timestamp": "2025-12-05T00:52:26.696Z"
-  }
+  },
+  "deadlines": [
+    {
+      "date": "03-31",
+      "label": "EEO-1 Report",
+      "type": "filing",
+      "description": "EEO-1 Report for Lilly Ledbetter Fair Pay Act of 2009",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "01-31",
+      "label": "Affirmative Action Plan Update",
+      "type": "plan",
+      "description": "Affirmative Action Plan Update for Lilly Ledbetter Fair Pay Act of 2009",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "09-30",
+      "label": "VETS-4212 Report",
+      "type": "filing",
+      "description": "VETS-4212 Report for Lilly Ledbetter Fair Pay Act of 2009",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Diversity/Affirmative Action"
+  ]
 }

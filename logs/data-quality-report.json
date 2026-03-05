@@ -1,0 +1,6980 @@
+{
+  "timestamp": "2026-03-04T16:04:09.189Z",
+  "mode": "fix",
+  "totalRegulations": 242,
+  "totalIssues": 333,
+  "fixesApplied": 618,
+  "tiers": {
+    "LOVV-A": 18,
+    "LOVV-B": 182,
+    "LOVV-C": 40,
+    "Unclassified": 2
+  },
+  "issueCounts": {
+    "NO_JSON_FILE": 11,
+    "CRITICAL_LOW_TASKS": 217,
+    "NO_DEADLINES": 2,
+    "LOW_TASKS": 13,
+    "LOW_DEADLINES": 90
+  },
+  "regulations": [
+    {
+      "regKey": "REG-001",
+      "name": "Jeanne Clery Disclosure of Campus Security Policy and Campus Crime Statistics Act",
+      "slug": "jeanne-clery-disclosure-of-campus-security-policy-",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "A",
+      "tasks": 49,
+      "deadlines": 7,
+      "issues": [
+        "NO_JSON_FILE"
+      ],
+      "fixes": [],
+      "jsonExists": false,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 49,
+        "hasDescription": 49,
+        "hasPriority": 49,
+        "hasRole": 40,
+        "hasCategory": 49
+      }
+    },
+    {
+      "regKey": "REG-002",
+      "name": "Title IX of the Education Amendments of 1972",
+      "slug": "title-ix-of-the-education-amendments-of-1972",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "A",
+      "tasks": 21,
+      "deadlines": 5,
+      "issues": [
+        "NO_JSON_FILE"
+      ],
+      "fixes": [],
+      "jsonExists": false,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 21,
+        "hasDescription": 21,
+        "hasPriority": 21,
+        "hasRole": 21,
+        "hasCategory": 21
+      }
+    },
+    {
+      "regKey": "REG-004",
+      "name": "Family Educational Rights and Privacy Act",
+      "slug": "family-educational-rights-and-privacy-act-ferpa",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "A",
+      "tasks": 20,
+      "deadlines": 5,
+      "issues": [],
+      "fixes": [],
+      "jsonExists": true,
+      "jsonHasDeadlines": true,
+      "jsonHasRelationships": true,
+      "jsonHasTags": true,
+      "taskQuality": {
+        "total": 20,
+        "hasDescription": 20,
+        "hasPriority": 20,
+        "hasRole": 20,
+        "hasCategory": 20
+      }
+    },
+    {
+      "regKey": "REG-007",
+      "name": "Campus Sex Crimes Prevention Act (§ 1601 of the Victims of Trafficking and Violence Protection Act of 2000)",
+      "slug": "campus-sex-crimes-prevention-act-1601-of-the-victi",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "A",
+      "tasks": 29,
+      "deadlines": 4,
+      "issues": [],
+      "fixes": [],
+      "jsonExists": true,
+      "jsonHasDeadlines": true,
+      "jsonHasRelationships": true,
+      "jsonHasTags": true,
+      "taskQuality": {
+        "total": 29,
+        "hasDescription": 29,
+        "hasPriority": 29,
+        "hasRole": 23,
+        "hasCategory": 29
+      }
+    },
+    {
+      "regKey": "REG-008",
+      "name": "Title VI of the Civil Rights Act of 1964",
+      "slug": "title-vi-of-the-civil-rights-act-of-1964",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "A",
+      "tasks": 35,
+      "deadlines": 5,
+      "issues": [
+        "NO_JSON_FILE"
+      ],
+      "fixes": [],
+      "jsonExists": false,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 35,
+        "hasDescription": 35,
+        "hasPriority": 35,
+        "hasRole": 28,
+        "hasCategory": 35
+      }
+    },
+    {
+      "regKey": "REG-009",
+      "name": "Title VI of the Civil Rights Act of 1964  42 U.S.C. §§ 2000d-2000d-7",
+      "slug": "title-vi-of-the-civil-rights-act-of-1964-42-u-s-c-",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "A",
+      "tasks": 31,
+      "deadlines": 5,
+      "issues": [
+        "NO_JSON_FILE"
+      ],
+      "fixes": [],
+      "jsonExists": false,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 31,
+        "hasDescription": 31,
+        "hasPriority": 31,
+        "hasRole": 25,
+        "hasCategory": 31
+      }
+    },
+    {
+      "regKey": "REG-010",
+      "name": "Title VII of the Civil Rights Act of 1964",
+      "slug": "title-vii-of-the-civil-rights-act-of-1964",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "A",
+      "tasks": 43,
+      "deadlines": 6,
+      "issues": [
+        "NO_JSON_FILE"
+      ],
+      "fixes": [],
+      "jsonExists": false,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 43,
+        "hasDescription": 43,
+        "hasPriority": 43,
+        "hasRole": 35,
+        "hasCategory": 43
+      }
+    },
+    {
+      "regKey": "REG-011",
+      "name": "False Claims Act",
+      "slug": "false-claims-act",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "A",
+      "tasks": 6,
+      "deadlines": 0,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "NO_DEADLINES"
+      ],
+      "fixes": [],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": true,
+      "jsonHasTags": true,
+      "taskQuality": {
+        "total": 6,
+        "hasDescription": 6,
+        "hasPriority": 6,
+        "hasRole": 4,
+        "hasCategory": 6
+      }
+    },
+    {
+      "regKey": "REG-015",
+      "name": "Americans with Disabilities Act (ADA)",
+      "slug": "americans-with-disabilities-act",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "A",
+      "tasks": 52,
+      "deadlines": 6,
+      "issues": [],
+      "fixes": [],
+      "jsonExists": true,
+      "jsonHasDeadlines": true,
+      "jsonHasRelationships": true,
+      "jsonHasTags": true,
+      "taskQuality": {
+        "total": 52,
+        "hasDescription": 52,
+        "hasPriority": 52,
+        "hasRole": 42,
+        "hasCategory": 52
+      }
+    },
+    {
+      "regKey": "REG-020",
+      "name": "Health Insurance Portability and Accountability Act (HIPAA)",
+      "slug": "hipaa",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "A",
+      "tasks": 50,
+      "deadlines": 9,
+      "issues": [],
+      "fixes": [],
+      "jsonExists": true,
+      "jsonHasDeadlines": true,
+      "jsonHasRelationships": true,
+      "jsonHasTags": true,
+      "taskQuality": {
+        "total": 50,
+        "hasDescription": 50,
+        "hasPriority": 50,
+        "hasRole": 41,
+        "hasCategory": 50
+      }
+    },
+    {
+      "regKey": "REG-029",
+      "name": "Fair and Accurate Credit Transaction Act (FACTA)",
+      "slug": "fair-and-accurate-credit-transaction-act-facta",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "A",
+      "tasks": 10,
+      "deadlines": 3,
+      "issues": [
+        "LOW_TASKS"
+      ],
+      "fixes": [],
+      "jsonExists": true,
+      "jsonHasDeadlines": true,
+      "jsonHasRelationships": true,
+      "jsonHasTags": true,
+      "taskQuality": {
+        "total": 10,
+        "hasDescription": 10,
+        "hasPriority": 10,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-037",
+      "name": "Export Administration Act of 1979",
+      "slug": "export-administration-act-of-1979",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "A",
+      "tasks": 7,
+      "deadlines": 2,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [],
+      "jsonExists": true,
+      "jsonHasDeadlines": true,
+      "jsonHasRelationships": true,
+      "jsonHasTags": true,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 4,
+        "hasCategory": 7
+      }
+    },
+    {
+      "regKey": "REG-043",
+      "name": "Higher Education Act: Cash Management",
+      "slug": "higher-education-act-cash-management",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "A",
+      "tasks": 8,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [],
+      "jsonExists": true,
+      "jsonHasDeadlines": true,
+      "jsonHasRelationships": true,
+      "jsonHasTags": true,
+      "taskQuality": {
+        "total": 8,
+        "hasDescription": 8,
+        "hasPriority": 8,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-100",
+      "name": "Affirmative Action/Equal Employment Opportunity",
+      "slug": "affirmative-action-equal-employment-opportunity",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "A",
+      "tasks": 8,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [],
+      "jsonExists": true,
+      "jsonHasDeadlines": true,
+      "jsonHasRelationships": true,
+      "jsonHasTags": true,
+      "taskQuality": {
+        "total": 8,
+        "hasDescription": 8,
+        "hasPriority": 8,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-017",
+      "name": "Equity in Athletics Disclosure Act (EADA)",
+      "slug": "equity-in-athletics-disclosure-act-eada",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 7,
+      "deadlines": 1,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_1_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 2,
+        "hasCategory": 3
+      }
+    },
+    {
+      "regKey": "REG-018",
+      "name": "Section 504 of The Rehabilitation Act of 1973",
+      "slug": "section-504-of-the-rehabilitation-act-of-1973",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 8,
+      "deadlines": 1,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES",
+        "NO_JSON_FILE"
+      ],
+      "fixes": [],
+      "jsonExists": false,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 8,
+        "hasDescription": 8,
+        "hasPriority": 8,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-019",
+      "name": "Emergency Planning and Community Right to Know Act (EPCRA)",
+      "slug": "emergency-planning-and-community-right-to-know-act",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 9,
+      "deadlines": 4,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_4_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 9,
+        "hasDescription": 9,
+        "hasPriority": 9,
+        "hasRole": 0,
+        "hasCategory": 1
+      }
+    },
+    {
+      "regKey": "REG-023",
+      "name": "Higher Education Act: Drug and Alcohol Abuse Prevention",
+      "slug": "higher-education-act-drug-and-alcohol-abuse-preven",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 13,
+      "deadlines": 4,
+      "issues": [
+        "LOW_TASKS"
+      ],
+      "fixes": [
+        "added_4_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 13,
+        "hasDescription": 13,
+        "hasPriority": 13,
+        "hasRole": 0,
+        "hasCategory": 1
+      }
+    },
+    {
+      "regKey": "REG-027",
+      "name": "Children’s Online Privacy Protection Act of 1998 (COPPA)",
+      "slug": "children-s-online-privacy-protection-act-of-1998-c",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 10,
+      "deadlines": 3,
+      "issues": [
+        "LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 10,
+        "hasDescription": 10,
+        "hasPriority": 10,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-028",
+      "name": "Electronic Communications Privacy Act",
+      "slug": "electronic-communications-privacy-act",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 8,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 8,
+        "hasDescription": 8,
+        "hasPriority": 8,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-030",
+      "name": "Federal Information Security Management Act (FISMA)",
+      "slug": "federal-information-security-management-act-fisma",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 9,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 9,
+        "hasDescription": 9,
+        "hasPriority": 9,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-031",
+      "name": "Freedom of Information Act",
+      "slug": "freedom-of-information-act",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 6,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 6,
+        "hasDescription": 6,
+        "hasPriority": 6,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-032",
+      "name": "Gramm Leach Bliley Act (GLBA)",
+      "slug": "gramm-leach-bliley-act-glba",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 11,
+      "deadlines": 3,
+      "issues": [
+        "LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 11,
+        "hasDescription": 11,
+        "hasPriority": 11,
+        "hasRole": 0,
+        "hasCategory": 1
+      }
+    },
+    {
+      "regKey": "REG-034",
+      "name": "Arms Export Control Act of 1976",
+      "slug": "arms-export-control-act-of-1976",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 7,
+      "deadlines": 2,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_2_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 4,
+        "hasCategory": 7
+      }
+    },
+    {
+      "regKey": "REG-035",
+      "name": "Contracts with Third Party Servicers",
+      "slug": "contracts-with-third-party-servicers",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 9,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 9,
+        "hasDescription": 9,
+        "hasPriority": 9,
+        "hasRole": 5,
+        "hasCategory": 9
+      }
+    },
+    {
+      "regKey": "REG-038",
+      "name": "Export Administration Regulations",
+      "slug": "export-administration-regulations",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 10,
+      "deadlines": 3,
+      "issues": [
+        "LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 10,
+        "hasDescription": 10,
+        "hasPriority": 10,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-039",
+      "name": "Foreign Assets Control Regulations",
+      "slug": "foreign-assets-control-regulations",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 6,
+      "deadlines": 2,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_2_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 6,
+        "hasDescription": 6,
+        "hasPriority": 6,
+        "hasRole": 3,
+        "hasCategory": 6
+      }
+    },
+    {
+      "regKey": "REG-041",
+      "name": "Higher Education Act: Audits",
+      "slug": "higher-education-act-audits",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 7,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-042",
+      "name": "Higher Education Act: Borrower Defense to Repayment",
+      "slug": "higher-education-act-borrower-defense-to-repayment",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 5,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 5,
+        "hasDescription": 5,
+        "hasPriority": 5,
+        "hasRole": 0,
+        "hasCategory": 1
+      }
+    },
+    {
+      "regKey": "REG-044",
+      "name": "Higher Education Act: Cohort Default Rate",
+      "slug": "higher-education-act-cohort-default-rate",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 7,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-045",
+      "name": "Higher Education Act: Eligibility and Certification",
+      "slug": "higher-education-act-eligibility-and-certification",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 8,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 8,
+        "hasDescription": 8,
+        "hasPriority": 8,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-046",
+      "name": "Higher Education Act: Entrance and Exit Counseling",
+      "slug": "higher-education-act-entrance-and-exit-counseling",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 6,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 6,
+        "hasDescription": 6,
+        "hasPriority": 6,
+        "hasRole": 0,
+        "hasCategory": 1
+      }
+    },
+    {
+      "regKey": "REG-047",
+      "name": "Higher Education Act: Federal Supplemental Educational Opportunity Grant Program",
+      "slug": "higher-education-act-federal-supplemental-educatio",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 6,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 6,
+        "hasDescription": 6,
+        "hasPriority": 6,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-048",
+      "name": "Higher Education Act: Federal Work Study",
+      "slug": "higher-education-act-federal-work-study",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 7,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 0,
+        "hasCategory": 1
+      }
+    },
+    {
+      "regKey": "REG-049",
+      "name": "Higher Education Act: Financial Responsibility Requirements",
+      "slug": "higher-education-act-financial-responsibility-requ",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 6,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 6,
+        "hasDescription": 6,
+        "hasPriority": 6,
+        "hasRole": 0,
+        "hasCategory": 1
+      }
+    },
+    {
+      "regKey": "REG-050",
+      "name": "Higher Education Act: Information Distributed to Students",
+      "slug": "higher-education-act-information-distributed-to-st",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 10,
+      "deadlines": 3,
+      "issues": [
+        "LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 10,
+        "hasDescription": 10,
+        "hasPriority": 10,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-051",
+      "name": "Higher Education Act: Net Price Calculator",
+      "slug": "higher-education-act-net-price-calculator",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 7,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 2,
+        "hasCategory": 3
+      }
+    },
+    {
+      "regKey": "REG-052",
+      "name": "Higher Education Act: PLUS Loans",
+      "slug": "higher-education-act-plus-loans",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 6,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 6,
+        "hasDescription": 6,
+        "hasPriority": 6,
+        "hasRole": 0,
+        "hasCategory": 1
+      }
+    },
+    {
+      "regKey": "REG-053",
+      "name": "Higher Education Act: Penalties for Drug Violations",
+      "slug": "higher-education-act-penalties-for-drug-violations",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 4,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 4,
+        "hasDescription": 4,
+        "hasPriority": 4,
+        "hasRole": 0,
+        "hasCategory": 1
+      }
+    },
+    {
+      "regKey": "REG-054",
+      "name": "Higher Education Act: Perkins Loans",
+      "slug": "higher-education-act-perkins-loans",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 6,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 6,
+        "hasDescription": 6,
+        "hasPriority": 6,
+        "hasRole": 0,
+        "hasCategory": 1
+      }
+    },
+    {
+      "regKey": "REG-055",
+      "name": "Higher Education Act: Preferred Lenders",
+      "slug": "higher-education-act-preferred-lenders",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 7,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-056",
+      "name": "Higher Education Act: Program Participation Agreements",
+      "slug": "higher-education-act-program-participation-agreeme",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 6,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 6,
+        "hasDescription": 6,
+        "hasPriority": 6,
+        "hasRole": 0,
+        "hasCategory": 1
+      }
+    },
+    {
+      "regKey": "REG-057",
+      "name": "Higher Education Act: Record Retention",
+      "slug": "higher-education-act-record-retention",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 7,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-059",
+      "name": "International Emergency Economic Powers Act",
+      "slug": "international-emergency-economic-powers-act",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 7,
+      "deadlines": 2,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_2_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-060",
+      "name": "International Traffic in Arms Regulations (ITAR)",
+      "slug": "international-traffic-in-arms-regulations-itar",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 8,
+      "deadlines": 2,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_2_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 8,
+        "hasDescription": 8,
+        "hasPriority": 8,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-061",
+      "name": "National Science Foundation Research Misconduct Policies",
+      "slug": "national-science-foundation-research-misconduct-po",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 7,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-064",
+      "name": "Outside Earned Income and Activities",
+      "slug": "outside-earned-income-and-activities",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 6,
+      "deadlines": 2,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_2_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 6,
+        "hasDescription": 6,
+        "hasPriority": 6,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-065",
+      "name": "Public Health Service Policies on Research Misconduct",
+      "slug": "public-health-service-policies-on-research-miscond",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 8,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 8,
+        "hasDescription": 8,
+        "hasPriority": 8,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-066",
+      "name": "Responsibility of Applicants for Promoting Objectivity in Research for which PHS Funding is Sought",
+      "slug": "responsibility-of-applicants-for-promoting-objecti",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 9,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 9,
+        "hasDescription": 9,
+        "hasPriority": 9,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-067",
+      "name": "Student Loan Default Prevention Initiative Act of 1990",
+      "slug": "student-loan-default-prevention-initiative-act-of-",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 5,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 5,
+        "hasDescription": 5,
+        "hasPriority": 5,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-068",
+      "name": "Student Right to Know Act",
+      "slug": "student-right-to-know-act",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 7,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 0,
+        "hasCategory": 1
+      }
+    },
+    {
+      "regKey": "REG-069",
+      "name": "Teacher Preparation Programs",
+      "slug": "teacher-preparation-programs",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 8,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 8,
+        "hasDescription": 8,
+        "hasPriority": 8,
+        "hasRole": 2,
+        "hasCategory": 3
+      }
+    },
+    {
+      "regKey": "REG-070",
+      "name": "Trading with the Enemy Act of 1917",
+      "slug": "trading-with-the-enemy-act-of-1917",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 5,
+      "deadlines": 2,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_2_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 5,
+        "hasDescription": 5,
+        "hasPriority": 5,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-071",
+      "name": "Fair Housing Act, Section 6",
+      "slug": "fair-housing-act-section-6",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 7,
+      "deadlines": 1,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_1_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-072",
+      "name": "Patient Protection and Affordable Care Act (Section 1557)",
+      "slug": "patient-protection-and-affordable-care-act-section",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 6,
+      "deadlines": 1,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_1_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 6,
+        "hasDescription": 6,
+        "hasPriority": 6,
+        "hasRole": 0,
+        "hasCategory": 1
+      }
+    },
+    {
+      "regKey": "REG-074",
+      "name": "Higher Education Act Financial Value Transparency & Gainful Employment",
+      "slug": "higher-education-act-financial-value-transparency-",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 7,
+      "deadlines": 1,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_1_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 0,
+        "hasCategory": 1
+      }
+    },
+    {
+      "regKey": "REG-075",
+      "name": "Pregnant Workers Fairness Act (PWFA)",
+      "slug": "pregnant-workers-fairness-act-pwfa",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 6,
+      "deadlines": 1,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_1_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 6,
+        "hasDescription": 6,
+        "hasPriority": 6,
+        "hasRole": 0,
+        "hasCategory": 1
+      }
+    },
+    {
+      "regKey": "REG-076",
+      "name": "The Equal Pay Act of 1963",
+      "slug": "the-equal-pay-act-of-1963",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 6,
+      "deadlines": 1,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_1_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 6,
+        "hasDescription": 6,
+        "hasPriority": 6,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-077",
+      "name": "The Family and Medical Leave Act of 1993",
+      "slug": "the-family-and-medical-leave-act-of-1993",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 9,
+      "deadlines": 1,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_1_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 9,
+        "hasDescription": 9,
+        "hasPriority": 9,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-078",
+      "name": "America COMPETES Act",
+      "slug": "america-competes-act",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 5,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 5,
+        "hasDescription": 5,
+        "hasPriority": 5,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-079",
+      "name": "Animal Welfare Act",
+      "slug": "animal-welfare-act",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 8,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 8,
+        "hasDescription": 8,
+        "hasPriority": 8,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-080",
+      "name": "Clinical Trials § Financial Disclosures by Investigator",
+      "slug": "clinical-trials-financial-disclosures-by-investiga",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 6,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 6,
+        "hasDescription": 6,
+        "hasPriority": 6,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-082",
+      "name": "Higher Education Act: Credit Hour Definition",
+      "slug": "higher-education-act-credit-hour-definition",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 6,
+      "deadlines": 1,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_1_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 6,
+        "hasDescription": 6,
+        "hasPriority": 6,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-083",
+      "name": "Higher Education Act: Incentive Compensation Prohibition",
+      "slug": "higher-education-act-incentive-compensation-prohib",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 6,
+      "deadlines": 1,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_1_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 6,
+        "hasDescription": 6,
+        "hasPriority": 6,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-084",
+      "name": "Higher Education Act: Misrepresentation",
+      "slug": "higher-education-act-misrepresentation",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 7,
+      "deadlines": 1,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_1_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-085",
+      "name": "Higher Education Act: State Authorization",
+      "slug": "higher-education-act-state-authorization",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 7,
+      "deadlines": 1,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_1_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-086",
+      "name": "Native American Graves Protection and Repatriation Act (NAGPRA)",
+      "slug": "native-american-graves-protection-and-repatriation",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 8,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 8,
+        "hasDescription": 8,
+        "hasPriority": 8,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-087",
+      "name": "OSHA",
+      "slug": "osha",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 11,
+      "deadlines": 3,
+      "issues": [
+        "LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 11,
+        "hasDescription": 11,
+        "hasPriority": 11,
+        "hasRole": 2,
+        "hasCategory": 3
+      }
+    },
+    {
+      "regKey": "REG-088",
+      "name": "OSHA Asbestos in Construction Standard",
+      "slug": "osha-asbestos-in-construction-standard",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 10,
+      "deadlines": 3,
+      "issues": [
+        "LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 10,
+        "hasDescription": 10,
+        "hasPriority": 10,
+        "hasRole": 2,
+        "hasCategory": 3
+      }
+    },
+    {
+      "regKey": "REG-089",
+      "name": "OSHA Asbestos in General Industry Standard",
+      "slug": "osha-asbestos-in-general-industry-standard",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 10,
+      "deadlines": 3,
+      "issues": [
+        "LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 10,
+        "hasDescription": 10,
+        "hasPriority": 10,
+        "hasRole": 2,
+        "hasCategory": 3
+      }
+    },
+    {
+      "regKey": "REG-090",
+      "name": "OSHA Enforcement Guidance for Personal Protective Equipment (PPE) in General Industry",
+      "slug": "osha-enforcement-guidance-for-personal-protective-",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 7,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-091",
+      "name": "OSHA Lead in Construction Standard",
+      "slug": "osha-lead-in-construction-standard",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 9,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 9,
+        "hasDescription": 9,
+        "hasPriority": 9,
+        "hasRole": 2,
+        "hasCategory": 3
+      }
+    },
+    {
+      "regKey": "REG-092",
+      "name": "OSHA Lead in General Industry Standard",
+      "slug": "osha-lead-in-general-industry-standard",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 9,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 9,
+        "hasDescription": 9,
+        "hasPriority": 9,
+        "hasRole": 2,
+        "hasCategory": 3
+      }
+    },
+    {
+      "regKey": "REG-093",
+      "name": "OSHA Welding, Cutting, and Brazing",
+      "slug": "osha-welding-cutting-and-brazing",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 7,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-094",
+      "name": "OSHA – Bloodborne Pathogens Standard",
+      "slug": "osha-bloodborne-pathogens-standard",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 10,
+      "deadlines": 3,
+      "issues": [
+        "LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 10,
+        "hasDescription": 10,
+        "hasPriority": 10,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-095",
+      "name": "OSHA’s  Emergency Action Plan Standard",
+      "slug": "osha-s-emergency-action-plan-standard",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 7,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 0,
+        "hasCategory": 1
+      }
+    },
+    {
+      "regKey": "REG-096",
+      "name": "OSHA’s  Occupational Noise Exposure Standard",
+      "slug": "osha-s-occupational-noise-exposure-standard",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 7,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 0,
+        "hasCategory": 1
+      }
+    },
+    {
+      "regKey": "REG-097",
+      "name": "OSHA’s Occupational Exposure to Hazardous Chemicals in Laboratories Standard",
+      "slug": "osha-s-occupational-exposure-to-hazardous-chemical",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 7,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 0,
+        "hasCategory": 1
+      }
+    },
+    {
+      "regKey": "REG-098",
+      "name": "Occupational Safety and Health Act of 1970",
+      "slug": "occupational-safety-and-health-act-of-1970",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 14,
+      "deadlines": 4,
+      "issues": [
+        "LOW_TASKS"
+      ],
+      "fixes": [
+        "added_4_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 14,
+        "hasDescription": 14,
+        "hasPriority": 14,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-099",
+      "name": "Small Unmanned Aircraft Systems",
+      "slug": "small-unmanned-aircraft-systems",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 7,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-101",
+      "name": "Communications Assistance for Law Enforcement Act (CALEA)",
+      "slug": "communications-assistance-for-law-enforcement-act-",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 6,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 6,
+        "hasDescription": 6,
+        "hasPriority": 6,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-102",
+      "name": "Controlled Substances Act",
+      "slug": "controlled-substances-act",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 8,
+      "deadlines": 1,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_1_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 8,
+        "hasDescription": 8,
+        "hasPriority": 8,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-103",
+      "name": "Controlling the Assault of Non-Solicited Pornography And Marketing Act of 2003 (CAN-SPAM Act)",
+      "slug": "controlling-the-assault-of-non-solicited-pornograp",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 8,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 8,
+        "hasDescription": 8,
+        "hasPriority": 8,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-104",
+      "name": "Department of Education General Administrative Regulations and Other Applicable Grant Regulations",
+      "slug": "department-of-education-general-administrative-reg",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 8,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 8,
+        "hasDescription": 8,
+        "hasPriority": 8,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-105",
+      "name": "Electronic Communications Privacy Act of 1986",
+      "slug": "electronic-communications-privacy-act-of-1986",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 6,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 6,
+        "hasDescription": 6,
+        "hasPriority": 6,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-106",
+      "name": "Equal Employment of Veterans",
+      "slug": "equal-employment-of-veterans",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 7,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-108",
+      "name": "FCC – Cable Certification",
+      "slug": "fcc-cable-certification",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 5,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 5,
+        "hasDescription": 5,
+        "hasPriority": 5,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-109",
+      "name": "FCC – Fixed Microwave Services, Licensing",
+      "slug": "fcc-fixed-microwave-services-licensing",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 5,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 5,
+        "hasDescription": 5,
+        "hasPriority": 5,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-110",
+      "name": "FCC – Wireless Communications, Licensing",
+      "slug": "fcc-wireless-communications-licensing",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 6,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 6,
+        "hasDescription": 6,
+        "hasPriority": 6,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-111",
+      "name": "Federal Awardee Performance and Integrity Information System (FAPIIS)",
+      "slug": "federal-awardee-performance-and-integrity-informat",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 4,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 4,
+        "hasDescription": 4,
+        "hasPriority": 4,
+        "hasRole": 0,
+        "hasCategory": 1
+      }
+    },
+    {
+      "regKey": "REG-115",
+      "name": "Hazardous Materials Transportation Act",
+      "slug": "hazardous-materials-transportation-act",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 7,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-116",
+      "name": "Homeland Security Act of 2002",
+      "slug": "homeland-security-act-of-2002",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 5,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 5,
+        "hasDescription": 5,
+        "hasPriority": 5,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-120",
+      "name": "Protection of Human Subjects Regulations (Common Rule)",
+      "slug": "protection-of-human-subjects-regulations-common-ru",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 9,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 9,
+        "hasDescription": 9,
+        "hasPriority": 9,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-121",
+      "name": "Telemarketing",
+      "slug": "telemarketing",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 6,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 6,
+        "hasDescription": 6,
+        "hasPriority": 6,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-123",
+      "name": "Veterans’ employment emphasis under Federal contracts",
+      "slug": "veterans-employment-emphasis-under-federal-contrac",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 6,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 6,
+        "hasDescription": 6,
+        "hasPriority": 6,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-124",
+      "name": "Atomic Energy Act of 1954",
+      "slug": "atomic-energy-act-of-1954",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 7,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 0,
+        "hasCategory": 1
+      }
+    },
+    {
+      "regKey": "REG-126",
+      "name": "Clean Air Act",
+      "slug": "clean-air-act",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 7,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-127",
+      "name": "Clean Water Act",
+      "slug": "clean-water-act",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 6,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 6,
+        "hasDescription": 6,
+        "hasPriority": 6,
+        "hasRole": 0,
+        "hasCategory": 1
+      }
+    },
+    {
+      "regKey": "REG-128",
+      "name": "Comprehensive Environmental Response, Compensation, and Liability Act (CERCLA)",
+      "slug": "comprehensive-environmental-response-compensation-",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 6,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 6,
+        "hasDescription": 6,
+        "hasPriority": 6,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-129",
+      "name": "Drug Free Schools and Communities Act",
+      "slug": "drug-free-schools-and-communities-act",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 12,
+      "deadlines": 0,
+      "issues": [
+        "LOW_TASKS",
+        "NO_DEADLINES",
+        "NO_JSON_FILE"
+      ],
+      "fixes": [],
+      "jsonExists": false,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 12,
+        "hasDescription": 12,
+        "hasPriority": 12,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-130",
+      "name": "Drug Free Workplace Act",
+      "slug": "drug-free-workplace-act",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 9,
+      "deadlines": 2,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_2_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 9,
+        "hasDescription": 9,
+        "hasPriority": 9,
+        "hasRole": 2,
+        "hasCategory": 3
+      }
+    },
+    {
+      "regKey": "REG-132",
+      "name": "Energy Policy Act",
+      "slug": "energy-policy-act",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 4,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 4,
+        "hasDescription": 4,
+        "hasPriority": 4,
+        "hasRole": 0,
+        "hasCategory": 1
+      }
+    },
+    {
+      "regKey": "REG-133",
+      "name": "Energy Reorganization Act of 1974, as amended",
+      "slug": "energy-reorganization-act-of-1974-as-amended",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 4,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 4,
+        "hasDescription": 4,
+        "hasPriority": 4,
+        "hasRole": 0,
+        "hasCategory": 1
+      }
+    },
+    {
+      "regKey": "REG-134",
+      "name": "Federal Insecticide, Fungicide and Rodenticide Act",
+      "slug": "federal-insecticide-fungicide-and-rodenticide-act",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 7,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-135",
+      "name": "Guarding and Use of Hand & Portable Powered Tools",
+      "slug": "guarding-and-use-of-hand-portable-powered-tools",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 6,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 6,
+        "hasDescription": 6,
+        "hasPriority": 6,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-136",
+      "name": "Hazardous and Solid Waste Amendments of 1984",
+      "slug": "hazardous-and-solid-waste-amendments-of-1984",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 4,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 4,
+        "hasDescription": 4,
+        "hasPriority": 4,
+        "hasRole": 0,
+        "hasCategory": 1
+      }
+    },
+    {
+      "regKey": "REG-139",
+      "name": "Housing & Urban Development Lead Based Paint Poisoning in Certain Residential Structures",
+      "slug": "housing-urban-development-lead-based-paint-poisoni",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 5,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 5,
+        "hasDescription": 5,
+        "hasPriority": 5,
+        "hasRole": 0,
+        "hasCategory": 1
+      }
+    },
+    {
+      "regKey": "REG-140",
+      "name": "Mandatory Reporting of Greenhouse Gases",
+      "slug": "mandatory-reporting-of-greenhouse-gases",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 6,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 6,
+        "hasDescription": 6,
+        "hasPriority": 6,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-141",
+      "name": "Motor Carrier Act of 1980",
+      "slug": "motor-carrier-act-of-1980",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 6,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 6,
+        "hasDescription": 6,
+        "hasPriority": 6,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-142",
+      "name": "National Emission Standards for Hazardous Air Pollutants (NESHAP)",
+      "slug": "national-emission-standards-for-hazardous-air-poll",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 6,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 6,
+        "hasDescription": 6,
+        "hasPriority": 6,
+        "hasRole": 0,
+        "hasCategory": 1
+      }
+    },
+    {
+      "regKey": "REG-143",
+      "name": "Oil Pollution Act",
+      "slug": "oil-pollution-act",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 7,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-144",
+      "name": "Residential Lead-Based Paint Hazard Reduction Act of 1992",
+      "slug": "residential-lead-based-paint-hazard-reduction-act-",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 6,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 6,
+        "hasDescription": 6,
+        "hasPriority": 6,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-145",
+      "name": "Resource Conservation and Recovery Act",
+      "slug": "resource-conservation-and-recovery-act",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 8,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 8,
+        "hasDescription": 8,
+        "hasPriority": 8,
+        "hasRole": 0,
+        "hasCategory": 1
+      }
+    },
+    {
+      "regKey": "REG-146",
+      "name": "Standards For the Management of Used Oil",
+      "slug": "standards-for-the-management-of-used-oil",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 6,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 6,
+        "hasDescription": 6,
+        "hasPriority": 6,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-147",
+      "name": "The Public Health Security and Bioterrorism Preparedness and Response Act",
+      "slug": "the-public-health-security-and-bioterrorism-prepar",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 6,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 6,
+        "hasDescription": 6,
+        "hasPriority": 6,
+        "hasRole": 0,
+        "hasCategory": 1
+      }
+    },
+    {
+      "regKey": "REG-148",
+      "name": "Toxic Substances Control Act",
+      "slug": "toxic-substances-control-act",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 6,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 6,
+        "hasDescription": 6,
+        "hasPriority": 6,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-149",
+      "name": "Bankruptcy Abuse Prevention & Consumer Protection Act of 2005",
+      "slug": "bankruptcy-abuse-prevention-consumer-protection-ac",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 9,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 9,
+        "hasDescription": 9,
+        "hasPriority": 9,
+        "hasRole": 5,
+        "hasCategory": 9
+      }
+    },
+    {
+      "regKey": "REG-150",
+      "name": "Clayton Antitrust Act of 1914",
+      "slug": "clayton-antitrust-act-of-1914",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 9,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 9,
+        "hasDescription": 9,
+        "hasPriority": 9,
+        "hasRole": 5,
+        "hasCategory": 9
+      }
+    },
+    {
+      "regKey": "REG-151",
+      "name": "Federal Unemployment Tax Act (FUTA)",
+      "slug": "federal-unemployment-tax-act-futa",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 9,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 9,
+        "hasDescription": 9,
+        "hasPriority": 9,
+        "hasRole": 5,
+        "hasCategory": 9
+      }
+    },
+    {
+      "regKey": "REG-152",
+      "name": "Higher Education Act – Disclosure of Foreign Gifts",
+      "slug": "higher-education-act-disclosure-of-foreign-gifts",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 8,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 8,
+        "hasDescription": 8,
+        "hasPriority": 8,
+        "hasRole": 4,
+        "hasCategory": 8
+      }
+    },
+    {
+      "regKey": "REG-153",
+      "name": "Higher Education Act: Readmission Requirements for Servicemembers",
+      "slug": "higher-education-act-readmission-requirements-for-",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 7,
+      "deadlines": 1,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_1_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-154",
+      "name": "Immigration and Nationality Act (INA)",
+      "slug": "immigration-and-nationality-act-ina",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 7,
+      "deadlines": 1,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_1_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-155",
+      "name": "Regulation E: Electronic Fund Transfers",
+      "slug": "regulation-e-electronic-fund-transfers",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 9,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 9,
+        "hasDescription": 9,
+        "hasPriority": 9,
+        "hasRole": 5,
+        "hasCategory": 9
+      }
+    },
+    {
+      "regKey": "REG-157",
+      "name": "Sherman Antitrust Act",
+      "slug": "sherman-antitrust-act",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 9,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 9,
+        "hasDescription": 9,
+        "hasPriority": 9,
+        "hasRole": 5,
+        "hasCategory": 9
+      }
+    },
+    {
+      "regKey": "REG-158",
+      "name": "Social Security Act",
+      "slug": "social-security-act",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 9,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 9,
+        "hasDescription": 9,
+        "hasPriority": 9,
+        "hasRole": 5,
+        "hasCategory": 9
+      }
+    },
+    {
+      "regKey": "REG-159",
+      "name": "Student Exchange and Visitor Information System (SEVIS)",
+      "slug": "student-exchange-and-visitor-information-system-se",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 9,
+      "deadlines": 1,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_1_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 9,
+        "hasDescription": 9,
+        "hasPriority": 9,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-160",
+      "name": "Tax Cuts and Jobs Act of 2017 (endowment excise tax)",
+      "slug": "tax-cuts-and-jobs-act-of-2017-endowment-excise-tax",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 9,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 9,
+        "hasDescription": 9,
+        "hasPriority": 9,
+        "hasRole": 5,
+        "hasCategory": 9
+      }
+    },
+    {
+      "regKey": "REG-161",
+      "name": "Truth in Lending Act",
+      "slug": "truth-in-lending-act",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 9,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 9,
+        "hasDescription": 9,
+        "hasPriority": 9,
+        "hasRole": 5,
+        "hasCategory": 9
+      }
+    },
+    {
+      "regKey": "REG-163",
+      "name": "Unrelated Business Income Tax (UBIT)",
+      "slug": "unrelated-business-income-tax-ubit",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 8,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 8,
+        "hasDescription": 8,
+        "hasPriority": 8,
+        "hasRole": 4,
+        "hasCategory": 8
+      }
+    },
+    {
+      "regKey": "REG-164",
+      "name": "Acts Affecting a Personal Financial Interest",
+      "slug": "acts-affecting-a-personal-financial-interest",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 7,
+      "deadlines": 2,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_2_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 4,
+        "hasCategory": 7
+      }
+    },
+    {
+      "regKey": "REG-165",
+      "name": "Bribery of Public Officials and Witnesses",
+      "slug": "bribery-of-public-officials-and-witnesses",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 7,
+      "deadlines": 2,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_2_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 4,
+        "hasCategory": 7
+      }
+    },
+    {
+      "regKey": "REG-166",
+      "name": "Byrd Amendment",
+      "slug": "byrd-amendment",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 8,
+      "deadlines": 4,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_4_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 8,
+        "hasDescription": 8,
+        "hasPriority": 8,
+        "hasRole": 4,
+        "hasCategory": 8
+      }
+    },
+    {
+      "regKey": "REG-167",
+      "name": "Cafeteria Plans 26 U.S.C. § 125",
+      "slug": "cafeteria-plans-26-u-s-c-125",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 9,
+      "deadlines": 4,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_4_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 9,
+        "hasDescription": 9,
+        "hasPriority": 9,
+        "hasRole": 5,
+        "hasCategory": 9
+      }
+    },
+    {
+      "regKey": "REG-168",
+      "name": "Charitable Gift Annuity Antitrust Relief Act",
+      "slug": "charitable-gift-annuity-antitrust-relief-act",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 9,
+      "deadlines": 4,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_4_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 9,
+        "hasDescription": 9,
+        "hasPriority": 9,
+        "hasRole": 5,
+        "hasCategory": 9
+      }
+    },
+    {
+      "regKey": "REG-169",
+      "name": "Compensation to Members of Congress, Officers, Others in Matters Affecting the Government",
+      "slug": "compensation-to-members-of-congress-officers-other",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 7,
+      "deadlines": 2,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_2_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 4,
+        "hasCategory": 7
+      }
+    },
+    {
+      "regKey": "REG-170",
+      "name": "Consumer Credit Protection Act, Title III (CCPA) – Garnishments",
+      "slug": "consumer-credit-protection-act-title-iii-ccpa-garn",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 7,
+      "deadlines": 2,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_2_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 4,
+        "hasCategory": 7
+      }
+    },
+    {
+      "regKey": "REG-171",
+      "name": "Deferred Compensation",
+      "slug": "deferred-compensation",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 8,
+      "deadlines": 4,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_4_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 8,
+        "hasDescription": 8,
+        "hasPriority": 8,
+        "hasRole": 4,
+        "hasCategory": 8
+      }
+    },
+    {
+      "regKey": "REG-172",
+      "name": "Employee Annuities",
+      "slug": "employee-annuities",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 8,
+      "deadlines": 4,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_4_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 8,
+        "hasDescription": 8,
+        "hasPriority": 8,
+        "hasRole": 4,
+        "hasCategory": 8
+      }
+    },
+    {
+      "regKey": "REG-173",
+      "name": "Ethics in Government Act (Amended by Ethics Reform Act and Honest Leadership and Open Government Act of 2007)",
+      "slug": "ethics-in-government-act-amended-by-ethics-reform-",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 7,
+      "deadlines": 2,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_2_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 4,
+        "hasCategory": 7
+      }
+    },
+    {
+      "regKey": "REG-174",
+      "name": "Fair Labor Standards Act (FLSA)",
+      "slug": "fair-labor-standards-act-flsa",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 7,
+      "deadlines": 2,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_2_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 4,
+        "hasCategory": 7
+      }
+    },
+    {
+      "regKey": "REG-175",
+      "name": "Federal Insurance Contributions Act (FICA)",
+      "slug": "federal-insurance-contributions-act-fica",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 7,
+      "deadlines": 2,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_2_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 4,
+        "hasCategory": 7
+      }
+    },
+    {
+      "regKey": "REG-176",
+      "name": "Federal Sentencing Guidelines",
+      "slug": "federal-sentencing-guidelines",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 8,
+      "deadlines": 1,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_1_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 8,
+        "hasDescription": 8,
+        "hasPriority": 8,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-177",
+      "name": "Federal Unemployment Tax Act",
+      "slug": "federal-unemployment-tax-act",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 7,
+      "deadlines": 2,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_2_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 4,
+        "hasCategory": 7
+      }
+    },
+    {
+      "regKey": "REG-178",
+      "name": "Foreign Bank Accounts and Tax Filings",
+      "slug": "foreign-bank-accounts-and-tax-filings",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 8,
+      "deadlines": 4,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_4_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 8,
+        "hasDescription": 8,
+        "hasPriority": 8,
+        "hasRole": 4,
+        "hasCategory": 8
+      }
+    },
+    {
+      "regKey": "REG-179",
+      "name": "Fringe Benefits",
+      "slug": "fringe-benefits",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 8,
+      "deadlines": 4,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_4_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 8,
+        "hasDescription": 8,
+        "hasPriority": 8,
+        "hasRole": 4,
+        "hasCategory": 8
+      }
+    },
+    {
+      "regKey": "REG-180",
+      "name": "Honest Leadership and Open Government Act of 2007",
+      "slug": "honest-leadership-and-open-government-act-of-2007",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 7,
+      "deadlines": 2,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_2_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 4,
+        "hasCategory": 7
+      }
+    },
+    {
+      "regKey": "REG-182",
+      "name": "Independent Contractors",
+      "slug": "independent-contractors",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 8,
+      "deadlines": 4,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_4_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 8,
+        "hasDescription": 8,
+        "hasPriority": 8,
+        "hasRole": 4,
+        "hasCategory": 8
+      }
+    },
+    {
+      "regKey": "REG-183",
+      "name": "Industrial Alcohol User Permits and Special Tax",
+      "slug": "industrial-alcohol-user-permits-and-special-tax",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 8,
+      "deadlines": 4,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_4_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 8,
+        "hasDescription": 8,
+        "hasPriority": 8,
+        "hasRole": 4,
+        "hasCategory": 8
+      }
+    },
+    {
+      "regKey": "REG-184",
+      "name": "Internal Revenue Service: Governance Information Required on Form 990",
+      "slug": "internal-revenue-service-governance-information-re",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 7,
+      "deadlines": 1,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_1_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-185",
+      "name": "Lobbying Disclosure Act",
+      "slug": "lobbying-disclosure-act",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 6,
+      "deadlines": 2,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_2_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 6,
+        "hasDescription": 6,
+        "hasPriority": 6,
+        "hasRole": 3,
+        "hasCategory": 6
+      }
+    },
+    {
+      "regKey": "REG-186",
+      "name": "Nonqualified Deferred Inclusion",
+      "slug": "nonqualified-deferred-inclusion",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 8,
+      "deadlines": 4,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_4_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 8,
+        "hasDescription": 8,
+        "hasPriority": 8,
+        "hasRole": 4,
+        "hasCategory": 8
+      }
+    },
+    {
+      "regKey": "REG-189",
+      "name": "Public Disclosure of Material",
+      "slug": "public-disclosure-of-material",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 9,
+      "deadlines": 4,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_4_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 9,
+        "hasDescription": 9,
+        "hasPriority": 9,
+        "hasRole": 5,
+        "hasCategory": 9
+      }
+    },
+    {
+      "regKey": "REG-190",
+      "name": "Qualified Pensions",
+      "slug": "qualified-pensions",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 8,
+      "deadlines": 4,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_4_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 8,
+        "hasDescription": 8,
+        "hasPriority": 8,
+        "hasRole": 4,
+        "hasCategory": 8
+      }
+    },
+    {
+      "regKey": "REG-192",
+      "name": "Qualified Tuition and Student Loan Interest Reporting",
+      "slug": "qualified-tuition-and-student-loan-interest-report",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 8,
+      "deadlines": 4,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_4_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 8,
+        "hasDescription": 8,
+        "hasPriority": 8,
+        "hasRole": 4,
+        "hasCategory": 8
+      }
+    },
+    {
+      "regKey": "REG-193",
+      "name": "Reporting of Payments of Royalties",
+      "slug": "reporting-of-payments-of-royalties",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 9,
+      "deadlines": 4,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_4_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 9,
+        "hasDescription": 9,
+        "hasPriority": 9,
+        "hasRole": 5,
+        "hasCategory": 9
+      }
+    },
+    {
+      "regKey": "REG-194",
+      "name": "Restrictions on Former Officers, Employees, and Elected Officials of the Executive and Legislative",
+      "slug": "restrictions-on-former-officers-employees-and-elec",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 7,
+      "deadlines": 2,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_2_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 4,
+        "hasCategory": 7
+      }
+    },
+    {
+      "regKey": "REG-195",
+      "name": "Salary of Government Officials and Employees Payable Only by United States",
+      "slug": "salary-of-government-officials-and-employees-payab",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 7,
+      "deadlines": 2,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_2_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 4,
+        "hasCategory": 7
+      }
+    },
+    {
+      "regKey": "REG-196",
+      "name": "Small Business Job Protection Act",
+      "slug": "small-business-job-protection-act",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 8,
+      "deadlines": 4,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_4_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 8,
+        "hasDescription": 8,
+        "hasPriority": 8,
+        "hasRole": 4,
+        "hasCategory": 8
+      }
+    },
+    {
+      "regKey": "REG-197",
+      "name": "Unrelated Business Income (UBIT)",
+      "slug": "unrelated-business-income-ubit",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 9,
+      "deadlines": 4,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_4_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 9,
+        "hasDescription": 9,
+        "hasPriority": 9,
+        "hasRole": 5,
+        "hasCategory": 9
+      }
+    },
+    {
+      "regKey": "REG-198",
+      "name": "American Jobs Creation Act of 2004",
+      "slug": "american-jobs-creation-act-of-2004",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 4,
+      "deadlines": 1,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_1_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 4,
+        "hasDescription": 4,
+        "hasPriority": 4,
+        "hasRole": 0,
+        "hasCategory": 1
+      }
+    },
+    {
+      "regKey": "REG-199",
+      "name": "Anti-Kickback Act of 1986",
+      "slug": "anti-kickback-act-of-1986",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 7,
+      "deadlines": 2,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_2_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 4,
+        "hasCategory": 7
+      }
+    },
+    {
+      "regKey": "REG-200",
+      "name": "Anti-discrimination laws for federal contractors",
+      "slug": "anti-discrimination-laws-for-federal-contractors",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 7,
+      "deadlines": 2,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_2_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 4,
+        "hasCategory": 7
+      }
+    },
+    {
+      "regKey": "REG-201",
+      "name": "Bayh-Dole Act of 1980",
+      "slug": "bayh-dole-act-of-1980",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 8,
+      "deadlines": 1,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_1_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 8,
+        "hasDescription": 8,
+        "hasPriority": 8,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-202",
+      "name": "Copeland Anti-Kickback Act",
+      "slug": "copeland-anti-kickback-act",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 6,
+      "deadlines": 2,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_2_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 6,
+        "hasDescription": 6,
+        "hasPriority": 6,
+        "hasRole": 3,
+        "hasCategory": 6
+      }
+    },
+    {
+      "regKey": "REG-203",
+      "name": "Copyright Act",
+      "slug": "copyright-act",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 7,
+      "deadlines": 2,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_2_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 4,
+        "hasCategory": 7
+      }
+    },
+    {
+      "regKey": "REG-205",
+      "name": "Davis-Bacon Act",
+      "slug": "davis-bacon-act",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 7,
+      "deadlines": 2,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_2_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 4,
+        "hasCategory": 7
+      }
+    },
+    {
+      "regKey": "REG-207",
+      "name": "Drug & Alcohol Testing of Transportation Employees",
+      "slug": "drug-alcohol-testing-of-transportation-employees",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 8,
+      "deadlines": 2,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_2_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 8,
+        "hasDescription": 8,
+        "hasPriority": 8,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-208",
+      "name": "E-Verify Executive Order 13465-Amending Executive Order 12989",
+      "slug": "e-verify-executive-order-13465-amending-executive-",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 7,
+      "deadlines": 2,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_2_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 4,
+        "hasCategory": 7
+      }
+    },
+    {
+      "regKey": "REG-209",
+      "name": "Employee Polygraph Protection Act",
+      "slug": "employee-polygraph-protection-act",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 5,
+      "deadlines": 2,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_2_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 5,
+        "hasDescription": 5,
+        "hasPriority": 5,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-210",
+      "name": "Fair Credit Reporting Act (FCRA)",
+      "slug": "fair-credit-reporting-act-fcra",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 8,
+      "deadlines": 2,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_2_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 8,
+        "hasDescription": 8,
+        "hasPriority": 8,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-211",
+      "name": "Federal Volunteer Protection Act",
+      "slug": "federal-volunteer-protection-act",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 5,
+      "deadlines": 2,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_2_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 5,
+        "hasDescription": 5,
+        "hasPriority": 5,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-212",
+      "name": "Foreign Agents Registration Act of 1938",
+      "slug": "foreign-agents-registration-act-of-1938",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 4,
+      "deadlines": 1,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_1_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 4,
+        "hasDescription": 4,
+        "hasPriority": 4,
+        "hasRole": 0,
+        "hasCategory": 1
+      }
+    },
+    {
+      "regKey": "REG-213",
+      "name": "Foreign Corrupt Practices Act (FCPA)",
+      "slug": "foreign-corrupt-practices-act-fcpa",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 7,
+      "deadlines": 1,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_1_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-214",
+      "name": "Higher Education Act: Institutional and financial assistance information for students",
+      "slug": "higher-education-act-institutional-and-financial-a",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 7,
+      "deadlines": 2,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_2_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 4,
+        "hasCategory": 7
+      }
+    },
+    {
+      "regKey": "REG-216",
+      "name": "Lanham Act",
+      "slug": "lanham-act",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 7,
+      "deadlines": 2,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_2_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 4,
+        "hasCategory": 7
+      }
+    },
+    {
+      "regKey": "REG-222",
+      "name": "Small Business Act and Small Business Investment Act of 1958",
+      "slug": "small-business-act-and-small-business-investment-a",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 7,
+      "deadlines": 2,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_2_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 4,
+        "hasCategory": 7
+      }
+    },
+    {
+      "regKey": "REG-223",
+      "name": "Small Webcasters Settlement Act of 2002",
+      "slug": "small-webcasters-settlement-act-of-2002",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 6,
+      "deadlines": 2,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_2_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 6,
+        "hasDescription": 6,
+        "hasPriority": 6,
+        "hasRole": 3,
+        "hasCategory": 6
+      }
+    },
+    {
+      "regKey": "REG-225",
+      "name": "Trade Sanctions Reform and Export Enhancement",
+      "slug": "trade-sanctions-reform-and-export-enhancement",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 7,
+      "deadlines": 2,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_2_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 4,
+        "hasCategory": 7
+      }
+    },
+    {
+      "regKey": "REG-226",
+      "name": "Trademark Revision Act",
+      "slug": "trademark-revision-act",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 5,
+      "deadlines": 1,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_1_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 5,
+        "hasDescription": 5,
+        "hasPriority": 5,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-227",
+      "name": "U.S. Patent Act",
+      "slug": "u-s-patent-act",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 5,
+      "deadlines": 1,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_1_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 5,
+        "hasDescription": 5,
+        "hasPriority": 5,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-228",
+      "name": "Visual Artists Rights Act",
+      "slug": "visual-artists-rights-act",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 5,
+      "deadlines": 1,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_1_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 5,
+        "hasDescription": 5,
+        "hasPriority": 5,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-229",
+      "name": "Worker Adjustment and Retraining Notification Act (WARN)",
+      "slug": "worker-adjustment-and-retraining-notification-act-",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 6,
+      "deadlines": 2,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_2_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 6,
+        "hasDescription": 6,
+        "hasPriority": 6,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-230",
+      "name": "Cafeteria Plan Regulations",
+      "slug": "cafeteria-plan-regulations",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 7,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 4,
+        "hasCategory": 7
+      }
+    },
+    {
+      "regKey": "REG-232",
+      "name": "Employee Retirement Income Security Act of 1974 (ERISA)",
+      "slug": "employee-retirement-income-security-act-of-1974-er",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 6,
+      "deadlines": 1,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_1_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 6,
+        "hasDescription": 6,
+        "hasPriority": 6,
+        "hasRole": 0,
+        "hasCategory": 1
+      }
+    },
+    {
+      "regKey": "REG-234",
+      "name": "Patient Protection and Affordable Care Act",
+      "slug": "patient-protection-and-affordable-care-act",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 6,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 6,
+        "hasDescription": 6,
+        "hasPriority": 6,
+        "hasRole": 3,
+        "hasCategory": 6
+      }
+    },
+    {
+      "regKey": "REG-235",
+      "name": "The Veterans’ Readjustment Benefits Act",
+      "slug": "the-veterans-readjustment-benefits-act",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 6,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 6,
+        "hasDescription": 6,
+        "hasPriority": 6,
+        "hasRole": 3,
+        "hasCategory": 6
+      }
+    },
+    {
+      "regKey": "REG-236",
+      "name": "Uniformed Services Employment and Reemployment Rights Act (USERRA)",
+      "slug": "uniformed-services-employment-and-reemployment-rig",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 7,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 4,
+        "hasCategory": 7
+      }
+    },
+    {
+      "regKey": "REG-237",
+      "name": "Age Discrimination Act of 1975",
+      "slug": "age-discrimination-act-of-1975",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 5,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 5,
+        "hasDescription": 5,
+        "hasPriority": 5,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-238",
+      "name": "Age Discrimination Employment Act of 1967",
+      "slug": "age-discrimination-employment-act-of-1967",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 6,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 6,
+        "hasDescription": 6,
+        "hasPriority": 6,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-241",
+      "name": "Civil Service Reform Act of 1978",
+      "slug": "civil-service-reform-act-of-1978",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 4,
+      "deadlines": 1,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_1_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 4,
+        "hasDescription": 4,
+        "hasPriority": 4,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-243",
+      "name": "National Labor Relations Act",
+      "slug": "national-labor-relations-act",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 6,
+      "deadlines": 1,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_1_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 6,
+        "hasDescription": 6,
+        "hasPriority": 6,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-245",
+      "name": "Higher Education Act: Code of Conduct",
+      "slug": "higher-education-act-code-of-conduct",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 7,
+      "deadlines": 1,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_1_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-246",
+      "name": "Higher Education Act: Foreign Gift and Contract Reports",
+      "slug": "higher-education-act-foreign-gift-and-contract-rep",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 5,
+      "deadlines": 1,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_1_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 5,
+        "hasDescription": 5,
+        "hasPriority": 5,
+        "hasRole": 0,
+        "hasCategory": 1
+      }
+    },
+    {
+      "regKey": "REG-247",
+      "name": "Internal Revenue Code: Substantiation and Disclosure Provisions",
+      "slug": "internal-revenue-code-substantiation-and-disclosur",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 6,
+      "deadlines": 1,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_1_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 6,
+        "hasDescription": 6,
+        "hasPriority": 6,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-248",
+      "name": "Pension Protection Act",
+      "slug": "pension-protection-act",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 6,
+      "deadlines": 1,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_1_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 6,
+        "hasDescription": 6,
+        "hasPriority": 6,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-251",
+      "name": "Higher Education Act: Textbook Information",
+      "slug": "higher-education-act-textbook-information",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "B",
+      "tasks": 4,
+      "deadlines": 1,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_1_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 4,
+        "hasDescription": 4,
+        "hasPriority": 4,
+        "hasRole": 0,
+        "hasCategory": 1
+      }
+    },
+    {
+      "regKey": "REG-033",
+      "name": "Health Information Technology for Economic and Clinical Health (HITECH) Act of 2009",
+      "slug": "health-information-technology-for-economic-and-cli",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "C",
+      "tasks": 10,
+      "deadlines": 3,
+      "issues": [
+        "LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 10,
+        "hasDescription": 10,
+        "hasPriority": 10,
+        "hasRole": 2,
+        "hasCategory": 3
+      }
+    },
+    {
+      "regKey": "REG-036",
+      "name": "Cooperative Research and Technology Enhancement Act (CREATE Act)",
+      "slug": "cooperative-research-and-technology-enhancement-ac",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "C",
+      "tasks": 5,
+      "deadlines": 1,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_1_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 5,
+        "hasDescription": 5,
+        "hasPriority": 5,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-040",
+      "name": "Higher Education Act: Aid Application Verification",
+      "slug": "higher-education-act-aid-application-verification",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "C",
+      "tasks": 8,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 8,
+        "hasDescription": 8,
+        "hasPriority": 8,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-058",
+      "name": "Higher Education Act: Standard of Conduct",
+      "slug": "higher-education-act-standard-of-conduct",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "C",
+      "tasks": 6,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 6,
+        "hasDescription": 6,
+        "hasPriority": 6,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-073",
+      "name": "Equal Employment Opportunity",
+      "slug": "equal-employment-opportunity",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "C",
+      "tasks": 8,
+      "deadlines": 1,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_1_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 8,
+        "hasDescription": 8,
+        "hasPriority": 8,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-081",
+      "name": "Food and Drug Administration (FDA) Amendments Act of 2007",
+      "slug": "food-and-drug-administration-fda-amendments-act-of",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "C",
+      "tasks": 6,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 6,
+        "hasDescription": 6,
+        "hasPriority": 6,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-112",
+      "name": "Federal Funding Accountability and Transparency Act of 2006 (FFATA)",
+      "slug": "federal-funding-accountability-and-transparency-ac",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "C",
+      "tasks": 5,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 5,
+        "hasDescription": 5,
+        "hasPriority": 5,
+        "hasRole": 0,
+        "hasCategory": 1
+      }
+    },
+    {
+      "regKey": "REG-113",
+      "name": "Fraud Enforcement and Recovery Act of 2009 (FERA)",
+      "slug": "fraud-enforcement-and-recovery-act-of-2009-fera",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "C",
+      "tasks": 5,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 5,
+        "hasDescription": 5,
+        "hasPriority": 5,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-114",
+      "name": "Genetic Information Non-Discrimination Act of 2008",
+      "slug": "genetic-information-non-discrimination-act-of-2008",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "C",
+      "tasks": 7,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-117",
+      "name": "Junk Fax Prevention Act of 2005",
+      "slug": "junk-fax-prevention-act-of-2005",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "C",
+      "tasks": 5,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 5,
+        "hasDescription": 5,
+        "hasPriority": 5,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-118",
+      "name": "Lilly Ledbetter Fair Pay Act of 2009",
+      "slug": "lilly-ledbetter-fair-pay-act-of-2009",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "C",
+      "tasks": 5,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 5,
+        "hasDescription": 5,
+        "hasPriority": 5,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-119",
+      "name": "No Electronic Theft Act",
+      "slug": "no-electronic-theft-act",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "C",
+      "tasks": 5,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 5,
+        "hasDescription": 5,
+        "hasPriority": 5,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-125",
+      "name": "Chemical Facility Anti-Terrorism Standards",
+      "slug": "chemical-facility-anti-terrorism-standards",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "C",
+      "tasks": 7,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-137",
+      "name": "Higher Education Opportunity Act",
+      "slug": "higher-education-opportunity-act",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "C",
+      "tasks": 7,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "NO_JSON_FILE"
+      ],
+      "fixes": [],
+      "jsonExists": false,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-138",
+      "name": "Higher Education Opportunity Act Sections 152 and 153",
+      "slug": "higher-education-opportunity-act-sections-152-and-",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "C",
+      "tasks": 6,
+      "deadlines": 1,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES",
+        "NO_JSON_FILE"
+      ],
+      "fixes": [],
+      "jsonExists": false,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 6,
+        "hasDescription": 6,
+        "hasPriority": 6,
+        "hasRole": 0,
+        "hasCategory": 1
+      }
+    },
+    {
+      "regKey": "REG-156",
+      "name": "Sarbanes Oxley Act of 2002 (SOX)",
+      "slug": "sarbanes-oxley-act-of-2002-sox",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "C",
+      "tasks": 9,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 9,
+        "hasDescription": 9,
+        "hasPriority": 9,
+        "hasRole": 5,
+        "hasCategory": 9
+      }
+    },
+    {
+      "regKey": "REG-162",
+      "name": "Uniform Administrative Requirements, Cost Principles, and Audit Requirements for Federal Awards (Uniform Guidance, Super Circular, or Omni Circular)",
+      "slug": "uniform-administrative-requirements-cost-principle",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "C",
+      "tasks": 8,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 8,
+        "hasDescription": 8,
+        "hasPriority": 8,
+        "hasRole": 4,
+        "hasCategory": 8
+      }
+    },
+    {
+      "regKey": "REG-181",
+      "name": "House and Senate Gift Ban and Ethics Rules",
+      "slug": "house-and-senate-gift-ban-and-ethics-rules",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "C",
+      "tasks": 7,
+      "deadlines": 2,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_2_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 4,
+        "hasCategory": 7
+      }
+    },
+    {
+      "regKey": "REG-188",
+      "name": "Political Activities",
+      "slug": "political-activities",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "C",
+      "tasks": 7,
+      "deadlines": 2,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_2_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 4,
+        "hasCategory": 7
+      }
+    },
+    {
+      "regKey": "REG-191",
+      "name": "Qualified Tuition Reductions",
+      "slug": "qualified-tuition-reductions",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "C",
+      "tasks": 6,
+      "deadlines": 2,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_2_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 6,
+        "hasDescription": 6,
+        "hasPriority": 6,
+        "hasRole": 3,
+        "hasCategory": 6
+      }
+    },
+    {
+      "regKey": "REG-204",
+      "name": "Copyright Term Extension Act",
+      "slug": "copyright-term-extension-act",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "C",
+      "tasks": 7,
+      "deadlines": 2,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_2_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 4,
+        "hasCategory": 7
+      }
+    },
+    {
+      "regKey": "REG-206",
+      "name": "Digital Millennium Copyright Act (DMCA)",
+      "slug": "digital-millennium-copyright-act-dmca",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "C",
+      "tasks": 7,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-217",
+      "name": "NSF grant term and condition, September 21, 2018",
+      "slug": "nsf-grant-term-and-condition-september-21-2018",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "C",
+      "tasks": 6,
+      "deadlines": 1,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_1_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 6,
+        "hasDescription": 6,
+        "hasPriority": 6,
+        "hasRole": 0,
+        "hasCategory": 1
+      }
+    },
+    {
+      "regKey": "REG-218",
+      "name": "Non-Retaliation for Disclosure of Compensation Information",
+      "slug": "non-retaliation-for-disclosure-of-compensation-inf",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "C",
+      "tasks": 7,
+      "deadlines": 2,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_2_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 4,
+        "hasCategory": 7
+      }
+    },
+    {
+      "regKey": "REG-224",
+      "name": "Technology Education and Copyright Harmonization Act (TEACH ACT) of 2002",
+      "slug": "technology-education-and-copyright-harmonization-a",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "C",
+      "tasks": 7,
+      "deadlines": 2,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_2_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 4,
+        "hasCategory": 7
+      }
+    },
+    {
+      "regKey": "REG-231",
+      "name": "Consolidated Omnibus Budget Reconciliation Act (COBRA)",
+      "slug": "consolidated-omnibus-budget-reconciliation-act-cob",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "C",
+      "tasks": 7,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 4,
+        "hasCategory": 7
+      }
+    },
+    {
+      "regKey": "REG-233",
+      "name": "Medicare, Medicaid, and SCHIP Extension Act of 2007",
+      "slug": "medicare-medicaid-and-schip-extension-act-of-2007",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "C",
+      "tasks": 6,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [
+        "added_3_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 6,
+        "hasDescription": 6,
+        "hasPriority": 6,
+        "hasRole": 3,
+        "hasCategory": 6
+      }
+    },
+    {
+      "regKey": "REG-249",
+      "name": "Philanthropy Protection Act of 1995",
+      "slug": "philanthropy-protection-act-of-1995",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": "C",
+      "tasks": 5,
+      "deadlines": 1,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [
+        "added_1_deadlines",
+        "added_relationships_array",
+        "added_tags"
+      ],
+      "jsonExists": true,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 5,
+        "hasDescription": 5,
+        "hasPriority": 5,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-240",
+      "name": "California Consumer Privacy Act",
+      "slug": "california-consumer-privacy-act",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": null,
+      "tasks": 6,
+      "deadlines": 1,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES",
+        "NO_JSON_FILE"
+      ],
+      "fixes": [],
+      "jsonExists": false,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 6,
+        "hasDescription": 6,
+        "hasPriority": 6,
+        "hasRole": 0,
+        "hasCategory": 1
+      }
+    },
+    {
+      "regKey": "REG-242",
+      "name": "General Data Protection Regulation",
+      "slug": "general-data-protection-regulation",
+      "jurisdiction": "federal",
+      "stateCode": null,
+      "lovvLevel": null,
+      "tasks": 7,
+      "deadlines": 1,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES",
+        "NO_JSON_FILE"
+      ],
+      "fixes": [],
+      "jsonExists": false,
+      "jsonHasDeadlines": false,
+      "jsonHasRelationships": false,
+      "jsonHasTags": false,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 0,
+        "hasCategory": 1
+      }
+    },
+    {
+      "regKey": "REG-005",
+      "name": "New Jersey Campus Sex Assault Victim Bill Of Rights",
+      "slug": "new-jersey-campus-sex-assault-victim-bill-of-rights",
+      "jurisdiction": "state",
+      "stateCode": "NJ",
+      "lovvLevel": "A",
+      "tasks": 37,
+      "deadlines": 4,
+      "issues": [],
+      "fixes": [],
+      "jsonExists": true,
+      "jsonHasDeadlines": true,
+      "jsonHasRelationships": true,
+      "jsonHasTags": true,
+      "taskQuality": {
+        "total": 37,
+        "hasDescription": 37,
+        "hasPriority": 37,
+        "hasRole": 30,
+        "hasCategory": 37
+      }
+    },
+    {
+      "regKey": "REG-006",
+      "name": "Pennsylvania Sexual Violence Education Act",
+      "slug": "pennsylvania-sexual-violence-education-act",
+      "jurisdiction": "state",
+      "stateCode": "PA",
+      "lovvLevel": "A",
+      "tasks": 37,
+      "deadlines": 4,
+      "issues": [],
+      "fixes": [],
+      "jsonExists": true,
+      "jsonHasDeadlines": true,
+      "jsonHasRelationships": true,
+      "jsonHasTags": true,
+      "taskQuality": {
+        "total": 37,
+        "hasDescription": 37,
+        "hasPriority": 37,
+        "hasRole": 29,
+        "hasCategory": 37
+      }
+    },
+    {
+      "regKey": "REG-012",
+      "name": "PA Act 36 of 1990 - English Fluency in Higher Ed",
+      "slug": "higher-education-act-recognition-of-accrediting-ag",
+      "jurisdiction": "state",
+      "stateCode": "PA",
+      "lovvLevel": "A",
+      "tasks": 3,
+      "deadlines": 2,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [],
+      "jsonExists": true,
+      "jsonHasDeadlines": true,
+      "jsonHasRelationships": true,
+      "jsonHasTags": true,
+      "taskQuality": {
+        "total": 3,
+        "hasDescription": 3,
+        "hasPriority": 3,
+        "hasRole": 3,
+        "hasCategory": 3
+      }
+    },
+    {
+      "regKey": "REG-252",
+      "name": "PA Act 55 of 2022 - Sexual Violence in Higher Ed",
+      "slug": "pennsylvania-act-55-of-2022-sexual-violence-higher-ed",
+      "jurisdiction": "state",
+      "stateCode": "PA",
+      "lovvLevel": "A",
+      "tasks": 35,
+      "deadlines": 8,
+      "issues": [],
+      "fixes": [],
+      "jsonExists": true,
+      "jsonHasDeadlines": true,
+      "jsonHasRelationships": true,
+      "jsonHasTags": true,
+      "taskQuality": {
+        "total": 35,
+        "hasDescription": 35,
+        "hasPriority": 35,
+        "hasRole": 35,
+        "hasCategory": 35
+      }
+    },
+    {
+      "regKey": "REG-013",
+      "name": "New Jersey Licensure Accreditation Standards",
+      "slug": "new-jersey-licensure-accreditation-standards",
+      "jurisdiction": "state",
+      "stateCode": "NJ",
+      "lovvLevel": "C",
+      "tasks": 8,
+      "deadlines": 2,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [],
+      "jsonExists": true,
+      "jsonHasDeadlines": true,
+      "jsonHasRelationships": true,
+      "jsonHasTags": true,
+      "taskQuality": {
+        "total": 8,
+        "hasDescription": 8,
+        "hasPriority": 8,
+        "hasRole": 5,
+        "hasCategory": 8
+      }
+    },
+    {
+      "regKey": "REG-014",
+      "name": "Pennsylvania Institutional Accreditation",
+      "slug": "pennsylvania-institutional-accreditation",
+      "jurisdiction": "state",
+      "stateCode": "PA",
+      "lovvLevel": "C",
+      "tasks": 7,
+      "deadlines": 2,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [],
+      "jsonExists": true,
+      "jsonHasDeadlines": true,
+      "jsonHasRelationships": true,
+      "jsonHasTags": true,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 4,
+        "hasCategory": 7
+      }
+    },
+    {
+      "regKey": "REG-024",
+      "name": "New Jersey Hazing Prevention",
+      "slug": "new-jersey-hazing-prevention",
+      "jurisdiction": "state",
+      "stateCode": "NJ",
+      "lovvLevel": "C",
+      "tasks": 9,
+      "deadlines": 4,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [],
+      "jsonExists": true,
+      "jsonHasDeadlines": true,
+      "jsonHasRelationships": true,
+      "jsonHasTags": true,
+      "taskQuality": {
+        "total": 9,
+        "hasDescription": 9,
+        "hasPriority": 9,
+        "hasRole": 0,
+        "hasCategory": 1
+      }
+    },
+    {
+      "regKey": "REG-025",
+      "name": "New Jersey Uniform Crime Reporting",
+      "slug": "new-jersey-uniform-crime-reporting",
+      "jurisdiction": "state",
+      "stateCode": "NJ",
+      "lovvLevel": "C",
+      "tasks": 7,
+      "deadlines": 4,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [],
+      "jsonExists": true,
+      "jsonHasDeadlines": true,
+      "jsonHasRelationships": true,
+      "jsonHasTags": true,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-026",
+      "name": "Pennsylvania Uniform Crime Reporting Act",
+      "slug": "pennsylvania-uniform-crime-reporting-act",
+      "jurisdiction": "state",
+      "stateCode": "PA",
+      "lovvLevel": "C",
+      "tasks": 6,
+      "deadlines": 4,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [],
+      "jsonExists": true,
+      "jsonHasDeadlines": true,
+      "jsonHasRelationships": true,
+      "jsonHasTags": true,
+      "taskQuality": {
+        "total": 6,
+        "hasDescription": 6,
+        "hasPriority": 6,
+        "hasRole": 0,
+        "hasCategory": 1
+      }
+    },
+    {
+      "regKey": "REG-062",
+      "name": "New Jersey Tuition Aid Grant Program",
+      "slug": "new-jersey-tuition-aid-grant-program",
+      "jurisdiction": "state",
+      "stateCode": "NJ",
+      "lovvLevel": "C",
+      "tasks": 5,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [],
+      "jsonExists": true,
+      "jsonHasDeadlines": true,
+      "jsonHasRelationships": true,
+      "jsonHasTags": true,
+      "taskQuality": {
+        "total": 5,
+        "hasDescription": 5,
+        "hasPriority": 5,
+        "hasRole": 0,
+        "hasCategory": 1
+      }
+    },
+    {
+      "regKey": "REG-063",
+      "name": "New Jersey Veterans Benefits Compliance",
+      "slug": "new-jersey-veterans-benefits-compliance",
+      "jurisdiction": "state",
+      "stateCode": "NJ",
+      "lovvLevel": "C",
+      "tasks": 5,
+      "deadlines": 3,
+      "issues": [
+        "CRITICAL_LOW_TASKS"
+      ],
+      "fixes": [],
+      "jsonExists": true,
+      "jsonHasDeadlines": true,
+      "jsonHasRelationships": true,
+      "jsonHasTags": true,
+      "taskQuality": {
+        "total": 5,
+        "hasDescription": 5,
+        "hasPriority": 5,
+        "hasRole": 0,
+        "hasCategory": 1
+      }
+    },
+    {
+      "regKey": "REG-187",
+      "name": "Pennsylvania Higher Education Gift Disclosure Act",
+      "slug": "pennsylvania-higher-education-gift-disclosure-act",
+      "jurisdiction": "state",
+      "stateCode": "PA",
+      "lovvLevel": "C",
+      "tasks": 6,
+      "deadlines": 2,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [],
+      "jsonExists": true,
+      "jsonHasDeadlines": true,
+      "jsonHasRelationships": true,
+      "jsonHasTags": true,
+      "taskQuality": {
+        "total": 6,
+        "hasDescription": 6,
+        "hasPriority": 6,
+        "hasRole": 3,
+        "hasCategory": 6
+      }
+    },
+    {
+      "regKey": "REG-219",
+      "name": "Pennsylvania English Fluency In Higher Education A",
+      "slug": "pennsylvania-english-fluency-in-higher-education-a",
+      "jurisdiction": "state",
+      "stateCode": "PA",
+      "lovvLevel": "C",
+      "tasks": 5,
+      "deadlines": 1,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [],
+      "jsonExists": true,
+      "jsonHasDeadlines": true,
+      "jsonHasRelationships": true,
+      "jsonHasTags": true,
+      "taskQuality": {
+        "total": 5,
+        "hasDescription": 5,
+        "hasPriority": 5,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-220",
+      "name": "Pennsylvania Graduation Rates Reporting Act",
+      "slug": "pennsylvania-graduation-rates-reporting-act",
+      "jurisdiction": "state",
+      "stateCode": "PA",
+      "lovvLevel": "C",
+      "tasks": 5,
+      "deadlines": 1,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [],
+      "jsonExists": true,
+      "jsonHasDeadlines": true,
+      "jsonHasRelationships": true,
+      "jsonHasTags": true,
+      "taskQuality": {
+        "total": 5,
+        "hasDescription": 5,
+        "hasPriority": 5,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-221",
+      "name": "Pennsylvania Higher Education Standards",
+      "slug": "pennsylvania-higher-education-standards",
+      "jurisdiction": "state",
+      "stateCode": "PA",
+      "lovvLevel": "C",
+      "tasks": 5,
+      "deadlines": 1,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [],
+      "jsonExists": true,
+      "jsonHasDeadlines": true,
+      "jsonHasRelationships": true,
+      "jsonHasTags": true,
+      "taskQuality": {
+        "total": 5,
+        "hasDescription": 5,
+        "hasPriority": 5,
+        "hasRole": 1,
+        "hasCategory": 2
+      }
+    },
+    {
+      "regKey": "REG-244",
+      "name": "Pennsylvania Student Consumer Protection",
+      "slug": "pennsylvania-student-consumer-protection",
+      "jurisdiction": "state",
+      "stateCode": "PA",
+      "lovvLevel": "C",
+      "tasks": 7,
+      "deadlines": 1,
+      "issues": [
+        "CRITICAL_LOW_TASKS",
+        "LOW_DEADLINES"
+      ],
+      "fixes": [],
+      "jsonExists": true,
+      "jsonHasDeadlines": true,
+      "jsonHasRelationships": true,
+      "jsonHasTags": true,
+      "taskQuality": {
+        "total": 7,
+        "hasDescription": 7,
+        "hasPriority": 7,
+        "hasRole": 3,
+        "hasCategory": 4
+      }
+    }
+  ]
+}

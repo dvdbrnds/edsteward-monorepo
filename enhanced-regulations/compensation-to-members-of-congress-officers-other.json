@@ -16,5 +16,27 @@
       "deadlines": 70
     },
     "timestamp": "2025-12-04T17:45:30.380Z"
-  }
+  },
+  "deadlines": [
+    {
+      "date": "continuous",
+      "label": "Annual Ethics Training",
+      "type": "training",
+      "description": "Annual Ethics Training for Compensation to Members of Congress, Officers, Others in Matters Affecting the Government",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "01-31",
+      "label": "Conflict of Interest Disclosure Review",
+      "type": "review",
+      "description": "Conflict of Interest Disclosure Review for Compensation to Members of Congress, Officers, Others in Matters Affecting the Government",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Ethics"
+  ]
 }

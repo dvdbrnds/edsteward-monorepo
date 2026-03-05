@@ -1,0 +1,1 @@
+Context assessment framework generated for code-analysis task with standard strictness. Thresholds: coverage 75%, quality 80%.

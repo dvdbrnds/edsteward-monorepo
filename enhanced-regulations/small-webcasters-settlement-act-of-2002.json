@@ -16,5 +16,27 @@
       "deadlines": 70
     },
     "timestamp": "2025-12-05T02:14:42.295Z"
-  }
+  },
+  "deadlines": [
+    {
+      "date": "continuous",
+      "label": "Annual DMCA Agent Registration Renewal",
+      "type": "registration",
+      "description": "Annual DMCA Agent Registration Renewal for Small Webcasters Settlement Act of 2002",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Copyright Policy Review",
+      "type": "review",
+      "description": "Copyright Policy Review for Small Webcasters Settlement Act of 2002",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Copyright & Trademark"
+  ]
 }

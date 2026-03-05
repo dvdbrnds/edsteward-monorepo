@@ -1,0 +1,1 @@
+Test memory storage - debugging byterover memory system in Cursor. User experiencing issues with memory retrieval not working properly.

@@ -16,5 +16,35 @@
       "deadlines": 70
     },
     "timestamp": "2025-12-04T19:20:26.719Z"
-  }
+  },
+  "deadlines": [
+    {
+      "date": "12-31",
+      "label": "Annual Privacy Assessment",
+      "type": "assessment",
+      "description": "Annual Privacy Assessment for Freedom of Information Act",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Data Breach Notification (if applicable)",
+      "type": "notification",
+      "description": "Data Breach Notification (if applicable) for Freedom of Information Act",
+      "isRecurring": true,
+      "recurrenceFrequency": "as-needed"
+    },
+    {
+      "date": "12-31",
+      "label": "Security Awareness Training",
+      "type": "training",
+      "description": "Security Awareness Training for Freedom of Information Act",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Privacy & Information Security"
+  ]
 }

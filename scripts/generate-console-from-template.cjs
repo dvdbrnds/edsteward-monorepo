@@ -11,6 +11,9 @@
  *   2. const REGULATION_SLUG = '...'
  *   3. const REG_KEY = '...'
  *   4. const REGULATION_NAME = '...' (if present)
+ *   5. const JURISDICTION_SOURCE = '...'
+ *   6. const STATE_CODE = '...'
+ *   7. const ENFORCING_AGENCY = '...'
  * 
  * DO NOT do global string replacements - that corrupts the template!
  * 
@@ -51,6 +54,38 @@ async function getRegulationData(regKey) {
   return result.rows[0];
 }
 
+// Enforcing agency lookup for state regulations
+const STATE_ENFORCING_AGENCIES = {
+  PA: {
+    default: 'PA Dept. of Education',
+    'pennsylvania-act-55-of-2022-sexual-violence-higher-ed': 'PA Dept. of Education / Title IX',
+    'pennsylvania-english-fluency-in-higher-education-a': 'PA Dept. of Education',
+    'pennsylvania-graduation-rates-reporting-act': 'PA Dept. of Education',
+    'pennsylvania-higher-education-gift-disclosure-act': 'PA Dept. of Education',
+    'pennsylvania-higher-education-standards': 'PA Dept. of Education',
+    'pennsylvania-institutional-accreditation': 'PA Dept. of Education',
+    'pennsylvania-sexual-violence-education-act': 'PA Dept. of Education',
+    'pennsylvania-student-consumer-protection': 'PA Attorney General / PA Dept. of Education',
+    'pennsylvania-uniform-crime-reporting-act': 'PA State Police / PA Dept. of Education',
+    'higher-education-act-recognition-of-accrediting-ag': 'PA Dept. of Education',
+  },
+  NJ: {
+    default: 'NJ Office of the Secretary of Higher Education',
+    'new-jersey-campus-sex-assault-victim-bill-of-rights': 'NJ Office of the Secretary of Higher Education',
+    'new-jersey-hazing-prevention': 'NJ Office of the Secretary of Higher Education',
+    'new-jersey-licensure-accreditation-standards': 'NJ Office of the Secretary of Higher Education',
+    'new-jersey-tuition-aid-grant-program': 'NJ Higher Education Student Assistance Authority',
+    'new-jersey-uniform-crime-reporting': 'NJ State Police',
+    'new-jersey-veterans-benefits-compliance': 'NJ Dept. of Military and Veterans Affairs',
+  }
+};
+
+function getEnforcingAgency(reg) {
+  if (reg.jurisdiction_source !== 'state' || !reg.state_code) return '';
+  const stateAgencies = STATE_ENFORCING_AGENCIES[reg.state_code] || {};
+  return stateAgencies[reg.item_id] || stateAgencies.default || '';
+}
+
 async function generateConsole(regKey) {
   console.log(`\n🔄 Generating console for ${regKey}...`);
   
@@ -58,6 +93,7 @@ async function generateConsole(regKey) {
   const reg = await getRegulationData(regKey);
   console.log(`   Found: ${reg.name}`);
   console.log(`   Slug: ${reg.item_id}`);
+  console.log(`   Jurisdiction: ${reg.jurisdiction_source || 'federal'}${reg.state_code ? ` (${reg.state_code})` : ''}`);
   
   // Read template
   let template = fs.readFileSync(TEMPLATE_FILE, 'utf-8');
@@ -114,6 +150,27 @@ async function generateConsole(regKey) {
     );
   }
   
+  // 6. Replace JURISDICTION_SOURCE constant
+  const jurisdictionSource = reg.jurisdiction_source || 'federal';
+  console_html = console_html.replace(
+    /const JURISDICTION_SOURCE = '[^']*';/,
+    `const JURISDICTION_SOURCE = '${jurisdictionSource}';`
+  );
+  
+  // 7. Replace STATE_CODE constant
+  const stateCode = reg.state_code || '';
+  console_html = console_html.replace(
+    /const STATE_CODE = '[^']*';/,
+    `const STATE_CODE = '${stateCode}';`
+  );
+  
+  // 8. Replace ENFORCING_AGENCY constant
+  const enforcingAgency = getEnforcingAgency(reg);
+  console_html = console_html.replace(
+    /const ENFORCING_AGENCY = '[^']*';/,
+    `const ENFORCING_AGENCY = '${enforcingAgency}';`
+  );
+  
   // ═══════════════════════════════════════════════════════════════════════════
   // VERIFICATION: Ensure REGULATION_SLUG is used (not hardcoded strings)
   // ═══════════════════════════════════════════════════════════════════════════
@@ -160,9 +217,10 @@ async function main() {
   }
   
   console.log('═══════════════════════════════════════════════════════════════════');
-  console.log('🏗️  Console Generator from Gold Standard Template');
-  console.log('   Template: Clery (REG-001)');
+  console.log('🏗️  Console Generator from Universal Template');
+  console.log('   Template: Clery (REG-001) — Jurisdiction-Aware');
   console.log('   Mode: SAFE - Only replaces configuration constants');
+  console.log('   Replaces: SLUG, REG_KEY, NAME, JURISDICTION, STATE_CODE, AGENCY');
   console.log('═══════════════════════════════════════════════════════════════════\n');
   
   try {

@@ -1,0 +1,1 @@
+MCP Engine startup command is `npm start` from root directory. This runs `mcp-start.js` which starts all services in order: Registry API (3010), LLM Gateway (3002), Delivery System (3051), Frontend (3050). Includes automatic port cleanup, health checks, auto-restart, and graceful shutdown with Ctrl+C. Alternative commands: `npm run start:all`, `npm run dev`, `npm stop`.

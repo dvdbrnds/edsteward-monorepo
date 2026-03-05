@@ -16,5 +16,35 @@
       "deadlines": 70
     },
     "timestamp": "2025-12-04T16:18:07.992Z"
-  }
+  },
+  "deadlines": [
+    {
+      "date": "10-01",
+      "label": "FISAP Annual Report",
+      "type": "filing",
+      "description": "FISAP Annual Report for Higher Education Act: Record Retention",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "06-30",
+      "label": "Annual Financial Aid Audit",
+      "type": "audit",
+      "description": "Annual Financial Aid Audit for Higher Education Act: Record Retention",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "07-01",
+      "label": "Gainful Employment Disclosure Update",
+      "type": "disclosure",
+      "description": "Gainful Employment Disclosure Update for Higher Education Act: Record Retention",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Financial Aid"
+  ]
 }

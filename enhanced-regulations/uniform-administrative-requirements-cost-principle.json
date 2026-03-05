@@ -16,5 +16,35 @@
       "deadlines": 70
     },
     "timestamp": "2025-12-05T02:40:58.767Z"
-  }
+  },
+  "deadlines": [
+    {
+      "date": "12-31",
+      "label": "Annual Financial Audit",
+      "type": "audit",
+      "description": "Annual Financial Audit for Uniform Administrative Requirements, Cost Principles, and Audit Requirements for Federal Awards (Uniform Guidance, Super Circular, or Omni Circular)",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "03-31",
+      "label": "A-133 Single Audit (if applicable)",
+      "type": "audit",
+      "description": "A-133 Single Audit (if applicable) for Uniform Administrative Requirements, Cost Principles, and Audit Requirements for Federal Awards (Uniform Guidance, Super Circular, or Omni Circular)",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Quarterly Financial Review",
+      "type": "review",
+      "description": "Quarterly Financial Review for Uniform Administrative Requirements, Cost Principles, and Audit Requirements for Federal Awards (Uniform Guidance, Super Circular, or Omni Circular)",
+      "isRecurring": true,
+      "recurrenceFrequency": "quarterly"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Accounting"
+  ]
 }

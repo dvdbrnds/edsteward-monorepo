@@ -16,5 +16,35 @@
       "deadlines": 70
     },
     "timestamp": "2025-12-04T16:10:32.358Z"
-  }
+  },
+  "deadlines": [
+    {
+      "date": "02-01",
+      "label": "OSHA 300 Log Posting",
+      "type": "posting",
+      "description": "OSHA 300 Log Posting for Chemical Facility Anti-Terrorism Standards",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "01-31",
+      "label": "Annual Safety Training",
+      "type": "training",
+      "description": "Annual Safety Training for Chemical Facility Anti-Terrorism Standards",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Hazardous Waste Manifest Submission",
+      "type": "filing",
+      "description": "Hazardous Waste Manifest Submission for Chemical Facility Anti-Terrorism Standards",
+      "isRecurring": true,
+      "recurrenceFrequency": "as-needed"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Environmental Health and Safety"
+  ]
 }

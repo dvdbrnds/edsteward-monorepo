@@ -16,5 +16,59 @@
       "deadlines": 70
     },
     "timestamp": "2025-12-04T16:28:34.408Z"
-  }
+  },
+  "deadlines": [
+    {
+      "date": "continuous",
+      "label": "Facility Accessibility Audit",
+      "type": "audit",
+      "description": "Conduct comprehensive facility accessibility audit",
+      "isRecurring": true,
+      "recurrenceFrequency": "triennial"
+    },
+    {
+      "date": "continuous",
+      "label": "Website Accessibility Audit",
+      "type": "audit",
+      "description": "Audit website for WCAG 2.1 AA compliance",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "ADA Training Completion",
+      "type": "training",
+      "description": "Complete annual ADA training for faculty and staff",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Self-Evaluation Review",
+      "type": "review",
+      "description": "Review and update ADA self-evaluation",
+      "isRecurring": true,
+      "recurrenceFrequency": "biennial"
+    },
+    {
+      "date": "continuous",
+      "label": "Accommodation Process Review",
+      "type": "review",
+      "description": "Review student and employee accommodation processes",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Emergency Evacuation Plan Update",
+      "type": "review",
+      "description": "Update personal emergency evacuation plans",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Americans with Disabilities Act (ADA)"
+  ]
 }
