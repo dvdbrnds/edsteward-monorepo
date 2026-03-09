@@ -1,0 +1,58 @@
+---
+description: EdSteward App — package-specific patterns and key files
+globs: packages/app/**
+alwaysApply: false
+---
+
+# EdSteward App (packages/app)
+
+## Tech Stack
+
+- **Frontend:** React 18, TypeScript, Vite, Tailwind CSS, shadcn/ui (Radix), Wouter, TanStack Query
+- **Backend:** Express.js, TypeScript (tsx)
+- **Database:** PostgreSQL (Neon Serverless), Drizzle ORM
+- **Auth:** Passport.js (Local + SAML/Okta/CAS2/OIDC), JWT, MFA (TOTP)
+- **Hosting:** AWS ECS Fargate, ALB, ECR, Route53
+- **Container:** Docker multi-stage build (Colima on macOS)
+
+## Key Files
+
+| File | Purpose |
+|------|---------|
+| `shared/schema.ts` | Drizzle ORM schema — single source of truth for all DB tables |
+| `server/index.ts` | Express server entry point |
+| `server/routes/api/` | ~32 API route modules |
+| `server/mcp-integration-api.ts` | Receives regulation data from MCP Engine |
+| `server/auth.ts` | Passport strategies and session config |
+| `client/src/pages/` | ~30 React page components |
+| `client/src/lib/version.ts` | App version string |
+| `admin-console/` | Separate admin app (frontend port 3001, backend port 4000) |
+| `.env` | Environment variables — never commit secrets |
+
+## Architecture
+
+- **Multi-tenant:** Database-per-tenant via Neon Serverless PostgreSQL, subdomain routing
+- **Single-tenant mode:** Default for local dev (uses `DATABASE_URL` from `.env`)
+- **Attestation system:** Magic link tokens for external users to upload evidence and sign attestations
+- **Compliance tasks:** Assigned to regulations with evidence requirements, DRI assignment, email notifications
+
+## Local Dev
+
+```zsh
+npm run dev                           # Main app on port 3000
+cd admin-console && npm run dev       # Admin frontend on port 3001
+cd admin-console/server && npx tsx watch index.ts  # Admin backend on port 4000
+```
+
+Check health: `curl -s http://localhost:3000/api/health`
+
+## Deployment Flow
+
+Code -> Commit -> Push -> Tag -> `./scripts/deploy-staging.sh` -> Verify -> `./scripts/deploy-production.sh`
+
+## Common Pitfalls
+
+- **EADDRINUSE:** Check if a service is already running and healthy before killing anything
+- **Admin console DB error:** Ensure dotenv path is correct in `admin-console/server/config/database-connections.ts`
+- **MFA warnings on startup:** Expected in dev — set `MFA_ENCRYPTION_KEY` env var to suppress
+- **Schema changes:** Run `npm run db:push` after editing `shared/schema.ts`

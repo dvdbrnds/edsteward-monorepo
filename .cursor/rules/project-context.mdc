@@ -1,0 +1,48 @@
+---
+description: EdSteward monorepo — project overview and architecture
+globs:
+alwaysApply: true
+---
+
+# EdSteward Monorepo
+
+EdSteward is a regulatory compliance SaaS platform for higher education institutions. It tracks federal and state regulations (FERPA, Title IX, Clery Act, HECVAT, state laws, etc.), generates compliance tasks, and manages attestation/evidence workflows.
+
+## Monorepo Structure
+
+Two packages connected via npm workspaces:
+
+| Package | Name | Role |
+|---------|------|------|
+| `packages/app` | edsteward | Main product — React + Express + PostgreSQL (Drizzle ORM). Multi-tenant SaaS with auth, compliance tasks, attestation, evidence upload. |
+| `packages/engine` | compliance-llm-gateway | Intelligence layer — LLM-powered regulation ingestion, enrichment, and delivery. Uses Anthropic Claude, OpenAI, government APIs (eCFR, Federal Register, Congress.gov). |
+
+## How They Connect
+
+The Engine ingests and enriches regulation data, then **pushes** it to the App:
+
+1. Engine builds regulation payloads (tasks, deadlines, risk assessments, summaries)
+2. POSTs to App's `/api/regulation-updates` (pending CCO review) or `/api/mcp/regulations/sync` (direct sync)
+3. App stores data in PostgreSQL and presents the compliance workflow to users
+4. Real-time updates via WebSocket from the Engine's delivery server
+
+Key integration files:
+- Engine side: `packages/engine/src/delivery-system/edsteward-integration.js`, `packages/engine/config/customers.json`
+- App side: `packages/app/server/mcp-integration-api.ts`, `packages/app/server/routes/api/`
+
+## Conventions
+
+- TypeScript for all new code in `packages/app`; ESM JavaScript in `packages/engine`
+- zsh shell on macOS with Homebrew (see User Rules)
+- Deployment: staging-first, then production after verification
+- Database schema is the single source of truth: `packages/app/shared/schema.ts`
+
+## Deep Reference Docs
+
+For detailed per-package context, read:
+- `packages/app/CLAUDE.md` — app architecture, auth, deployment, common issues
+- `packages/engine/SESSION-STARTUP.md` — engine services, ports, regulation pipeline, database schema
+
+## Auto-Generated State
+
+See `.cursor/rules/project-state.mdc` for current versions, ports, and environment URLs. Regenerate it with `zsh scripts/generate-cursor-rules.zsh`.

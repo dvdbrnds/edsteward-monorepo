@@ -1,0 +1,72 @@
+---
+description: MCP Engine — package-specific patterns and key files
+globs: packages/engine/**
+alwaysApply: false
+---
+
+# MCP Engine (packages/engine)
+
+## Tech Stack
+
+- **Runtime:** Node.js, ESM modules (`"type": "module"` — use `import`, never `require`)
+- **Backend:** Express.js, Winston logging
+- **LLM:** Anthropic Claude, OpenAI
+- **MCP:** @modelcontextprotocol/sdk
+- **Database:** PostgreSQL (source of truth), Redis + BullMQ for queues
+- **Frontend:** React 18, Vite, Ant Design, styled-components (port 3050)
+- **Deploy:** Docker Compose, PM2
+
+## Key Files
+
+| File | Purpose |
+|------|---------|
+| `mcp-start.js` | Unified startup — starts all services with health checks and port conflict resolution |
+| `start-registry-postgres.js` | Registry API entry point (PostgreSQL mode) |
+| `src/llm-gateway/start-llm-gateway-phase4.js` | LLM Gateway entry point |
+| `src/delivery-system/delivery-server.js` | WebSocket + REST delivery to EdSteward |
+| `src/delivery-system/edsteward-integration.js` | EdSteward API integration logic |
+| `config/customers.json` | Target environments (moravian-dev, moravian-prod) with URLs and auth |
+| `data/edsteward-regkey-bulk-mapping.json` | REG-key to EdSteward ID mapping (242 entries) |
+| `enhanced-regulations/` | Per-regulation JSON files (federal + state) |
+| `.env` | Secrets — never commit; copy `.env.example` for setup |
+
+## Services
+
+| Service | Port | Entry Point |
+|---------|------|-------------|
+| Registry API | 3010 | `start-registry-postgres.js` |
+| LLM Gateway | 3002 | `src/llm-gateway/start-llm-gateway-phase4.js` |
+| Frontend | 3050 | Vite dev server (`src/client/`) |
+| Delivery Server | 3051 | `src/delivery-system/delivery-server.js` |
+| Customer API | 3060 | `src/server/customer-management-api.js` |
+| Inquisitor | 3061 | `src/inquisitor-mcp/inquisitor-server.js` |
+
+Start all: `node mcp-start.js`
+
+## Federal vs State Regulation Pipeline
+
+| Component | Federal | State (PA/NJ) |
+|-----------|---------|---------------|
+| Statute text | eCFR API | Enhanced JSON + Open States API |
+| Rulemaking | Federal Register API | PA General Assembly + PA Code & Bulletin |
+| Source client | `ecfr-api-client.js` | `state-legislature-api-client.js` |
+| Task templates | Federal templates | State-specific templates |
+
+Do NOT use CFR/eCFR endpoints for state regulations — they have a separate pipeline.
+
+## EdSteward Delivery Flow
+
+1. Console page triggers "Push to Selected Target" or "Send to Moravian Production"
+2. Hits delivery server at `localhost:3051/api/customers/push`
+3. Delivery server builds payload from Registry API data
+4. POSTs to EdSteward's `/api/regulation-updates` (pending CCO review)
+5. Direct sync available via `/api/mcp/regulations/sync` (bypasses approval queue)
+
+## Gotchas
+
+- **ESM only** — `import` not `require`; all `.js` files are ES modules
+- **PostgreSQL is source of truth** — old CSV registry is deprecated
+- **`mcp-start.js` kills conflicting processes** — it frees ports on startup
+- **Docker required** — `docker-compose up -d` for PostgreSQL, Redis, Kafka
+- **Console pages are static HTML** — served from `src/client/public/regulations/`; each regulation gets its own page
+- **Task extractor matching** — templates match by slug first, then keywords; requires 2+ keyword matches to prevent false positives

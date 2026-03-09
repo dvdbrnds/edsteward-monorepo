@@ -1,0 +1,50 @@
+---
+description: "AUTO-GENERATED project state — do not edit by hand. Regenerate: zsh scripts/generate-cursor-rules.zsh"
+globs:
+alwaysApply: true
+---
+
+# Project State (auto-generated)
+
+> Generated at: 2026-03-09 11:05:06
+
+## Versions
+
+| Component | Version |
+|-----------|---------|
+| EdSteward App | STABLE v1.5.0 |
+| MCP Engine | v5.3.0 |
+
+## Workspace Packages
+
+| Path | Package Name |
+|------|-------------|
+| `packages/app` | edsteward |
+| `packages/engine` | compliance-llm-gateway |
+
+## Ports
+
+| Port | Service | Health Check |
+|------|---------|-------------|
+| 3000 | EdSteward App (Express + Vite) | `curl -s http://localhost:3000/api/health` |
+| 3001 | Admin Console Frontend (Vite) | `curl -s -o /dev/null -w "%{http_code}" http://localhost:3001/` |
+| 4000 | Admin Console Backend (Express) | `curl -s http://localhost:4000/api/health` |
+| 3010 | Engine: Registry API | `curl -s http://localhost:3010/health` |
+| 3002 | Engine: LLM Gateway | `curl -s http://localhost:3002/api/llm/health` |
+| 3050 | Engine: Frontend (Vite) | `curl -s -o /dev/null -w "%{http_code}" http://localhost:3050/` |
+| 3051 | Engine: Delivery Server | `curl -s http://localhost:3051/health` |
+| 3060 | Engine: Customer API | `curl -s -o /dev/null -w "%{http_code}" http://localhost:3060/` |
+| 3061 | Engine: Inquisitor MCP | `curl -s -o /dev/null -w "%{http_code}" http://localhost:3061/` |
+
+## Environments
+
+| Environment | URL |
+|-------------|-----|
+| Production | https://moravian.edsteward.ai |
+| Staging | https://staging.edsteward.ai |
+| Local Dev | http://localhost:3000 |
+
+## Regulation Data
+
+- Enhanced regulation JSON files: **242**
+- Location: `packages/engine/enhanced-regulations/`
