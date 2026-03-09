@@ -26,9 +26,9 @@ import { existsSync } from 'fs';
 const CONFIG = {
   ports: {
     registry: 3010,
-    llmGateway: 3002,
+    llmGateway: 3004,
     frontend: 3050,
-    delivery: 3051,
+    delivery: 3003,
     customerManagement: 3060,
     inquisitor: 3061
   },
@@ -433,7 +433,7 @@ async function startFrontend() {
       if (canRestart('frontend')) {
         setTimeout(() => {
           if (!isShuttingDown) {
-            startFrontendServer();
+            startFrontend();
           }
         }, 2000);
       } else {

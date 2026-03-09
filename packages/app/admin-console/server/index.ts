@@ -4,9 +4,14 @@
  */
 
 import dotenv from 'dotenv';
-// Only load .env file if DATABASE_URL is not already set (allows ECS/Docker env vars to take precedence)
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+
+// Load .env from packages/app/.env (two directories up from admin-console/server/)
 if (!process.env.DATABASE_URL) {
-  dotenv.config();
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = dirname(__filename);
+  dotenv.config({ path: join(__dirname, '..', '..', '.env') });
 }
 
 import express, { Request, Response, NextFunction } from 'express';
@@ -93,7 +98,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Admin users (TODO: Move to database with proper password hashing)
 const adminUsers = [
   { id: 1, email: 'admin@edsteward.ai', password: 'admin123', name: 'EdSteward Admin', role: 'super_admin' },
-  { id: 2, email: 'dvdbrnds@gmail.com', password: 'gabadh', name: 'David Brands', role: 'super_admin' }
+  { id: 2, email: 'dvdbrnds@gmail.com', password: 'gabadhgabadh', name: 'David Brands', role: 'super_admin' }
 ];
 
 // Token storage (in-memory for simplicity)
@@ -1440,7 +1445,7 @@ app.post('/api/sync/dev-to-template', requireAuth, async (req, res) => {
     // Re-authenticate admin
     const adminUsers = [
       { id: 1, email: 'admin@edsteward.ai', password: 'admin123', name: 'EdSteward Admin', role: 'super_admin' },
-      { id: 2, email: 'dvdbrnds@gmail.com', password: 'gabadh', name: 'David Brands', role: 'super_admin' }
+      { id: 2, email: 'dvdbrnds@gmail.com', password: 'gabadhgabadh', name: 'David Brands', role: 'super_admin' }
     ];
     const matchingAdmin = adminUsers.find(u => u.email === adminEmail);
     if (!matchingAdmin || matchingAdmin.password !== adminPassword) {

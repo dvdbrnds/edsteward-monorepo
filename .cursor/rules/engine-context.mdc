@@ -35,9 +35,9 @@ alwaysApply: false
 | Service | Port | Entry Point |
 |---------|------|-------------|
 | Registry API | 3010 | `start-registry-postgres.js` |
-| LLM Gateway | 3002 | `src/llm-gateway/start-llm-gateway-phase4.js` |
+| LLM Gateway | 3004 | `src/llm-gateway/start-llm-gateway-phase4.js` |
 | Frontend | 3050 | Vite dev server (`src/client/`) |
-| Delivery Server | 3051 | `src/delivery-system/delivery-server.js` |
+| Delivery Server | 3003 | `src/delivery-system/delivery-server.js` |
 | Customer API | 3060 | `src/server/customer-management-api.js` |
 | Inquisitor | 3061 | `src/inquisitor-mcp/inquisitor-server.js` |
 
@@ -57,7 +57,7 @@ Do NOT use CFR/eCFR endpoints for state regulations — they have a separate pip
 ## EdSteward Delivery Flow
 
 1. Console page triggers "Push to Selected Target" or "Send to Moravian Production"
-2. Hits delivery server at `localhost:3051/api/customers/push`
+2. Hits delivery server at `localhost:3003/api/customers/push`
 3. Delivery server builds payload from Registry API data
 4. POSTs to EdSteward's `/api/regulation-updates` (pending CCO review)
 5. Direct sync available via `/api/mcp/regulations/sync` (bypasses approval queue)

@@ -10,16 +10,15 @@ import { Pool } from 'pg';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 
-// Load environment variables - only if DATABASE_URL is not already set (allows ECS env vars to take precedence)
+// Load .env from packages/app/.env
+// Source: admin-console/server/config/ -> 3 levels up
+// Compiled (dist): admin-console/server/dist/config/ -> 4 levels up
 if (!process.env.DATABASE_URL) {
   const __filename = fileURLToPath(import.meta.url);
   const __dirname = dirname(__filename);
-  // When compiled, we're in dist/config, so go up to server/ where .env lives
-  // In source: config/ -> server/.env (one level up)
-  // In dist: dist/config/ -> server/.env (two levels up)
-  const envPath = __dirname.includes('dist') 
-    ? join(__dirname, '..', '..', '.env')
-    : join(__dirname, '..', '.env');
+  const envPath = __dirname.includes('dist')
+    ? join(__dirname, '..', '..', '..', '..', '.env')
+    : join(__dirname, '..', '..', '..', '.env');
   dotenv.config({ path: envPath });
 }
 
