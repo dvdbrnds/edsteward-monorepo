@@ -9,7 +9,7 @@ WORKDIR /app
 # Copy package files
 COPY package.json package-lock.json ./
 
-# Install dependencies
+# Install production dependencies
 RUN npm ci --only=production --legacy-peer-deps && npm cache clean --force
 
 # Rebuild the source code only when needed
