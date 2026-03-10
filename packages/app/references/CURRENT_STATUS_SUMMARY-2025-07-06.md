@@ -8,7 +8,7 @@
 - **Status**: ✅ LIVE and ACCESSIBLE
 - **Staging Admin**: https://staging.edsteward.ai/
 - **Moravian Tenant**: https://moravian.edsteward.ai/
-- **Credentials**: dvdbrnds / gabadh
+- **Credentials**: dvdbrnds / gabadhgabadh
 - **Access**: Run `./scripts/access-staging.sh` for full details
 
 ### 🔄 **Automated Deployment Pipeline**
@@ -41,7 +41,7 @@ Sample Data: ✅ Loaded
 - Moravian University (Conservatory)
 - 5 conservatory regulations
 - 3 upcoming deadlines
-- Admin user: dvdbrnds/gabadh
+- Admin user: dvdbrnds/gabadhgabadh
 ```
 
 ### Load Balancer & Routing
@@ -114,7 +114,7 @@ git push origin main
 
 ### Option 3: Test Current Features
 - Access staging at https://staging.edsteward.ai/
-- Login with dvdbrnds/gabadh
+- Login with dvdbrnds/gabadhgabadh
 - Test institution filtering on dashboard
 - Verify regulation details and deadlines
 

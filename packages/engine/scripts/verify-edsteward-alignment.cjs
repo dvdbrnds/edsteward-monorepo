@@ -14,7 +14,9 @@ const pool = new Pool({
 });
 
 const EDSTEWARD_URL = process.env.EDSTEWARD_URL || 'http://localhost:3000';
-const EDSTEWARD_AUTH = Buffer.from('dvdbrnds:gabadh').toString('base64');
+const EDSTEWARD_USER = process.env.EDSTEWARD_USER || 'dvdbrnds';
+const EDSTEWARD_PASS = process.env.EDSTEWARD_PASSWORD || process.env.EDSTEWARD_PASS;
+const EDSTEWARD_AUTH = Buffer.from(`${EDSTEWARD_USER}:${EDSTEWARD_PASS}`).toString('base64');
 
 async function getMCPStats() {
   const result = await pool.query(`

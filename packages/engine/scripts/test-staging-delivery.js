@@ -24,7 +24,7 @@ async function testStaging() {
   if (!health.success) {
     console.log('\n⚠️  Cannot connect to staging. Options:');
     console.log('   1. Check if staging.edsteward.ai is running');
-    console.log('   2. Verify credentials: dvdbrnds:gabadh');
+    console.log('   2. Verify credentials: set EDSTEWARD_USER and EDSTEWARD_PASSWORD env vars');
     console.log('   3. Try production instead: moravian.edsteward.ai');
     return;
   }

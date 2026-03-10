@@ -92,7 +92,7 @@ POST /api/mcp/regulations/sync
 - Creates new regulations OR updates existing ones
 - Matches by `regulationId` (mapped to `item_id`)
 - Includes category normalization
-- Authentication: Basic Auth (`dvdbrnds:gabadh`)
+- Authentication: Basic Auth (`dvdbrnds:[REDACTED]`)
 
 ### Create Only
 
@@ -266,7 +266,7 @@ The cleanup properly cascaded through all dependent tables:
 
 ```bash
 # Quick status check
-curl -u dvdbrnds:gabadh http://localhost:3000/api/mcp/alignment-status
+curl -u dvdbrnds:[REDACTED] http://localhost:3000/api/mcp/alignment-status
 
 # Full verification
 npm run verify:alignment

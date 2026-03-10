@@ -14,7 +14,7 @@ echo ""
 
 echo "👤 **Login Credentials:**"
 echo "   • Username: dvdbrnds"
-echo "   • Password: gabadh"
+echo "   • Password: gabadhgabadh"
 echo ""
 
 echo "📊 **Sample Data Available:**"
@@ -47,7 +47,7 @@ fi
 
 echo ""
 echo "🎯 **What to Test:**"
-echo "   1. Login with dvdbrnds/gabadh"
+echo "   1. Login with dvdbrnds/gabadhgabadh"
 echo "   2. Dashboard shows conservatory filtering"
 echo "   3. Regulation count: '5 of 12 regulations'"
 echo "   4. Pink highlighting on institution badges"

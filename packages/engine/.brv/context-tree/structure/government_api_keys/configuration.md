@@ -4,13 +4,13 @@ All government source API keys are now configured in `.env`:
 
 ```
 # Congress.gov - https://api.congress.gov/sign-up/
-CONGRESS_API_KEY=sPlJ7p7D6ROgAfoNjEr3rDiMUpgTSH9y6fCnXb6B
+CONGRESS_API_KEY=[REDACTED-API-KEY]
 
 # Regulations.gov - https://api.data.gov/signup/
-REGULATIONS_GOV_API_KEY=BiQSbIAInPeZewKyGZZC7XzD4S3cU8YejhfIaWXp
+REGULATIONS_GOV_API_KEY=[REDACTED-API-KEY]
 
 # GovInfo (GPO) - https://api.govinfo.gov/docs/ (uses data.gov keys)
-GOVINFO_API_KEY=7eVEqDzmOBaKcXaAwbJ0HqUHF37lI90BzeX6GBFX
+GOVINFO_API_KEY=[REDACTED-API-KEY]
 ```
 
 Note: data.gov is the centralized API key system for federal government APIs. One key from data.gov works for multiple APIs (Regulations.gov, GovInfo, etc.)

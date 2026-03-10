@@ -33,10 +33,10 @@
   "authentication": {
     "method": "basic",
     "username": "dvdbrnds",
-    "password": "gabadh",
-    "base64": "ZHZkYnJuZHM6Z2FiYWRo",
+    "password": "SET_VIA_EDSTEWARD_PASSWORD_ENV",
+    "base64": "SET_VIA_ENV",
     "header": "Authorization",
-    "headerValue": "Basic ZHZkYnJuZHM6Z2FiYWRo"
+    "headerValue": "Basic [REDACTED-BASE64]"
   },
   
   "rateLimits": {

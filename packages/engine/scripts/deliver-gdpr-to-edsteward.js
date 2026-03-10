@@ -7,6 +7,10 @@
 import { EdStewardIntegration } from '../src/delivery-system/edsteward-integration.js';
 import { ComplianceTaskGenerator } from '../src/services/compliance-task-generator.js';
 
+const EDSTEWARD_USER = process.env.EDSTEWARD_USER || 'dvdbrnds';
+const EDSTEWARD_PASS = process.env.EDSTEWARD_PASSWORD || process.env.EDSTEWARD_PASS;
+const EDSTEWARD_AUTH = Buffer.from(`${EDSTEWARD_USER}:${EDSTEWARD_PASS}`).toString('base64');
+
 const GDPR_FULL_TEXT = `
 GENERAL DATA PROTECTION REGULATION (GDPR)
 EU Regulation 2016/679
@@ -252,7 +256,7 @@ async function deliverGDPR() {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Basic ZHZkYnJuZHM6Z2FiYWRo'
+        'Authorization': `Basic ${EDSTEWARD_AUTH}`
       },
       body: JSON.stringify(payload)
     });

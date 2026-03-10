@@ -3,14 +3,14 @@ EdSteward Bulk Import Configuration Successfully Completed for MCP Engine Integr
 **CRITICAL SUCCESS**: EdSteward is now fully configured to receive 347 regulations from MCP Engine with Basic Authentication.
 
 **Configuration Implemented**:
-1. **Basic Authentication Middleware**: Added `basicAuthMiddleware` function supporting credentials `dvdbrnds:gabadh` (Base64: `ZHZkYnJuZHM6Z2FiYWRo`)
+1. **Basic Authentication Middleware**: Added `basicAuthMiddleware` function supporting credentials `gabadhgabadh` (Base64: `[REDACTED-BASE64]`)
 2. **Bulk Import Health Check**: New endpoint `/api/regulation-updates/bulk-import/health` with Basic Auth
 3. **Enhanced Logging**: Detailed logging for MCP Engine bulk import tracking with timestamps and regulation IDs
 4. **Optimized Response Format**: Returns exact format expected by MCP Engine including `success`, `updateId`, `regulationId`, `timestamp`, `bulkImport` flag
 
 **Test Results Confirmed**:
 - ✅ Health check endpoint operational (Status 200)
-- ✅ Basic Authentication working (dvdbrnds:gabadh)
+- ✅ Basic Authentication working (gabadhgabadh)
 - ✅ Bulk import endpoint accepting MCP Engine payloads
 - ✅ Federal Register enhancement metadata preserved
 - ✅ Database storage working correctly (Update ID 328 created)

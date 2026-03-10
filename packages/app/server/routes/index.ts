@@ -13,6 +13,12 @@ import { initializeDatabase } from '../db-init';
 import { getDatabaseStorage } from '../services/database';
 import { syslog, LogLevel, LogFacility } from '../services/syslog';
 import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const APP_ROOT = path.resolve(__dirname, '../..');
 
 // Import modular route handlers
 import uploadsRoutes from './api/uploads';
@@ -1567,13 +1573,13 @@ export function registerRoutes(app: express.Application): Server {
   initializeBackupScheduler();
 
   // Serve static files
-  app.use('/downloads', express.static(path.join(process.cwd(), 'public/downloads')));
+  app.use('/downloads', express.static(path.join(APP_ROOT, 'public/downloads')));
   
   // Serve uploaded evidence files
-  app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
+  app.use('/uploads', express.static(path.join(APP_ROOT, 'uploads')));
 
   // Serve branding assets
-  const assetsPath = path.join(process.cwd(), 'client/public/assets');
+  const assetsPath = path.join(APP_ROOT, 'client/public/assets');
   app.use('/assets', express.static(assetsPath, {
     setHeaders: (res, path) => {
       // Set appropriate cache headers for assets

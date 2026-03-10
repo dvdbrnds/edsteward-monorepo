@@ -16,7 +16,7 @@ MCP Engine does NOT send these fields that EdSteward REQUIRES:
 **EdSteward Integration Endpoint:**
 ```
 POST /api/mcp/regulations/create
-Auth: Basic (dvdbrnds:gabadh) or X-MCP-API-KEY header
+Auth: Basic (gabadhgabadh) or X-MCP-API-KEY header
 ```
 
 **Expected Payload Structure:**

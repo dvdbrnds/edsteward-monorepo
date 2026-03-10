@@ -8,7 +8,9 @@ import path from 'path';
 
 const CONSOLE_DIR = 'src/client/public/regulations';
 const EDSTEWARD_URL = 'https://moravian.edsteward.ai';
-const AUTH = Buffer.from('dvdbrnds:gabadh').toString('base64');
+const EDSTEWARD_USER = process.env.EDSTEWARD_USER || 'dvdbrnds';
+const EDSTEWARD_PASS = process.env.EDSTEWARD_PASSWORD || process.env.EDSTEWARD_PASS;
+const AUTH = Buffer.from(`${EDSTEWARD_USER}:${EDSTEWARD_PASS}`).toString('base64');
 
 // The new button HTML
 const NEW_BUTTON = `<button id="sendToEdstewardBtn" onclick="sendToEdSteward()" class="run-button" style="background: #2563eb; margin-left: 12px; font-size: 12px;">

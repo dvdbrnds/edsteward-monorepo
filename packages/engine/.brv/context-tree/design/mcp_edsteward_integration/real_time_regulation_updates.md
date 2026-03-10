@@ -11,7 +11,7 @@ Final status confirmation from both teams:
 **EdSteward Status:**
 - Dev server running on localhost:3000 with 24 active users
 - Successfully processed MCP Engine test update (Update ID: 484)
-- Basic Auth working for MCP Engine integration (dvdbrnds:gabadh)
+- Basic Auth working for MCP Engine integration (gabadhgabadh)
 - Database connected with 355 regulations
 - WebSocket server operational on /ws path
 - Configured to connect to MCP Engine on port 3051

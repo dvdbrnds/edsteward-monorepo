@@ -372,7 +372,7 @@ Send tasks with regulation update:
 
 ```
 POST /api/regulation-updates
-Authorization: Basic ZHZkYnJuZHM6Z2FiYWRo
+Authorization: Basic [REDACTED-BASE64]
 
 {
   "regulationId": 42,
@@ -425,7 +425,7 @@ If you need to add tasks to an existing regulation without updating content:
 
 ```
 POST /api/compliance-tasks/bulk
-Authorization: Basic ZHZkYnJuZHM6Z2FiYWRo
+Authorization: Basic [REDACTED-BASE64]
 
 {
   "regulationId": 42,

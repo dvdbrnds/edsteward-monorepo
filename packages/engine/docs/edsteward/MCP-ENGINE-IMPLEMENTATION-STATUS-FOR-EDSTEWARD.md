@@ -220,7 +220,7 @@ Which Tier 2 regulations should we implement next?
 - `config/edsteward-integration.json` - Configuration
 
 ### Authentication
-Using Basic Auth: `Authorization: Basic ZHZkYnJuZHM6Z2FiYWRo`
+Using Basic Auth: `Authorization: Basic [REDACTED-BASE64]`
 
 ### Endpoint
 `POST /api/regulation-updates` (same endpoint, with `complianceTasks` array)

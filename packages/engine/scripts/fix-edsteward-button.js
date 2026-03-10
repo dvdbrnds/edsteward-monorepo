@@ -46,7 +46,7 @@ const OLD_FUNCTION = `
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': 'Basic ZHZkYnJuZHM6Z2FiYWRo'
+                        'Authorization': 'Basic [REDACTED-BASE64]'
                     },
                     body: JSON.stringify(payload)
                 });

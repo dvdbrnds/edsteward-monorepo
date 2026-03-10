@@ -10,7 +10,7 @@
       "auth": {
         "method": "basic",
         "username": "dvdbrnds",
-        "password": "gabadh"
+        "password": "SET_VIA_EDSTEWARD_PASSWORD_ENV"
       },
       "enabled": true,
       "subscriptions": ["all"]
@@ -25,7 +25,7 @@
       "auth": {
         "method": "basic",
         "username": "mcp-engine",
-        "password": "gabadh"
+        "password": "SET_VIA_EDSTEWARD_PASSWORD_ENV"
       },
       "enabled": true,
       "subscriptions": ["all"]

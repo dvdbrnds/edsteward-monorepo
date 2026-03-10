@@ -5,6 +5,37 @@ All notable changes to EdSteward are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0] - 2026-03-09
+
+### Changed
+- Monorepo migration: EdSteward and MCP Engine now live in a single
+  `edsteward-monorepo` under `packages/app` and `packages/engine` (npm workspaces)
+- Consolidated 3 Anthropic API keys (`ANTHROPIC_API_KEY`, `LLM_API_KEY`,
+  `REQUIREMENTS_API_KEY`) down to a single `ANTHROPIC_API_KEY` on the engine side
+- MCP Engine integration auth (`basicAuthMCP` middleware) now reads
+  `MCP_ENGINE_USERNAME` / `MCP_ENGINE_PASSWORD` from env vars instead of
+  hardcoded credentials
+- Rotated all API keys exposed during brief public repo window:
+  Anthropic, Congress.gov, Regulations.gov, GovInfo, CourtListener, Open States,
+  MCP_API_KEY, and EDSTEWARD_PASSWORD
+- Scrubbed hardcoded secrets from ~30 script files, ~45 doc/reference files,
+  2 config JSONs, and 2 source modules across both packages
+- Static asset paths in `server/routes/index.ts` now resolve from
+  `import.meta.url` instead of `process.cwd()` for monorepo resilience
+
+### Added
+- `packages/engine/.env.example` for beta customer onboarding
+- Engine `llm-processing.js` falls back to `ANTHROPIC_API_KEY` when
+  `LLM_API_KEY` is not set
+
+### Fixed
+- `mcp-start.js` typo: `startFrontendServer()` corrected to `startFrontend()`
+
+### Security
+- All previously exposed API keys and credentials have been rotated
+- `.env` files confirmed untracked via `.gitignore` at repo root
+- Engine `.env` removed from git index (`git rm --cached`)
+
 ## [1.4.16] - 2026-02-12
 
 ### Fixed
@@ -343,6 +374,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Version | Date | Milestone |
 |---------|------|-----------|
+| 1.5.0 | 2026-03-09 | Monorepo migration, API key rotation, security scrub |
+| 1.4.x | 2026-02-12 | MCP schema alignment, task dedup, EO support |
 | 1.2.0 | 2026-01-15 | Demo prep fixes, attestation display |
 | 1.1.0 | 2026-01-06 | Multi-tenant architecture |
 | 1.0.0 | 2026-01-02 | Dark mode, scheduler, mobile |

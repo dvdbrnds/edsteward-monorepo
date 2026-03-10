@@ -19,7 +19,7 @@
  *   MCP_DB_PASSWORD   - MCP Engine database password (default: empty)
  *   EDSTEWARD_URL     - EdSteward API URL (default: http://localhost:5000)
  *   EDSTEWARD_USER    - EdSteward username (default: dvdbrnds)
- *   EDSTEWARD_PASS    - EdSteward password (default: gabadh)
+ *   EDSTEWARD_PASS    - EdSteward password (or EDSTEWARD_PASSWORD)
  */
 
 const { Pool } = require('pg');
@@ -36,7 +36,7 @@ const mcpPool = new Pool({
 // EdSteward configuration
 const EDSTEWARD_URL = process.env.EDSTEWARD_URL || 'http://localhost:5000';
 const EDSTEWARD_USER = process.env.EDSTEWARD_USER || 'dvdbrnds';
-const EDSTEWARD_PASS = process.env.EDSTEWARD_PASS || 'gabadh';
+const EDSTEWARD_PASS = process.env.EDSTEWARD_PASSWORD || process.env.EDSTEWARD_PASS;
 const EDSTEWARD_AUTH = Buffer.from(`${EDSTEWARD_USER}:${EDSTEWARD_PASS}`).toString('base64');
 
 // Rate limiting configuration  

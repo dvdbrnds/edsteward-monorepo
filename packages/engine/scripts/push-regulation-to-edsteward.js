@@ -12,7 +12,9 @@ const { Pool } = pg;
 
 // Configuration
 const EDSTEWARD_URL = process.env.EDSTEWARD_URL || 'https://moravian.edsteward.ai';
-const EDSTEWARD_AUTH = Buffer.from('dvdbrnds:gabadh').toString('base64');
+const EDSTEWARD_USER = process.env.EDSTEWARD_USER || 'dvdbrnds';
+const EDSTEWARD_PASS = process.env.EDSTEWARD_PASSWORD || process.env.EDSTEWARD_PASS;
+const EDSTEWARD_AUTH = Buffer.from(`${EDSTEWARD_USER}:${EDSTEWARD_PASS}`).toString('base64');
 
 // Database connection
 const pool = new Pool({

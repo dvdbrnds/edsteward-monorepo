@@ -6,7 +6,7 @@
   - Production: `https://moravian.edsteward.ai`
   - Staging: `https://staging.edsteward.ai`
   - Development: `http://localhost:3000`
-- **Auth**: Basic Auth `Authorization: Basic ZHZkYnJuZHM6Z2FiYWRo` (dvdbrnds:gabadh)
+- **Auth**: Basic Auth `Authorization: Basic [REDACTED-BASE64]` (gabadhgabadh)
 - **Health Check**: `GET /api/regulation-updates/bulk-import/health`
 
 ### Regulation ID System

@@ -121,7 +121,7 @@ curl https://beta.edsteward.ai/
 **Login credentials (same as production):**
 
 - Username: `dvdbrnds`
-- Password: `gabadh`
+- Password: `gabadhgabadh`
 
 **Test login:**
 
@@ -252,7 +252,7 @@ aws acm describe-certificate --certificate-arn [CERT_ARN] --region us-east-1
 Beta environment is successfully deployed when:
 
 - ✅ <https://beta.edsteward.ai> loads successfully
-- ✅ Login with dvdbrnds/gabadh works
+- ✅ Login with dvdbrnds/gabadhgabadh works
 - ✅ Dashboard shows 354 regulations and 21 users
 - ✅ All functionality mirrors production exactly
 - ✅ SSL certificate is valid and working

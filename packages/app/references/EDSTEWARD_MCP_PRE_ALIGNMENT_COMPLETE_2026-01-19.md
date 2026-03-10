@@ -90,7 +90,7 @@ All pre-alignment tasks have been completed. EdSteward is ready to receive 251 r
 
 ### Endpoint: `POST /api/mcp/regulations/create`
 
-**Authentication:** Basic Auth (`dvdbrnds:gabadh`)
+**Authentication:** Basic Auth (`dvdbrnds:[REDACTED]`)
 
 **Request Payload:**
 ```json

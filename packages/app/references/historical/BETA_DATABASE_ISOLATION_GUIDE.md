@@ -114,7 +114,7 @@ psql "YOUR_BETA_DATABASE_URL" -c "SELECT COUNT(*) FROM users, regulations;"
 
 ### 4.2 Test Authentication Isolation
 
-1. **Production**: Login at `https://moravian.edsteward.ai` with `dvdbrnds/gabadh`
+1. **Production**: Login at `https://moravian.edsteward.ai` with `dvdbrnds/gabadhgabadh`
 2. **Beta**: Login at `http://BETA_IP:3000` with beta user account
 
 ### 4.3 Test Data Isolation
@@ -148,7 +148,7 @@ psql "YOUR_BETA_DATABASE_URL" -c "SELECT COUNT(*) FROM users, regulations;"
 The beta database will contain a subset of production users:
 
 - **Username**: `dvdbrnds` (same as production)
-- **Password**: `gabadh` (same as production)
+- **Password**: `gabadhgabadh` (same as production)
 - **Purpose**: Testing authentication flows
 
 ### Key Differences

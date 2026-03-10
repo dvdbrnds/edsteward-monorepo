@@ -10,7 +10,7 @@ import { getDatabaseStorage } from '../server/services/database';
 
 // Known passwords for migration (you'll need to update these)
 const KNOWN_PASSWORDS: Record<string, string> = {
-    'dvdbrnds': 'gabadh',
+    'dvdbrnds': 'gabadhgabadh',
     'admin': 'admin123',  // Update with actual password
     'nasol': 'password123',  // Update with actual password
     // Add other users and their passwords here

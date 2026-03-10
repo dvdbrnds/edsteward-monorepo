@@ -43,8 +43,7 @@ async function fixProductionAuth() {
       if (!user.password || !user.password.startsWith('$2b$')) {
         console.log(`🔑 Fixing password for user: ${user.username}`);
         
-        // Set password 'gabadh' for all users in production (same as your test password)
-        const hashedPassword = await bcrypt.hash('gabadh', 10);
+        const hashedPassword = await bcrypt.hash('gabadhgabadh', 10);
         
         await db.update(users)
           .set({ password: hashedPassword })
@@ -57,7 +56,7 @@ async function fixProductionAuth() {
     }
     
     console.log('🎉 Production authentication fix completed!');
-    console.log('📝 All users now have password: gabadh');
+    console.log('📝 All users now have password: gabadhgabadh');
     console.log('🔗 You can now login at: https://moravian.edsteward.ai/');
     
   } catch (error) {

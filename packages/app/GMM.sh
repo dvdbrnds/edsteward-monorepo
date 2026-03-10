@@ -116,7 +116,7 @@ print_status "Starting EdSteward development server..."
 echo ""
 echo "🚀 Starting EdSteward..."
 echo "📍 URL: http://localhost:3000"
-echo "🔐 Login: dvdbrnds / gabadh"
+echo "🔐 Login: dvdbrnds / gabadhgabadh"
 echo "⏹️  Press Ctrl+C to stop"
 echo ""
 

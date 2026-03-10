@@ -36,7 +36,7 @@ docker build --platform linux/amd64 -t edsteward:latest . && docker tag edstewar
 - URL: https://moravian.edsteward.ai (200 OK)
 - Authentication: Working with session cookies
 - Database: 354 total regulations (59 Pennsylvania + others)
-- Login: username 'dvdbrnds' password 'gabadh'
+- Login: username 'dvdbrnds' password 'gabadhgabadh'
 
 **CRITICAL SUCCESS FACTORS:**
 1. Fixed Dockerfile build issues by removing non-existent directory copies

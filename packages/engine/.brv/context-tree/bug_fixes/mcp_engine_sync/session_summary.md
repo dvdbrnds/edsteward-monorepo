@@ -40,7 +40,7 @@ sleep 1 && pm2 start edsteward --update-env
 ### 4. MCP Engine Sync API
 **Endpoint:** `POST /api/mcp/regulations/sync`
 
-**Auth:** Basic Auth `ZHZkYnJuZHM6Z2FiYWRo` (dvdbrnds:gabadh)
+**Auth:** Basic Auth `[REDACTED-BASE64]` (gabadhgabadh)
 
 **Fields EdSteward reads:**
 - `mcpRegKey` - for matching/upsert

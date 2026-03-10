@@ -6,7 +6,7 @@ EDSTEWARD INTEGRATION DIAGNOSIS - Customer Delivery Issue
 1. **MCP Engine Delivery System**: ✅ Working - processing 347 regulations, showing 346 successful deliveries
 2. **EdSteward URL Configuration**: ✅ Fixed - now using correct production URL `https://moravian.edsteward.ai`
 3. **EdSteward Connectivity**: ✅ Confirmed - EdSteward health endpoint responding with "OK"
-4. **Authentication**: ⚠️ Required - EdSteward API requires Basic Auth (dvdbrnds:gabadh)
+4. **Authentication**: ⚠️ Required - EdSteward API requires Basic Auth (gabadhgabadh)
 
 **Key Findings**:
 - Delivery system was defaulting to `localhost:3000` instead of production EdSteward URL
@@ -16,7 +16,7 @@ EDSTEWARD INTEGRATION DIAGNOSIS - Customer Delivery Issue
 
 **Technical Details**:
 - **EdSteward Production URL**: `https://moravian.edsteward.ai`
-- **Authentication**: Basic Auth with username `dvdbrnds` and password `gabadh`
+- **Authentication**: Basic Auth with username `dvdbrnds` and password `gabadhgabadh`
 - **API Endpoint**: `/api/regulation-updates` (POST)
 - **Regulation Mapping**: TEACH Act = EdSteward ID 55
 

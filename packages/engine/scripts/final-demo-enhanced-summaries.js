@@ -122,7 +122,10 @@ async function runFinalDemo() {
 }
 
 // Set environment variables and run demo
-process.env.LLM_API_KEY = process.env.LLM_API_KEY || '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';
+if (!process.env.LLM_API_KEY && !process.env.ANTHROPIC_API_KEY) {
+  console.error('Set ANTHROPIC_API_KEY environment variable before running this script.');
+  process.exit(1);
+}
 process.env.LLM_DEFAULT_MODEL = process.env.LLM_DEFAULT_MODEL || 'claude-3-5-sonnet-20241022';
 
 runFinalDemo().catch(error => {

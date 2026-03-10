@@ -18,7 +18,7 @@ When deleting regulations, must delete in this order to handle FK constraints:
 GET /api/mcp/alignment-status - Returns alignment verification stats
 GET /api/mcp/regulation-hashes - Returns item_id + version_hash for diff checking
 ```
-Both use Basic Auth (dvdbrnds:gabadh)
+Both use Basic Auth (gabadhgabadh)
 
 ### Verification Commands
 ```bash

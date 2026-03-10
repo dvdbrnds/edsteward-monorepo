@@ -31,7 +31,7 @@
 ### 1.2 Login Flow
 - [ ] Enter invalid username → Click Login → Verify error message
 - [ ] Enter valid username, wrong password → Click Login → Verify error
-- [ ] Enter valid credentials (username: `dvdbrnds`, password: `gabadh`)
+- [ ] Enter valid credentials (username: `dvdbrnds`, password: `gabadhgabadh`)
 - [ ] Click **Login** button
 - [ ] Verify redirect to Dashboard
 

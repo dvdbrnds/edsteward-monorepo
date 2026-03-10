@@ -1249,7 +1249,7 @@ class DeliveryServer {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Basic ' + Buffer.from('dvdbrnds:gabadh').toString('base64'),
+            'Authorization': 'Basic ' + Buffer.from(`${process.env.EDSTEWARD_USERNAME || 'dvdbrnds'}:${process.env.EDSTEWARD_PASSWORD}`).toString('base64'),
             'X-MCP-Source': 'mcp-engine',
             'X-Sync-Type': 'gold-certified'
           },

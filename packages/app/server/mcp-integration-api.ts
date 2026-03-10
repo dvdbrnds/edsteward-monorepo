@@ -735,9 +735,10 @@ export function setupMCPIntegrationApi(app: express.Application) {
       return next();
     }
 
-    // Legacy fallback (deprecated — remove after MCP Engine migrates to API key)
-    if (username === 'dvdbrnds' && password === 'gabadh') {
-      console.warn('⚠️ MCP Create/Sync using deprecated hardcoded credentials. Migrate to X-MCP-API-Key.');
+    // Legacy fallback using env vars
+    const engineUser = process.env.MCP_ENGINE_USERNAME;
+    const enginePass = process.env.MCP_ENGINE_PASSWORD;
+    if (engineUser && enginePass && username === engineUser && password === enginePass) {
       return next();
     }
 
@@ -754,7 +755,7 @@ export function setupMCPIntegrationApi(app: express.Application) {
    * This is the correct endpoint for MCP Engine to use when adding regulations
    * that don't already exist in EdSteward.
    * 
-   * Authentication: Basic Auth (dvdbrnds:gabadh)
+   * Authentication: Basic Auth (MCP_ENGINE_USERNAME:MCP_ENGINE_PASSWORD) or X-MCP-API-Key header
    * 
    * Example payload:
    * {

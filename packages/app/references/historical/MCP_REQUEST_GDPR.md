@@ -133,7 +133,7 @@ Please deliver via the existing MCP integration endpoint:
 
 ```
 POST /api/regulation-updates
-Authorization: Basic dvdbrnds:gabadh
+Authorization: Basic dvdbrnds:[REDACTED]
 Content-Type: application/json
 
 {

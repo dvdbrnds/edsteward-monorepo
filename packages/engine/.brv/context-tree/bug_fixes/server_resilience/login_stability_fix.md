@@ -54,7 +54,7 @@ setImmediate(async () => {
 ```
 
 **Results**:
-- ✅ Login works perfectly: `username: "dvdbrnds"`, `password: "gabadh"`
+- ✅ Login works perfectly: `username: "dvdbrnds"`, `password: "gabadhgabadh"`
 - ✅ Server starts reliably even when MCP Engine unavailable
 - ✅ 99% reduction in TUF error log spam
 - ✅ Circuit breaker prevents cascade failures

@@ -207,7 +207,7 @@ against one endpoint but not the other, and data silently gets dropped.
 
 | Endpoint | Auth Method |
 |----------|------------|
-| Create/Sync (`/api/mcp/regulations/*`) | Basic Auth (hardcoded `dvdbrnds:gabadh`) |
+| Create/Sync (`/api/mcp/regulations/*`) | Basic Auth (hardcoded `dvdbrnds:[REDACTED]`) |
 | Updates (`/api/regulation-updates`) | Basic Auth (`MCP_ENGINE_USERNAME`/`MCP_ENGINE_PASSWORD` from env) |
 | Orchestrator (`/api/mcp/versions/*`) | `X-MCP-API-Key` header |
 

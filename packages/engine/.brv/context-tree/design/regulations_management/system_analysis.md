@@ -34,7 +34,7 @@ EdSteward Regulation Data Structure and Import Analysis Complete:
 - **Federal Register Enhancement**: Metadata storage for enhanced regulation content
 
 **INTEGRATION POINTS:**
-- **MCP Engine**: POST endpoint with Basic Auth (dvdbrnds:gabadh) for bulk regulation imports
+- **MCP Engine**: POST endpoint with Basic Auth (gabadhgabadh) for bulk regulation imports
 - **Federal Register**: Enhanced content integration with metadata storage
 - **External Sources**: JSONB sources array for tracking regulation data sources
 - **Background Jobs**: Ready for queue-based processing of regulation updates

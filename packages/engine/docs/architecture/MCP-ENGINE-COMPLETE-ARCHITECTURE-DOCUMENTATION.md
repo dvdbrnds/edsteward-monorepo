@@ -292,7 +292,7 @@ const CERTAINTY_LEVELS = {
 ```javascript
 // Basic Auth
 headers: {
-  'Authorization': 'Basic ZHZkYnJuZHM6Z2FiYWRo',
+  'Authorization': 'Basic [REDACTED-BASE64]',
   'Content-Type': 'application/json'
 }
 ```
@@ -308,7 +308,7 @@ headers: {
       "url": "http://localhost:3000",
       "apiEndpoint": "/api/regulation-updates",
       "type": "development",
-      "auth": { "method": "basic", "username": "dvdbrnds", "password": "gabadh" }
+      "auth": { "method": "basic", "username": "dvdbrnds", "password": "gabadhgabadh" }
     },
     {
       "id": "moravian-prod",

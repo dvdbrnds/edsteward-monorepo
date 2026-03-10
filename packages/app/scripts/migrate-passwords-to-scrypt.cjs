@@ -17,7 +17,7 @@ async function migratePasswordsToScrypt() {
         // Define the passwords we know for common users
         const knownPasswords = {
             'admin': 'admin123',
-            'dvdbrnds': 'gabadh',
+            'dvdbrnds': 'gabadhgabadh',
             'user': 'password'
         };
 

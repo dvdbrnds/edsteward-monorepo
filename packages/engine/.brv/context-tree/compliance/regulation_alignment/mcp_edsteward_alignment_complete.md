@@ -40,7 +40,7 @@ npm run verify:alignment   # Check alignment status
 - `POST /api/mcp/regulations/create` - Create new regulation
 - `GET /api/mcp/alignment-status` - Alignment verification
 - `GET /api/mcp/regulation-hashes` - Drift detection
-- Auth: Basic `dvdbrnds:gabadh`
+- Auth: Basic `gabadhgabadh`
 
 ### Key Git Commits
 - MCP Engine: `cf95186` - Pre-alignment data enrichment

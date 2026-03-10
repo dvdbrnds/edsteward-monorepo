@@ -12,7 +12,7 @@
 2. **Federal Register Integration & MCP Engine Bulk Import** (Commit 5ebb8e6):
    - Added metadata JSONB column to regulation_updates table
    - GIN indexes for efficient Federal Register querying
-   - Basic Authentication middleware (dvdbrnds:gabadh)
+   - Basic Authentication middleware (gabadhgabadh)
    - Support for 500 simultaneous regulation updates
    - Enhanced MCP Engine payload processing with metadata preservation
 

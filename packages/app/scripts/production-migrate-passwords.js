@@ -22,7 +22,7 @@ async function hashPassword(password) {
  * Known passwords for migration
  */
 const KNOWN_PASSWORDS = {
-    'dvdbrnds': 'gabadh',
+    'dvdbrnds': 'gabadhgabadh',
     'admin': 'admin123',
     'nasol': 'password123'
 };

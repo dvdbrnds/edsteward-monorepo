@@ -3,8 +3,7 @@
 **MAJOR ACHIEVEMENT**: Successfully implemented comprehensive LLM-powered text enhancement system for regulatory compliance, transforming terrible legal jargon into actionable guidance for compliance officers.
 
 **DUAL API ARCHITECTURE**:
-- Summary API Key (First Key): `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`
-- Requirements API Key (Second Key): `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`
+- API Key: Set via `ANTHROPIC_API_KEY` environment variable (consolidated to single key)
 - Both keys use Anthropic Claude 3.5 Sonnet model for consistent, high-quality output
 
 **CORE SERVICES IMPLEMENTED**:

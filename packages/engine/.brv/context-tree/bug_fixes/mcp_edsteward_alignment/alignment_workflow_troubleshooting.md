@@ -58,5 +58,5 @@ EDSTEWARD_URL=http://localhost:5000
 ```
 
 **EdSteward:**
-- Basic Auth: dvdbrnds:gabadh
+- Basic Auth: gabadhgabadh
 - API base: /api/mcp/

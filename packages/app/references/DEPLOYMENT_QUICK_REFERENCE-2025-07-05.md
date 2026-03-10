@@ -72,7 +72,7 @@ aws logs tail /ecs/edsteward-multi-tenant-staging --follow --region us-east-1
 | **Admin** | https://admin.edsteward.ai | Admin interface |
 | **Dev** | https://dev.edsteward.ai | Development (optional) |
 
-**Login**: `dvdbrnds` / `gabadh`
+**Login**: `dvdbrnds` / `gabadhgabadh`
 
 ---
 
@@ -124,7 +124,7 @@ aws logs tail /ecs/edsteward-multi-tenant-staging --follow --region us-east-1
 - ✅ AWS deployment script completes successfully
 - ✅ Health endpoints return HTTP 200
 - ✅ Application loads in browser
-- ✅ Login works with `dvdbrnds` / `gabadh`
+- ✅ Login works with `dvdbrnds` / `gabadhgabadh`
 
 ---
 

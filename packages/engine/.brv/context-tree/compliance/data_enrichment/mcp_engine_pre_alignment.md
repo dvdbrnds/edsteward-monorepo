@@ -37,4 +37,4 @@
 - Rate limiting disabled on dev for bulk sync
 - Ready to receive 251 regulations
 - Endpoint: POST /api/mcp/regulations/create
-- Auth: Basic dvdbrnds:gabadh
+- Auth: Basic gabadhgabadh

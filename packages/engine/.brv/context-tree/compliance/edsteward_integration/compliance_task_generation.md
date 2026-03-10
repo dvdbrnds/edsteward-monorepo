@@ -20,7 +20,7 @@
 
 ### EdSteward Integration Details
 - Endpoint: `POST /api/regulation-updates`
-- Auth: Basic Auth `dvdbrnds:gabadh`
+- Auth: Basic Auth `gabadhgabadh`
 - Payload includes `complianceTasks[]` array with hierarchical tasks
 - Standard roles: Director of Campus Safety, Registrar, Title IX Coordinator, General Counsel, etc.
 

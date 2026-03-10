@@ -12,7 +12,7 @@ EDSTEWARD BULK IMPORT CONFIGURATION REQUIREMENT
 
 **MCP Engine Delivery Details**:
 - **Endpoint**: `https://moravian.edsteward.ai/api/regulation-updates`
-- **Authentication**: Basic Auth (dvdbrnds:gabadh)
+- **Authentication**: Basic Auth (gabadhgabadh)
 - **Payload Format**: JSON with regulationId, name, content, status, metadata
 - **Delivery Volume**: 347 regulations (294 federal + 52 PA + 1 third-party)
 - **Regulation Mapping**: MCP Engine slugs → EdSteward IDs (1-354)

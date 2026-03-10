@@ -25,13 +25,13 @@ POST /api/regulation-updates
 **Method:** Basic Authentication
 
 ```
-Authorization: Basic ZHZkYnJuZHM6Z2FiYWRo
+Authorization: Basic [REDACTED-BASE64]
 ```
 
 Credentials:
 - Username: `dvdbrnds`
-- Password: `gabadh`
-- Base64: `ZHZkYnJuZHM6Z2FiYWRo`
+- Password: `[REDACTED]`
+- Base64: `[REDACTED-BASE64]`
 
 **Note:** Localhost requests bypass authentication for local testing.
 
@@ -610,12 +610,12 @@ await storage.createNotificationQueueItem({
 
 **Header:**
 ```
-Authorization: Basic ZHZkYnJuZHM6Z2FiYWRo
+Authorization: Basic [REDACTED-BASE64]
 ```
 
 **Credentials:**
 - Username: `dvdbrnds`
-- Password: `gabadh`
+- Password: `[REDACTED]`
 
 **Bypass:** Localhost requests (`localhost`, `127.0.0.1`) bypass authentication for development.
 
@@ -710,8 +710,8 @@ GET  https://moravian.edsteward.ai/api/regulations
 | Item | Value |
 |------|-------|
 | **Endpoint** | `POST /api/regulation-updates` |
-| **Auth** | Basic Auth: `dvdbrnds:gabadh` |
-| **Auth Header** | `Authorization: Basic ZHZkYnJuZHM6Z2FiYWRo` |
+| **Auth** | Basic Auth: `dvdbrnds:[REDACTED]` |
+| **Auth Header** | `Authorization: Basic [REDACTED-BASE64]` |
 | **ID Field** | `regulationId` (integer 1-500) |
 | **Required Fields** | `regulationId`, `name` |
 | **Filing Deadlines** | JSON array of `{type, date, frequency, description}` |

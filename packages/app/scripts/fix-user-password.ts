@@ -24,7 +24,7 @@ async function fixUserPassword() {
             console.log('👤 User dvdbrnds not found, creating new user...');
 
             // Create user with scrypt hash
-            const hashedPassword = await hashPassword('gabadh');
+            const hashedPassword = await hashPassword('gabadhgabadh');
 
             await db.execute(sql`
         INSERT INTO users (username, password, email, role, "firstName", "lastName", department)
@@ -42,7 +42,7 @@ async function fixUserPassword() {
                 console.log('⚠️  Detected old bcrypt hash, updating to scrypt...');
 
                 // Update password to scrypt hash
-                const hashedPassword = await hashPassword('gabadh');
+                const hashedPassword = await hashPassword('gabadhgabadh');
 
                 await db.execute(sql`
           UPDATE users 
@@ -57,7 +57,7 @@ async function fixUserPassword() {
                 console.log('⚠️  Unknown password format, updating to scrypt...');
 
                 // Update password to scrypt hash
-                const hashedPassword = await hashPassword('gabadh');
+                const hashedPassword = await hashPassword('gabadhgabadh');
 
                 await db.execute(sql`
           UPDATE users 

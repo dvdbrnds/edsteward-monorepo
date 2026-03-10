@@ -137,7 +137,7 @@ Send tasks with regulation update:
 
 ```
 POST /api/regulation-updates
-Authorization: Basic ZHZkYnJuZHM6Z2FiYWRo
+Authorization: Basic [REDACTED-BASE64]
 ```
 
 ---

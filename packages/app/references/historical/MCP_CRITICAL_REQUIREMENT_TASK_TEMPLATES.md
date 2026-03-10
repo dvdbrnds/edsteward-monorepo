@@ -124,7 +124,7 @@ EdSteward is ready to receive task templates via:
 ### Endpoint
 ```
 POST /api/regulation-updates
-Authorization: Basic dvdbrnds:gabadh
+Authorization: Basic dvdbrnds:[REDACTED]
 Content-Type: application/json
 ```
 

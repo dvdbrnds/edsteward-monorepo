@@ -14,7 +14,8 @@
 import fs from 'fs';
 import path from 'path';
 
-const API_KEY = process.env.MCP_API_KEY || 'mcp_e8dcc41247c6a154c0f8db78565dda6628b936cdfb01ef81e6e5ed0349d9d585';
+const API_KEY = process.env.MCP_API_KEY;
+if (!API_KEY) { console.error('Set MCP_API_KEY environment variable.'); process.exit(1); }
 const EDSTEWARD_URL = 'https://moravian.edsteward.ai';
 const REGISTRY_URL = 'http://localhost:3010';
 

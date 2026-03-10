@@ -2,7 +2,7 @@ const { Pool } = require('pg');
 
 const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://neondb_owner:npg_a2BNKdZeg9FU@ep-summer-pine-ae88mdbc-pooler.c-2.us-east-2.aws.neon.tech/neondb?sslmode=require';
 const EDSTEWARD_URL = 'http://localhost:3000';
-const AUTH = 'Basic ' + Buffer.from('dvdbrnds:gabadh').toString('base64');
+const AUTH = 'Basic ' + Buffer.from((process.env.MCP_ENGINE_USERNAME || 'dvdbrnds') + ':' + (process.env.MCP_ENGINE_PASSWORD || 'changeme')).toString('base64');
 
 const pool = new Pool({ connectionString: DATABASE_URL });
 

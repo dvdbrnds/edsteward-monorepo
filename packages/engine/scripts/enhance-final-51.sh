@@ -2,7 +2,8 @@
 
 # Enhance the final 51 regulations (43 federal + 8 PA)
 
-export MCP_REGULATION_ENHANCEMENT_KEY="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"
+export MCP_REGULATION_ENHANCEMENT_KEY="${MCP_REGULATION_ENHANCEMENT_KEY:-$ANTHROPIC_API_KEY}"
+if [ -z "$MCP_REGULATION_ENHANCEMENT_KEY" ]; then echo "Set ANTHROPIC_API_KEY before running."; exit 1; fi
 
 cd "/Users/dvdbrnds/Desktop/DISASTER RECOVERY MCP ENGINE/MCP-Engine"
 

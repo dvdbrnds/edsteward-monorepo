@@ -125,7 +125,7 @@ if [ "$TASK_ARN" != "None" ] && [ ! -z "$TASK_ARN" ]; then
         echo ""
         echo -e "${BLUE}📋 Access Your Staging Environment:${NC}"
         echo "Direct IP: http://$TASK_IP:3000"
-        echo "Login: dvdbrnds / gabadh"
+        echo "Login: dvdbrnds / gabadhgabadh"
         echo ""
         
         if [ ! -z "$STAGING_TG_ARN" ] && [ "$STAGING_TG_ARN" != "None" ]; then

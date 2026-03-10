@@ -88,7 +88,7 @@ Dev:         dev.edsteward.ai       (dev → development) [optional]
 • Test in browser:
   ```bash
   open https://moravian.edsteward.ai
-  # Login: dvdbrnds / gabadh
+  # Login: dvdbrnds / gabadhgabadh
   ```
 
 • Verify production deployment is working correctly
@@ -498,7 +498,7 @@ aws ecs update-service --cluster <cluster> --service <service> --desired-count 1
 - **CloudWatch Logs**: https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logsV2:log-groups
 
 ### **Environment URLs**
-- **Production**: https://moravian.edsteward.ai (dvdbrnds / gabadh)
+- **Production**: https://moravian.edsteward.ai (dvdbrnds / gabadhgabadh)
 - **Staging**: https://staging.edsteward.ai
 - **Admin**: https://admin.edsteward.ai
 

@@ -40,9 +40,9 @@ try {
     },
     authentication: {
       method: 'basic',
-      username: 'dvdbrnds',
-      password: 'gabadh',
-      base64: 'ZHZkYnJuZHM6Z2FiYWRo'
+      username: process.env.EDSTEWARD_USERNAME || 'dvdbrnds',
+      password: process.env.EDSTEWARD_PASSWORD,
+      get base64() { return Buffer.from(`${this.username}:${this.password}`).toString('base64'); }
     },
     rateLimits: {
       delayBetweenRequests: 100

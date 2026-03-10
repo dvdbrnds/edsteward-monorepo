@@ -69,7 +69,7 @@ const requireAuth = (req: express.Request, res: express.Response, next: express.
 
 ## Developer Notes
 - All tenants (admin, staging, moravian, test) now have consistent authentication behavior
-- Developer backdoor account `dvdbrnds` / `gabadh` works across all tenants
+- Developer backdoor account `dvdbrnds` / `gabadhgabadh` works across all tenants
 - Both SAML and username/password authentication work as fallback methods
 - No breaking changes to existing functionality
 

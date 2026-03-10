@@ -4,7 +4,7 @@ Created a new endpoint for MCP Engine to add NEW regulations (like GDPR) with co
 
 ### Endpoint: `POST /api/mcp/regulations/create`
 
-**Authentication:** Basic Auth (`dvdbrnds:gabadh` / Base64: `ZHZkYnJuZHM6Z2FiYWRo`)
+**Authentication:** Basic Auth (`gabadhgabadh` / Base64: `[REDACTED-BASE64]`)
 
 **Key Features:**
 - Creates regulation + all compliance tasks atomically

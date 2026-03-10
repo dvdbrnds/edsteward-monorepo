@@ -141,7 +141,7 @@ https://staging.yourdomain.com
 
 **Expected Results:**
 - ✅ Orange "STAGING ENVIRONMENT" banner visible
-- ✅ Login works with: dvdbrnds/gabadh
+- ✅ Login works with: dvdbrnds/gabadhgabadh
 - ✅ Shows 5 conservatory regulations
 - ✅ Admin settings accessible
 

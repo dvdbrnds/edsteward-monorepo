@@ -470,7 +470,7 @@ psql "$DATABASE_URL" -c "INSERT INTO users (username, password, email, role, cre
 
 log "✅ Admin users created:"
 log "   - admin@${CUSTOMER_DOMAIN} (password: password123)"
-log "   - dvdbrnds@edsteward.ai (password: gabadh)"
+log "   - dvdbrnds@edsteward.ai (password: gabadhgabadh)"
 
 # =============================================================================
 # STEP 9: WAIT FOR DEPLOYMENT AND HEALTH CHECK

@@ -25,8 +25,7 @@ async function fixStagingAuth() {
       if (!user.password || !user.password.startsWith('$2b$')) {
         console.log(`🔑 Fixing password for user: ${user.username}`);
         
-        // Set a default password (gabadh) for all users in staging
-        const hashedPassword = await bcrypt.hash('gabadh', 10);
+        const hashedPassword = await bcrypt.hash('gabadhgabadh', 10);
         
         await db.update(users)
           .set({ password: hashedPassword })
@@ -39,7 +38,7 @@ async function fixStagingAuth() {
     }
     
     console.log('🎉 Staging authentication fix completed!');
-    console.log('📝 All users now have password: gabadh');
+    console.log('📝 All users now have password: gabadhgabadh');
     
   } catch (error) {
     console.error('❌ Error fixing staging auth:', error);

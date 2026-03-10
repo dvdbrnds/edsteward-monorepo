@@ -11,7 +11,7 @@ Successfully implemented a multi-tenant authentication system with fallback supp
 - No tenant is locked into a single authentication method
 
 ### 2. Developer Backdoor Account
-- Created developer account `dvdbrnds` / `gabadh` in all tenant databases
+- Created developer account `dvdbrnds` / `gabadhgabadh` in all tenant databases
 - Account has admin privileges across all tenants
 - Provides guaranteed access for development and troubleshooting
 
@@ -44,13 +44,13 @@ Successfully implemented a multi-tenant authentication system with fallback supp
 ## Verification Results
 
 ### Moravian Tenant (https://moravian.edsteward.ai/)
-✅ Username/password login: `dvdbrnds` / `gabadh`  
+✅ Username/password login: `dvdbrnds` / `gabadhgabadh`  
 ✅ Session establishment and `/api/user` endpoint  
 ✅ Tenant context: `tenantId: "moravian"`  
 ✅ SAML SSO option available in UI  
 
 ### Staging Tenant (https://staging.edsteward.ai/)
-✅ Username/password login: `dvdbrnds` / `gabadh`  
+✅ Username/password login: `dvdbrnds` / `gabadhgabadh`  
 ✅ Session establishment and `/api/user` endpoint  
 ✅ Tenant context: `tenantId: "staging"`  
 

@@ -67,7 +67,7 @@ export async function initializeDatabase() {
 
       // Hash passwords properly
       const adminPassword = await hashPassword('admin123');
-      const dvdbrndSPassword = await hashPassword('gabadh');
+      const dvdbrndSPassword = await hashPassword('gabadhgabadh');
       const userPassword = await hashPassword('password');
 
       // Create admin user

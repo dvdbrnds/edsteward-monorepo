@@ -127,8 +127,8 @@ MCP Engine delivers regulation data to EdSteward:
 
 | Environment | URL | Auth |
 |-------------|-----|------|
-| Production | https://moravian.edsteward.ai | Basic `mcp-engine:gabadh` |
-| Development | http://localhost:3000 | Basic `dvdbrnds:gabadh` |
+| Production | https://moravian.edsteward.ai | Basic `mcp-engine:[REDACTED]` |
+| Development | http://localhost:3000 | Basic `dvdbrnds:gabadhgabadh` |
 
 Delivery flow:
 1. Console page "Push to Selected Target" or "Send to Moravian Production" button

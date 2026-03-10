@@ -11,7 +11,7 @@ Open a terminal and run:
 ```bash
 cd /Users/dvdbrnds/Desktop/DISASTER\ RECOVERY\ MCP\ ENGINE/MCP-Engine
 
-export ANTHROPIC_API_KEY="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"
+export ANTHROPIC_API_KEY="your-anthropic-api-key"
 
 node src/inquisitor-mcp/inquisitor-server.js
 ```

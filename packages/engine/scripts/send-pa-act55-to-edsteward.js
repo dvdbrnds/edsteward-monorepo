@@ -24,10 +24,12 @@ const ENDPOINTS = {
   update: `${EDSTEWARD_BASE}/api/regulation-updates`,
 };
 
-const AUTH_USER = process.env.EDSTEWARD_USERNAME || 'dvdbrnds';
-const AUTH_PASS = process.env.EDSTEWARD_PASSWORD || 'gabadh';
+const AUTH_USER = process.env.EDSTEWARD_USERNAME;
+const AUTH_PASS = process.env.EDSTEWARD_PASSWORD;
+if (!AUTH_USER || !AUTH_PASS) { console.error('Set EDSTEWARD_USERNAME and EDSTEWARD_PASSWORD.'); process.exit(1); }
 const BASIC_TOKEN = Buffer.from(`${AUTH_USER}:${AUTH_PASS}`).toString('base64');
-const MCP_API_KEY = process.env.MCP_API_KEY || 'mcp_e8dcc41247c6a154c0f8db78565dda6628b936cdfb01ef81e6e5ed0349d9d585';
+const MCP_API_KEY = process.env.MCP_API_KEY;
+if (!MCP_API_KEY) { console.error('Set MCP_API_KEY environment variable.'); process.exit(1); }
 
 const MAX_RETRIES = 3;
 const RETRY_DELAY_MS = 2000;

@@ -6,7 +6,9 @@
  */
 
 const EDSTEWARD_URL = 'https://moravian.edsteward.ai';
-const AUTH = Buffer.from('dvdbrnds:gabadh').toString('base64');
+const EDSTEWARD_USER = process.env.EDSTEWARD_USER || 'dvdbrnds';
+const EDSTEWARD_PASS = process.env.EDSTEWARD_PASSWORD || process.env.EDSTEWARD_PASS;
+const AUTH = Buffer.from(`${EDSTEWARD_USER}:${EDSTEWARD_PASS}`).toString('base64');
 
 const FERPA_ID = 2; // FERPA EdSteward ID
 

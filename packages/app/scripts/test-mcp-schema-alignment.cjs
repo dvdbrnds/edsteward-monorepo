@@ -19,8 +19,8 @@ require('dotenv').config();
 const DATABASE_URL = process.env.DATABASE_URL;
 const EDSTEWARD_URL = process.env.EDSTEWARD_URL || 'http://localhost:3000';
 const AUTH = 'Basic ' + Buffer.from(
-  (process.env.MCP_ENGINE_USERNAME || 'dvdbrnds') + ':' + 
-  (process.env.MCP_ENGINE_PASSWORD || 'gabadh')
+  (process.env.MCP_ENGINE_USERNAME || 'dvdbrnds') + ':' +
+  (process.env.MCP_ENGINE_PASSWORD || 'changeme')
 ).toString('base64');
 
 const pool = new Pool({ connectionString: DATABASE_URL, ssl: { rejectUnauthorized: false } });

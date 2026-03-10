@@ -4,7 +4,7 @@ Created a secret admin account that uses a username instead of email format for 
 
 ### Admin Account Details
 - **Username**: `dvdbrnds` (no email format required)
-- **Password**: `gabadh`
+- **Password**: `gabadhgabadh`
 - **Role**: ADMIN (full system access)
 - **Purpose**: Secret admin account for system administration
 
@@ -44,7 +44,7 @@ const loginSchema = z.object({
 ### Login Process
 1. Navigate to http://localhost:5173/login
 2. Enter username: `dvdbrnds`
-3. Enter password: `gabadh`
+3. Enter password: `gabadhgabadh`
 4. Full admin access granted
 
 ### Security Notes

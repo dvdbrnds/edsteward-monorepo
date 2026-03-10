@@ -15,7 +15,7 @@ EDSTEWARD INTEGRATION RESOLUTION - Customer Delivery Dashboard
    - Added Basic Auth support to EdSteward integration
    - Updated `EdStewardIntegration` class to use username/password from environment
    - Added fallback to Bearer token if Basic Auth not available
-   - Configured with credentials: `dvdbrnds:gabadh`
+   - Configured with credentials: `gabadhgabadh`
 
 3. **Enhanced Delivery System**:
    - Added real-time progress polling to frontend dashboard

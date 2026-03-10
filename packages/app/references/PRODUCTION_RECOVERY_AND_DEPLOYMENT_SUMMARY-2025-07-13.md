@@ -33,7 +33,7 @@
 - **Eliminated bcrypt completely** - was causing ES modules conflicts
 - **Migrated all passwords to scrypt format** using custom migration script
 - **Simplified authentication** - removed tenant-specific auth logic
-- **Working credentials**: dvdbrnds/gabadh (verified in both dev and production)
+- **Working credentials**: dvdbrnds/gabadhgabadh (verified in both dev and production)
 
 ### 2. Docker Infrastructure Fixes
 
@@ -115,7 +115,7 @@ aws ecs update-service --cluster edsteward-cluster --service edsteward-service -
 
 - **Development**: Authentication working with scrypt hashes
 - **Production**: Authentication working with scrypt hashes
-- **Test user**: dvdbrnds/gabadh works in both environments
+- **Test user**: dvdbrnds/gabadhgabadh works in both environments
 
 ## Current File Structure Changes
 

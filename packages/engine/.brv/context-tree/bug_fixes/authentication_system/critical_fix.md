@@ -16,7 +16,7 @@ Critical EdSteward authentication system fix completed successfully on September
 
 4. **Invalid Password Hashes**: Users had corrupted/old password hashes
    - **Fix**: Generated new scrypt hashes using: `8495ad6d7567efec6322d6fb1b2a8061:669153d02dda8a957a05b990533f7cd30ab4484210d50ff976cd971ad63022dd`
-   - **Password**: `gabadh` for both `dvdbrnds@edsteward.ai` and `jordanh@gmailfake.com`
+   - **Password**: `gabadhgabadh` for both `dvdbrnds@edsteward.ai` and `jordanh@gmailfake.com`
 
 5. **Conflicting Authentication Endpoints**: Multiple `/api/login` implementations
    - **Fix**: Disabled old `setupAuth` in `server/routes/index.ts`, kept single-tenant auth only
@@ -28,16 +28,16 @@ Critical EdSteward authentication system fix completed successfully on September
 
 **WORKING LOGIN CREDENTIALS:**
 - Username: `dvdbrnds` (NOT email)
-- Password: `gabadh`
+- Password: `gabadhgabadh`
 - Email: `dvdbrnds@edsteward.ai`
 
 **VERIFICATION COMMANDS:**
 ```bash
 # Test login API
-curl -s -X POST "https://moravian.edsteward.ai/api/login" -H "Content-Type: application/json" -d '{"username":"dvdbrnds","password":"gabadh"}'
+curl -s -X POST "https://moravian.edsteward.ai/api/login" -H "Content-Type: application/json" -d '{"username":"dvdbrnds","password":"gabadhgabadh"}'
 
 # Check session cookies
-curl -s -c cookies.txt -X POST "https://moravian.edsteward.ai/api/login" -H "Content-Type: application/json" -d '{"username":"dvdbrnds","password":"gabadh"}'
+curl -s -c cookies.txt -X POST "https://moravian.edsteward.ai/api/login" -H "Content-Type: application/json" -d '{"username":"dvdbrnds","password":"gabadhgabadh"}'
 
 # Test authenticated endpoint
 curl -s -b cookies.txt "https://moravian.edsteward.ai/api/setup/status"
