@@ -1,0 +1,280 @@
+{
+  "roles": [
+    {
+      "canonical": "Compliance Officer",
+      "group": "Compliance",
+      "aliases": [
+        "compliance", "institutional compliance officer", "director of compliance",
+        "compliance reporting manager", "compliance staff", "compliance officer / president",
+        "general counsel / compliance officer", "communications / compliance officer",
+        "hr director / compliance officer"
+      ]
+    },
+    {
+      "canonical": "General Counsel",
+      "group": "Legal",
+      "aliases": [
+        "legal counsel", "legal", "university counsel",
+        "legal counsel and compliance officer"
+      ]
+    },
+    {
+      "canonical": "CFO",
+      "group": "Finance",
+      "aliases": [
+        "chief financial officer", "controller", "accounting manager"
+      ]
+    },
+    {
+      "canonical": "HR Director",
+      "group": "Human Resources",
+      "aliases": [
+        "human resources director", "human resources", "hr",
+        "benefits manager", "payroll manager", "hr/training", "hr staff"
+      ]
+    },
+    {
+      "canonical": "Title IX Coordinator",
+      "group": "Civil Rights",
+      "aliases": [
+        "title ix coordinator / general counsel",
+        "title ix coordinator / student affairs",
+        "hr/title ix", "general counsel / title ix coordinator"
+      ]
+    },
+    {
+      "canonical": "Clery Compliance Officer",
+      "group": "Campus Safety",
+      "aliases": []
+    },
+    {
+      "canonical": "Financial Aid Director",
+      "group": "Enrollment & Financial Aid",
+      "aliases": [
+        "financial aid officer", "financial aid counselor",
+        "financial aid records manager", "financial aid verification coordinator",
+        "student financial services director", "financial aid appeals officer",
+        "student accounts manager"
+      ]
+    },
+    {
+      "canonical": "IT Security Officer",
+      "group": "Information Technology",
+      "aliases": [
+        "ciso", "chief information security officer",
+        "it security manager", "information security manager",
+        "information security coordinator", "information security",
+        "chief information officer", "data protection officer",
+        "data security officer", "it security",
+        "security assessment team lead", "incident response manager"
+      ]
+    },
+    {
+      "canonical": "Campus Police Chief",
+      "group": "Campus Safety",
+      "aliases": [
+        "campus safety director", "campus safety",
+        "campus police/security", "security director",
+        "public safety director", "security officer",
+        "campus police / campus security department",
+        "campus police chief / emergency management director"
+      ]
+    },
+    {
+      "canonical": "Registrar",
+      "group": "Academic Records",
+      "aliases": [
+        "records manager"
+      ]
+    },
+    {
+      "canonical": "VP Academic Affairs",
+      "group": "Academic Affairs",
+      "aliases": [
+        "academic affairs", "provost", "chief academic officer",
+        "academic affairs dean", "academic affairs director"
+      ]
+    },
+    {
+      "canonical": "VP Student Affairs",
+      "group": "Student Affairs",
+      "aliases": [
+        "student affairs", "chief student affairs officer",
+        "student affairs vice president", "vice president for student affairs",
+        "student affairs assessment coordinator"
+      ]
+    },
+    {
+      "canonical": "Dean of Students",
+      "group": "Student Affairs",
+      "aliases": [
+        "dean of students / student affairs",
+        "student life director", "student conduct officer",
+        "greek life director", "student health director",
+        "housing director", "residence life",
+        "counseling center", "health services director",
+        "community service coordinator", "health services",
+        "student affairs"
+      ]
+    },
+    {
+      "canonical": "Privacy Officer",
+      "group": "Compliance",
+      "aliases": [
+        "chief privacy officer"
+      ]
+    },
+    {
+      "canonical": "President",
+      "group": "Executive",
+      "aliases": [
+        "president/chancellor", "president / provost",
+        "senior administration"
+      ]
+    },
+    {
+      "canonical": "Disability Services Coordinator",
+      "group": "Student Services",
+      "aliases": [
+        "disability services", "disability services director",
+        "ada coordinator", "ada/504 coordinator",
+        "section 504 coordinator", "accessibility coordinator"
+      ]
+    },
+    {
+      "canonical": "Emergency Management Director",
+      "group": "Campus Safety",
+      "aliases": [
+        "emergency response coordinator", "emergency management"
+      ]
+    },
+    {
+      "canonical": "Facilities Director",
+      "group": "Operations",
+      "aliases": [
+        "facilities", "ehs director",
+        "environmental health and safety director"
+      ]
+    },
+    {
+      "canonical": "Environmental Compliance Officer",
+      "group": "Compliance",
+      "aliases": [
+        "environmental compliance manager",
+        "environmental compliance specialist"
+      ]
+    },
+    {
+      "canonical": "Fire Safety Officer",
+      "group": "Campus Safety",
+      "aliases": [
+        "safety officer"
+      ]
+    },
+    {
+      "canonical": "Export Control Officer",
+      "group": "Research & Compliance",
+      "aliases": [
+        "ofac compliance officer"
+      ]
+    },
+    {
+      "canonical": "Research Compliance Officer",
+      "group": "Research & Compliance",
+      "aliases": [
+        "research integrity officer", "research compliance",
+        "vice president for research"
+      ]
+    },
+    {
+      "canonical": "Training Coordinator",
+      "group": "Human Resources",
+      "aliases": [
+        "training director"
+      ]
+    },
+    {
+      "canonical": "Procurement Director",
+      "group": "Finance",
+      "aliases": [
+        "procurement manager", "procurement officer",
+        "procurement staff", "procurement security officer",
+        "procurement"
+      ]
+    },
+    {
+      "canonical": "Internal Auditor",
+      "group": "Finance",
+      "aliases": [
+        "quality assurance manager", "risk management officer"
+      ]
+    },
+    {
+      "canonical": "International Programs Director",
+      "group": "Academic Affairs",
+      "aliases": []
+    },
+    {
+      "canonical": "Institutional Research Director",
+      "group": "Academic Affairs",
+      "aliases": [
+        "institutional research", "assessment coordinator"
+      ]
+    },
+    {
+      "canonical": "Library Director",
+      "group": "Academic Affairs",
+      "aliases": []
+    },
+    {
+      "canonical": "Ethics Officer",
+      "group": "Compliance",
+      "aliases": []
+    },
+    {
+      "canonical": "Communications Director",
+      "group": "Communications",
+      "aliases": [
+        "communications", "web services"
+      ]
+    },
+    {
+      "canonical": "Government Relations",
+      "group": "External Affairs",
+      "aliases": []
+    },
+    {
+      "canonical": "Board Compensation Committee",
+      "group": "Governance",
+      "aliases": []
+    },
+    {
+      "canonical": "Technology Transfer Officer",
+      "group": "Research & Compliance",
+      "aliases": [
+        "patent attorney", "director of industry relations",
+        "grants administrator"
+      ]
+    },
+    {
+      "canonical": "Title VI Coordinator",
+      "group": "Civil Rights",
+      "aliases": [
+        "chief diversity officer"
+      ]
+    },
+    {
+      "canonical": "Admissions Director",
+      "group": "Enrollment & Financial Aid",
+      "aliases": []
+    },
+    {
+      "canonical": "Curriculum Coordinator",
+      "group": "Academic Affairs",
+      "aliases": [
+        "teacher preparation program director",
+        "special education program coordinator"
+      ]
+    }
+  ]
+}

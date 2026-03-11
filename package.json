@@ -11,7 +11,10 @@
     "start:engine": "npm run start --workspace=packages/engine",
     "start:app": "npm run start --workspace=packages/app",
     "build:app": "npm run build --workspace=packages/app",
-    "test:app": "npm run test --workspace=packages/app"
+    "test:app": "npm run test --workspace=packages/app",
+    "dev:website": "npm run dev --workspace=packages/website",
+    "build:website": "npm run build --workspace=packages/website",
+    "preview:website": "npm run preview --workspace=packages/website"
   },
   "devDependencies": {
     "concurrently": "^8.2.0"

@@ -13,6 +13,7 @@ import dotenv from 'dotenv';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { normalizeRole as normalizeRoleShared } from '../utils/role-normalizer.js';
 import pg from 'pg';
 import { RegulationDeliveryEngine, REGULATION_EVENTS } from './regulation-delivery-engine.js';
 import { EdStewardIntegration } from './edsteward-integration.js';
@@ -25,11 +26,16 @@ const __dirname = path.dirname(__filename);
 // Load environment variables
 dotenv.config();
 
-// Load customer configuration
+// Load customer configuration and resolve env-var placeholders in auth passwords
 let customerConfig = { customers: [], defaults: {} };
 try {
   const configPath = path.join(__dirname, '../../config/customers.json');
   customerConfig = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+  for (const customer of customerConfig.customers) {
+    if (customer.auth?.password === 'SET_VIA_EDSTEWARD_PASSWORD_ENV') {
+      customer.auth.password = process.env.EDSTEWARD_PASSWORD || '';
+    }
+  }
   console.log(`✅ Loaded ${customerConfig.customers.length} customers from config`);
 } catch (error) {
   console.warn('⚠️ Customer config not found, using defaults');
@@ -71,62 +77,7 @@ class DeliveryServer {
   // Dean of Students, HR Director, Financial Aid Director, VP Academic Affairs,
   // VP Student Affairs, IT Security Officer, Legal Counsel, Disability Services, Athletic Director
   normalizeRole(role) {
-    if (!role) return null;
-    
-    // Standard role mapping (MCP Engine → EdSteward standard)
-    const roleMapping = {
-      // Legal
-      'general counsel': 'Legal Counsel',
-      'legal': 'Legal Counsel',
-      'university counsel': 'Legal Counsel',
-      
-      // Campus Safety/Police
-      'campus safety director': 'Campus Police Chief',
-      'campus police/security': 'Campus Police Chief',
-      'campus safety': 'Campus Police Chief',
-      'security director': 'Campus Police Chief',
-      'public safety director': 'Campus Police Chief',
-      
-      // Academic Affairs
-      'academic affairs': 'VP Academic Affairs',
-      'provost': 'VP Academic Affairs',
-      'chief academic officer': 'VP Academic Affairs',
-      
-      // Student Affairs
-      'student affairs': 'VP Student Affairs',
-      'chief student affairs officer': 'VP Student Affairs',
-      
-      // IT/Security
-      'it director': 'IT Security Officer',
-      'ciso': 'IT Security Officer',
-      'chief information security officer': 'IT Security Officer',
-      'information security': 'IT Security Officer',
-      
-      // Disability Services
-      'disability services director': 'Disability Services',
-      'ada coordinator': 'Disability Services',
-      'accessibility coordinator': 'Disability Services',
-      
-      // HR variations
-      'human resources': 'HR Director',
-      'hr': 'HR Director',
-      'hr/training': 'HR Director',
-      'hr/title ix': 'HR Director',
-      
-      // Athletics
-      'athletics director': 'Athletic Director',
-      'athletics': 'Athletic Director'
-    };
-    
-    const normalized = role.toLowerCase().trim();
-    
-    // Check if there's a direct mapping
-    if (roleMapping[normalized]) {
-      return roleMapping[normalized];
-    }
-    
-    // Return original role (EdSteward admin can create custom mapping)
-    return role;
+    return normalizeRoleShared(role);
   }
 
   setupMiddleware() {
@@ -585,6 +536,7 @@ class DeliveryServer {
             status: 'pending',  // CRITICAL: Creates pending update for CCO review — NEVER 'approved'
             summary: regulationContent.summary || regulationContent.description || `MCP Engine update for ${regulationContent.name}`,
             requirements: requirementsText || '',
+            regulationText: regulationContent.regulationText || regulationContent.regulation_text || regulationContent.fullText || '',
 
             // ═══════════════════════════════════════════════════════════
             // COMPLIANCE TASKS — Full hierarchical task tree
@@ -1012,8 +964,8 @@ class DeliveryServer {
       try {
         // Fetch regulation from database
         const regResult = await this.pool.query(`
-          SELECT id, reg_key, name, statute, cfr, summary, effective_date, item_id, category, topic
-          FROM regulations 
+          SELECT id, reg_key, name, statute, cfr, summary, effective_date, item_id, category, topic, regulation_text
+          FROM regulations
           WHERE (reg_key = $1 OR item_id = $2) AND is_current = true
           LIMIT 1
         `, [regKey, regulationSlug]);
@@ -1024,12 +976,15 @@ class DeliveryServer {
         
         const regulation = regResult.rows[0];
         
-        // Fetch tasks from database
+        // Fetch tasks from database (full schema including hierarchy)
         const tasksResult = await this.pool.query(`
-          SELECT task_id, title, description, priority, requirement_type, sort_order
+          SELECT id, task_id, title, description, instructions, category, priority,
+                 requirement_type, assigned_role, statutory_role, statutory_citation,
+                 evidence_required, evidence_type, evidence_instructions,
+                 sort_order, parent_task_id
           FROM regulation_tasks 
           WHERE regulation_id = $1
-          ORDER BY sort_order
+          ORDER BY sort_order, id
         `, [regulation.id]);
         
         // Fetch deadlines from database
@@ -1121,25 +1076,65 @@ class DeliveryServer {
               taskId: `task-${regulation.reg_key}-${index}-sub-${si}`,
               title: st.title,
               description: st.description || st.title,
+              instructions: st.instructions || '',
               priority: st.priority || 'medium',
-              statutoryCitation: st.statutoryCitation || ''
+              category: st.category || task.category || 'Uncategorized',
+              requirementType: st.requirementType || 'requirement',
+              statutoryCitation: st.statutoryCitation || '',
+              assignedRole: st.assignedRole || task.assignedRole || '',
+              evidenceRequired: st.evidenceRequired || false,
+              evidenceType: st.evidenceType || 'none',
+              deadline: st.deadline || null
             }))
           }));
         } else {
-          complianceTasks = tasksResult.rows.map((task, index) => ({
-            taskId: task.task_id || `task-${regulation.reg_key}-${index}`,
-            title: task.title,
-            description: task.description || task.title,
-            priority: task.priority || 'medium',
-            category: task.category || 'Uncategorized',
-            requirementType: task.requirement_type || 'requirement',
-            statutoryCitation: task.statutory_citation || '',
-            statutoryLanguage: '',
-            assignedRole: task.assigned_role || '',
-            evidenceRequired: task.evidence_required || '',
-            deadline: null,
-            subtasks: []
-          }));
+          // Build hierarchical tasks with parent/child relationships
+          const dbTaskMap = new Map();
+          const dbTasks = tasksResult.rows;
+          dbTasks.forEach(t => dbTaskMap.set(t.id, `task-${t.id}`));
+
+          const dbParentTasks = dbTasks.filter(t => !t.parent_task_id);
+          const dbChildTasks = dbTasks.filter(t => t.parent_task_id);
+
+          complianceTasks = [
+            ...dbParentTasks.map(t => ({
+              tempId: dbTaskMap.get(t.id),
+              taskId: t.task_id || dbTaskMap.get(t.id),
+              title: t.title,
+              description: t.description || t.title,
+              instructions: t.instructions || '',
+              category: t.category || 'Uncategorized',
+              priority: this.normalizePriority(t.priority),
+              requirementType: t.requirement_type || 'requirement',
+              statutoryRole: t.statutory_role || '',
+              statutoryCitation: t.statutory_citation || '',
+              assignedRole: this.normalizeRole(t.assigned_role) || '',
+              evidenceRequired: t.evidence_required || false,
+              evidenceType: t.evidence_type || 'none',
+              evidenceInstructions: t.evidence_instructions || '',
+              deadline: null,
+              subtasks: []
+            })),
+            ...dbChildTasks.map(t => ({
+              tempId: dbTaskMap.get(t.id),
+              taskId: t.task_id || dbTaskMap.get(t.id),
+              parentTempId: dbTaskMap.get(t.parent_task_id),
+              title: t.title,
+              description: t.description || t.title,
+              instructions: t.instructions || '',
+              category: t.category || 'Uncategorized',
+              priority: this.normalizePriority(t.priority),
+              requirementType: t.requirement_type || 'requirement',
+              statutoryRole: t.statutory_role || '',
+              statutoryCitation: t.statutory_citation || '',
+              assignedRole: this.normalizeRole(t.assigned_role) || '',
+              evidenceRequired: t.evidence_required || false,
+              evidenceType: t.evidence_type || 'none',
+              evidenceInstructions: t.evidence_instructions || '',
+              deadline: null,
+              subtasks: []
+            }))
+          ];
         }
 
         // Deadlines — prefer bespoke config
@@ -1209,6 +1204,7 @@ class DeliveryServer {
           category: regulation.category,
           topic: regulation.topic,
           summary: regulation.summary,
+          regulationText: regulation.regulation_text || '',
           effectiveDate: regulation.effective_date,
           bespokeSource: !!bespokeConfig,
           complianceTasks,
@@ -1308,9 +1304,9 @@ class DeliveryServer {
       try {
         // Get all regulations
         let regulations = await this.pool.query(`
-          SELECT id, reg_key, name, item_id, statute, cfr, 
-                 category, topic, summary, effective_date, jurisdiction_source
-          FROM regulations 
+          SELECT id, reg_key, name, item_id, statute, cfr,
+                 category, topic, summary, effective_date, jurisdiction_source, regulation_text
+          FROM regulations
           WHERE is_current = true AND reg_key IS NOT NULL
           ORDER BY reg_key
         `);
@@ -1403,6 +1399,7 @@ class DeliveryServer {
               topic: reg.topic || 'General',
               jurisdictionSource: reg.jurisdiction_source || 'federal',
               summary: reg.summary || '',
+              regulationText: reg.regulation_text || '',
               complianceTasks: hierarchicalTasks
             };
             

@@ -942,7 +942,8 @@ export function setupMCPIntegrationApi(app: express.Application) {
         console.log(`📝 Creating ${data.complianceTasks.length} compliance tasks...`);
         
         // Helper: build task values from canonical 21-field schema
-        const buildTaskValues = (task: typeof data.complianceTasks[0], parentId?: number) => ({
+        // parentRole cascades the parent's assignedRole to subtasks that don't have their own
+        const buildTaskValues = (task: typeof data.complianceTasks[0], parentId?: number, parentRole?: string | null) => ({
           regulationId: newRegulation.id,
           parentTaskId: parentId || null,
           taskId: task.taskId || null,
@@ -950,7 +951,7 @@ export function setupMCPIntegrationApi(app: express.Application) {
           description: task.description || null,
           instructions: task.instructions || null,
           category: task.category || null,
-          assignedRole: task.assignedRole || null,
+          assignedRole: task.assignedRole || parentRole || null,
           statutoryRole: task.statutoryRole || null,
           statutoryCitation: task.statutoryCitation || null,
           requirementType: task.requirementType || 'requirement',
@@ -969,6 +970,9 @@ export function setupMCPIntegrationApi(app: express.Application) {
           isTemplate: false,
         });
         
+        // Track parent roles for cascading to subtasks
+        const parentRoleMap = new Map<string, string>();
+        
         // First pass: create root tasks (no parent)
         const rootTasks = data.complianceTasks.filter(t => !t.parentTempId);
         for (const task of rootTasks) {
@@ -978,6 +982,9 @@ export function setupMCPIntegrationApi(app: express.Application) {
           
           if (task.tempId) {
             taskIdMap.set(task.tempId, newTask.id);
+            if (task.assignedRole) {
+              parentRoleMap.set(task.tempId, task.assignedRole);
+            }
           }
           createdTasks.push({
             id: newTask.id,
@@ -986,7 +993,7 @@ export function setupMCPIntegrationApi(app: express.Application) {
           });
         }
         
-        // Second pass: create child tasks (with parent)
+        // Second pass: create child tasks (with parent), inheriting parent's role if none specified
         const childTasks = data.complianceTasks.filter(t => t.parentTempId);
         for (const task of childTasks) {
           const parentId = taskIdMap.get(task.parentTempId!);
@@ -995,8 +1002,9 @@ export function setupMCPIntegrationApi(app: express.Application) {
             continue;
           }
           
+          const parentRole = parentRoleMap.get(task.parentTempId!) || null;
           const [newTask] = await db.insert(complianceTasks).values(
-            buildTaskValues(task, parentId)
+            buildTaskValues(task, parentId, parentRole)
           ).returning();
           
           if (task.tempId) {
@@ -1545,7 +1553,8 @@ export function setupMCPIntegrationApi(app: express.Application) {
           return null;
         };
 
-        const buildSyncTaskValues = (task: any, parentId?: number) => {
+        // parentRole cascades the parent's assignedRole to subtasks that don't have their own
+        const buildSyncTaskValues = (task: any, parentId?: number, parentRole?: string | null) => {
           const ev = resolveEvidence(task);
           return {
             regulationId,
@@ -1555,7 +1564,7 @@ export function setupMCPIntegrationApi(app: express.Application) {
             description: task.description || null,
             instructions: task.instructions || null,
             category: task.category || null,
-            assignedRole: task.assignedRole || null,
+            assignedRole: task.assignedRole || parentRole || null,
             statutoryRole: task.statutoryRole || null,
             statutoryCitation: task.statutoryCitation || null,
             statutoryLanguage: task.statutoryLanguage || null,
@@ -1577,13 +1586,13 @@ export function setupMCPIntegrationApi(app: express.Application) {
           };
         };
         
-        const buildUpdateFields = (task: any) => {
+        const buildUpdateFields = (task: any, parentRole?: string | null) => {
           const ev = resolveEvidence(task);
           return {
             description: task.description || null,
             instructions: task.instructions || null,
             category: task.category || null,
-            assignedRole: task.assignedRole || null,
+            assignedRole: task.assignedRole || parentRole || null,
             statutoryRole: task.statutoryRole || null,
             statutoryCitation: task.statutoryCitation || null,
             statutoryLanguage: task.statutoryLanguage || null,
@@ -1601,6 +1610,7 @@ export function setupMCPIntegrationApi(app: express.Application) {
         
         let tasksUpdated = 0;
         let tasksSkipped = 0;
+        const syncParentRoleMap = new Map<string, string>();
         
         // First pass: root tasks (no parent)
         console.log(`   ▶️ Pass 1: Processing ${rootTasks.length} root tasks...`);
@@ -1648,9 +1658,15 @@ export function setupMCPIntegrationApi(app: express.Application) {
             createdTasks.push({ id: newTask.id, tempId: task.tempId, title: task.title });
           }
 
+          // Track parent role for cascading to subtasks
+          if (task.tempId && task.assignedRole) {
+            syncParentRoleMap.set(task.tempId, task.assignedRole);
+          }
+
           // Process inline subtasks[] if present on this root task
           if (Array.isArray(task.subtasks) && task.subtasks.length > 0) {
             const parentDbId = task.tempId ? taskIdMap.get(task.tempId) : createdTasks[createdTasks.length - 1]?.id;
+            const parentRole = task.assignedRole || null;
             if (parentDbId) {
               for (const sub of task.subtasks) {
                 const subExisting = preserveTasks ? findExisting(sub) : null;
@@ -1660,7 +1676,7 @@ export function setupMCPIntegrationApi(app: express.Application) {
                     tasksSkipped++;
                     continue;
                   }
-                  const subUpdates = buildUpdateFields(sub);
+                  const subUpdates = buildUpdateFields(sub, parentRole);
                   await db.execute(sql`
                     UPDATE compliance_tasks SET
                       parent_task_id = ${parentDbId},
@@ -1686,7 +1702,7 @@ export function setupMCPIntegrationApi(app: express.Application) {
                   tasksUpdated++;
                 } else {
                   const [newSub] = await db.insert(complianceTasks).values(
-                    buildSyncTaskValues(sub, parentDbId)
+                    buildSyncTaskValues(sub, parentDbId, parentRole)
                   ).returning();
                   createdTasks.push({ id: newSub.id, tempId: sub.tempId, title: sub.title });
                 }
@@ -1709,6 +1725,7 @@ export function setupMCPIntegrationApi(app: express.Application) {
             continue;
           }
           
+          const parentRole = syncParentRoleMap.get(task.parentTempId!) || null;
           const existing = preserveTasks ? findExisting(task) : null;
           
           if (existing) {
@@ -1718,7 +1735,7 @@ export function setupMCPIntegrationApi(app: express.Application) {
               tasksSkipped++;
               continue;
             }
-            const updates = buildUpdateFields(task);
+            const updates = buildUpdateFields(task, parentRole);
             await db.execute(sql`
               UPDATE compliance_tasks SET
                 parent_task_id = ${parentId},
@@ -1746,7 +1763,7 @@ export function setupMCPIntegrationApi(app: express.Application) {
           } else {
             // New child task — insert it
             const [newTask] = await db.insert(complianceTasks).values(
-              buildSyncTaskValues(task, parentId)
+              buildSyncTaskValues(task, parentId, parentRole)
             ).returning();
             if (task.tempId) taskIdMap.set(task.tempId, newTask.id);
             createdTasks.push({ id: newTask.id, tempId: task.tempId, title: task.title });

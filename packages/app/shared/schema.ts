@@ -1462,6 +1462,30 @@ export const insertEOStatusHistorySchema = createInsertSchema(eoStatusHistory);
 export type EOStatusHistory = typeof eoStatusHistory.$inferSelect;
 export type InsertEOStatusHistory = z.infer<typeof insertEOStatusHistorySchema>;
 
+// ===== DEMO REQUESTS (edsteward.com website) =====
+
+export const demoRequests = pgTable("demo_requests", {
+  id: serial("id").primaryKey(),
+  firstName: text("first_name").notNull(),
+  lastName: text("last_name").notNull(),
+  email: text("email").notNull(),
+  institution: text("institution").notNull(),
+  role: text("role"),
+  message: text("message"),
+  status: text("status").notNull().default("new"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+}, (table) => {
+  return {
+    statusIdx: index("demo_requests_status_idx").on(table.status),
+    emailIdx: index("demo_requests_email_idx").on(table.email),
+  };
+});
+
+export const insertDemoRequestSchema = createInsertSchema(demoRequests);
+export type DemoRequest = typeof demoRequests.$inferSelect;
+export type InsertDemoRequest = z.infer<typeof insertDemoRequestSchema>;
+
 // ===== SINGLE-TENANT ARCHITECTURE =====
 // Single-tenant configuration is handled via environment variables and config files
 // No tenant tables needed for single-tenant deployment

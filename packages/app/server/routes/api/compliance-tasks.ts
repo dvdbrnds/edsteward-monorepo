@@ -10,7 +10,7 @@ import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import { getDbForRequest } from '../../services/database';
 import { complianceTasks, taskEvidence, taskActivity, users, regulations, taskAttestationTokens } from '@shared/schema';
-import { eq, desc, asc, and, gt } from 'drizzle-orm';
+import { eq, desc, asc, and, gt, sql, isNull, isNotNull } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
 import { requireAuth, requireAdmin } from '../../middleware/role-based-auth';
 import { emailService } from '../../services/email';
@@ -622,7 +622,8 @@ router.post('/bulk', requireAuth, requireAdmin, async (req: Request, res: Respon
     }
 
     const createdTasks: any[] = [];
-    const taskIdMap = new Map<string, number>(); // Map temp IDs to real IDs for parent references
+    const taskIdMap = new Map<string, number>();
+    const parentRoleMap = new Map<string, string>();
 
     // First pass: create all root tasks (no parent)
     for (const task of tasks.filter((t: any) => !t.parentTempId)) {
@@ -645,21 +646,23 @@ router.post('/bulk', requireAuth, requireAdmin, async (req: Request, res: Respon
       createdTasks.push(newTask);
       if (task.tempId) {
         taskIdMap.set(task.tempId, newTask.id);
+        if (task.assignedRole) parentRoleMap.set(task.tempId, task.assignedRole);
       }
     }
 
-    // Second pass: create sub-tasks with parent references
+    // Second pass: create sub-tasks, inheriting parent's role if none specified
     for (const task of tasks.filter((t: any) => t.parentTempId)) {
       const parentId = taskIdMap.get(task.parentTempId);
       if (!parentId) continue;
 
+      const parentRole = parentRoleMap.get(task.parentTempId) || null;
       const [newTask] = await db.insert(complianceTasks).values({
         regulationId,
         parentTaskId: parentId,
         title: task.title,
         description: task.description,
         instructions: task.instructions,
-        assignedRole: task.assignedRole,
+        assignedRole: task.assignedRole || parentRole,
         dueDate: task.dueDate ? new Date(task.dueDate) : null,
         priority: task.priority || 'medium',
         evidenceRequired: task.evidenceRequired || false,
@@ -752,6 +755,7 @@ router.post('/apply-template/clery/:regulationId', requireAuth, requireAdmin, as
     // Get Clery tasks with dates for the specified year
     const cleryTasks = getCleryTasksWithDates(year || new Date().getFullYear());
     const taskIdMap = new Map<string, number>();
+    const parentRoleMap = new Map<string, string>();
     const createdTasks: any[] = [];
 
     // First pass: create all root tasks (no parent)
@@ -774,20 +778,22 @@ router.post('/apply-template/clery/:regulationId', requireAuth, requireAdmin, as
 
       createdTasks.push(newTask);
       taskIdMap.set(task.tempId, newTask.id);
+      if (task.assignedRole) parentRoleMap.set(task.tempId, task.assignedRole);
     }
 
-    // Second pass: create sub-tasks
+    // Second pass: create sub-tasks, inheriting parent's role if none specified
     for (const task of cleryTasks.filter(t => t.parentTempId)) {
       const parentId = taskIdMap.get(task.parentTempId!);
       if (!parentId) continue;
 
+      const parentRole = parentRoleMap.get(task.parentTempId!) || null;
       const [newTask] = await db.insert(complianceTasks).values({
         regulationId,
         parentTaskId: parentId,
         title: task.title,
         description: task.description,
         instructions: task.instructions,
-        assignedRole: task.assignedRole,
+        assignedRole: task.assignedRole || parentRole,
         dueDate: task.dueDate ? new Date(task.dueDate) : null,
         priority: task.priority,
         evidenceRequired: task.evidenceRequired,
@@ -1651,7 +1657,7 @@ router.post('/bulk/assign', requireAdmin, async (req: Request, res: Response) =>
       return res.status(400).json({ error: 'Task IDs array required' });
     }
 
-    if (!userId && !role) {
+    if (userId === undefined && !role) {
       return res.status(400).json({ error: 'Either userId or role required' });
     }
 
@@ -1664,7 +1670,7 @@ router.post('/bulk/assign', requireAdmin, async (req: Request, res: Response) =>
     }
 
     const updateData: Record<string, unknown> = { updatedAt: new Date() };
-    if (userId) updateData.assignedTo = userId;
+    if (userId !== undefined) updateData.assignedTo = userId;
     if (role) updateData.assignedRole = role;
 
     // Update all tasks
@@ -1683,7 +1689,7 @@ router.post('/bulk/assign', requireAdmin, async (req: Request, res: Response) =>
           taskId,
           userId: req.user!.id,
           activityType: 'assignment',
-          content: `Bulk assigned to ${userId ? `user ${userId}` : `role "${role}"`}`,
+          content: userId ? `Bulk assigned to user ${userId}` : userId === null ? 'Unassigned via bulk operation' : `Bulk assigned to role "${role}"`,
         });
       }
     }
@@ -1822,6 +1828,38 @@ router.post('/bulk/notify', requireAdmin, async (req: Request, res: Response) =>
   } catch (error) {
     console.error('Error bulk sending notifications:', error);
     res.status(500).json({ error: 'Failed to bulk send notifications' });
+  }
+});
+
+/**
+ * POST /api/compliance-tasks/bulk/backfill-roles
+ * Cascade parent assignedRole to subtasks that have no role of their own (admin only)
+ */
+router.post('/bulk/backfill-roles', requireAdmin, async (req: Request, res: Response) => {
+  try {
+    const db = getDbForRequest(req);
+
+    const result = await db.execute(sql`
+      UPDATE compliance_tasks child
+      SET assigned_role = parent.assigned_role
+      FROM compliance_tasks parent
+      WHERE child.parent_task_id = parent.id
+        AND (child.assigned_role IS NULL OR child.assigned_role = '')
+        AND parent.assigned_role IS NOT NULL
+        AND parent.assigned_role != ''
+    `);
+
+    const updatedCount = (result as any).rowCount || 0;
+    console.log(`✅ Backfilled assigned_role on ${updatedCount} subtasks`);
+
+    res.json({
+      success: true,
+      updatedCount,
+      message: `Cascaded parent roles to ${updatedCount} subtask(s)`,
+    });
+  } catch (error) {
+    console.error('Error backfilling roles:', error);
+    res.status(500).json({ error: 'Failed to backfill roles' });
   }
 });
 

@@ -12,21 +12,21 @@
  * Standard EdSteward roles
  */
 const ROLES = {
-  CAMPUS_SAFETY: 'Director of Campus Safety',
-  CAMPUS_SAFETY_ADMIN: 'Campus Safety Administrator',
+  CAMPUS_SAFETY: 'Campus Police Chief',
+  CAMPUS_SAFETY_ADMIN: 'Campus Police Chief',
   REGISTRAR: 'Registrar',
   TITLE_IX: 'Title IX Coordinator',
   GENERAL_COUNSEL: 'General Counsel',
-  PRESIDENT: 'President / Provost',
-  HR: 'HR / Compliance',
-  IT_SECURITY: 'IT Security',
-  WEB_COMMS: 'Web Communications',
-  CAMPUS_COMMS: 'Campus Communications',
+  PRESIDENT: 'President',
+  HR: 'HR Director',
+  IT_SECURITY: 'IT Security Officer',
+  WEB_COMMS: 'Communications Director',
+  CAMPUS_COMMS: 'Communications Director',
   TRAINING: 'Training Coordinator',
-  STUDENT_AFFAIRS: 'Student Affairs',
+  STUDENT_AFFAIRS: 'VP Student Affairs',
   ATHLETIC_DIRECTOR: 'Athletic Director',
   COMPLIANCE: 'Compliance Officer',
-  DISABILITY: 'Disability Services Director',
+  DISABILITY: 'Disability Services Coordinator',
   FINANCIAL_AID: 'Financial Aid Director',
   FACILITIES: 'Facilities Director'
 };

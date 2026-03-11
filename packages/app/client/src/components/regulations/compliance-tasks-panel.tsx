@@ -71,6 +71,14 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command';
 import { toast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { TaskDetailDialog } from './task-detail-dialog';
@@ -146,6 +154,7 @@ interface ComplianceTasksPanelProps {
   regulationId: number;
   regulationName: string;
   isAdmin?: boolean;
+  onScrollToFullText?: () => void;
 }
 
 const statusIcons: Record<string, React.ReactNode> = {
@@ -193,6 +202,15 @@ interface AssignableUser {
   lastName: string | null;
 }
 
+function getAllDescendantIds(task: ComplianceTask): number[] {
+  const ids: number[] = [];
+  for (const sub of task.subTasks) {
+    ids.push(sub.id);
+    ids.push(...getAllDescendantIds(sub));
+  }
+  return ids;
+}
+
 function TaskItem({ 
   task, 
   isAdmin, 
@@ -209,6 +227,8 @@ function TaskItem({
   depth = 0,
   selectedTaskIds = [],
   onToggleSelect,
+  inheritedAssignment,
+  onScrollToFullText,
 }: { 
   task: ComplianceTask; 
   isAdmin?: boolean;
@@ -225,17 +245,30 @@ function TaskItem({
   depth?: number;
   selectedTaskIds?: number[];
   onToggleSelect?: (_taskId: number) => void;
+  inheritedAssignment?: { name: string; isRole: boolean } | null;
+  onScrollToFullText?: () => void;
 }) {
   const [expanded, setExpanded] = useState(depth === 0);
   const [assignPopoverOpen, setAssignPopoverOpen] = useState(false);
   const hasSubTasks = task.subTasks && task.subTasks.length > 0;
   const isOverdue = task.dueDate && new Date(task.dueDate) < new Date() && task.status !== 'completed';
 
+  const hasOwnAssignment = !!(task.assignedUser || task.assignedRole);
   const assigneeName = task.assignedUser 
     ? (task.assignedUser.firstName && task.assignedUser.lastName 
         ? `${task.assignedUser.firstName} ${task.assignedUser.lastName}`
         : task.assignedUser.username)
-    : task.assignedRole || 'Unassigned';
+    : task.assignedRole || inheritedAssignment?.name || 'Unassigned';
+  const isInheritedAssignment = !hasOwnAssignment && !!inheritedAssignment;
+
+  // Compute what to pass down to subtasks
+  const childInheritedAssignment = task.assignedUser
+    ? { name: task.assignedUser.firstName && task.assignedUser.lastName
+          ? `${task.assignedUser.firstName} ${task.assignedUser.lastName}`
+          : task.assignedUser.username, isRole: false }
+    : task.assignedRole
+      ? { name: task.assignedRole, isRole: true }
+      : inheritedAssignment || null;
 
   return (
     <div className={cn("border-l-2", depth > 0 ? "ml-6 pl-4" : "pl-0", 
@@ -300,6 +333,21 @@ function TaskItem({
                 )}>
                   {task.title}
                 </h4>
+                {task.statutoryCitation && (
+                  onScrollToFullText ? (
+                    <button
+                      type="button"
+                      onClick={(e) => { e.stopPropagation(); onScrollToFullText(); }}
+                      className="text-xs text-blue-600 hover:text-blue-800 hover:underline font-normal"
+                    >
+                      {task.statutoryCitation}
+                    </button>
+                  ) : (
+                    <span className="text-xs text-muted-foreground font-normal">
+                      {task.statutoryCitation}
+                    </span>
+                  )
+                )}
               </button>
               {task.description && (
                 <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{task.description}</p>
@@ -337,8 +385,12 @@ function TaskItem({
             {/* Assignee with inline assign */}
             <div className="flex items-center gap-1">
               <UserIcon className="h-3 w-3" />
-              <span className={cn(!task.assignedUser && task.assignedRole && "text-amber-600")}>
+              <span className={cn(
+                !task.assignedUser && task.assignedRole && "text-amber-600",
+                isInheritedAssignment && "text-amber-500 italic"
+              )}>
                 {assigneeName}
+                {isInheritedAssignment && <span className="text-[10px] ml-1 not-italic opacity-70">(inherited)</span>}
               </span>
               {isAdmin && onAssign && (
                 <Popover open={assignPopoverOpen} onOpenChange={setAssignPopoverOpen}>
@@ -353,50 +405,51 @@ function TaskItem({
                       Assign
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-56 p-2" align="start" onClick={(e) => e.stopPropagation()}>
-                    <div className="space-y-1">
-                      <div className="text-xs font-medium text-muted-foreground px-2 py-1">
-                        Assign to:
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="w-full justify-start text-xs h-8"
-                        disabled={isAssigning}
-                        onClick={() => {
-                          onAssign(task.id, null);
-                          setAssignPopoverOpen(false);
-                        }}
-                      >
-                        <span className="text-muted-foreground italic">Unassign</span>
-                      </Button>
-                      {availableUsers?.map((user) => {
-                        const displayName = user.firstName && user.lastName
-                          ? `${user.firstName} ${user.lastName}`
-                          : user.username || user.email || `User #${user.id}`;
-                        return (
-                          <Button
-                            key={user.id}
-                            variant="ghost"
-                            size="sm"
-                            className={cn(
-                              "w-full justify-start text-xs h-auto py-1.5 flex-col items-start",
-                              task.assignedTo === user.id && "bg-primary/10"
-                            )}
-                            disabled={isAssigning}
-                            onClick={() => {
-                              onAssign(task.id, user.id);
+                  <PopoverContent className="w-60 p-0" align="start" onClick={(e) => e.stopPropagation()}>
+                    <Command>
+                      <CommandInput placeholder="Search users..." className="h-9" />
+                      <CommandList>
+                        <CommandEmpty>No users found.</CommandEmpty>
+                        <CommandGroup>
+                          <CommandItem
+                            value="__unassign__"
+                            onSelect={() => {
+                              onAssign(task.id, null);
                               setAssignPopoverOpen(false);
                             }}
+                            disabled={isAssigning}
                           >
-                            <span>{displayName}</span>
-                            {user.email && (
-                              <span className="text-[10px] text-muted-foreground font-normal">{user.email}</span>
-                            )}
-                          </Button>
-                        );
-                      })}
-                    </div>
+                            <span className="text-muted-foreground italic text-xs">Unassign</span>
+                          </CommandItem>
+                          {availableUsers?.map((user) => {
+                            const displayName = user.firstName && user.lastName
+                              ? `${user.firstName} ${user.lastName}`
+                              : user.username || user.email || `User #${user.id}`;
+                            return (
+                              <CommandItem
+                                key={user.id}
+                                value={`${displayName} ${user.email || ''}`}
+                                onSelect={() => {
+                                  onAssign(task.id, user.id);
+                                  setAssignPopoverOpen(false);
+                                }}
+                                disabled={isAssigning}
+                                className={cn(
+                                  task.assignedTo === user.id && "bg-primary/10"
+                                )}
+                              >
+                                <div className="flex flex-col">
+                                  <span className="text-xs">{displayName}</span>
+                                  {user.email && (
+                                    <span className="text-[10px] text-muted-foreground">{user.email}</span>
+                                  )}
+                                </div>
+                              </CommandItem>
+                            );
+                          })}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
                   </PopoverContent>
                 </Popover>
               )}
@@ -723,6 +776,8 @@ function TaskItem({
               depth={depth + 1}
               selectedTaskIds={selectedTaskIds}
               onToggleSelect={onToggleSelect}
+              inheritedAssignment={childInheritedAssignment}
+              onScrollToFullText={onScrollToFullText}
             />
           ))}
         </div>
@@ -731,7 +786,7 @@ function TaskItem({
   );
 }
 
-export function ComplianceTasksPanel({ regulationId, regulationName: _regulationName, isAdmin }: ComplianceTasksPanelProps) {
+export function ComplianceTasksPanel({ regulationId, regulationName: _regulationName, isAdmin, onScrollToFullText }: ComplianceTasksPanelProps) {
   const queryClient = useQueryClient();
   const [selectedTask, setSelectedTask] = useState<ComplianceTask | null>(null);
   const [nudgeTask, setNudgeTask] = useState<ComplianceTask | null>(null);
@@ -791,7 +846,7 @@ export function ComplianceTasksPanel({ regulationId, regulationName: _regulation
     enabled: !!isAdmin,
   });
 
-  // Assign task mutation
+  // Assign task mutation (single task, used as fallback)
   const assignTaskMutation = useMutation({
     mutationFn: async ({ taskId, userId }: { taskId: number; userId: number | null }) => {
       const response = await fetch(`/api/compliance-tasks/${taskId}`, {
@@ -805,17 +860,90 @@ export function ComplianceTasksPanel({ regulationId, regulationName: _regulation
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['compliance-tasks', regulationId] });
-      // Also refresh the "My Tasks" dashboard widget
       queryClient.invalidateQueries({ queryKey: ['/api/compliance-tasks/my-tasks'] });
-      toast({ title: 'Task assigned' });
     },
     onError: () => {
       toast({ title: 'Failed to assign task', variant: 'destructive' });
     },
   });
 
+  // Bulk assign mutation for cascading parent→subtask assignments
+  const bulkAssignMutation = useMutation({
+    mutationFn: async ({ taskIds, userId }: { taskIds: number[]; userId: number | null }) => {
+      const response = await fetch('/api/compliance-tasks/bulk/assign', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ taskIds, userId }),
+      });
+      if (!response.ok) throw new Error('Failed to assign tasks');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['compliance-tasks', regulationId] });
+      queryClient.invalidateQueries({ queryKey: ['/api/compliance-tasks/my-tasks'] });
+    },
+    onError: () => {
+      toast({ title: 'Failed to assign tasks', variant: 'destructive' });
+    },
+  });
+
   const handleAssignTask = (taskId: number, userId: number | null) => {
-    assignTaskMutation.mutate({ taskId, userId });
+    const findTask = (tasks: ComplianceTask[]): ComplianceTask | undefined => {
+      for (const t of tasks) {
+        if (t.id === taskId) return t;
+        const found = findTask(t.subTasks);
+        if (found) return found;
+      }
+    };
+
+    const task = findTask(data?.tasks || []);
+    if (!task || task.subTasks.length === 0) {
+      assignTaskMutation.mutate({ taskId, userId }, {
+        onSuccess: () => { toast({ title: 'Task assigned' }); },
+      });
+      return;
+    }
+
+    const parentRole = task.assignedRole?.toLowerCase().trim() || '';
+    const cascadable: number[] = [taskId];
+    const skipped: ComplianceTask[] = [];
+
+    const collectCascadable = (subtasks: ComplianceTask[]) => {
+      for (const sub of subtasks) {
+        const subRole = sub.assignedRole?.toLowerCase().trim() || '';
+        const hasDifferentSpecialistRole = subRole && subRole !== parentRole;
+
+        if (hasDifferentSpecialistRole) {
+          skipped.push(sub);
+        } else {
+          cascadable.push(sub.id);
+          if (sub.subTasks.length > 0) {
+            collectCascadable(sub.subTasks);
+          }
+        }
+      }
+    };
+
+    collectCascadable(task.subTasks);
+
+    bulkAssignMutation.mutate({ taskIds: cascadable, userId }, {
+      onSuccess: () => {
+        const assignedCount = cascadable.length;
+        if (skipped.length > 0) {
+          const skippedRoles = [...new Set(skipped.map(s => s.assignedRole).filter(Boolean))];
+          toast({
+            title: `Assigned ${assignedCount} task${assignedCount > 1 ? 's' : ''}`,
+            description: `${skipped.length} subtask${skipped.length > 1 ? 's' : ''} skipped (assigned to ${skippedRoles.join(', ')})`,
+          });
+        } else {
+          toast({
+            title: `Assigned ${assignedCount} task${assignedCount > 1 ? 's' : ''}`,
+            description: assignedCount > 1 ? 'Including all subtasks' : undefined,
+          });
+        }
+      },
+    });
   };
 
   // Update task status
@@ -834,6 +962,41 @@ export function ComplianceTasksPanel({ regulationId, regulationName: _regulation
       queryClient.invalidateQueries({ queryKey: ['compliance-tasks', regulationId] });
     },
   });
+
+  // Bulk status update for cascading parent→subtask status changes
+  const bulkUpdateStatusMutation = useMutation({
+    mutationFn: async ({ taskIds, status }: { taskIds: number[]; status: string }) => {
+      const response = await fetch('/api/compliance-tasks/bulk/status', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ taskIds, status }),
+      });
+      if (!response.ok) throw new Error('Failed to update tasks');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['compliance-tasks', regulationId] });
+    },
+  });
+
+  const handleStatusChange = (taskId: number, status: string) => {
+    const findTask = (tasks: ComplianceTask[]): ComplianceTask | undefined => {
+      for (const t of tasks) {
+        if (t.id === taskId) return t;
+        const found = findTask(t.subTasks);
+        if (found) return found;
+      }
+    };
+    const task = findTask(data?.tasks || []);
+    const descendantIds = task ? getAllDescendantIds(task) : [];
+
+    if (descendantIds.length > 0) {
+      bulkUpdateStatusMutation.mutate({ taskIds: [taskId, ...descendantIds], status });
+    } else {
+      updateStatusMutation.mutate({ taskId, status });
+    }
+  };
 
   // Nudge mutation
   const nudgeMutation = useMutation({
@@ -1214,7 +1377,7 @@ export function ComplianceTasksPanel({ regulationId, regulationName: _regulation
                 key={task.id}
                 task={task}
                 isAdmin={isAdmin}
-                onStatusChange={(taskId, status) => updateStatusMutation.mutate({ taskId, status })}
+                onStatusChange={handleStatusChange}
                 onNudge={setNudgeTask}
                 onEscalate={setEscalateTask}
                 onRequestAttestation={(task) => {
@@ -1234,14 +1397,29 @@ export function ComplianceTasksPanel({ regulationId, regulationName: _regulation
                 onDeleteEvidence={handleDeleteEvidence}
                 onAssign={handleAssignTask}
                 availableUsers={availableUsers}
-                isAssigning={assignTaskMutation.isPending}
+                isAssigning={assignTaskMutation.isPending || bulkAssignMutation.isPending}
                 selectedTaskIds={selectedTaskIds}
+                onScrollToFullText={onScrollToFullText}
                 onToggleSelect={(taskId) => {
-                  setSelectedTaskIds(prev => 
-                    prev.includes(taskId) 
-                      ? prev.filter(id => id !== taskId)
-                      : [...prev, taskId]
-                  );
+                  const findTask = (tasks: ComplianceTask[]): ComplianceTask | undefined => {
+                    for (const t of tasks) {
+                      if (t.id === taskId) return t;
+                      const found = findTask(t.subTasks);
+                      if (found) return found;
+                    }
+                  };
+                  const task = findTask(data?.tasks || []);
+                  const descendantIds = task ? getAllDescendantIds(task) : [];
+                  const allIds = [taskId, ...descendantIds];
+
+                  setSelectedTaskIds(prev => {
+                    if (prev.includes(taskId)) {
+                      const toRemove = new Set(allIds);
+                      return prev.filter(id => !toRemove.has(id));
+                    } else {
+                      return [...new Set([...prev, ...allIds])];
+                    }
+                  });
                 }}
               />
             ))}
@@ -1570,7 +1748,8 @@ export function ComplianceTasksPanel({ regulationId, regulationName: _regulation
         onOpenChange={(open) => !open && setSelectedTask(null)}
         regulationId={regulationId}
         isAdmin={isAdmin}
-        onStatusChange={(taskId, status) => updateStatusMutation.mutate({ taskId, status })}
+        onStatusChange={handleStatusChange}
+        onScrollToFullText={onScrollToFullText}
       />
 
       {/* Add Task Dialog */}

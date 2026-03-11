@@ -7,6 +7,7 @@
 
 import { query, getClient } from '../services/database.js';
 import crypto from 'crypto';
+import { normalizeRole } from '../utils/role-normalizer.js';
 
 /**
  * Generate SHA-256 hash for version tracking
@@ -341,7 +342,7 @@ const RegulationRepository = {
             task.description,
             task.category,
             task.priority || 'medium',
-            task.assignedRole || task.assigned_role,
+            normalizeRole(task.assignedRole || task.assigned_role),
             task.estimatedEffort || task.estimated_effort,
             task.evidenceRequired || task.evidence_required || false,
             task.evidenceType || task.evidence_type,

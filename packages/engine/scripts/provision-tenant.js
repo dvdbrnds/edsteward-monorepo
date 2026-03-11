@@ -16,6 +16,7 @@ import fetch from 'node-fetch';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { normalizeRole } from '../src/utils/role-normalizer.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -49,45 +50,7 @@ function normalizePriority(priority) {
   return 'medium';
 }
 
-// Normalize assigned roles to EdSteward's standard role names
-// EdSteward standard roles: Registrar, Title IX Coordinator, Campus Police Chief,
-// Dean of Students, HR Director, Financial Aid Director, VP Academic Affairs,
-// VP Student Affairs, IT Security Officer, Legal Counsel, Disability Services, Athletic Director
-function normalizeRole(role) {
-  if (!role) return null;
-  
-  const roleMapping = {
-    'general counsel': 'Legal Counsel',
-    'legal': 'Legal Counsel',
-    'university counsel': 'Legal Counsel',
-    'campus safety director': 'Campus Police Chief',
-    'campus police/security': 'Campus Police Chief',
-    'campus safety': 'Campus Police Chief',
-    'security director': 'Campus Police Chief',
-    'public safety director': 'Campus Police Chief',
-    'academic affairs': 'VP Academic Affairs',
-    'provost': 'VP Academic Affairs',
-    'chief academic officer': 'VP Academic Affairs',
-    'student affairs': 'VP Student Affairs',
-    'chief student affairs officer': 'VP Student Affairs',
-    'it director': 'IT Security Officer',
-    'ciso': 'IT Security Officer',
-    'chief information security officer': 'IT Security Officer',
-    'information security': 'IT Security Officer',
-    'disability services director': 'Disability Services',
-    'ada coordinator': 'Disability Services',
-    'accessibility coordinator': 'Disability Services',
-    'human resources': 'HR Director',
-    'hr': 'HR Director',
-    'hr/training': 'HR Director',
-    'hr/title ix': 'HR Director',
-    'athletics director': 'Athletic Director',
-    'athletics': 'Athletic Director'
-  };
-  
-  const normalized = role.toLowerCase().trim();
-  return roleMapping[normalized] || role;
-}
+// normalizeRole imported from ../src/utils/role-normalizer.js
 
 async function getCustomerConfig(customerId) {
   const customer = customersConfig.customers.find(c => c.id === customerId);
@@ -102,7 +65,7 @@ async function getAllRegulations() {
     SELECT 
       r.id, r.reg_key, r.name, r.item_id, r.statute, r.cfr, 
       r.category, r.topic, r.summary, r.effective_date,
-      r.jurisdiction_source
+      r.jurisdiction_source, r.regulation_text
     FROM regulations r
     WHERE r.is_current = true AND r.reg_key IS NOT NULL
     ORDER BY r.reg_key
@@ -201,6 +164,7 @@ async function syncRegulationToTenant(regulation, tasks, deadlines, customer, dr
     topic: regulation.topic || 'General',
     jurisdictionSource: regulation.jurisdiction_source || 'federal',
     summary: regulation.summary || '',
+    regulationText: regulation.regulation_text || '',
     effectiveDate: regulation.effective_date,
     complianceTasks: hierarchicalTasks,
     deadlines: deadlines.map(d => ({

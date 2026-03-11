@@ -55,12 +55,18 @@ import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command';
 import { toast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 
@@ -133,6 +139,7 @@ interface TaskDetailDialogProps {
   regulationId: number;
   isAdmin?: boolean;
   onStatusChange: (_taskId: number, _status: string) => void;
+  onScrollToFullText?: () => void;
 }
 
 const statusIcons: Record<string, React.ReactNode> = {
@@ -197,6 +204,7 @@ export function TaskDetailDialog({
   regulationId,
   isAdmin,
   onStatusChange,
+  onScrollToFullText,
 }: TaskDetailDialogProps) {
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -515,37 +523,60 @@ export function TaskDetailDialog({
                 
                 {showAssignSelect && isAdmin ? (
                   <div className="space-y-2">
-                    <Select
-                      value={task.assignedTo?.toString() || 'unassigned'}
-                      onValueChange={(value) => {
-                        const userId = value === 'unassigned' ? null : parseInt(value);
-                        assignDriMutation.mutate(userId);
-                      }}
-                      disabled={assignDriMutation.isPending}
-                    >
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select a person..." />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="unassigned">
-                          <span className="text-muted-foreground italic">Unassigned</span>
-                        </SelectItem>
-                        {availableUsers?.map((user) => {
-                          const displayName = user.firstName && user.lastName
-                            ? `${user.firstName} ${user.lastName}`
-                            : user.username || user.email || `User #${user.id}`;
-                          const showEmail = user.email && displayName !== user.email;
-                          return (
-                            <SelectItem key={user.id} value={user.id.toString()}>
-                              {displayName}
-                              {showEmail && (
-                                <span className="text-muted-foreground ml-2">({user.email})</span>
-                              )}
-                            </SelectItem>
-                          );
-                        })}
-                      </SelectContent>
-                    </Select>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className="w-full justify-start font-normal"
+                          disabled={assignDriMutation.isPending}
+                        >
+                          {task.assignedTo && task.assignedUser
+                            ? (task.assignedUser.firstName && task.assignedUser.lastName
+                              ? `${task.assignedUser.firstName} ${task.assignedUser.lastName}`
+                              : task.assignedUser.username || task.assignedUser.email)
+                            : <span className="text-muted-foreground">Select a person...</span>}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-64 p-0" align="start">
+                        <Command>
+                          <CommandInput placeholder="Search users..." className="h-9" />
+                          <CommandList>
+                            <CommandEmpty>No users found.</CommandEmpty>
+                            <CommandGroup>
+                              <CommandItem
+                                value="__unassign__"
+                                onSelect={() => assignDriMutation.mutate(null)}
+                              >
+                                <span className="text-muted-foreground italic">Unassigned</span>
+                              </CommandItem>
+                              {availableUsers?.map((user) => {
+                                const displayName = user.firstName && user.lastName
+                                  ? `${user.firstName} ${user.lastName}`
+                                  : user.username || user.email || `User #${user.id}`;
+                                const showEmail = user.email && displayName !== user.email;
+                                return (
+                                  <CommandItem
+                                    key={user.id}
+                                    value={`${displayName} ${user.email || ''}`}
+                                    onSelect={() => assignDriMutation.mutate(user.id)}
+                                    className={cn(
+                                      task.assignedTo === user.id && "bg-primary/10"
+                                    )}
+                                  >
+                                    <div className="flex flex-col">
+                                      <span>{displayName}</span>
+                                      {showEmail && (
+                                        <span className="text-xs text-muted-foreground">{user.email}</span>
+                                      )}
+                                    </div>
+                                  </CommandItem>
+                                );
+                              })}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
                     {task.assignedRole && (
                       <div className="text-xs text-muted-foreground">
                         Suggested role: <span className="font-medium">{task.assignedRole}</span>
@@ -595,6 +626,23 @@ export function TaskDetailDialog({
               <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
                 <h4 className="font-medium text-blue-900 mb-2">Instructions</h4>
                 <p className="text-sm text-blue-800 whitespace-pre-wrap">{task.instructions}</p>
+              </div>
+            )}
+
+            {/* Statute Reference */}
+            {task.statutoryCitation && (
+              <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                <h4 className="font-medium text-amber-900 mb-1 text-sm">Statute Reference</h4>
+                <p className="text-sm text-amber-800">{task.statutoryCitation}</p>
+                {onScrollToFullText && (
+                  <button
+                    type="button"
+                    onClick={() => { onOpenChange(false); setTimeout(() => onScrollToFullText(), 150); }}
+                    className="mt-2 text-xs text-blue-600 hover:text-blue-800 hover:underline"
+                  >
+                    View in full regulation text
+                  </button>
+                )}
               </div>
             )}
 

@@ -41,6 +41,19 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 
@@ -248,8 +261,8 @@ export function BulkTaskOperations({
             <div className="flex-1" />
 
             {/* Bulk Actions */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
+            <Popover>
+              <PopoverTrigger asChild>
                 <Button variant="outline" size="sm" disabled={isLoading}>
                   {isLoading ? (
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -258,28 +271,42 @@ export function BulkTaskOperations({
                   )}
                   Assign
                 </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem
-                  onClick={() => handleBulkAction({ type: 'assign', value: undefined, label: 'Unassigned' })}
-                >
-                  Unassign
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                {users?.map((user) => (
-                  <DropdownMenuItem
-                    key={user.id}
-                    onClick={() => handleBulkAction({ 
-                      type: 'assign', 
-                      value: user.id, 
-                      label: getUserDisplayName(user) 
-                    })}
-                  >
-                    {getUserDisplayName(user)}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
+              </PopoverTrigger>
+              <PopoverContent className="w-60 p-0" align="end">
+                <Command>
+                  <CommandInput placeholder="Search users..." className="h-9" />
+                  <CommandList>
+                    <CommandEmpty>No users found.</CommandEmpty>
+                    <CommandGroup>
+                      <CommandItem
+                        value="__unassign__"
+                        onSelect={() => handleBulkAction({ type: 'assign', value: undefined, label: 'Unassigned' })}
+                      >
+                        <span className="text-muted-foreground italic">Unassign</span>
+                      </CommandItem>
+                      {users?.map((user) => (
+                        <CommandItem
+                          key={user.id}
+                          value={`${getUserDisplayName(user)} ${user.email || ''}`}
+                          onSelect={() => handleBulkAction({ 
+                            type: 'assign', 
+                            value: user.id, 
+                            label: getUserDisplayName(user) 
+                          })}
+                        >
+                          <div className="flex flex-col">
+                            <span className="text-sm">{getUserDisplayName(user)}</span>
+                            {user.email && (
+                              <span className="text-xs text-muted-foreground">{user.email}</span>
+                            )}
+                          </div>
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

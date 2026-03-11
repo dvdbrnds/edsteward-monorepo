@@ -48,6 +48,7 @@ import executiveOrdersRouter from './api/executive-orders';
 import complianceRouter from './api/compliance';
 import featureFlagsRouter from './api/feature-flags';
 import dataExportRouter from './api/data-export';
+import demoRequestsRouter from './api/demo-requests';
 // @ts-ignore
 import migrationRoutes from './database-migration.js';
 
@@ -401,6 +402,7 @@ export function registerRoutes(app: express.Application): Server {
   app.use('/api/compliance', complianceRouter); // HECVAT compliance reports for tenants
   app.use('/api/feature-flags', featureFlagsRouter); // Feature flag management
   app.use('/api/my-data', dataExportRouter); // Self-service data export (HECVAT PRIV-03)
+  app.use('/api/demo-requests', demoRequestsRouter); // Public demo request form from edsteward.com
 
   // Note: AWS Tenant Management was removed - belongs in separate admin-console app at admin.edsteward.ai
   

@@ -1277,15 +1277,32 @@ export class DatabaseStorage implements IStorage {
         return results[0] as Regulation;
       }
 
-      // Fallback to regular ID if itemId search fails
+      // Fallback to regular numeric ID if itemId search fails
+      const numericId = parseInt(regulationId, 10);
+      if (isNaN(numericId)) {
+        return null;
+      }
       const fallbackResults = await this.db.select()
         .from(regulations)
-        .where(eq(regulations.id, parseInt(regulationId, 10)));
+        .where(eq(regulations.id, numericId));
 
       return fallbackResults.length > 0 ? (fallbackResults[0] as Regulation) : null;
     } catch (error) {
       console.error(`Error fetching regulation with ID ${regulationId}:`, error);
       throw error;
+    }
+  }
+
+  async getRegulationByRegKey(regKey: string): Promise<Regulation | null> {
+    try {
+      const results = await this.db.select()
+        .from(regulations)
+        .where(eq(regulations.regKey, regKey));
+
+      return results.length > 0 ? (results[0] as Regulation) : null;
+    } catch (error) {
+      console.error(`Error fetching regulation by reg_key ${regKey}:`, error);
+      return null;
     }
   }
 

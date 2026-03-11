@@ -217,7 +217,7 @@ function RegulationDetailPage() {
   const [evidenceNotesOpen, setEvidenceNotesOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [auditOpen, setAuditOpen] = useState(false);
-  const [fullTextOpen, setFullTextOpen] = useState(false);
+  const [fullTextOpen, setFullTextOpen] = useState(() => window.location.hash === '#full-regulation-text');
   
   const regulationId = location.split("/")[2];
   const isAdmin = user?.role?.toLowerCase() === "admin";
@@ -1249,6 +1249,12 @@ function RegulationDetailPage() {
                     regulationId={regulation.id}
                     regulationName={regulation.name || regulation.topic || 'Unknown'}
                     isAdmin={isRegulationAdmin}
+                    onScrollToFullText={() => {
+                      setFullTextOpen(true);
+                      setTimeout(() => {
+                        document.getElementById('full-regulation-text')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      }, 100);
+                    }}
                   />
                 </CollapsibleContent>
               </Collapsible>
@@ -1505,7 +1511,7 @@ function RegulationDetailPage() {
               )}
 
               {/* FULL REGULATION TEXT */}
-              <Collapsible open={fullTextOpen} onOpenChange={setFullTextOpen}>
+              <Collapsible id="full-regulation-text" open={fullTextOpen} onOpenChange={setFullTextOpen}>
                 <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-card rounded-lg border hover:bg-background transition-colors">
                   <div className="flex items-center gap-3">
                     <Scale className="h-5 w-5 text-muted-foreground" />

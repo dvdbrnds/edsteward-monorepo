@@ -13,6 +13,7 @@
  */
 
 import crypto from 'crypto';
+import { normalizeRole } from '../../utils/role-normalizer.js';
 import { callLLM } from '../../regulatory-sources/llm-processing.js';
 
 // Always use AI extraction when we have enough text — produces structured sections with subtasks
@@ -637,10 +638,11 @@ Return a JSON object with this EXACT structure (no markdown, no code fences):
       "description": "What this compliance area covers under ${regName}",
       "category": "One of: Reporting, Documentation, Training, Monitoring, Policy Development, Risk Management, Governance, Partnerships, Student Services, Employee Compliance, Financial Compliance, Data Management, Safety & Security",
       "priority": "critical|high|medium",
-      "assignedRole": "Title of responsible person (e.g., Compliance Officer, Registrar, HR Director)",
+      "assignedRole": "MUST be one of: Compliance Officer, General Counsel, CFO, HR Director, Title IX Coordinator, Clery Compliance Officer, Financial Aid Director, IT Security Officer, Campus Police Chief, Registrar, VP Academic Affairs, VP Student Affairs, Dean of Students, Privacy Officer, President, Disability Services Coordinator, Emergency Management Director, Facilities Director, Environmental Compliance Officer, Fire Safety Officer, Export Control Officer, Research Compliance Officer, Training Coordinator, Procurement Director, Internal Auditor, International Programs Director, Institutional Research Director, Library Director, Ethics Officer, Communications Director, Government Relations, Board Compensation Committee, Technology Transfer Officer, Title VI Coordinator, Admissions Director, Curriculum Coordinator",
+      "statutoryCitation": "The specific section of ${statute || 'the statute'} that requires this (e.g., '20 U.S.C. § 1092(f)(1)', '34 CFR 106.8(a)')",
       "deadline": { "type": "annual|quarterly|monthly|event-triggered|one-time", "date": "MM-DD or null", "description": "When this is due" },
       "subtasks": [
-        { "title": "Specific action item", "description": "Details", "priority": "critical|high|medium" }
+        { "title": "Specific action item", "description": "Details", "priority": "critical|high|medium", "statutoryCitation": "Specific subsection if different from parent" }
       ]
     }
   ],
@@ -658,7 +660,8 @@ CRITICAL RULES:
 - Include realistic deadlines based on the regulation's actual requirements
 - Include penalties if specifically mentioned in this regulation
 - Every task must be specific and verifiable, not vague
-- Use real compliance language and cite specific sections when possible`;
+- Every task MUST include a statutoryCitation referencing the specific section of ${statute || 'the statute'} that requires this action
+- assignedRole MUST be chosen from the provided canonical list — do not invent new role titles`;
 
   try {
     const response = await callLLM(prompt, { 
@@ -746,7 +749,7 @@ export async function extractComplianceRequirements(regulationSlug, regulationTe
         description: req.text,
         category: 'Compliance Requirement',
         priority: req.strength === 'prohibitory' ? 'critical' : 'high',
-        assignedRole: 'Compliance Officer',
+        assignedRole: normalizeRole('Compliance Officer'),
         evidenceRequired: true,
         evidenceType: 'document',
         sortOrder: sortOrder++,
@@ -803,7 +806,8 @@ export async function extractComplianceRequirements(regulationSlug, regulationTe
             description: section.description,
             category: section.category || 'Compliance Requirement',
             priority: section.priority || 'high',
-            assignedRole: section.assignedRole || 'Compliance Officer',
+            assignedRole: normalizeRole(section.assignedRole || 'Compliance Officer'),
+            statutoryCitation: section.statutoryCitation || '',
             deadline: section.deadline || null,
             evidenceRequired: true,
             evidenceType: 'document',
@@ -820,7 +824,8 @@ export async function extractComplianceRequirements(regulationSlug, regulationTe
                 description: subtask.description || '',
                 category: section.category || 'Compliance Requirement',
                 priority: subtask.priority || 'medium',
-                assignedRole: subtask.assignedRole || section.assignedRole || 'Compliance Officer',
+                assignedRole: normalizeRole(subtask.assignedRole || section.assignedRole || 'Compliance Officer'),
+                statutoryCitation: subtask.statutoryCitation || section.statutoryCitation || '',
                 evidenceRequired: true,
                 evidenceType: 'document',
                 sortOrder: sortOrder++,
