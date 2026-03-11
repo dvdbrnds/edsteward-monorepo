@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About — EdSteward</title>
+  <meta name="description" content="EdSteward was built to solve the compliance burden facing higher education institutions. Learn about our mission, approach, and the team behind the platform.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .about-values {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-xl);
+    }
+    @media (max-width: 768px) {
+      .about-values { grid-template-columns: 1fr; }
+    }
+    .about-value {
+      display: flex;
+      gap: var(--space-lg);
+      align-items: flex-start;
+    }
+    .about-value__icon {
+      flex-shrink: 0;
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-md);
+      background: var(--color-blue-pale);
+      color: var(--color-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .about-value__title {
+      font-family: var(--font-display);
+      font-size: var(--text-lg);
+      font-weight: 600;
+      margin-bottom: var(--space-xs);
+      color: var(--color-gray-900);
+    }
+    .about-value__text {
+      font-size: var(--text-sm);
+      color: var(--color-text-muted);
+      line-height: var(--leading-relaxed);
+    }
+    .about-story {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-3xl);
+      align-items: center;
+    }
+    @media (max-width: 768px) {
+      .about-story { grid-template-columns: 1fr; }
+    }
+    .about-story__visual {
+      background: linear-gradient(135deg, var(--color-blue-pale) 0%, #f0fdfa 100%);
+      border-radius: var(--radius-xl);
+      padding: var(--space-3xl);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .about-story__visual svg {
+      width: 200px;
+      height: 200px;
+      opacity: 0.8;
+    }
+    .about-story__content h2 {
+      margin-bottom: var(--space-lg);
+    }
+    .about-story__content p {
+      color: var(--color-text-muted);
+      font-size: var(--text-base);
+      line-height: var(--leading-relaxed);
+      margin-bottom: var(--space-md);
+    }
+    .timeline {
+      position: relative;
+      padding-left: var(--space-2xl);
+    }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 8px;
+      top: 4px;
+      bottom: 4px;
+      width: 2px;
+      background: var(--color-border);
+    }
+    .timeline__item {
+      position: relative;
+      padding-bottom: var(--space-xl);
+    }
+    .timeline__item:last-child { padding-bottom: 0; }
+    .timeline__dot {
+      position: absolute;
+      left: calc(-1 * var(--space-2xl) + 2px);
+      top: 4px;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--color-primary);
+      border: 3px solid var(--color-white);
+      box-shadow: 0 0 0 2px var(--color-primary);
+    }
+    .timeline__year {
+      font-family: var(--font-display);
+      font-size: var(--text-sm);
+      font-weight: 700;
+      color: var(--color-primary);
+      margin-bottom: var(--space-xs);
+    }
+    .timeline__text {
+      font-size: var(--text-sm);
+      color: var(--color-text-muted);
+      line-height: var(--leading-relaxed);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Page Header -->
+  <section class="page-header">
+    <div class="container">
+      <h1 class="fade-up">Compliance should empower,<br>not overwhelm</h1>
+      <p class="fade-up">We're building the tools that let higher education focus on students — not paperwork.</p>
+    </div>
+  </section>
+
+  <!-- Our Story -->
+  <section class="section">
+    <div class="container">
+      <div class="about-story fade-up">
+        <div class="about-story__visual">
+          <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M100 10L20 45v55c0 46.4 34.1 89.7 80 100 45.9-10.3 80-53.6 80-100V45L100 10z" fill="#2563eb" opacity="0.08"/>
+            <path d="M100 10L20 45v55c0 46.4 34.1 89.7 80 100 45.9-10.3 80-53.6 80-100V45L100 10z" stroke="#2563eb" stroke-width="2" opacity="0.3"/>
+            <path d="M70 100l20 20 40-40" stroke="#2563eb" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/>
+            <circle cx="100" cy="85" r="35" stroke="#0d9488" stroke-width="1.5" stroke-dasharray="4 4" opacity="0.4"/>
+          </svg>
+        </div>
+        <div class="about-story__content">
+          <h2>Why we built EdSteward</h2>
+          <p>
+            Higher education institutions face a unique regulatory burden. From FERPA and Title IX
+            to the Clery Act and state-specific requirements, compliance teams juggle hundreds of
+            obligations with limited resources and fragmented tools.
+          </p>
+          <p>
+            EdSteward was born from firsthand experience with this challenge. We saw compliance
+            officers tracking regulations in spreadsheets, chasing attestations via email, and
+            spending months preparing for audits that should take days.
+          </p>
+          <p>
+            We built a platform that automates the tedious parts — regulation monitoring, task
+            generation, evidence collection — so compliance professionals can focus on strategy,
+            risk reduction, and institutional improvement.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Values -->
+  <section class="section section--alt">
+    <div class="container">
+      <div class="section__header fade-up">
+        <h2>What drives us</h2>
+        <p>The principles behind every feature we build and every decision we make.</p>
+      </div>
+      <div class="about-values stagger">
+
+        <div class="about-value">
+          <div class="about-value__icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <div>
+            <div class="about-value__title">Purpose-built for higher ed</div>
+            <p class="about-value__text">We don't build generic compliance software and bolt on education features. Every aspect of EdSteward is designed for the unique regulatory landscape of colleges and universities.</p>
+          </div>
+        </div>
+
+        <div class="about-value">
+          <div class="about-value__icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+          </div>
+          <div>
+            <div class="about-value__title">Reduce burden, not add to it</div>
+            <p class="about-value__text">If a feature doesn't save compliance teams time or reduce risk, we don't ship it. Every workflow is designed to minimize clicks and cognitive load.</p>
+          </div>
+        </div>
+
+        <div class="about-value">
+          <div class="about-value__icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </div>
+          <div>
+            <div class="about-value__title">Transparency and trust</div>
+            <p class="about-value__text">Our AI explains its reasoning. Our pricing is straightforward. Our data practices are auditable. We build trust the same way we help institutions build compliance.</p>
+          </div>
+        </div>
+
+        <div class="about-value">
+          <div class="about-value__icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          </div>
+          <div>
+            <div class="about-value__title">Continuous intelligence</div>
+            <p class="about-value__text">Regulations change constantly. EdSteward monitors government sources around the clock so your institution is never caught off guard by a new requirement or deadline.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Timeline -->
+  <section class="section">
+    <div class="container container--narrow">
+      <div class="section__header fade-up">
+        <h2>Our journey</h2>
+      </div>
+      <div class="timeline fade-up">
+        <div class="timeline__item">
+          <div class="timeline__dot"></div>
+          <div class="timeline__year">2024</div>
+          <p class="timeline__text">EdSteward founded to solve the compliance tracking problem in higher education. Initial research with compliance officers across 20+ institutions.</p>
+        </div>
+        <div class="timeline__item">
+          <div class="timeline__dot"></div>
+          <div class="timeline__year">2025</div>
+          <p class="timeline__text">Platform launched with federal regulation tracking, AI-powered task generation, and attestation workflows. First institutional partners onboarded.</p>
+        </div>
+        <div class="timeline__item">
+          <div class="timeline__dot"></div>
+          <div class="timeline__year">2026</div>
+          <p class="timeline__text">Expanded to 50-state regulation coverage with 242+ regulations tracked. Multi-tenant platform and enterprise security features released.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="section section--dark">
+    <div class="container">
+      <div class="cta-banner">
+        <h2>Join us in transforming compliance</h2>
+        <p>We're always looking for institutions ready to move beyond spreadsheets and manual tracking.</p>
+        <div class="cta-banner__actions">
+          <a href="/contact.html" class="btn btn--primary btn--lg">Get in Touch</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script type="module">
+    import { init } from '/js/main.js';
+    init('about');
+  </script>
+</body>
+</html>
