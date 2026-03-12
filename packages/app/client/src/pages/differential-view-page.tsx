@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useRoute, useLocation } from 'wouter';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import Navigation from "@/components/layout/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -56,6 +56,7 @@ const getRiskColors = (level: string | null) => {
 const DifferentialViewPage: React.FC<DifferentialViewPageProps> = ({ isDemo = false }) => {
   const [match, params] = useRoute<{ id: string }>('/regulations/updates/:id');
   const [, setLocation] = useLocation();
+  const queryClient = useQueryClient();
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [showReasonDialog, setShowReasonDialog] = useState(false);
   const [action, setAction] = useState<'approve' | 'reject' | 'defer' | null>(null);
@@ -188,6 +189,7 @@ const DifferentialViewPage: React.FC<DifferentialViewPageProps> = ({ isDemo = fa
       });
       
       if (!response.ok) throw new Error('Failed to approve');
+      await queryClient.invalidateQueries({ queryKey: ['/api/regulation-updates/pending'] });
       setLocation('/regulations/updates');
     } catch (err: any) {
       alert(`Error: ${err.message}`);
@@ -211,6 +213,7 @@ const DifferentialViewPage: React.FC<DifferentialViewPageProps> = ({ isDemo = fa
       });
       
       if (!response.ok) throw new Error('Failed to reject');
+      await queryClient.invalidateQueries({ queryKey: ['/api/regulation-updates/pending'] });
       setLocation('/regulations/updates');
     } catch (err: any) {
       alert(`Error: ${err.message}`);
@@ -234,6 +237,7 @@ const DifferentialViewPage: React.FC<DifferentialViewPageProps> = ({ isDemo = fa
       });
       
       if (!response.ok) throw new Error('Failed to defer');
+      await queryClient.invalidateQueries({ queryKey: ['/api/regulation-updates/pending'] });
       setLocation('/regulations/updates');
     } catch (err: any) {
       alert(`Error: ${err.message}`);

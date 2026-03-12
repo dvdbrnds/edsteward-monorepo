@@ -10,7 +10,7 @@ import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import { getDbForRequest } from '../../services/database';
 import { complianceTasks, taskEvidence, taskActivity, users, regulations, taskAttestationTokens } from '@shared/schema';
-import { eq, desc, asc, and, gt, sql, isNull, isNotNull } from 'drizzle-orm';
+import { eq, desc, asc, and, gt, lt, gte, sql, isNull, isNotNull } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
 import { requireAuth, requireAdmin } from '../../middleware/role-based-auth';
 import { emailService } from '../../services/email';
@@ -721,6 +721,66 @@ router.get('/my-tasks', requireAuth, async (req: Request, res: Response) => {
   } catch (error) {
     console.error('Error fetching my tasks:', error);
     res.status(500).json({ error: 'Failed to fetch tasks' });
+  }
+});
+
+// ===== COMPLIANCE ALERTS (overdue + due-soon) =====
+/**
+ * GET /api/compliance-tasks/alerts
+ * Returns overdue and due-soon tasks for the notifications page badges.
+ * Uses JS filtering (same approach as dashboard-analytics) for reliable date comparison.
+ */
+router.get('/alerts', requireAuth, async (req: Request, res: Response) => {
+  try {
+    const db = getDbForRequest(req);
+    const now = new Date();
+    const sevenDaysOut = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+
+    const rows = await db.select({
+      task: complianceTasks,
+      regulation: {
+        id: regulations.id,
+        name: regulations.name,
+        topic: regulations.topic,
+      },
+    })
+    .from(complianceTasks)
+    .leftJoin(regulations, eq(complianceTasks.regulationId, regulations.id))
+    .orderBy(asc(complianceTasks.dueDate));
+
+    const flat = rows.map(r => ({
+      id: r.task.id,
+      name: r.task.name,
+      status: r.task.status,
+      priority: r.task.priority,
+      dueDate: r.task.dueDate,
+      assignedRole: r.task.assignedRole,
+      regulationId: r.task.regulationId,
+      regulationName: r.regulation?.name ?? null,
+      regulationTopic: r.regulation?.topic ?? null,
+    }));
+
+    const withDueDate = flat.filter(t =>
+      t.dueDate &&
+      t.status !== 'completed' &&
+      t.status !== 'not_applicable'
+    );
+
+    const overdue = withDueDate
+      .filter(t => new Date(t.dueDate!) < now)
+      .sort((a, b) => new Date(a.dueDate!).getTime() - new Date(b.dueDate!).getTime());
+
+    const dueSoon = withDueDate
+      .filter(t => {
+        const d = new Date(t.dueDate!);
+        return d >= now && d <= sevenDaysOut;
+      })
+      .sort((a, b) => new Date(a.dueDate!).getTime() - new Date(b.dueDate!).getTime());
+
+    res.json({ overdue, dueSoon, counts: { overdue: overdue.length, dueSoon: dueSoon.length } });
+  } catch (error) {
+    console.error('Error fetching compliance alerts:', error);
+    res.status(500).json({ error: 'Failed to fetch alerts' });
   }
 });
 

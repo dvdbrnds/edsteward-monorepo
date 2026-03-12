@@ -1,0 +1,16 @@
+{
+  "workflowId": "WF-1773318147855-kce14l",
+  "timestamp": "2026-03-12T12:22:57.825Z",
+  "scores": {
+    "overall": 90,
+    "certaintyLevel": "A"
+  },
+  "metrics": {
+    "apiCalls": 12,
+    "dataPoints": 56,
+    "validationRate": 90
+  },
+  "taskCount": 0,
+  "deadlineCount": 0,
+  "runtime": "00:30"
+}

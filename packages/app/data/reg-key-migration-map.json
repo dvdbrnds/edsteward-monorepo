@@ -1,0 +1,2512 @@
+[
+  {
+    "id": 519,
+    "oldKey": "REG-001",
+    "newKey": "REG-001",
+    "name": "Jeanne Clery Disclosure of Campus Security Policy and Campus Crime Statistics Act",
+    "riskScore": 96,
+    "riskLevel": "CRITICAL",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 598,
+    "oldKey": "REG-002",
+    "newKey": "REG-002",
+    "name": "Title IX of the Education Amendments of 1972",
+    "riskScore": 88,
+    "riskLevel": "SEVERE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 370,
+    "oldKey": "REG-004",
+    "newKey": "REG-003",
+    "name": "Family Educational Rights and Privacy Act",
+    "riskScore": 85,
+    "riskLevel": "SEVERE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 392,
+    "oldKey": "REG-007",
+    "newKey": "REG-004",
+    "name": "Campus Sex Crimes Prevention Act (§ 1601 of the Victims of Trafficking and Violence Protection Act of 2000)",
+    "riskScore": 77,
+    "riskLevel": "SEVERE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 600,
+    "oldKey": "REG-008",
+    "newKey": "REG-005",
+    "name": "Title VI of the Civil Rights Act of 1964",
+    "riskScore": 77,
+    "riskLevel": "SEVERE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 601,
+    "oldKey": "REG-009",
+    "newKey": "REG-006",
+    "name": "Title VI of the Civil Rights Act of 1964  42 U.S.C. §§ 2000d-2000d-7",
+    "riskScore": 77,
+    "riskLevel": "SEVERE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 602,
+    "oldKey": "REG-010",
+    "newKey": "REG-007",
+    "name": "Title VII of the Civil Rights Act of 1964",
+    "riskScore": 77,
+    "riskLevel": "SEVERE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 444,
+    "oldKey": "REG-011",
+    "newKey": "REG-008",
+    "name": "False Claims Act",
+    "riskScore": 75,
+    "riskLevel": "SEVERE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 499,
+    "oldKey": "REG-012",
+    "newKey": "REG-009",
+    "name": "PA Act 36 of 1990 - English Fluency in Higher Ed",
+    "riskScore": 75,
+    "riskLevel": "SEVERE",
+    "jurisdictionSource": "state",
+    "stateCode": null
+  },
+  {
+    "id": 378,
+    "oldKey": "REG-015",
+    "newKey": "REG-010",
+    "name": "Americans with Disabilities Act (ADA)",
+    "riskScore": 74,
+    "riskLevel": "SEVERE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 379,
+    "oldKey": "REG-016",
+    "newKey": "REG-011",
+    "name": "Americans with Disabilities Act of 1990",
+    "riskScore": 74,
+    "riskLevel": "SEVERE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 433,
+    "oldKey": "REG-017",
+    "newKey": "REG-012",
+    "name": "Equity in Athletics Disclosure Act (EADA)",
+    "riskScore": 74,
+    "riskLevel": "SEVERE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 579,
+    "oldKey": "REG-018",
+    "newKey": "REG-013",
+    "name": "Section 504 of The Rehabilitation Act of 1973",
+    "riskScore": 74,
+    "riskLevel": "SEVERE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 424,
+    "oldKey": "REG-019",
+    "newKey": "REG-014",
+    "name": "Emergency Planning and Community Right to Know Act (EPCRA)",
+    "riskScore": 72,
+    "riskLevel": "SEVERE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 466,
+    "oldKey": "REG-020",
+    "newKey": "REG-015",
+    "name": "Health Insurance Portability and Accountability Act (HIPAA)",
+    "riskScore": 72,
+    "riskLevel": "SEVERE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 470,
+    "oldKey": "REG-021",
+    "newKey": "REG-016",
+    "name": "Health Insurance Portability and Accountability Act",
+    "riskScore": 72,
+    "riskLevel": "SEVERE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 471,
+    "oldKey": "REG-022",
+    "newKey": "REG-017",
+    "name": "Health Insurance Portability and Accountability Act",
+    "riskScore": 72,
+    "riskLevel": "SEVERE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 481,
+    "oldKey": "REG-023",
+    "newKey": "REG-018",
+    "name": "Higher Education Act: Drug and Alcohol Abuse Prevention",
+    "riskScore": 72,
+    "riskLevel": "SEVERE",
+    "jurisdictionSource": "state",
+    "stateCode": null
+  },
+  {
+    "id": 464,
+    "oldKey": "REG-032",
+    "newKey": "REG-019",
+    "name": "Gramm Leach Bliley Act (GLBA)",
+    "riskScore": 70,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 407,
+    "oldKey": "REG-102",
+    "newKey": "REG-020",
+    "name": "Controlled Substances Act",
+    "riskScore": 70,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 418,
+    "oldKey": "REG-129",
+    "newKey": "REG-021",
+    "name": "Drug Free Schools and Communities Act",
+    "riskScore": 70,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 395,
+    "oldKey": "REG-027",
+    "newKey": "REG-022",
+    "name": "Children’s Online Privacy Protection Act of 1998 (COPPA)",
+    "riskScore": 68,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 443,
+    "oldKey": "REG-029",
+    "newKey": "REG-023",
+    "name": "Fair and Accurate Credit Transaction Act (FACTA)",
+    "riskScore": 68,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 460,
+    "oldKey": "REG-031",
+    "newKey": "REG-024",
+    "name": "Freedom of Information Act",
+    "riskScore": 68,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 469,
+    "oldKey": "REG-033",
+    "newKey": "REG-025",
+    "name": "Health Information Technology for Economic and Clinical Health (HITECH) Act of 2009",
+    "riskScore": 68,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 442,
+    "oldKey": "REG-174",
+    "newKey": "REG-026",
+    "name": "Fair Labor Standards Act (FLSA)",
+    "riskScore": 68,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 432,
+    "oldKey": "REG-107",
+    "newKey": "REG-027",
+    "name": "Equal Pay Act of 1963",
+    "riskScore": 66,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 398,
+    "oldKey": "REG-126",
+    "newKey": "REG-028",
+    "name": "Clean Air Act",
+    "riskScore": 66,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 399,
+    "oldKey": "REG-127",
+    "newKey": "REG-029",
+    "name": "Clean Water Act",
+    "riskScore": 66,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 383,
+    "oldKey": "REG-034",
+    "newKey": "REG-030",
+    "name": "Arms Export Control Act of 1976",
+    "riskScore": 65,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 406,
+    "oldKey": "REG-035",
+    "newKey": "REG-031",
+    "name": "Contracts with Third Party Servicers",
+    "riskScore": 65,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 409,
+    "oldKey": "REG-036",
+    "newKey": "REG-032",
+    "name": "Cooperative Research and Technology Enhancement Act (CREATE Act)",
+    "riskScore": 65,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 435,
+    "oldKey": "REG-037",
+    "newKey": "REG-033",
+    "name": "Export Administration Act of 1979",
+    "riskScore": 65,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 456,
+    "oldKey": "REG-039",
+    "newKey": "REG-034",
+    "name": "Foreign Assets Control Regulations",
+    "riskScore": 65,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 474,
+    "oldKey": "REG-040",
+    "newKey": "REG-035",
+    "name": "Higher Education Act: Aid Application Verification",
+    "riskScore": 65,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "state",
+    "stateCode": null
+  },
+  {
+    "id": 475,
+    "oldKey": "REG-041",
+    "newKey": "REG-036",
+    "name": "Higher Education Act: Audits",
+    "riskScore": 65,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "state",
+    "stateCode": null
+  },
+  {
+    "id": 476,
+    "oldKey": "REG-042",
+    "newKey": "REG-037",
+    "name": "Higher Education Act: Borrower Defense to Repayment",
+    "riskScore": 65,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "state",
+    "stateCode": null
+  },
+  {
+    "id": 477,
+    "oldKey": "REG-043",
+    "newKey": "REG-038",
+    "name": "Higher Education Act: Cash Management",
+    "riskScore": 65,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 479,
+    "oldKey": "REG-044",
+    "newKey": "REG-039",
+    "name": "Higher Education Act: Cohort Default Rate",
+    "riskScore": 65,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "state",
+    "stateCode": null
+  },
+  {
+    "id": 482,
+    "oldKey": "REG-045",
+    "newKey": "REG-040",
+    "name": "Higher Education Act: Eligibility and Certification",
+    "riskScore": 65,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "state",
+    "stateCode": null
+  },
+  {
+    "id": 483,
+    "oldKey": "REG-046",
+    "newKey": "REG-041",
+    "name": "Higher Education Act: Entrance and Exit Counseling",
+    "riskScore": 65,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "state",
+    "stateCode": null
+  },
+  {
+    "id": 484,
+    "oldKey": "REG-047",
+    "newKey": "REG-042",
+    "name": "Higher Education Act: Federal Supplemental Educational Opportunity Grant Program",
+    "riskScore": 65,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "state",
+    "stateCode": null
+  },
+  {
+    "id": 485,
+    "oldKey": "REG-048",
+    "newKey": "REG-043",
+    "name": "Higher Education Act: Federal Work Study",
+    "riskScore": 65,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "state",
+    "stateCode": null
+  },
+  {
+    "id": 486,
+    "oldKey": "REG-049",
+    "newKey": "REG-044",
+    "name": "Higher Education Act: Financial Responsibility Requirements",
+    "riskScore": 65,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "state",
+    "stateCode": null
+  },
+  {
+    "id": 489,
+    "oldKey": "REG-050",
+    "newKey": "REG-045",
+    "name": "Higher Education Act: Information Distributed to Students",
+    "riskScore": 65,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "state",
+    "stateCode": null
+  },
+  {
+    "id": 492,
+    "oldKey": "REG-051",
+    "newKey": "REG-046",
+    "name": "Higher Education Act: Net Price Calculator",
+    "riskScore": 65,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "state",
+    "stateCode": null
+  },
+  {
+    "id": 493,
+    "oldKey": "REG-052",
+    "newKey": "REG-047",
+    "name": "Higher Education Act: PLUS Loans",
+    "riskScore": 65,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "state",
+    "stateCode": null
+  },
+  {
+    "id": 494,
+    "oldKey": "REG-053",
+    "newKey": "REG-048",
+    "name": "Higher Education Act: Penalties for Drug Violations",
+    "riskScore": 65,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "state",
+    "stateCode": null
+  },
+  {
+    "id": 495,
+    "oldKey": "REG-054",
+    "newKey": "REG-049",
+    "name": "Higher Education Act: Perkins Loans",
+    "riskScore": 65,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "state",
+    "stateCode": null
+  },
+  {
+    "id": 496,
+    "oldKey": "REG-055",
+    "newKey": "REG-050",
+    "name": "Higher Education Act: Preferred Lenders",
+    "riskScore": 65,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 497,
+    "oldKey": "REG-056",
+    "newKey": "REG-051",
+    "name": "Higher Education Act: Program Participation Agreements",
+    "riskScore": 65,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "state",
+    "stateCode": null
+  },
+  {
+    "id": 500,
+    "oldKey": "REG-057",
+    "newKey": "REG-052",
+    "name": "Higher Education Act: Record Retention",
+    "riskScore": 65,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "state",
+    "stateCode": null
+  },
+  {
+    "id": 501,
+    "oldKey": "REG-058",
+    "newKey": "REG-053",
+    "name": "Higher Education Act: Standard of Conduct",
+    "riskScore": 65,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "state",
+    "stateCode": null
+  },
+  {
+    "id": 517,
+    "oldKey": "REG-059",
+    "newKey": "REG-054",
+    "name": "International Emergency Economic Powers Act",
+    "riskScore": 65,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 530,
+    "oldKey": "REG-061",
+    "newKey": "REG-055",
+    "name": "National Science Foundation Research Misconduct Policies",
+    "riskScore": 65,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 554,
+    "oldKey": "REG-064",
+    "newKey": "REG-056",
+    "name": "Outside Earned Income and Activities",
+    "riskScore": 65,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 567,
+    "oldKey": "REG-065",
+    "newKey": "REG-057",
+    "name": "Public Health Service Policies on Research Misconduct",
+    "riskScore": 65,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 575,
+    "oldKey": "REG-066",
+    "newKey": "REG-058",
+    "name": "Responsibility of Applicants for Promoting Objectivity in Research for which PHS Funding is Sought",
+    "riskScore": 65,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 588,
+    "oldKey": "REG-067",
+    "newKey": "REG-059",
+    "name": "Student Loan Default Prevention Initiative Act of 1990",
+    "riskScore": 65,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 589,
+    "oldKey": "REG-068",
+    "newKey": "REG-060",
+    "name": "Student Right to Know Act",
+    "riskScore": 65,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 591,
+    "oldKey": "REG-069",
+    "newKey": "REG-061",
+    "name": "Teacher Preparation Programs",
+    "riskScore": 65,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 606,
+    "oldKey": "REG-070",
+    "newKey": "REG-062",
+    "name": "Trading with the Enemy Act of 1917",
+    "riskScore": 65,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 373,
+    "oldKey": "REG-237",
+    "newKey": "REG-063",
+    "name": "Age Discrimination Act of 1975",
+    "riskScore": 64,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 436,
+    "oldKey": "REG-038",
+    "newKey": "REG-064",
+    "name": "Export Administration Regulations",
+    "riskScore": 62,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 518,
+    "oldKey": "REG-060",
+    "newKey": "REG-065",
+    "name": "International Traffic in Arms Regulations (ITAR)",
+    "riskScore": 62,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 441,
+    "oldKey": "REG-071",
+    "newKey": "REG-066",
+    "name": "Fair Housing Act, Section 6",
+    "riskScore": 62,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 556,
+    "oldKey": "REG-072",
+    "newKey": "REG-067",
+    "name": "Patient Protection and Affordable Care Act (Section 1557)",
+    "riskScore": 62,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 512,
+    "oldKey": "REG-154",
+    "newKey": "REG-068",
+    "name": "Immigration and Nationality Act (INA)",
+    "riskScore": 62,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 430,
+    "oldKey": "REG-073",
+    "newKey": "REG-069",
+    "name": "Equal Employment Opportunity",
+    "riskScore": 60,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 472,
+    "oldKey": "REG-074",
+    "newKey": "REG-070",
+    "name": "Higher Education Act Financial Value Transparency & Gainful Employment",
+    "riskScore": 60,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 564,
+    "oldKey": "REG-075",
+    "newKey": "REG-071",
+    "name": "Pregnant Workers Fairness Act (PWFA)",
+    "riskScore": 60,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 594,
+    "oldKey": "REG-076",
+    "newKey": "REG-072",
+    "name": "The Equal Pay Act of 1963",
+    "riskScore": 60,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 595,
+    "oldKey": "REG-077",
+    "newKey": "REG-073",
+    "name": "The Family and Medical Leave Act of 1993",
+    "riskScore": 60,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 411,
+    "oldKey": "REG-203",
+    "newKey": "REG-074",
+    "name": "Copyright Act",
+    "riskScore": 60,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 413,
+    "oldKey": "REG-205",
+    "newKey": "REG-075",
+    "name": "Davis-Bacon Act",
+    "riskScore": 60,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 416,
+    "oldKey": "REG-206",
+    "newKey": "REG-076",
+    "name": "Digital Millennium Copyright Act (DMCA)",
+    "riskScore": 60,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 426,
+    "oldKey": "REG-209",
+    "newKey": "REG-077",
+    "name": "Employee Polygraph Protection Act",
+    "riskScore": 60,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 529,
+    "oldKey": "REG-243",
+    "newKey": "REG-078",
+    "name": "National Labor Relations Act",
+    "riskScore": 60,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 376,
+    "oldKey": "REG-078",
+    "newKey": "REG-079",
+    "name": "America COMPETES Act",
+    "riskScore": 58,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 380,
+    "oldKey": "REG-079",
+    "newKey": "REG-080",
+    "name": "Animal Welfare Act",
+    "riskScore": 58,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 400,
+    "oldKey": "REG-080",
+    "newKey": "REG-081",
+    "name": "Clinical Trials § Financial Disclosures by Investigator",
+    "riskScore": 58,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 454,
+    "oldKey": "REG-081",
+    "newKey": "REG-082",
+    "name": "Food and Drug Administration (FDA) Amendments Act of 2007",
+    "riskScore": 58,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 480,
+    "oldKey": "REG-082",
+    "newKey": "REG-083",
+    "name": "Higher Education Act: Credit Hour Definition",
+    "riskScore": 58,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 488,
+    "oldKey": "REG-083",
+    "newKey": "REG-084",
+    "name": "Higher Education Act: Incentive Compensation Prohibition",
+    "riskScore": 58,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 491,
+    "oldKey": "REG-084",
+    "newKey": "REG-085",
+    "name": "Higher Education Act: Misrepresentation",
+    "riskScore": 58,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 502,
+    "oldKey": "REG-085",
+    "newKey": "REG-086",
+    "name": "Higher Education Act: State Authorization",
+    "riskScore": 58,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 531,
+    "oldKey": "REG-086",
+    "newKey": "REG-087",
+    "name": "Native American Graves Protection and Repatriation Act (NAGPRA)",
+    "riskScore": 58,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 541,
+    "oldKey": "REG-087",
+    "newKey": "REG-088",
+    "name": "OSHA",
+    "riskScore": 58,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 542,
+    "oldKey": "REG-088",
+    "newKey": "REG-089",
+    "name": "OSHA Asbestos in Construction Standard",
+    "riskScore": 58,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 543,
+    "oldKey": "REG-089",
+    "newKey": "REG-090",
+    "name": "OSHA Asbestos in General Industry Standard",
+    "riskScore": 58,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 544,
+    "oldKey": "REG-090",
+    "newKey": "REG-091",
+    "name": "OSHA Enforcement Guidance for Personal Protective Equipment (PPE) in General Industry",
+    "riskScore": 58,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 545,
+    "oldKey": "REG-091",
+    "newKey": "REG-092",
+    "name": "OSHA Lead in Construction Standard",
+    "riskScore": 58,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 546,
+    "oldKey": "REG-092",
+    "newKey": "REG-093",
+    "name": "OSHA Lead in General Industry Standard",
+    "riskScore": 58,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 547,
+    "oldKey": "REG-093",
+    "newKey": "REG-094",
+    "name": "OSHA Welding, Cutting, and Brazing",
+    "riskScore": 58,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 548,
+    "oldKey": "REG-094",
+    "newKey": "REG-095",
+    "name": "OSHA – Bloodborne Pathogens Standard",
+    "riskScore": 58,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 549,
+    "oldKey": "REG-095",
+    "newKey": "REG-096",
+    "name": "OSHA’s  Emergency Action Plan Standard",
+    "riskScore": 58,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 550,
+    "oldKey": "REG-096",
+    "newKey": "REG-097",
+    "name": "OSHA’s  Occupational Noise Exposure Standard",
+    "riskScore": 58,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 551,
+    "oldKey": "REG-097",
+    "newKey": "REG-098",
+    "name": "OSHA’s Occupational Exposure to Hazardous Chemicals in Laboratories Standard",
+    "riskScore": 58,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 552,
+    "oldKey": "REG-098",
+    "newKey": "REG-099",
+    "name": "Occupational Safety and Health Act of 1970",
+    "riskScore": 58,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 583,
+    "oldKey": "REG-099",
+    "newKey": "REG-100",
+    "name": "Small Unmanned Aircraft Systems",
+    "riskScore": 58,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 401,
+    "oldKey": "REG-101",
+    "newKey": "REG-101",
+    "name": "Communications Assistance for Law Enforcement Act (CALEA)",
+    "riskScore": 55,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 408,
+    "oldKey": "REG-103",
+    "newKey": "REG-102",
+    "name": "Controlling the Assault of Non-Solicited Pornography And Marketing Act of 2003 (CAN-SPAM Act)",
+    "riskScore": 55,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 415,
+    "oldKey": "REG-104",
+    "newKey": "REG-103",
+    "name": "Department of Education General Administrative Regulations and Other Applicable Grant Regulations",
+    "riskScore": 55,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 422,
+    "oldKey": "REG-105",
+    "newKey": "REG-104",
+    "name": "Electronic Communications Privacy Act of 1986",
+    "riskScore": 55,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 431,
+    "oldKey": "REG-106",
+    "newKey": "REG-105",
+    "name": "Equal Employment of Veterans",
+    "riskScore": 55,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 437,
+    "oldKey": "REG-108",
+    "newKey": "REG-106",
+    "name": "FCC – Cable Certification",
+    "riskScore": 55,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 438,
+    "oldKey": "REG-109",
+    "newKey": "REG-107",
+    "name": "FCC – Fixed Microwave Services, Licensing",
+    "riskScore": 55,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 439,
+    "oldKey": "REG-110",
+    "newKey": "REG-108",
+    "name": "FCC – Wireless Communications, Licensing",
+    "riskScore": 55,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 445,
+    "oldKey": "REG-111",
+    "newKey": "REG-109",
+    "name": "Federal Awardee Performance and Integrity Information System (FAPIIS)",
+    "riskScore": 55,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 446,
+    "oldKey": "REG-112",
+    "newKey": "REG-110",
+    "name": "Federal Funding Accountability and Transparency Act of 2006 (FFATA)",
+    "riskScore": 55,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 459,
+    "oldKey": "REG-113",
+    "newKey": "REG-111",
+    "name": "Fraud Enforcement and Recovery Act of 2009 (FERA)",
+    "riskScore": 55,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 463,
+    "oldKey": "REG-114",
+    "newKey": "REG-112",
+    "name": "Genetic Information Non-Discrimination Act of 2008",
+    "riskScore": 55,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 467,
+    "oldKey": "REG-115",
+    "newKey": "REG-113",
+    "name": "Hazardous Materials Transportation Act",
+    "riskScore": 55,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 507,
+    "oldKey": "REG-116",
+    "newKey": "REG-114",
+    "name": "Homeland Security Act of 2002",
+    "riskScore": 55,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 520,
+    "oldKey": "REG-117",
+    "newKey": "REG-115",
+    "name": "Junk Fax Prevention Act of 2005",
+    "riskScore": 55,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 522,
+    "oldKey": "REG-118",
+    "newKey": "REG-116",
+    "name": "Lilly Ledbetter Fair Pay Act of 2009",
+    "riskScore": 55,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 538,
+    "oldKey": "REG-119",
+    "newKey": "REG-117",
+    "name": "No Electronic Theft Act",
+    "riskScore": 55,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 565,
+    "oldKey": "REG-120",
+    "newKey": "REG-118",
+    "name": "Protection of Human Subjects Regulations (Common Rule)",
+    "riskScore": 55,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 593,
+    "oldKey": "REG-121",
+    "newKey": "REG-119",
+    "name": "Telemarketing",
+    "riskScore": 55,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 611,
+    "oldKey": "REG-122",
+    "newKey": "REG-120",
+    "name": "Unknown Regulation",
+    "riskScore": 55,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 614,
+    "oldKey": "REG-123",
+    "newKey": "REG-121",
+    "name": "Veterans’ employment emphasis under Federal contracts",
+    "riskScore": 55,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 613,
+    "oldKey": "REG-163",
+    "newKey": "REG-122",
+    "name": "Unrelated Business Income Tax (UBIT)",
+    "riskScore": 54,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 372,
+    "oldKey": "REG-100",
+    "newKey": "REG-123",
+    "name": "Affirmative Action/Equal Employment Opportunity",
+    "riskScore": 52,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 384,
+    "oldKey": "REG-124",
+    "newKey": "REG-124",
+    "name": "Atomic Energy Act of 1954",
+    "riskScore": 52,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 394,
+    "oldKey": "REG-125",
+    "newKey": "REG-125",
+    "name": "Chemical Facility Anti-Terrorism Standards",
+    "riskScore": 52,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 403,
+    "oldKey": "REG-128",
+    "newKey": "REG-126",
+    "name": "Comprehensive Environmental Response, Compensation, and Liability Act (CERCLA)",
+    "riskScore": 52,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 419,
+    "oldKey": "REG-130",
+    "newKey": "REG-127",
+    "name": "Drug Free Workplace Act",
+    "riskScore": 52,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 423,
+    "oldKey": "REG-131",
+    "newKey": "REG-128",
+    "name": "Osha",
+    "riskScore": 52,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 428,
+    "oldKey": "REG-132",
+    "newKey": "REG-129",
+    "name": "Energy Policy Act",
+    "riskScore": 52,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 429,
+    "oldKey": "REG-133",
+    "newKey": "REG-130",
+    "name": "Energy Reorganization Act of 1974, as amended",
+    "riskScore": 52,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 448,
+    "oldKey": "REG-134",
+    "newKey": "REG-131",
+    "name": "Federal Insecticide, Fungicide and Rodenticide Act",
+    "riskScore": 52,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 465,
+    "oldKey": "REG-135",
+    "newKey": "REG-132",
+    "name": "Guarding and Use of Hand & Portable Powered Tools",
+    "riskScore": 52,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 468,
+    "oldKey": "REG-136",
+    "newKey": "REG-133",
+    "name": "Hazardous and Solid Waste Amendments of 1984",
+    "riskScore": 52,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 505,
+    "oldKey": "REG-137",
+    "newKey": "REG-134",
+    "name": "Higher Education Opportunity Act",
+    "riskScore": 52,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 506,
+    "oldKey": "REG-138",
+    "newKey": "REG-135",
+    "name": "Higher Education Opportunity Act Sections 152 and 153",
+    "riskScore": 52,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 510,
+    "oldKey": "REG-139",
+    "newKey": "REG-136",
+    "name": "Housing & Urban Development Lead Based Paint Poisoning in Certain Residential Structures",
+    "riskScore": 52,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 524,
+    "oldKey": "REG-140",
+    "newKey": "REG-137",
+    "name": "Mandatory Reporting of Greenhouse Gases",
+    "riskScore": 52,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 526,
+    "oldKey": "REG-141",
+    "newKey": "REG-138",
+    "name": "Motor Carrier Act of 1980",
+    "riskScore": 52,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 528,
+    "oldKey": "REG-142",
+    "newKey": "REG-139",
+    "name": "National Emission Standards for Hazardous Air Pollutants (NESHAP)",
+    "riskScore": 52,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 553,
+    "oldKey": "REG-143",
+    "newKey": "REG-140",
+    "name": "Oil Pollution Act",
+    "riskScore": 52,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 573,
+    "oldKey": "REG-144",
+    "newKey": "REG-141",
+    "name": "Residential Lead-Based Paint Hazard Reduction Act of 1992",
+    "riskScore": 52,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 574,
+    "oldKey": "REG-145",
+    "newKey": "REG-142",
+    "name": "Resource Conservation and Recovery Act",
+    "riskScore": 52,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 586,
+    "oldKey": "REG-146",
+    "newKey": "REG-143",
+    "name": "Standards For the Management of Used Oil",
+    "riskScore": 52,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 596,
+    "oldKey": "REG-147",
+    "newKey": "REG-144",
+    "name": "The Public Health Security and Bioterrorism Preparedness and Response Act",
+    "riskScore": 52,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 603,
+    "oldKey": "REG-148",
+    "newKey": "REG-145",
+    "name": "Toxic Substances Control Act",
+    "riskScore": 52,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 447,
+    "oldKey": "REG-030",
+    "newKey": "REG-146",
+    "name": "Federal Information Security Management Act (FISMA)",
+    "riskScore": 50,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 385,
+    "oldKey": "REG-149",
+    "newKey": "REG-147",
+    "name": "Bankruptcy Abuse Prevention & Consumer Protection Act of 2005",
+    "riskScore": 50,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 397,
+    "oldKey": "REG-150",
+    "newKey": "REG-148",
+    "name": "Clayton Antitrust Act of 1914",
+    "riskScore": 50,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 452,
+    "oldKey": "REG-151",
+    "newKey": "REG-149",
+    "name": "Federal Unemployment Tax Act (FUTA)",
+    "riskScore": 50,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 473,
+    "oldKey": "REG-152",
+    "newKey": "REG-150",
+    "name": "Higher Education Act – Disclosure of Foreign Gifts",
+    "riskScore": 50,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 498,
+    "oldKey": "REG-153",
+    "newKey": "REG-151",
+    "name": "Higher Education Act: Readmission Requirements for Servicemembers",
+    "riskScore": 50,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 571,
+    "oldKey": "REG-155",
+    "newKey": "REG-152",
+    "name": "Regulation E: Electronic Fund Transfers",
+    "riskScore": 50,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 578,
+    "oldKey": "REG-156",
+    "newKey": "REG-153",
+    "name": "Sarbanes Oxley Act of 2002 (SOX)",
+    "riskScore": 50,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 580,
+    "oldKey": "REG-157",
+    "newKey": "REG-154",
+    "name": "Sherman Antitrust Act",
+    "riskScore": 50,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 585,
+    "oldKey": "REG-158",
+    "newKey": "REG-155",
+    "name": "Social Security Act",
+    "riskScore": 50,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 587,
+    "oldKey": "REG-159",
+    "newKey": "REG-156",
+    "name": "Student Exchange and Visitor Information System (SEVIS)",
+    "riskScore": 50,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 590,
+    "oldKey": "REG-160",
+    "newKey": "REG-157",
+    "name": "Tax Cuts and Jobs Act of 2017 (endowment excise tax)",
+    "riskScore": 50,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 607,
+    "oldKey": "REG-161",
+    "newKey": "REG-158",
+    "name": "Truth in Lending Act",
+    "riskScore": 50,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 609,
+    "oldKey": "REG-162",
+    "newKey": "REG-159",
+    "name": "Uniform Administrative Requirements, Cost Principles, and Audit Requirements for Federal Awards (Uniform Guidance, Super Circular, or Omni Circular)",
+    "riskScore": 50,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 371,
+    "oldKey": "REG-164",
+    "newKey": "REG-160",
+    "name": "Acts Affecting a Personal Financial Interest",
+    "riskScore": 48,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 387,
+    "oldKey": "REG-165",
+    "newKey": "REG-161",
+    "name": "Bribery of Public Officials and Witnesses",
+    "riskScore": 48,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 388,
+    "oldKey": "REG-166",
+    "newKey": "REG-162",
+    "name": "Byrd Amendment",
+    "riskScore": 48,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 390,
+    "oldKey": "REG-167",
+    "newKey": "REG-163",
+    "name": "Cafeteria Plans 26 U.S.C. § 125",
+    "riskScore": 48,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 393,
+    "oldKey": "REG-168",
+    "newKey": "REG-164",
+    "name": "Charitable Gift Annuity Antitrust Relief Act",
+    "riskScore": 48,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 402,
+    "oldKey": "REG-169",
+    "newKey": "REG-165",
+    "name": "Compensation to Members of Congress, Officers, Others in Matters Affecting the Government",
+    "riskScore": 48,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 405,
+    "oldKey": "REG-170",
+    "newKey": "REG-166",
+    "name": "Consumer Credit Protection Act, Title III (CCPA) – Garnishments",
+    "riskScore": 48,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 414,
+    "oldKey": "REG-171",
+    "newKey": "REG-167",
+    "name": "Deferred Compensation",
+    "riskScore": 48,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 425,
+    "oldKey": "REG-172",
+    "newKey": "REG-168",
+    "name": "Employee Annuities",
+    "riskScore": 48,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 434,
+    "oldKey": "REG-173",
+    "newKey": "REG-169",
+    "name": "Ethics in Government Act (Amended by Ethics Reform Act and Honest Leadership and Open Government Act of 2007)",
+    "riskScore": 48,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 449,
+    "oldKey": "REG-175",
+    "newKey": "REG-170",
+    "name": "Federal Insurance Contributions Act (FICA)",
+    "riskScore": 48,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 450,
+    "oldKey": "REG-176",
+    "newKey": "REG-171",
+    "name": "Federal Sentencing Guidelines",
+    "riskScore": 48,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 451,
+    "oldKey": "REG-177",
+    "newKey": "REG-172",
+    "name": "Federal Unemployment Tax Act",
+    "riskScore": 48,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 457,
+    "oldKey": "REG-178",
+    "newKey": "REG-173",
+    "name": "Foreign Bank Accounts and Tax Filings",
+    "riskScore": 48,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 461,
+    "oldKey": "REG-179",
+    "newKey": "REG-174",
+    "name": "Fringe Benefits",
+    "riskScore": 48,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 508,
+    "oldKey": "REG-180",
+    "newKey": "REG-175",
+    "name": "Honest Leadership and Open Government Act of 2007",
+    "riskScore": 48,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 509,
+    "oldKey": "REG-181",
+    "newKey": "REG-176",
+    "name": "House and Senate Gift Ban and Ethics Rules",
+    "riskScore": 48,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 513,
+    "oldKey": "REG-182",
+    "newKey": "REG-177",
+    "name": "Independent Contractors",
+    "riskScore": 48,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 514,
+    "oldKey": "REG-183",
+    "newKey": "REG-178",
+    "name": "Industrial Alcohol User Permits and Special Tax",
+    "riskScore": 48,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 516,
+    "oldKey": "REG-184",
+    "newKey": "REG-179",
+    "name": "Internal Revenue Service: Governance Information Required on Form 990",
+    "riskScore": 48,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 523,
+    "oldKey": "REG-185",
+    "newKey": "REG-180",
+    "name": "Lobbying Disclosure Act",
+    "riskScore": 48,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 540,
+    "oldKey": "REG-186",
+    "newKey": "REG-181",
+    "name": "Nonqualified Deferred Inclusion",
+    "riskScore": 48,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 563,
+    "oldKey": "REG-188",
+    "newKey": "REG-182",
+    "name": "Political Activities",
+    "riskScore": 48,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 566,
+    "oldKey": "REG-189",
+    "newKey": "REG-183",
+    "name": "Public Disclosure of Material",
+    "riskScore": 48,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 568,
+    "oldKey": "REG-190",
+    "newKey": "REG-184",
+    "name": "Qualified Pensions",
+    "riskScore": 48,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 569,
+    "oldKey": "REG-191",
+    "newKey": "REG-185",
+    "name": "Qualified Tuition Reductions",
+    "riskScore": 48,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 570,
+    "oldKey": "REG-192",
+    "newKey": "REG-186",
+    "name": "Qualified Tuition and Student Loan Interest Reporting",
+    "riskScore": 48,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 572,
+    "oldKey": "REG-193",
+    "newKey": "REG-187",
+    "name": "Reporting of Payments of Royalties",
+    "riskScore": 48,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 576,
+    "oldKey": "REG-194",
+    "newKey": "REG-188",
+    "name": "Restrictions on Former Officers, Employees, and Elected Officials of the Executive and Legislative",
+    "riskScore": 48,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 577,
+    "oldKey": "REG-195",
+    "newKey": "REG-189",
+    "name": "Salary of Government Officials and Employees Payable Only by United States",
+    "riskScore": 48,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 582,
+    "oldKey": "REG-196",
+    "newKey": "REG-190",
+    "name": "Small Business Job Protection Act",
+    "riskScore": 48,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 612,
+    "oldKey": "REG-197",
+    "newKey": "REG-191",
+    "name": "Unrelated Business Income (UBIT)",
+    "riskScore": 48,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 421,
+    "oldKey": "REG-028",
+    "newKey": "REG-192",
+    "name": "Electronic Communications Privacy Act",
+    "riskScore": 46,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 377,
+    "oldKey": "REG-198",
+    "newKey": "REG-193",
+    "name": "American Jobs Creation Act of 2004",
+    "riskScore": 45,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 381,
+    "oldKey": "REG-199",
+    "newKey": "REG-194",
+    "name": "Anti-Kickback Act of 1986",
+    "riskScore": 45,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 382,
+    "oldKey": "REG-200",
+    "newKey": "REG-195",
+    "name": "Anti-discrimination laws for federal contractors",
+    "riskScore": 45,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 386,
+    "oldKey": "REG-201",
+    "newKey": "REG-196",
+    "name": "Bayh-Dole Act of 1980",
+    "riskScore": 45,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 410,
+    "oldKey": "REG-202",
+    "newKey": "REG-197",
+    "name": "Copeland Anti-Kickback Act",
+    "riskScore": 45,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 412,
+    "oldKey": "REG-204",
+    "newKey": "REG-198",
+    "name": "Copyright Term Extension Act",
+    "riskScore": 45,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 417,
+    "oldKey": "REG-207",
+    "newKey": "REG-199",
+    "name": "Drug & Alcohol Testing of Transportation Employees",
+    "riskScore": 45,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 420,
+    "oldKey": "REG-208",
+    "newKey": "REG-200",
+    "name": "E-Verify Executive Order 13465-Amending Executive Order 12989",
+    "riskScore": 45,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 440,
+    "oldKey": "REG-210",
+    "newKey": "REG-201",
+    "name": "Fair Credit Reporting Act (FCRA)",
+    "riskScore": 45,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 453,
+    "oldKey": "REG-211",
+    "newKey": "REG-202",
+    "name": "Federal Volunteer Protection Act",
+    "riskScore": 45,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 455,
+    "oldKey": "REG-212",
+    "newKey": "REG-203",
+    "name": "Foreign Agents Registration Act of 1938",
+    "riskScore": 45,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 458,
+    "oldKey": "REG-213",
+    "newKey": "REG-204",
+    "name": "Foreign Corrupt Practices Act (FCPA)",
+    "riskScore": 45,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 490,
+    "oldKey": "REG-214",
+    "newKey": "REG-205",
+    "name": "Higher Education Act: Institutional and financial assistance information for students",
+    "riskScore": 45,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 511,
+    "oldKey": "REG-215",
+    "newKey": "REG-206",
+    "name": "Immigration and Nationality Act",
+    "riskScore": 45,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 521,
+    "oldKey": "REG-216",
+    "newKey": "REG-207",
+    "name": "Lanham Act",
+    "riskScore": 45,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 527,
+    "oldKey": "REG-217",
+    "newKey": "REG-208",
+    "name": "NSF grant term and condition, September 21, 2018",
+    "riskScore": 45,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 539,
+    "oldKey": "REG-218",
+    "newKey": "REG-209",
+    "name": "Non-Retaliation for Disclosure of Compensation Information",
+    "riskScore": 45,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 581,
+    "oldKey": "REG-222",
+    "newKey": "REG-210",
+    "name": "Small Business Act and Small Business Investment Act of 1958",
+    "riskScore": 45,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 584,
+    "oldKey": "REG-223",
+    "newKey": "REG-211",
+    "name": "Small Webcasters Settlement Act of 2002",
+    "riskScore": 45,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 592,
+    "oldKey": "REG-224",
+    "newKey": "REG-212",
+    "name": "Technology Education and Copyright Harmonization Act (TEACH ACT) of 2002",
+    "riskScore": 45,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 604,
+    "oldKey": "REG-225",
+    "newKey": "REG-213",
+    "name": "Trade Sanctions Reform and Export Enhancement",
+    "riskScore": 45,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 605,
+    "oldKey": "REG-226",
+    "newKey": "REG-214",
+    "name": "Trademark Revision Act",
+    "riskScore": 45,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 608,
+    "oldKey": "REG-227",
+    "newKey": "REG-215",
+    "name": "U.S. Patent Act",
+    "riskScore": 45,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 615,
+    "oldKey": "REG-228",
+    "newKey": "REG-216",
+    "name": "Visual Artists Rights Act",
+    "riskScore": 45,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 616,
+    "oldKey": "REG-229",
+    "newKey": "REG-217",
+    "name": "Worker Adjustment and Retraining Notification Act (WARN)",
+    "riskScore": 45,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 389,
+    "oldKey": "REG-230",
+    "newKey": "REG-218",
+    "name": "Cafeteria Plan Regulations",
+    "riskScore": 42,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 404,
+    "oldKey": "REG-231",
+    "newKey": "REG-219",
+    "name": "Consolidated Omnibus Budget Reconciliation Act (COBRA)",
+    "riskScore": 42,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 427,
+    "oldKey": "REG-232",
+    "newKey": "REG-220",
+    "name": "Employee Retirement Income Security Act of 1974 (ERISA)",
+    "riskScore": 42,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 525,
+    "oldKey": "REG-233",
+    "newKey": "REG-221",
+    "name": "Medicare, Medicaid, and SCHIP Extension Act of 2007",
+    "riskScore": 42,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 555,
+    "oldKey": "REG-234",
+    "newKey": "REG-222",
+    "name": "Patient Protection and Affordable Care Act",
+    "riskScore": 42,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 597,
+    "oldKey": "REG-235",
+    "newKey": "REG-223",
+    "name": "The Veterans’ Readjustment Benefits Act",
+    "riskScore": 42,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 610,
+    "oldKey": "REG-236",
+    "newKey": "REG-224",
+    "name": "Uniformed Services Employment and Reemployment Rights Act (USERRA)",
+    "riskScore": 42,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 374,
+    "oldKey": "REG-238",
+    "newKey": "REG-225",
+    "name": "Age Discrimination Employment Act of 1967",
+    "riskScore": 40,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 375,
+    "oldKey": "REG-239",
+    "newKey": "REG-226",
+    "name": "Age Discrimination in Employment Act of 1967",
+    "riskScore": 40,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 391,
+    "oldKey": "REG-240",
+    "newKey": "REG-227",
+    "name": "California Consumer Privacy Act",
+    "riskScore": 40,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 396,
+    "oldKey": "REG-241",
+    "newKey": "REG-228",
+    "name": "Civil Service Reform Act of 1978",
+    "riskScore": 40,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 462,
+    "oldKey": "REG-242",
+    "newKey": "REG-229",
+    "name": "General Data Protection Regulation",
+    "riskScore": 40,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 478,
+    "oldKey": "REG-245",
+    "newKey": "REG-230",
+    "name": "Higher Education Act: Code of Conduct",
+    "riskScore": 38,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 487,
+    "oldKey": "REG-246",
+    "newKey": "REG-231",
+    "name": "Higher Education Act: Foreign Gift and Contract Reports",
+    "riskScore": 38,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 515,
+    "oldKey": "REG-247",
+    "newKey": "REG-232",
+    "name": "Internal Revenue Code: Substantiation and Disclosure Provisions",
+    "riskScore": 38,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 561,
+    "oldKey": "REG-248",
+    "newKey": "REG-233",
+    "name": "Pension Protection Act",
+    "riskScore": 38,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 562,
+    "oldKey": "REG-249",
+    "newKey": "REG-234",
+    "name": "Philanthropy Protection Act of 1995",
+    "riskScore": 38,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 504,
+    "oldKey": "REG-250",
+    "newKey": "REG-235",
+    "name": "Higher Education Act: Textbook Informatoin",
+    "riskScore": 35,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 503,
+    "oldKey": "REG-251",
+    "newKey": "REG-236",
+    "name": "Higher Education Act: Textbook Information",
+    "riskScore": 29,
+    "riskLevel": "LOW",
+    "jurisdictionSource": "federal",
+    "stateCode": null
+  },
+  {
+    "id": 679,
+    "oldKey": "REG-252",
+    "newKey": "REG-237",
+    "name": "PA Act 55 of 2022 - Sexual Violence in Higher Ed",
+    "riskScore": null,
+    "riskLevel": null,
+    "jurisdictionSource": "state",
+    "stateCode": null
+  },
+  {
+    "id": 532,
+    "oldKey": "REG-005",
+    "newKey": "NJ-001",
+    "name": "New Jersey Campus Sex Assault Victim Bill Of Rights",
+    "riskScore": 78,
+    "riskLevel": "SEVERE",
+    "jurisdictionSource": "state",
+    "stateCode": "NJ"
+  },
+  {
+    "id": 534,
+    "oldKey": "REG-013",
+    "newKey": "NJ-002",
+    "name": "New Jersey Licensure Accreditation Standards",
+    "riskScore": 75,
+    "riskLevel": "SEVERE",
+    "jurisdictionSource": "state",
+    "stateCode": "NJ"
+  },
+  {
+    "id": 533,
+    "oldKey": "REG-024",
+    "newKey": "NJ-003",
+    "name": "New Jersey Hazing Prevention",
+    "riskScore": 72,
+    "riskLevel": "SEVERE",
+    "jurisdictionSource": "state",
+    "stateCode": "NJ"
+  },
+  {
+    "id": 536,
+    "oldKey": "REG-025",
+    "newKey": "NJ-004",
+    "name": "New Jersey Uniform Crime Reporting",
+    "riskScore": 72,
+    "riskLevel": "SEVERE",
+    "jurisdictionSource": "state",
+    "stateCode": "NJ"
+  },
+  {
+    "id": 535,
+    "oldKey": "REG-062",
+    "newKey": "NJ-005",
+    "name": "New Jersey Tuition Aid Grant Program",
+    "riskScore": 65,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "state",
+    "stateCode": "NJ"
+  },
+  {
+    "id": 537,
+    "oldKey": "REG-063",
+    "newKey": "NJ-006",
+    "name": "New Jersey Veterans Benefits Compliance",
+    "riskScore": 65,
+    "riskLevel": "HIGH",
+    "jurisdictionSource": "state",
+    "stateCode": "NJ"
+  },
+  {
+    "id": 297,
+    "oldKey": "REG-006",
+    "newKey": "PA-001",
+    "name": "Pennsylvania Sexual Violence Education Act",
+    "riskScore": 78,
+    "riskLevel": "SEVERE",
+    "jurisdictionSource": "state",
+    "stateCode": "PA"
+  },
+  {
+    "id": 559,
+    "oldKey": "REG-014",
+    "newKey": "PA-002",
+    "name": "Pennsylvania Institutional Accreditation",
+    "riskScore": 75,
+    "riskLevel": "SEVERE",
+    "jurisdictionSource": "state",
+    "stateCode": "PA"
+  },
+  {
+    "id": 296,
+    "oldKey": "REG-026",
+    "newKey": "PA-003",
+    "name": "Pennsylvania Uniform Crime Reporting Act",
+    "riskScore": 72,
+    "riskLevel": "SEVERE",
+    "jurisdictionSource": "state",
+    "stateCode": "PA"
+  },
+  {
+    "id": 298,
+    "oldKey": "REG-187",
+    "newKey": "PA-004",
+    "name": "Pennsylvania Higher Education Gift Disclosure Act",
+    "riskScore": 48,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "state",
+    "stateCode": "PA"
+  },
+  {
+    "id": 299,
+    "oldKey": "REG-219",
+    "newKey": "PA-005",
+    "name": "Pennsylvania English Fluency In Higher Education A",
+    "riskScore": 45,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "state",
+    "stateCode": "PA"
+  },
+  {
+    "id": 557,
+    "oldKey": "REG-220",
+    "newKey": "PA-006",
+    "name": "Pennsylvania Graduation Rates Reporting Act",
+    "riskScore": 45,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "state",
+    "stateCode": "PA"
+  },
+  {
+    "id": 558,
+    "oldKey": "REG-221",
+    "newKey": "PA-007",
+    "name": "Pennsylvania Higher Education Standards",
+    "riskScore": 45,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "state",
+    "stateCode": "PA"
+  },
+  {
+    "id": 560,
+    "oldKey": "REG-244",
+    "newKey": "PA-008",
+    "name": "Pennsylvania Student Consumer Protection",
+    "riskScore": 40,
+    "riskLevel": "MODERATE",
+    "jurisdictionSource": "state",
+    "stateCode": "PA"
+  }
+]

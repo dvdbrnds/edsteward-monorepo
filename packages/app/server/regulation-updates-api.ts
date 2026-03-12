@@ -486,8 +486,18 @@ async function lookupRegulationByRegKey(regKey: string, tenantId?: string): Prom
     return null;
   }
   
-  // Normalize the reg_key format (accept REG-001, REG-1, reg-001, etc.)
-  const normalizedKey = regKey.toUpperCase().replace(/REG-0*(\d+)/, 'REG-$1').replace(/REG-(\d)$/, 'REG-00$1').replace(/REG-(\d\d)$/, 'REG-0$1');
+  // Normalize the reg_key format.
+  // Accepts: REG-001, REG-1, reg-001, PA-1, pa-001, NJ-3, etc.
+  const upper = regKey.toUpperCase();
+  const match = upper.match(/^([A-Z]{2,3})-0*(\d+)$/);
+  let normalizedKey: string;
+  if (match) {
+    const prefix = match[1];
+    const num = match[2].padStart(3, '0');
+    normalizedKey = `${prefix}-${num}`;
+  } else {
+    normalizedKey = upper;
+  }
   
   try {
     const storage = getDatabaseStorage(tenantId);
@@ -519,8 +529,8 @@ async function resolveRegulationId(identifier: number | string, regKey?: string,
     if (regKeyResult) return regKeyResult;
   }
   
-  // Priority 2: Check if identifier itself is a reg_key
-  if (typeof identifier === 'string' && identifier.toUpperCase().startsWith('REG-')) {
+  // Priority 2: Check if identifier itself is a reg_key (REG-XXX, PA-XXX, NJ-XXX, etc.)
+  if (typeof identifier === 'string' && /^[A-Za-z]{2,3}-\d+$/i.test(identifier)) {
     const regKeyResult = await lookupRegulationByRegKey(identifier, tenantId);
     if (regKeyResult) return regKeyResult;
   }

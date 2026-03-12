@@ -36,6 +36,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { useLegacyBranding } from "@/hooks/use-branding";
 import { useTheme } from "@/hooks/use-theme";
+import { useNotificationBadges } from "@/hooks/use-notification-badges";
 import { FULL_VERSION } from "@/lib/version";
 
 // TUF component removed - deprecated system
@@ -58,6 +59,7 @@ export default function Navigation() {
   const [location] = useLocation();
   const branding = useLegacyBranding();
   const { resolvedTheme, toggleTheme } = useTheme();
+  const badges = useNotificationBadges();
   
   // Tenant detection for AWS management visibility
   const [_currentTenant, setCurrentTenant] = useState<string | null>(null);
@@ -91,12 +93,12 @@ export default function Navigation() {
   });
 
   const links = [
-    { href: "/", label: "Dashboard", icon: LayoutDashboard },
-    { href: "/analytics", label: "Analytics", icon: BarChart3 },
-    { href: "/notifications", label: "Notifications", icon: Bell },
+    { href: "/", label: "Dashboard", icon: LayoutDashboard, badge: badges.totalUrgent },
+    { href: "/analytics", label: "Analytics", icon: BarChart3, badge: 0 },
+    { href: "/notifications", label: "Notifications", icon: Bell, badge: badges.overdueAlerts },
     ...(user?.role?.toLowerCase() === "admin" || user?.role?.toLowerCase() === "compliance_officer"
       ? [
-        { href: "/regulations/updates", label: "Regulation Updates", icon: FileText },
+        { href: "/regulations/updates", label: "Regulation Updates", icon: FileText, badge: badges.pendingUpdates },
       ]
       : []),
     ...(user?.role?.toLowerCase() === "admin"
@@ -106,9 +108,9 @@ export default function Navigation() {
         //   ? [{ href: "/admin/dashboard", label: "Admin Dashboard", icon: LayoutDashboard }]
         //   : []
         // ),
-        { href: "/admin/settings", label: "System Settings", icon: Settings },
-        { href: "/executive-orders", label: "Executive Orders", icon: FileText },
-        { href: "/audit-trail", label: "Audit Trail", icon: Shield },
+        { href: "/admin/settings", label: "System Settings", icon: Settings, badge: 0 },
+        { href: "/executive-orders", label: "Executive Orders", icon: FileText, badge: 0 },
+        { href: "/audit-trail", label: "Audit Trail", icon: Shield, badge: 0 },
         // AWS Tenant Management - DISABLED
         // ...(currentTenant === 'admin' 
         //   ? [{ href: "/admin/aws-tenant-management", label: "AWS Tenant Management", icon: Server }]
@@ -171,10 +173,15 @@ export default function Navigation() {
                         className={`${isActive
                           ? "text-white border-b-2 border-white"
                           : "text-gray-300 hover:text-white hover:border-b-2 hover:border-border"
-                          } flex items-center space-x-2 rounded-none px-2 h-16 whitespace-nowrap`}
+                          } relative flex items-center space-x-2 rounded-none px-2 h-16 whitespace-nowrap`}
                       >
                         <Icon className="h-4 w-4" />
                         <span>{link.label}</span>
+                        {link.badge > 0 && (
+                          <span className="absolute -top-0.5 -right-1 flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[11px] font-bold leading-none text-white bg-red-500 rounded-full shadow-sm">
+                            {link.badge > 99 ? "99+" : link.badge}
+                          </span>
+                        )}
                       </Button>
                     </Link>
                   );
@@ -294,6 +301,11 @@ export default function Navigation() {
                   >
                     <Icon className="h-5 w-5 mr-3" />
                     {link.label}
+                    {link.badge > 0 && (
+                      <span className="ml-auto flex items-center justify-center min-w-[20px] h-[20px] px-1.5 text-xs font-bold leading-none text-white bg-red-500 rounded-full">
+                        {link.badge > 99 ? "99+" : link.badge}
+                      </span>
+                    )}
                   </button>
                 </Link>
               );

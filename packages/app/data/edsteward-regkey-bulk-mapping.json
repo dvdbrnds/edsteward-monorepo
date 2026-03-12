@@ -42,7 +42,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-004",
+    "regKey": "REG-003",
     "mcpDbId": 256,
     "itemId": "family-educational-rights-and-privacy-act-ferpa",
     "name": "Family Educational Rights and Privacy Act (FERPA)",
@@ -56,35 +56,7 @@
     "edstewardId": 223
   },
   {
-    "regKey": "REG-005",
-    "mcpDbId": 326,
-    "itemId": "new-jersey-campus-sex-assault-victim-bill-of-rights",
-    "name": "New Jersey Campus Sex Assault Victim Bill Of Rights",
-    "statute": "N.J.S.A. 18A:61E-1 et seq.",
-    "category": "Sexual Misconduct",
-    "topic": "Sexual Misconduct",
-    "jurisdictionSource": "state",
-    "stateCode": "NJ",
-    "riskScore": 78,
-    "riskLevel": "SEVERE",
-    "edstewardId": null
-  },
-  {
-    "regKey": "REG-006",
-    "mcpDbId": 323,
-    "itemId": "pennsylvania-sexual-violence-education-act",
-    "name": "Pennsylvania Sexual Violence Education Act",
-    "statute": "24 P.S. § 20-2001 et seq. (Act 16 of 2014)",
-    "category": "Sexual Misconduct",
-    "topic": "Sexual Misconduct",
-    "jurisdictionSource": "state",
-    "stateCode": "PA",
-    "riskScore": 78,
-    "riskLevel": "SEVERE",
-    "edstewardId": null
-  },
-  {
-    "regKey": "REG-007",
+    "regKey": "REG-004",
     "mcpDbId": 60,
     "itemId": "campus-sex-crimes-prevention-act-1601-of-the-victi",
     "name": "Campus Sex Crimes Prevention Act (§ 1601 of the Victims of Trafficking and Violence Protection Act of 2000)",
@@ -98,7 +70,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-008",
+    "regKey": "REG-005",
     "mcpDbId": 30,
     "itemId": "title-vi-of-the-civil-rights-act-of-1964",
     "name": "Title VI of the Civil Rights Act of 1964",
@@ -112,7 +84,7 @@
     "edstewardId": 8
   },
   {
-    "regKey": "REG-009",
+    "regKey": "REG-006",
     "mcpDbId": 69,
     "itemId": "title-vi-of-the-civil-rights-act-of-1964-42-u-s-c-",
     "name": "Title VI of the Civil Rights Act of 1964  42 U.S.C. §§ 2000d-2000d-7",
@@ -126,7 +98,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-010",
+    "regKey": "REG-007",
     "mcpDbId": 103,
     "itemId": "title-vii-of-the-civil-rights-act-of-1964",
     "name": "Title VII of the Civil Rights Act of 1964",
@@ -140,7 +112,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-011",
+    "regKey": "REG-008",
     "mcpDbId": 212,
     "itemId": "false-claims-act",
     "name": "False Claims Act",
@@ -154,7 +126,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-012",
+    "regKey": "REG-009",
     "mcpDbId": 48,
     "itemId": "higher-education-act-recognition-of-accrediting-ag",
     "name": "Higher Education Act: Recognition of Accrediting Agency or Association",
@@ -168,35 +140,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-013",
-    "mcpDbId": 328,
-    "itemId": "new-jersey-licensure-accreditation-standards",
-    "name": "New Jersey Licensure Accreditation Standards",
-    "statute": "N.J.A.C. 9A:1-1 et seq.",
-    "category": "Accreditation",
-    "topic": "Accreditation",
-    "jurisdictionSource": "state",
-    "stateCode": "NJ",
-    "riskScore": 75,
-    "riskLevel": "SEVERE",
-    "edstewardId": null
-  },
-  {
-    "regKey": "REG-014",
-    "mcpDbId": 322,
-    "itemId": "pennsylvania-institutional-accreditation",
-    "name": "Pennsylvania Institutional Accreditation",
-    "statute": "22 Pa. Code § 31.21",
-    "category": "Accreditation",
-    "topic": "Accreditation",
-    "jurisdictionSource": "state",
-    "stateCode": "PA",
-    "riskScore": 75,
-    "riskLevel": "SEVERE",
-    "edstewardId": null
-  },
-  {
-    "regKey": "REG-015",
+    "regKey": "REG-010",
     "mcpDbId": 59,
     "itemId": "americans-with-disabilities-act",
     "name": "Americans with Disabilities Act",
@@ -210,7 +154,7 @@
     "edstewardId": 2
   },
   {
-    "regKey": "REG-016",
+    "regKey": "REG-011",
     "mcpDbId": 24,
     "itemId": "americans-with-disabilities-act-of-1990",
     "name": "Americans with Disabilities Act of 1990",
@@ -224,7 +168,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-017",
+    "regKey": "REG-012",
     "mcpDbId": 55,
     "itemId": "equity-in-athletics-disclosure-act-eada",
     "name": "Equity in Athletics Disclosure Act (EADA)",
@@ -238,7 +182,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-018",
+    "regKey": "REG-013",
     "mcpDbId": 28,
     "itemId": "section-504-of-the-rehabilitation-act-of-1973",
     "name": "Section 504 of The Rehabilitation Act of 1973",
@@ -252,7 +196,7 @@
     "edstewardId": 6
   },
   {
-    "regKey": "REG-019",
+    "regKey": "REG-014",
     "mcpDbId": 62,
     "itemId": "emergency-planning-and-community-right-to-know-act",
     "name": "Emergency Planning and Community Right to Know Act (EPCRA)",
@@ -266,7 +210,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-020",
+    "regKey": "REG-015",
     "mcpDbId": 217,
     "itemId": "hipaa",
     "name": "HIPAA",
@@ -280,7 +224,7 @@
     "edstewardId": 76
   },
   {
-    "regKey": "REG-021",
+    "regKey": "REG-016",
     "mcpDbId": 333,
     "itemId": "health-insurance-portability-and-accountability-act",
     "name": "Health Insurance Portability and Accountability Act",
@@ -294,7 +238,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-022",
+    "regKey": "REG-017",
     "mcpDbId": 76,
     "itemId": "health-insurance-portability-and-accountability-ac",
     "name": "Health Insurance Portability and Accountability Act",
@@ -308,7 +252,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-023",
+    "regKey": "REG-018",
     "mcpDbId": 63,
     "itemId": "higher-education-act-drug-and-alcohol-abuse-preven",
     "name": "Higher Education Act: Drug and Alcohol Abuse Prevention",
@@ -322,119 +266,7 @@
     "edstewardId": 67
   },
   {
-    "regKey": "REG-024",
-    "mcpDbId": 327,
-    "itemId": "new-jersey-hazing-prevention",
-    "name": "New Jersey Hazing Prevention",
-    "statute": "N.J.S.A. 2C:40-3 et seq.",
-    "category": "Campus Safety",
-    "topic": "Campus Safety",
-    "jurisdictionSource": "state",
-    "stateCode": "NJ",
-    "riskScore": 72,
-    "riskLevel": "SEVERE",
-    "edstewardId": null
-  },
-  {
-    "regKey": "REG-025",
-    "mcpDbId": 330,
-    "itemId": "new-jersey-uniform-crime-reporting",
-    "name": "New Jersey Uniform Crime Reporting",
-    "statute": "N.J.S.A. 52:17B-5",
-    "category": "Campus Safety",
-    "topic": "Campus Safety",
-    "jurisdictionSource": "state",
-    "stateCode": "NJ",
-    "riskScore": 72,
-    "riskLevel": "SEVERE",
-    "edstewardId": null
-  },
-  {
-    "regKey": "REG-026",
-    "mcpDbId": 325,
-    "itemId": "pennsylvania-uniform-crime-reporting-act",
-    "name": "Pennsylvania Uniform Crime Reporting Act",
-    "statute": "18 Pa.C.S. § 9101 et seq.",
-    "category": "Campus Safety",
-    "topic": "Campus Safety",
-    "jurisdictionSource": "state",
-    "stateCode": "PA",
-    "riskScore": 72,
-    "riskLevel": "SEVERE",
-    "edstewardId": null
-  },
-  {
-    "regKey": "REG-027",
-    "mcpDbId": 252,
-    "itemId": "children-s-online-privacy-protection-act-of-1998-c",
-    "name": "Children’s Online Privacy Protection Act of 1998 (COPPA)",
-    "statute": "15 U.S.C. §  6501",
-    "category": "Privacy & Information Security",
-    "topic": "Privacy & Information Security",
-    "jurisdictionSource": "federal",
-    "stateCode": null,
-    "riskScore": 68,
-    "riskLevel": "HIGH",
-    "edstewardId": null
-  },
-  {
-    "regKey": "REG-028",
-    "mcpDbId": 253,
-    "itemId": "electronic-communications-privacy-act",
-    "name": "Electronic Communications Privacy Act",
-    "statute": "18 U.S.C. §§ 2510-2523 (Wiretap); 18 U.S.C. §§ 2701-2713 (Stored Communications)",
-    "category": "Privacy & Information Security",
-    "topic": "Privacy & Information Security",
-    "jurisdictionSource": "federal",
-    "stateCode": null,
-    "riskScore": 68,
-    "riskLevel": "HIGH",
-    "edstewardId": null
-  },
-  {
-    "regKey": "REG-029",
-    "mcpDbId": 255,
-    "itemId": "fair-and-accurate-credit-transaction-act-facta",
-    "name": "Fair and Accurate Credit Transaction Act (FACTA)",
-    "statute": "Public Law No. 108-159",
-    "category": "Privacy & Information Security",
-    "topic": "Privacy & Information Security",
-    "jurisdictionSource": "federal",
-    "stateCode": null,
-    "riskScore": 68,
-    "riskLevel": "HIGH",
-    "edstewardId": null
-  },
-  {
-    "regKey": "REG-030",
-    "mcpDbId": 257,
-    "itemId": "federal-information-security-management-act-fisma",
-    "name": "Federal Information Security Management Act (FISMA)",
-    "statute": "44 U.S.C. § 35",
-    "category": "Privacy & Information Security",
-    "topic": "Privacy & Information Security",
-    "jurisdictionSource": "federal",
-    "stateCode": null,
-    "riskScore": 68,
-    "riskLevel": "HIGH",
-    "edstewardId": null
-  },
-  {
-    "regKey": "REG-031",
-    "mcpDbId": 258,
-    "itemId": "freedom-of-information-act",
-    "name": "Freedom of Information Act",
-    "statute": "5 U.S.C. § 552",
-    "category": "Privacy & Information Security",
-    "topic": "Privacy & Information Security",
-    "jurisdictionSource": "federal",
-    "stateCode": null,
-    "riskScore": 68,
-    "riskLevel": "HIGH",
-    "edstewardId": null
-  },
-  {
-    "regKey": "REG-032",
+    "regKey": "REG-019",
     "mcpDbId": 259,
     "itemId": "gramm-leach-bliley-act-glba",
     "name": "Gramm Leach Bliley Act (GLBA)",
@@ -448,7 +280,77 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-033",
+    "regKey": "REG-020",
+    "mcpDbId": 216,
+    "itemId": "controlled-substances-act",
+    "name": "Controlled Substances Act",
+    "statute": "21 U.S.C. §§ 801-889",
+    "category": "Health Care and Insurance",
+    "topic": "Health Care and Insurance",
+    "jurisdictionSource": "federal",
+    "stateCode": null,
+    "riskScore": 55,
+    "riskLevel": "HIGH",
+    "edstewardId": null
+  },
+  {
+    "regKey": "REG-021",
+    "mcpDbId": 61,
+    "itemId": "drug-free-schools-and-communities-act",
+    "name": "Drug Free Schools and Communities Act",
+    "statute": "20 U.S.C. § 1011i",
+    "category": "Campus Safety",
+    "topic": "Campus Safety",
+    "jurisdictionSource": "federal",
+    "stateCode": null,
+    "riskScore": 52,
+    "riskLevel": "HIGH",
+    "edstewardId": null
+  },
+  {
+    "regKey": "REG-022",
+    "mcpDbId": 252,
+    "itemId": "children-s-online-privacy-protection-act-of-1998-c",
+    "name": "Children’s Online Privacy Protection Act of 1998 (COPPA)",
+    "statute": "15 U.S.C. §  6501",
+    "category": "Privacy & Information Security",
+    "topic": "Privacy & Information Security",
+    "jurisdictionSource": "federal",
+    "stateCode": null,
+    "riskScore": 68,
+    "riskLevel": "HIGH",
+    "edstewardId": null
+  },
+  {
+    "regKey": "REG-023",
+    "mcpDbId": 255,
+    "itemId": "fair-and-accurate-credit-transaction-act-facta",
+    "name": "Fair and Accurate Credit Transaction Act (FACTA)",
+    "statute": "Public Law No. 108-159",
+    "category": "Privacy & Information Security",
+    "topic": "Privacy & Information Security",
+    "jurisdictionSource": "federal",
+    "stateCode": null,
+    "riskScore": 68,
+    "riskLevel": "HIGH",
+    "edstewardId": null
+  },
+  {
+    "regKey": "REG-024",
+    "mcpDbId": 258,
+    "itemId": "freedom-of-information-act",
+    "name": "Freedom of Information Act",
+    "statute": "5 U.S.C. § 552",
+    "category": "Privacy & Information Security",
+    "topic": "Privacy & Information Security",
+    "jurisdictionSource": "federal",
+    "stateCode": null,
+    "riskScore": 68,
+    "riskLevel": "HIGH",
+    "edstewardId": null
+  },
+  {
+    "regKey": "REG-025",
     "mcpDbId": 261,
     "itemId": "health-information-technology-for-economic-and-cli",
     "name": "Health Information Technology for Economic and Clinical Health (HITECH) Act of 2009",
@@ -462,7 +364,63 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-034",
+    "regKey": "REG-026",
+    "mcpDbId": 314,
+    "itemId": "fair-labor-standards-act-flsa",
+    "name": "Fair Labor Standards Act (FLSA)",
+    "statute": "29 U.S.C. §§ 201-219",
+    "category": "Wages",
+    "topic": "Wages",
+    "jurisdictionSource": "federal",
+    "stateCode": null,
+    "riskScore": 48,
+    "riskLevel": "MODERATE",
+    "edstewardId": null
+  },
+  {
+    "regKey": "REG-027",
+    "mcpDbId": 111,
+    "itemId": "equal-pay-act-of-1963",
+    "name": "Equal Pay Act of 1963",
+    "statute": "29 U.S.C. § 206(d)",
+    "category": "Diversity/Affirmative Action",
+    "topic": "Diversity/Affirmative Action",
+    "jurisdictionSource": "federal",
+    "stateCode": null,
+    "riskScore": 55,
+    "riskLevel": "HIGH",
+    "edstewardId": null
+  },
+  {
+    "regKey": "REG-028",
+    "mcpDbId": 130,
+    "itemId": "clean-air-act",
+    "name": "Clean Air Act",
+    "statute": "42 U.S.C. §§ 7401-7671q",
+    "category": "Environmental Health and Safety",
+    "topic": "Environmental Health and Safety",
+    "jurisdictionSource": "federal",
+    "stateCode": null,
+    "riskScore": 52,
+    "riskLevel": "HIGH",
+    "edstewardId": null
+  },
+  {
+    "regKey": "REG-029",
+    "mcpDbId": 131,
+    "itemId": "clean-water-act",
+    "name": "Clean Water Act",
+    "statute": "33 U.S.C. §§ 1251-1387",
+    "category": "Environmental Health and Safety",
+    "topic": "Environmental Health and Safety",
+    "jurisdictionSource": "federal",
+    "stateCode": null,
+    "riskScore": 52,
+    "riskLevel": "HIGH",
+    "edstewardId": null
+  },
+  {
+    "regKey": "REG-030",
     "mcpDbId": 169,
     "itemId": "arms-export-control-act-of-1976",
     "name": "Arms Export Control Act of 1976",
@@ -476,7 +434,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-035",
+    "regKey": "REG-031",
     "mcpDbId": 175,
     "itemId": "contracts-with-third-party-servicers",
     "name": "Contracts with Third Party Servicers",
@@ -490,7 +448,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-036",
+    "regKey": "REG-032",
     "mcpDbId": 241,
     "itemId": "cooperative-research-and-technology-enhancement-ac",
     "name": "Cooperative Research and Technology Enhancement Act (CREATE Act)",
@@ -504,7 +462,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-037",
+    "regKey": "REG-033",
     "mcpDbId": 170,
     "itemId": "export-administration-act-of-1979",
     "name": "Export Administration Act of 1979",
@@ -518,21 +476,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-038",
-    "mcpDbId": 277,
-    "itemId": "export-administration-regulations",
-    "name": "Export Administration Regulations",
-    "statute": "15 CFR Parts 730-774 (EAR)",
-    "category": "Research",
-    "topic": "Research",
-    "jurisdictionSource": "federal",
-    "stateCode": null,
-    "riskScore": 65,
-    "riskLevel": "HIGH",
-    "edstewardId": null
-  },
-  {
-    "regKey": "REG-039",
+    "regKey": "REG-034",
     "mcpDbId": 171,
     "itemId": "foreign-assets-control-regulations",
     "name": "Foreign Assets Control Regulations",
@@ -546,7 +490,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-040",
+    "regKey": "REG-035",
     "mcpDbId": 176,
     "itemId": "higher-education-act-aid-application-verification",
     "name": "Higher Education Act: Aid Application Verification",
@@ -560,7 +504,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-041",
+    "regKey": "REG-036",
     "mcpDbId": 177,
     "itemId": "higher-education-act-audits",
     "name": "Higher Education Act: Audits",
@@ -574,7 +518,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-042",
+    "regKey": "REG-037",
     "mcpDbId": 178,
     "itemId": "higher-education-act-borrower-defense-to-repayment",
     "name": "Higher Education Act: Borrower Defense to Repayment",
@@ -588,7 +532,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-043",
+    "regKey": "REG-038",
     "mcpDbId": 179,
     "itemId": "higher-education-act-cash-management",
     "name": "Higher Education Act: Cash Management",
@@ -602,7 +546,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-044",
+    "regKey": "REG-039",
     "mcpDbId": 181,
     "itemId": "higher-education-act-cohort-default-rate",
     "name": "Higher Education Act: Cohort Default Rate",
@@ -616,7 +560,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-045",
+    "regKey": "REG-040",
     "mcpDbId": 182,
     "itemId": "higher-education-act-eligibility-and-certification",
     "name": "Higher Education Act: Eligibility and Certification",
@@ -630,7 +574,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-046",
+    "regKey": "REG-041",
     "mcpDbId": 183,
     "itemId": "higher-education-act-entrance-and-exit-counseling",
     "name": "Higher Education Act: Entrance and Exit Counseling",
@@ -644,7 +588,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-047",
+    "regKey": "REG-042",
     "mcpDbId": 184,
     "itemId": "higher-education-act-federal-supplemental-educatio",
     "name": "Higher Education Act: Federal Supplemental Educational Opportunity Grant Program",
@@ -658,7 +602,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-048",
+    "regKey": "REG-043",
     "mcpDbId": 185,
     "itemId": "higher-education-act-federal-work-study",
     "name": "Higher Education Act: Federal Work Study",
@@ -672,7 +616,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-049",
+    "regKey": "REG-044",
     "mcpDbId": 186,
     "itemId": "higher-education-act-financial-responsibility-requ",
     "name": "Higher Education Act: Financial Responsibility Requirements",
@@ -686,7 +630,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-050",
+    "regKey": "REG-045",
     "mcpDbId": 187,
     "itemId": "higher-education-act-information-distributed-to-st",
     "name": "Higher Education Act: Information Distributed to Students",
@@ -700,7 +644,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-051",
+    "regKey": "REG-046",
     "mcpDbId": 188,
     "itemId": "higher-education-act-net-price-calculator",
     "name": "Higher Education Act: Net Price Calculator",
@@ -714,7 +658,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-052",
+    "regKey": "REG-047",
     "mcpDbId": 189,
     "itemId": "higher-education-act-plus-loans",
     "name": "Higher Education Act: PLUS Loans",
@@ -728,7 +672,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-053",
+    "regKey": "REG-048",
     "mcpDbId": 190,
     "itemId": "higher-education-act-penalties-for-drug-violations",
     "name": "Higher Education Act: Penalties for Drug Violations",
@@ -742,7 +686,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-054",
+    "regKey": "REG-049",
     "mcpDbId": 191,
     "itemId": "higher-education-act-perkins-loans",
     "name": "Higher Education Act: Perkins Loans",
@@ -756,7 +700,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-055",
+    "regKey": "REG-050",
     "mcpDbId": 192,
     "itemId": "higher-education-act-preferred-lenders",
     "name": "Higher Education Act: Preferred Lenders",
@@ -770,7 +714,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-056",
+    "regKey": "REG-051",
     "mcpDbId": 66,
     "itemId": "higher-education-act-program-participation-agreeme",
     "name": "Higher Education Act: Program Participation Agreements",
@@ -784,7 +728,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-057",
+    "regKey": "REG-052",
     "mcpDbId": 194,
     "itemId": "higher-education-act-record-retention",
     "name": "Higher Education Act: Record Retention",
@@ -798,7 +742,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-058",
+    "regKey": "REG-053",
     "mcpDbId": 195,
     "itemId": "higher-education-act-standard-of-conduct",
     "name": "Higher Education Act: Standard of Conduct",
@@ -812,7 +756,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-059",
+    "regKey": "REG-054",
     "mcpDbId": 172,
     "itemId": "international-emergency-economic-powers-act",
     "name": "International Emergency Economic Powers Act",
@@ -826,21 +770,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-060",
-    "mcpDbId": 173,
-    "itemId": "international-traffic-in-arms-regulations-itar",
-    "name": "International Traffic in Arms Regulations (ITAR)",
-    "statute": "22 U.S.C. § 2778",
-    "category": "Export Controls",
-    "topic": "Export Controls",
-    "jurisdictionSource": "federal",
-    "stateCode": null,
-    "riskScore": 65,
-    "riskLevel": "HIGH",
-    "edstewardId": null
-  },
-  {
-    "regKey": "REG-061",
+    "regKey": "REG-055",
     "mcpDbId": 279,
     "itemId": "national-science-foundation-research-misconduct-po",
     "name": "National Science Foundation Research Misconduct Policies",
@@ -854,35 +784,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-062",
-    "mcpDbId": 329,
-    "itemId": "new-jersey-tuition-aid-grant-program",
-    "name": "New Jersey Tuition Aid Grant Program",
-    "statute": "N.J.A.C. 9A:9-2",
-    "category": "Financial Aid",
-    "topic": "Financial Aid",
-    "jurisdictionSource": "state",
-    "stateCode": "NJ",
-    "riskScore": 65,
-    "riskLevel": "HIGH",
-    "edstewardId": null
-  },
-  {
-    "regKey": "REG-063",
-    "mcpDbId": 331,
-    "itemId": "new-jersey-veterans-benefits-compliance",
-    "name": "New Jersey Veterans Benefits Compliance",
-    "statute": "N.J.S.A. 18A:62-6",
-    "category": "Financial Aid",
-    "topic": "Financial Aid",
-    "jurisdictionSource": "state",
-    "stateCode": "NJ",
-    "riskScore": 65,
-    "riskLevel": "HIGH",
-    "edstewardId": null
-  },
-  {
-    "regKey": "REG-064",
+    "regKey": "REG-056",
     "mcpDbId": 166,
     "itemId": "outside-earned-income-and-activities",
     "name": "Outside Earned Income and Activities",
@@ -896,7 +798,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-065",
+    "regKey": "REG-057",
     "mcpDbId": 282,
     "itemId": "public-health-service-policies-on-research-miscond",
     "name": "Public Health Service Policies on Research Misconduct",
@@ -910,7 +812,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-066",
+    "regKey": "REG-058",
     "mcpDbId": 283,
     "itemId": "responsibility-of-applicants-for-promoting-objecti",
     "name": "Responsibility of Applicants for Promoting Objectivity in Research for which PHS Funding is Sought",
@@ -924,7 +826,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-067",
+    "regKey": "REG-059",
     "mcpDbId": 197,
     "itemId": "student-loan-default-prevention-initiative-act-of-",
     "name": "Student Loan Default Prevention Initiative Act of 1990",
@@ -938,7 +840,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-068",
+    "regKey": "REG-060",
     "mcpDbId": 198,
     "itemId": "student-right-to-know-act",
     "name": "Student Right to Know Act",
@@ -952,7 +854,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-069",
+    "regKey": "REG-061",
     "mcpDbId": 31,
     "itemId": "teacher-preparation-programs",
     "name": "Teacher Preparation Programs",
@@ -966,7 +868,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-070",
+    "regKey": "REG-062",
     "mcpDbId": 174,
     "itemId": "trading-with-the-enemy-act-of-1917",
     "name": "Trading with the Enemy Act of 1917",
@@ -980,7 +882,49 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-071",
+    "regKey": "REG-063",
+    "mcpDbId": 23,
+    "itemId": "age-discrimination-act-of-1975",
+    "name": "Age Discrimination Act of 1975",
+    "statute": "42 U.S.C. §§ 6101-6107",
+    "category": "Diversity/Affirmative Action",
+    "topic": "Diversity/Affirmative Action",
+    "jurisdictionSource": "federal",
+    "stateCode": null,
+    "riskScore": 40,
+    "riskLevel": "MODERATE",
+    "edstewardId": null
+  },
+  {
+    "regKey": "REG-064",
+    "mcpDbId": 277,
+    "itemId": "export-administration-regulations",
+    "name": "Export Administration Regulations",
+    "statute": "15 CFR Parts 730-774 (EAR)",
+    "category": "Research",
+    "topic": "Research",
+    "jurisdictionSource": "federal",
+    "stateCode": null,
+    "riskScore": 65,
+    "riskLevel": "HIGH",
+    "edstewardId": null
+  },
+  {
+    "regKey": "REG-065",
+    "mcpDbId": 173,
+    "itemId": "international-traffic-in-arms-regulations-itar",
+    "name": "International Traffic in Arms Regulations (ITAR)",
+    "statute": "22 U.S.C. § 2778",
+    "category": "Export Controls",
+    "topic": "Export Controls",
+    "jurisdictionSource": "federal",
+    "stateCode": null,
+    "riskScore": 65,
+    "riskLevel": "HIGH",
+    "edstewardId": null
+  },
+  {
+    "regKey": "REG-066",
     "mcpDbId": 90,
     "itemId": "fair-housing-act-section-6",
     "name": "Fair Housing Act, Section 6",
@@ -994,7 +938,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-072",
+    "regKey": "REG-067",
     "mcpDbId": 91,
     "itemId": "patient-protection-and-affordable-care-act-section",
     "name": "Patient Protection and Affordable Care Act (Section 1557)",
@@ -1008,7 +952,21 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-073",
+    "regKey": "REG-068",
+    "mcpDbId": 225,
+    "itemId": "immigration-and-nationality-act-ina",
+    "name": "Immigration and Nationality Act (INA)",
+    "statute": "8 U.S.C. §§ 1101-1537",
+    "category": "Immigration,Recruitment Hiring & Termination",
+    "topic": "Immigration,Recruitment Hiring & Termination",
+    "jurisdictionSource": "federal",
+    "stateCode": null,
+    "riskScore": 50,
+    "riskLevel": "HIGH",
+    "edstewardId": null
+  },
+  {
+    "regKey": "REG-069",
     "mcpDbId": 96,
     "itemId": "equal-employment-opportunity",
     "name": "Equal Employment Opportunity",
@@ -1022,7 +980,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-074",
+    "regKey": "REG-070",
     "mcpDbId": 262,
     "itemId": "higher-education-act-financial-value-transparency-",
     "name": "Higher Education Act Financial Value Transparency & Gainful Employment",
@@ -1036,7 +994,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-075",
+    "regKey": "REG-071",
     "mcpDbId": 105,
     "itemId": "pregnant-workers-fairness-act-pwfa",
     "name": "Pregnant Workers Fairness Act (PWFA)",
@@ -1050,7 +1008,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-076",
+    "regKey": "REG-072",
     "mcpDbId": 100,
     "itemId": "the-equal-pay-act-of-1963",
     "name": "The Equal Pay Act of 1963",
@@ -1064,7 +1022,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-077",
+    "regKey": "REG-073",
     "mcpDbId": 93,
     "itemId": "the-family-and-medical-leave-act-of-1993",
     "name": "The Family and Medical Leave Act of 1993",
@@ -1078,7 +1036,77 @@
     "edstewardId": null
   },
   {
+    "regKey": "REG-074",
+    "mcpDbId": 81,
+    "itemId": "copyright-act",
+    "name": "Copyright Act",
+    "statute": "17 U.S.C. §§ 101-1332",
+    "category": "Copyright & Trademark",
+    "topic": "Copyright & Trademark",
+    "jurisdictionSource": "federal",
+    "stateCode": null,
+    "riskScore": 45,
+    "riskLevel": "MODERATE",
+    "edstewardId": null
+  },
+  {
+    "regKey": "REG-075",
+    "mcpDbId": 74,
+    "itemId": "davis-bacon-act",
+    "name": "Davis-Bacon Act",
+    "statute": "40 U.S.C. §§ 3141- 3144, 3146, 3147",
+    "category": "Contracts & Procurement",
+    "topic": "Contracts & Procurement",
+    "jurisdictionSource": "federal",
+    "stateCode": null,
+    "riskScore": 45,
+    "riskLevel": "MODERATE",
+    "edstewardId": null
+  },
+  {
+    "regKey": "REG-076",
+    "mcpDbId": 83,
+    "itemId": "digital-millennium-copyright-act-dmca",
+    "name": "Digital Millennium Copyright Act (DMCA)",
+    "statute": "Public Law 105-304",
+    "category": "Information Technology",
+    "topic": "Information Technology",
+    "jurisdictionSource": "federal",
+    "stateCode": null,
+    "riskScore": 45,
+    "riskLevel": "MODERATE",
+    "edstewardId": null
+  },
+  {
+    "regKey": "REG-077",
+    "mcpDbId": 269,
+    "itemId": "employee-polygraph-protection-act",
+    "name": "Employee Polygraph Protection Act",
+    "statute": "29 U.S.C. §§ 2001-2009",
+    "category": "Recruitment Hiring & Termination",
+    "topic": "Recruitment Hiring & Termination",
+    "jurisdictionSource": "federal",
+    "stateCode": null,
+    "riskScore": 45,
+    "riskLevel": "MODERATE",
+    "edstewardId": null
+  },
+  {
     "regKey": "REG-078",
+    "mcpDbId": 312,
+    "itemId": "national-labor-relations-act",
+    "name": "National Labor Relations Act",
+    "statute": "29 U.S.C. § 151 et seq.",
+    "category": "Unions",
+    "topic": "Unions",
+    "jurisdictionSource": "federal",
+    "stateCode": null,
+    "riskScore": 40,
+    "riskLevel": "MODERATE",
+    "edstewardId": null
+  },
+  {
+    "regKey": "REG-079",
     "mcpDbId": 274,
     "itemId": "america-competes-act",
     "name": "America COMPETES Act",
@@ -1092,7 +1120,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-079",
+    "regKey": "REG-080",
     "mcpDbId": 275,
     "itemId": "animal-welfare-act",
     "name": "Animal Welfare Act",
@@ -1106,7 +1134,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-080",
+    "regKey": "REG-081",
     "mcpDbId": 276,
     "itemId": "clinical-trials-financial-disclosures-by-investiga",
     "name": "Clinical Trials § Financial Disclosures by Investigator",
@@ -1120,7 +1148,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-081",
+    "regKey": "REG-082",
     "mcpDbId": 278,
     "itemId": "food-and-drug-administration-fda-amendments-act-of",
     "name": "Food and Drug Administration (FDA) Amendments Act of 2007",
@@ -1134,7 +1162,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-082",
+    "regKey": "REG-083",
     "mcpDbId": 263,
     "itemId": "higher-education-act-credit-hour-definition",
     "name": "Higher Education Act: Credit Hour Definition",
@@ -1148,7 +1176,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-083",
+    "regKey": "REG-084",
     "mcpDbId": 264,
     "itemId": "higher-education-act-incentive-compensation-prohib",
     "name": "Higher Education Act: Incentive Compensation Prohibition",
@@ -1162,7 +1190,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-084",
+    "regKey": "REG-085",
     "mcpDbId": 265,
     "itemId": "higher-education-act-misrepresentation",
     "name": "Higher Education Act: Misrepresentation",
@@ -1176,7 +1204,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-085",
+    "regKey": "REG-086",
     "mcpDbId": 266,
     "itemId": "higher-education-act-state-authorization",
     "name": "Higher Education Act: State Authorization",
@@ -1190,7 +1218,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-086",
+    "regKey": "REG-087",
     "mcpDbId": 280,
     "itemId": "native-american-graves-protection-and-repatriation",
     "name": "Native American Graves Protection and Repatriation Act (NAGPRA)",
@@ -1204,7 +1232,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-087",
+    "regKey": "REG-088",
     "mcpDbId": 144,
     "itemId": "osha",
     "name": "OSHA",
@@ -1218,7 +1246,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-088",
+    "regKey": "REG-089",
     "mcpDbId": 145,
     "itemId": "osha-asbestos-in-construction-standard",
     "name": "OSHA Asbestos in Construction Standard",
@@ -1232,7 +1260,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-089",
+    "regKey": "REG-090",
     "mcpDbId": 146,
     "itemId": "osha-asbestos-in-general-industry-standard",
     "name": "OSHA Asbestos in General Industry Standard",
@@ -1246,7 +1274,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-090",
+    "regKey": "REG-091",
     "mcpDbId": 147,
     "itemId": "osha-enforcement-guidance-for-personal-protective-",
     "name": "OSHA Enforcement Guidance for Personal Protective Equipment (PPE) in General Industry",
@@ -1260,7 +1288,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-091",
+    "regKey": "REG-092",
     "mcpDbId": 148,
     "itemId": "osha-lead-in-construction-standard",
     "name": "OSHA Lead in Construction Standard",
@@ -1274,7 +1302,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-092",
+    "regKey": "REG-093",
     "mcpDbId": 149,
     "itemId": "osha-lead-in-general-industry-standard",
     "name": "OSHA Lead in General Industry Standard",
@@ -1288,7 +1316,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-093",
+    "regKey": "REG-094",
     "mcpDbId": 150,
     "itemId": "osha-welding-cutting-and-brazing",
     "name": "OSHA Welding, Cutting, and Brazing",
@@ -1302,7 +1330,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-094",
+    "regKey": "REG-095",
     "mcpDbId": 151,
     "itemId": "osha-bloodborne-pathogens-standard",
     "name": "OSHA – Bloodborne Pathogens Standard",
@@ -1316,7 +1344,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-095",
+    "regKey": "REG-096",
     "mcpDbId": 152,
     "itemId": "osha-s-emergency-action-plan-standard",
     "name": "OSHA’s  Emergency Action Plan Standard",
@@ -1330,7 +1358,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-096",
+    "regKey": "REG-097",
     "mcpDbId": 153,
     "itemId": "osha-s-occupational-noise-exposure-standard",
     "name": "OSHA’s  Occupational Noise Exposure Standard",
@@ -1344,7 +1372,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-097",
+    "regKey": "REG-098",
     "mcpDbId": 154,
     "itemId": "osha-s-occupational-exposure-to-hazardous-chemical",
     "name": "OSHA’s Occupational Exposure to Hazardous Chemicals in Laboratories Standard",
@@ -1358,7 +1386,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-098",
+    "regKey": "REG-099",
     "mcpDbId": 68,
     "itemId": "occupational-safety-and-health-act-of-1970",
     "name": "Occupational Safety and Health Act of 1970",
@@ -1372,7 +1400,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-099",
+    "regKey": "REG-100",
     "mcpDbId": 284,
     "itemId": "small-unmanned-aircraft-systems",
     "name": "Small Unmanned Aircraft Systems",
@@ -1382,20 +1410,6 @@
     "jurisdictionSource": "federal",
     "stateCode": null,
     "riskScore": 58,
-    "riskLevel": "HIGH",
-    "edstewardId": null
-  },
-  {
-    "regKey": "REG-100",
-    "mcpDbId": 106,
-    "itemId": "affirmative-action-equal-employment-opportunity",
-    "name": "Affirmative Action/Equal Employment Opportunity",
-    "statute": "Executive Order 11246",
-    "category": "Diversity/Affirmative Action",
-    "topic": "Diversity/Affirmative Action",
-    "jurisdictionSource": "federal",
-    "stateCode": null,
-    "riskScore": 55,
     "riskLevel": "HIGH",
     "edstewardId": null
   },
@@ -1415,20 +1429,6 @@
   },
   {
     "regKey": "REG-102",
-    "mcpDbId": 216,
-    "itemId": "controlled-substances-act",
-    "name": "Controlled Substances Act",
-    "statute": "21 U.S.C. §§ 801-889",
-    "category": "Health Care and Insurance",
-    "topic": "Health Care and Insurance",
-    "jurisdictionSource": "federal",
-    "stateCode": null,
-    "riskScore": 55,
-    "riskLevel": "HIGH",
-    "edstewardId": null
-  },
-  {
-    "regKey": "REG-103",
     "mcpDbId": 201,
     "itemId": "controlling-the-assault-of-non-solicited-pornograp",
     "name": "Controlling the Assault of Non-Solicited Pornography And Marketing Act of 2003 (CAN-SPAM Act)",
@@ -1442,7 +1442,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-104",
+    "regKey": "REG-103",
     "mcpDbId": 211,
     "itemId": "department-of-education-general-administrative-reg",
     "name": "Department of Education General Administrative Regulations and Other Applicable Grant Regulations",
@@ -1456,7 +1456,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-105",
+    "regKey": "REG-104",
     "mcpDbId": 229,
     "itemId": "electronic-communications-privacy-act-of-1986",
     "name": "Electronic Communications Privacy Act of 1986",
@@ -1470,7 +1470,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-106",
+    "regKey": "REG-105",
     "mcpDbId": 97,
     "itemId": "equal-employment-of-veterans",
     "name": "Equal Employment of Veterans",
@@ -1484,21 +1484,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-107",
-    "mcpDbId": 111,
-    "itemId": "equal-pay-act-of-1963",
-    "name": "Equal Pay Act of 1963",
-    "statute": "29 U.S.C. § 206(d)",
-    "category": "Diversity/Affirmative Action",
-    "topic": "Diversity/Affirmative Action",
-    "jurisdictionSource": "federal",
-    "stateCode": null,
-    "riskScore": 55,
-    "riskLevel": "HIGH",
-    "edstewardId": null
-  },
-  {
-    "regKey": "REG-108",
+    "regKey": "REG-106",
     "mcpDbId": 230,
     "itemId": "fcc-cable-certification",
     "name": "FCC – Cable Certification",
@@ -1512,7 +1498,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-109",
+    "regKey": "REG-107",
     "mcpDbId": 231,
     "itemId": "fcc-fixed-microwave-services-licensing",
     "name": "FCC – Fixed Microwave Services, Licensing",
@@ -1526,7 +1512,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-110",
+    "regKey": "REG-108",
     "mcpDbId": 232,
     "itemId": "fcc-wireless-communications-licensing",
     "name": "FCC – Wireless Communications, Licensing",
@@ -1540,7 +1526,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-111",
+    "regKey": "REG-109",
     "mcpDbId": 213,
     "itemId": "federal-awardee-performance-and-integrity-informat",
     "name": "Federal Awardee Performance and Integrity Information System (FAPIIS)",
@@ -1554,7 +1540,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-112",
+    "regKey": "REG-110",
     "mcpDbId": 214,
     "itemId": "federal-funding-accountability-and-transparency-ac",
     "name": "Federal Funding Accountability and Transparency Act of 2006 (FFATA)",
@@ -1568,7 +1554,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-113",
+    "regKey": "REG-111",
     "mcpDbId": 215,
     "itemId": "fraud-enforcement-and-recovery-act-of-2009-fera",
     "name": "Fraud Enforcement and Recovery Act of 2009 (FERA)",
@@ -1582,7 +1568,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-114",
+    "regKey": "REG-112",
     "mcpDbId": 98,
     "itemId": "genetic-information-non-discrimination-act-of-2008",
     "name": "Genetic Information Non-Discrimination Act of 2008",
@@ -1596,7 +1582,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-115",
+    "regKey": "REG-113",
     "mcpDbId": 138,
     "itemId": "hazardous-materials-transportation-act",
     "name": "Hazardous Materials Transportation Act",
@@ -1610,7 +1596,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-116",
+    "regKey": "REG-114",
     "mcpDbId": 235,
     "itemId": "homeland-security-act-of-2002",
     "name": "Homeland Security Act of 2002",
@@ -1624,7 +1610,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-117",
+    "regKey": "REG-115",
     "mcpDbId": 236,
     "itemId": "junk-fax-prevention-act-of-2005",
     "name": "Junk Fax Prevention Act of 2005",
@@ -1638,7 +1624,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-118",
+    "regKey": "REG-116",
     "mcpDbId": 99,
     "itemId": "lilly-ledbetter-fair-pay-act-of-2009",
     "name": "Lilly Ledbetter Fair Pay Act of 2009",
@@ -1652,7 +1638,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-119",
+    "regKey": "REG-117",
     "mcpDbId": 237,
     "itemId": "no-electronic-theft-act",
     "name": "No Electronic Theft Act",
@@ -1666,7 +1652,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-120",
+    "regKey": "REG-118",
     "mcpDbId": 281,
     "itemId": "protection-of-human-subjects-regulations-common-ru",
     "name": "Protection of Human Subjects Regulations (Common Rule)",
@@ -1680,7 +1666,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-121",
+    "regKey": "REG-119",
     "mcpDbId": 238,
     "itemId": "telemarketing",
     "name": "Telemarketing",
@@ -1694,7 +1680,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-122",
+    "regKey": "REG-120",
     "mcpDbId": 209,
     "itemId": "unknown",
     "name": "Unknown Regulation",
@@ -1708,11 +1694,39 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-123",
+    "regKey": "REG-121",
     "mcpDbId": 119,
     "itemId": "veterans-employment-emphasis-under-federal-contrac",
     "name": "Veterans’ employment emphasis under Federal contracts",
     "statute": "38 U.S.C § 4212",
+    "category": "Diversity/Affirmative Action",
+    "topic": "Diversity/Affirmative Action",
+    "jurisdictionSource": "federal",
+    "stateCode": null,
+    "riskScore": 55,
+    "riskLevel": "HIGH",
+    "edstewardId": null
+  },
+  {
+    "regKey": "REG-122",
+    "mcpDbId": 46,
+    "itemId": "unrelated-business-income-tax-ubit",
+    "name": "Unrelated Business Income Tax (UBIT)",
+    "statute": "26 U.S.C. § 511",
+    "category": "Accounting",
+    "topic": "Accounting",
+    "jurisdictionSource": "federal",
+    "stateCode": null,
+    "riskScore": 50,
+    "riskLevel": "HIGH",
+    "edstewardId": null
+  },
+  {
+    "regKey": "REG-123",
+    "mcpDbId": 106,
+    "itemId": "affirmative-action-equal-employment-opportunity",
+    "name": "Affirmative Action/Equal Employment Opportunity",
+    "statute": "Executive Order 11246",
     "category": "Diversity/Affirmative Action",
     "topic": "Diversity/Affirmative Action",
     "jurisdictionSource": "federal",
@@ -1751,34 +1765,6 @@
   },
   {
     "regKey": "REG-126",
-    "mcpDbId": 130,
-    "itemId": "clean-air-act",
-    "name": "Clean Air Act",
-    "statute": "42 U.S.C. §§ 7401-7671q",
-    "category": "Environmental Health and Safety",
-    "topic": "Environmental Health and Safety",
-    "jurisdictionSource": "federal",
-    "stateCode": null,
-    "riskScore": 52,
-    "riskLevel": "HIGH",
-    "edstewardId": null
-  },
-  {
-    "regKey": "REG-127",
-    "mcpDbId": 131,
-    "itemId": "clean-water-act",
-    "name": "Clean Water Act",
-    "statute": "33 U.S.C. §§ 1251-1387",
-    "category": "Environmental Health and Safety",
-    "topic": "Environmental Health and Safety",
-    "jurisdictionSource": "federal",
-    "stateCode": null,
-    "riskScore": 52,
-    "riskLevel": "HIGH",
-    "edstewardId": null
-  },
-  {
-    "regKey": "REG-128",
     "mcpDbId": 132,
     "itemId": "comprehensive-environmental-response-compensation-",
     "name": "Comprehensive Environmental Response, Compensation, and Liability Act (CERCLA)",
@@ -1792,21 +1778,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-129",
-    "mcpDbId": 61,
-    "itemId": "drug-free-schools-and-communities-act",
-    "name": "Drug Free Schools and Communities Act",
-    "statute": "20 U.S.C. § 1011i",
-    "category": "Campus Safety",
-    "topic": "Campus Safety",
-    "jurisdictionSource": "federal",
-    "stateCode": null,
-    "riskScore": 52,
-    "riskLevel": "HIGH",
-    "edstewardId": null
-  },
-  {
-    "regKey": "REG-130",
+    "regKey": "REG-127",
     "mcpDbId": 268,
     "itemId": "drug-free-workplace-act",
     "name": "Drug Free Workplace Act",
@@ -1820,7 +1792,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-131",
+    "regKey": "REG-128",
     "mcpDbId": 133,
     "itemId": "emergency-planning-and-community-right-act-epcra",
     "name": "Emergency Planning and Community Right Act (EPCRA)",
@@ -1834,7 +1806,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-132",
+    "regKey": "REG-129",
     "mcpDbId": 134,
     "itemId": "energy-policy-act",
     "name": "Energy Policy Act",
@@ -1848,7 +1820,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-133",
+    "regKey": "REG-130",
     "mcpDbId": 135,
     "itemId": "energy-reorganization-act-of-1974-as-amended",
     "name": "Energy Reorganization Act of 1974, as amended",
@@ -1862,7 +1834,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-134",
+    "regKey": "REG-131",
     "mcpDbId": 136,
     "itemId": "federal-insecticide-fungicide-and-rodenticide-act",
     "name": "Federal Insecticide, Fungicide and Rodenticide Act",
@@ -1876,7 +1848,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-135",
+    "regKey": "REG-132",
     "mcpDbId": 137,
     "itemId": "guarding-and-use-of-hand-portable-powered-tools",
     "name": "Guarding and Use of Hand & Portable Powered Tools",
@@ -1890,7 +1862,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-136",
+    "regKey": "REG-133",
     "mcpDbId": 139,
     "itemId": "hazardous-and-solid-waste-amendments-of-1984",
     "name": "Hazardous and Solid Waste Amendments of 1984",
@@ -1904,7 +1876,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-137",
+    "regKey": "REG-134",
     "mcpDbId": 218,
     "itemId": "higher-education-opportunity-act",
     "name": "Higher Education Opportunity Act",
@@ -1918,7 +1890,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-138",
+    "regKey": "REG-135",
     "mcpDbId": 27,
     "itemId": "higher-education-opportunity-act-sections-152-and-",
     "name": "Higher Education Opportunity Act Sections 152 and 153",
@@ -1932,7 +1904,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-139",
+    "regKey": "REG-136",
     "mcpDbId": 140,
     "itemId": "housing-urban-development-lead-based-paint-poisoni",
     "name": "Housing & Urban Development Lead Based Paint Poisoning in Certain Residential Structures",
@@ -1946,7 +1918,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-140",
+    "regKey": "REG-137",
     "mcpDbId": 141,
     "itemId": "mandatory-reporting-of-greenhouse-gases",
     "name": "Mandatory Reporting of Greenhouse Gases",
@@ -1960,7 +1932,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-141",
+    "regKey": "REG-138",
     "mcpDbId": 142,
     "itemId": "motor-carrier-act-of-1980",
     "name": "Motor Carrier Act of 1980",
@@ -1974,7 +1946,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-142",
+    "regKey": "REG-139",
     "mcpDbId": 143,
     "itemId": "national-emission-standards-for-hazardous-air-poll",
     "name": "National Emission Standards for Hazardous Air Pollutants (NESHAP)",
@@ -1988,7 +1960,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-143",
+    "regKey": "REG-140",
     "mcpDbId": 155,
     "itemId": "oil-pollution-act",
     "name": "Oil Pollution Act",
@@ -2002,7 +1974,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-144",
+    "regKey": "REG-141",
     "mcpDbId": 156,
     "itemId": "residential-lead-based-paint-hazard-reduction-act-",
     "name": "Residential Lead-Based Paint Hazard Reduction Act of 1992",
@@ -2016,7 +1988,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-145",
+    "regKey": "REG-142",
     "mcpDbId": 157,
     "itemId": "resource-conservation-and-recovery-act",
     "name": "Resource Conservation and Recovery Act",
@@ -2030,7 +2002,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-146",
+    "regKey": "REG-143",
     "mcpDbId": 158,
     "itemId": "standards-for-the-management-of-used-oil",
     "name": "Standards For the Management of Used Oil",
@@ -2044,7 +2016,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-147",
+    "regKey": "REG-144",
     "mcpDbId": 159,
     "itemId": "the-public-health-security-and-bioterrorism-prepar",
     "name": "The Public Health Security and Bioterrorism Preparedness and Response Act",
@@ -2058,7 +2030,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-148",
+    "regKey": "REG-145",
     "mcpDbId": 160,
     "itemId": "toxic-substances-control-act",
     "name": "Toxic Substances Control Act",
@@ -2072,7 +2044,21 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-149",
+    "regKey": "REG-146",
+    "mcpDbId": 257,
+    "itemId": "federal-information-security-management-act-fisma",
+    "name": "Federal Information Security Management Act (FISMA)",
+    "statute": "44 U.S.C. § 35",
+    "category": "Privacy & Information Security",
+    "topic": "Privacy & Information Security",
+    "jurisdictionSource": "federal",
+    "stateCode": null,
+    "riskScore": 68,
+    "riskLevel": "HIGH",
+    "edstewardId": null
+  },
+  {
+    "regKey": "REG-147",
     "mcpDbId": 32,
     "itemId": "bankruptcy-abuse-prevention-consumer-protection-ac",
     "name": "Bankruptcy Abuse Prevention & Consumer Protection Act of 2005",
@@ -2086,7 +2072,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-150",
+    "regKey": "REG-148",
     "mcpDbId": 33,
     "itemId": "clayton-antitrust-act-of-1914",
     "name": "Clayton Antitrust Act of 1914",
@@ -2100,7 +2086,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-151",
+    "regKey": "REG-149",
     "mcpDbId": 36,
     "itemId": "federal-unemployment-tax-act-futa",
     "name": "Federal Unemployment Tax Act (FUTA)",
@@ -2114,7 +2100,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-152",
+    "regKey": "REG-150",
     "mcpDbId": 37,
     "itemId": "higher-education-act-disclosure-of-foreign-gifts",
     "name": "Higher Education Act – Disclosure of Foreign Gifts",
@@ -2128,7 +2114,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-153",
+    "regKey": "REG-151",
     "mcpDbId": 51,
     "itemId": "higher-education-act-readmission-requirements-for-",
     "name": "Higher Education Act: Readmission Requirements for Servicemembers",
@@ -2142,21 +2128,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-154",
-    "mcpDbId": 225,
-    "itemId": "immigration-and-nationality-act-ina",
-    "name": "Immigration and Nationality Act (INA)",
-    "statute": "8 U.S.C. §§ 1101-1537",
-    "category": "Immigration,Recruitment Hiring & Termination",
-    "topic": "Immigration,Recruitment Hiring & Termination",
-    "jurisdictionSource": "federal",
-    "stateCode": null,
-    "riskScore": 50,
-    "riskLevel": "HIGH",
-    "edstewardId": null
-  },
-  {
-    "regKey": "REG-155",
+    "regKey": "REG-152",
     "mcpDbId": 39,
     "itemId": "regulation-e-electronic-fund-transfers",
     "name": "Regulation E: Electronic Fund Transfers",
@@ -2170,7 +2142,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-156",
+    "regKey": "REG-153",
     "mcpDbId": 40,
     "itemId": "sarbanes-oxley-act-of-2002-sox",
     "name": "Sarbanes Oxley Act of 2002 (SOX)",
@@ -2184,7 +2156,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-157",
+    "regKey": "REG-154",
     "mcpDbId": 41,
     "itemId": "sherman-antitrust-act",
     "name": "Sherman Antitrust Act",
@@ -2198,7 +2170,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-158",
+    "regKey": "REG-155",
     "mcpDbId": 42,
     "itemId": "social-security-act",
     "name": "Social Security Act",
@@ -2212,7 +2184,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-159",
+    "regKey": "REG-156",
     "mcpDbId": 224,
     "itemId": "student-exchange-and-visitor-information-system-se",
     "name": "Student Exchange and Visitor Information System (SEVIS)",
@@ -2226,7 +2198,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-160",
+    "regKey": "REG-157",
     "mcpDbId": 43,
     "itemId": "tax-cuts-and-jobs-act-of-2017-endowment-excise-tax",
     "name": "Tax Cuts and Jobs Act of 2017 (endowment excise tax)",
@@ -2240,7 +2212,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-161",
+    "regKey": "REG-158",
     "mcpDbId": 44,
     "itemId": "truth-in-lending-act",
     "name": "Truth in Lending Act",
@@ -2254,7 +2226,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-162",
+    "regKey": "REG-159",
     "mcpDbId": 45,
     "itemId": "uniform-administrative-requirements-cost-principle",
     "name": "Uniform Administrative Requirements, Cost Principles, and Audit Requirements for Federal Awards (Uniform Guidance, Super Circular, or Omni Circular)",
@@ -2268,21 +2240,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-163",
-    "mcpDbId": 46,
-    "itemId": "unrelated-business-income-tax-ubit",
-    "name": "Unrelated Business Income Tax (UBIT)",
-    "statute": "26 U.S.C. § 511",
-    "category": "Accounting",
-    "topic": "Accounting",
-    "jurisdictionSource": "federal",
-    "stateCode": null,
-    "riskScore": 50,
-    "riskLevel": "HIGH",
-    "edstewardId": null
-  },
-  {
-    "regKey": "REG-164",
+    "regKey": "REG-160",
     "mcpDbId": 161,
     "itemId": "acts-affecting-a-personal-financial-interest",
     "name": "Acts Affecting a Personal Financial Interest",
@@ -2296,7 +2254,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-165",
+    "regKey": "REG-161",
     "mcpDbId": 162,
     "itemId": "bribery-of-public-officials-and-witnesses",
     "name": "Bribery of Public Officials and Witnesses",
@@ -2310,7 +2268,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-166",
+    "regKey": "REG-162",
     "mcpDbId": 72,
     "itemId": "byrd-amendment",
     "name": "Byrd Amendment",
@@ -2324,7 +2282,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-167",
+    "regKey": "REG-163",
     "mcpDbId": 295,
     "itemId": "cafeteria-plans-26-u-s-c-125",
     "name": "Cafeteria Plans 26 U.S.C. § 125",
@@ -2338,7 +2296,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-168",
+    "regKey": "REG-164",
     "mcpDbId": 296,
     "itemId": "charitable-gift-annuity-antitrust-relief-act",
     "name": "Charitable Gift Annuity Antitrust Relief Act",
@@ -2352,7 +2310,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-169",
+    "regKey": "REG-165",
     "mcpDbId": 163,
     "itemId": "compensation-to-members-of-congress-officers-other",
     "name": "Compensation to Members of Congress, Officers, Others in Matters Affecting the Government",
@@ -2366,7 +2324,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-170",
+    "regKey": "REG-166",
     "mcpDbId": 313,
     "itemId": "consumer-credit-protection-act-title-iii-ccpa-garn",
     "name": "Consumer Credit Protection Act, Title III (CCPA) – Garnishments",
@@ -2380,7 +2338,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-171",
+    "regKey": "REG-167",
     "mcpDbId": 285,
     "itemId": "deferred-compensation",
     "name": "Deferred Compensation",
@@ -2394,7 +2352,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-172",
+    "regKey": "REG-168",
     "mcpDbId": 286,
     "itemId": "employee-annuities",
     "name": "Employee Annuities",
@@ -2408,7 +2366,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-173",
+    "regKey": "REG-169",
     "mcpDbId": 164,
     "itemId": "ethics-in-government-act-amended-by-ethics-reform-",
     "name": "Ethics in Government Act (Amended by Ethics Reform Act and Honest Leadership and Open Government Act of 2007)",
@@ -2422,21 +2380,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-174",
-    "mcpDbId": 314,
-    "itemId": "fair-labor-standards-act-flsa",
-    "name": "Fair Labor Standards Act (FLSA)",
-    "statute": "29 U.S.C. §§ 201-219",
-    "category": "Wages",
-    "topic": "Wages",
-    "jurisdictionSource": "federal",
-    "stateCode": null,
-    "riskScore": 48,
-    "riskLevel": "MODERATE",
-    "edstewardId": null
-  },
-  {
-    "regKey": "REG-175",
+    "regKey": "REG-170",
     "mcpDbId": 35,
     "itemId": "federal-insurance-contributions-act-fica",
     "name": "Federal Insurance Contributions Act (FICA)",
@@ -2450,7 +2394,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-176",
+    "regKey": "REG-171",
     "mcpDbId": 207,
     "itemId": "federal-sentencing-guidelines",
     "name": "Federal Sentencing Guidelines",
@@ -2464,7 +2408,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-177",
+    "regKey": "REG-172",
     "mcpDbId": 299,
     "itemId": "federal-unemployment-tax-act",
     "name": "Federal Unemployment Tax Act",
@@ -2478,7 +2422,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-178",
+    "regKey": "REG-173",
     "mcpDbId": 300,
     "itemId": "foreign-bank-accounts-and-tax-filings",
     "name": "Foreign Bank Accounts and Tax Filings",
@@ -2492,7 +2436,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-179",
+    "regKey": "REG-174",
     "mcpDbId": 301,
     "itemId": "fringe-benefits",
     "name": "Fringe Benefits",
@@ -2506,7 +2450,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-180",
+    "regKey": "REG-175",
     "mcpDbId": 247,
     "itemId": "honest-leadership-and-open-government-act-of-2007",
     "name": "Honest Leadership and Open Government Act of 2007",
@@ -2520,7 +2464,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-181",
+    "regKey": "REG-176",
     "mcpDbId": 165,
     "itemId": "house-and-senate-gift-ban-and-ethics-rules",
     "name": "House and Senate Gift Ban and Ethics Rules",
@@ -2534,7 +2478,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-182",
+    "regKey": "REG-177",
     "mcpDbId": 302,
     "itemId": "independent-contractors",
     "name": "Independent Contractors",
@@ -2548,7 +2492,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-183",
+    "regKey": "REG-178",
     "mcpDbId": 303,
     "itemId": "industrial-alcohol-user-permits-and-special-tax",
     "name": "Industrial Alcohol User Permits and Special Tax",
@@ -2562,7 +2506,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-184",
+    "regKey": "REG-179",
     "mcpDbId": 208,
     "itemId": "internal-revenue-service-governance-information-re",
     "name": "Internal Revenue Service: Governance Information Required on Form 990",
@@ -2576,7 +2520,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-185",
+    "regKey": "REG-180",
     "mcpDbId": 249,
     "itemId": "lobbying-disclosure-act",
     "name": "Lobbying Disclosure Act",
@@ -2590,7 +2534,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-186",
+    "regKey": "REG-181",
     "mcpDbId": 288,
     "itemId": "nonqualified-deferred-inclusion",
     "name": "Nonqualified Deferred Inclusion",
@@ -2604,21 +2548,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-187",
-    "mcpDbId": 320,
-    "itemId": "pennsylvania-higher-education-gift-disclosure-act",
-    "name": "Pennsylvania Higher Education Gift Disclosure Act",
-    "statute": "22 Pa. Code § 31.41 (Act 188 of 1982)",
-    "category": "Ethics",
-    "topic": "Ethics",
-    "jurisdictionSource": "state",
-    "stateCode": "PA",
-    "riskScore": 48,
-    "riskLevel": "MODERATE",
-    "edstewardId": null
-  },
-  {
-    "regKey": "REG-188",
+    "regKey": "REG-182",
     "mcpDbId": 250,
     "itemId": "political-activities",
     "name": "Political Activities",
@@ -2632,7 +2562,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-189",
+    "regKey": "REG-183",
     "mcpDbId": 305,
     "itemId": "public-disclosure-of-material",
     "name": "Public Disclosure of Material",
@@ -2646,7 +2576,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-190",
+    "regKey": "REG-184",
     "mcpDbId": 289,
     "itemId": "qualified-pensions",
     "name": "Qualified Pensions",
@@ -2660,7 +2590,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-191",
+    "regKey": "REG-185",
     "mcpDbId": 317,
     "itemId": "qualified-tuition-reductions",
     "name": "Qualified Tuition Reductions",
@@ -2674,7 +2604,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-192",
+    "regKey": "REG-186",
     "mcpDbId": 38,
     "itemId": "qualified-tuition-and-student-loan-interest-report",
     "name": "Qualified Tuition and Student Loan Interest Reporting",
@@ -2688,7 +2618,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-193",
+    "regKey": "REG-187",
     "mcpDbId": 308,
     "itemId": "reporting-of-payments-of-royalties",
     "name": "Reporting of Payments of Royalties",
@@ -2702,7 +2632,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-194",
+    "regKey": "REG-188",
     "mcpDbId": 167,
     "itemId": "restrictions-on-former-officers-employees-and-elec",
     "name": "Restrictions on Former Officers, Employees, and Elected Officials of the Executive and Legislative",
@@ -2716,7 +2646,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-195",
+    "regKey": "REG-189",
     "mcpDbId": 168,
     "itemId": "salary-of-government-officials-and-employees-payab",
     "name": "Salary of Government Officials and Employees Payable Only by United States",
@@ -2730,7 +2660,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-196",
+    "regKey": "REG-190",
     "mcpDbId": 309,
     "itemId": "small-business-job-protection-act",
     "name": "Small Business Job Protection Act",
@@ -2744,7 +2674,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-197",
+    "regKey": "REG-191",
     "mcpDbId": 310,
     "itemId": "unrelated-business-income-ubit",
     "name": "Unrelated Business Income (UBIT)",
@@ -2758,7 +2688,21 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-198",
+    "regKey": "REG-192",
+    "mcpDbId": 253,
+    "itemId": "electronic-communications-privacy-act",
+    "name": "Electronic Communications Privacy Act",
+    "statute": "18 U.S.C. §§ 2510-2523 (Wiretap); 18 U.S.C. §§ 2701-2713 (Stored Communications)",
+    "category": "Privacy & Information Security",
+    "topic": "Privacy & Information Security",
+    "jurisdictionSource": "federal",
+    "stateCode": null,
+    "riskScore": 68,
+    "riskLevel": "HIGH",
+    "edstewardId": null
+  },
+  {
+    "regKey": "REG-193",
     "mcpDbId": 239,
     "itemId": "american-jobs-creation-act-of-2004",
     "name": "American Jobs Creation Act of 2004",
@@ -2772,7 +2716,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-199",
+    "regKey": "REG-194",
     "mcpDbId": 70,
     "itemId": "anti-kickback-act-of-1986",
     "name": "Anti-Kickback Act of 1986",
@@ -2786,7 +2730,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-200",
+    "regKey": "REG-195",
     "mcpDbId": 71,
     "itemId": "anti-discrimination-laws-for-federal-contractors",
     "name": "Anti-discrimination laws for federal contractors",
@@ -2800,7 +2744,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-201",
+    "regKey": "REG-196",
     "mcpDbId": 240,
     "itemId": "bayh-dole-act-of-1980",
     "name": "Bayh-Dole Act of 1980",
@@ -2814,7 +2758,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-202",
+    "regKey": "REG-197",
     "mcpDbId": 73,
     "itemId": "copeland-anti-kickback-act",
     "name": "Copeland Anti-Kickback Act",
@@ -2828,21 +2772,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-203",
-    "mcpDbId": 81,
-    "itemId": "copyright-act",
-    "name": "Copyright Act",
-    "statute": "17 U.S.C. §§ 101-1332",
-    "category": "Copyright & Trademark",
-    "topic": "Copyright & Trademark",
-    "jurisdictionSource": "federal",
-    "stateCode": null,
-    "riskScore": 45,
-    "riskLevel": "MODERATE",
-    "edstewardId": null
-  },
-  {
-    "regKey": "REG-204",
+    "regKey": "REG-198",
     "mcpDbId": 82,
     "itemId": "copyright-term-extension-act",
     "name": "Copyright Term Extension Act",
@@ -2856,35 +2786,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-205",
-    "mcpDbId": 74,
-    "itemId": "davis-bacon-act",
-    "name": "Davis-Bacon Act",
-    "statute": "40 U.S.C. §§ 3141- 3144, 3146, 3147",
-    "category": "Contracts & Procurement",
-    "topic": "Contracts & Procurement",
-    "jurisdictionSource": "federal",
-    "stateCode": null,
-    "riskScore": 45,
-    "riskLevel": "MODERATE",
-    "edstewardId": null
-  },
-  {
-    "regKey": "REG-206",
-    "mcpDbId": 83,
-    "itemId": "digital-millennium-copyright-act-dmca",
-    "name": "Digital Millennium Copyright Act (DMCA)",
-    "statute": "Public Law 105-304",
-    "category": "Information Technology",
-    "topic": "Information Technology",
-    "jurisdictionSource": "federal",
-    "stateCode": null,
-    "riskScore": 45,
-    "riskLevel": "MODERATE",
-    "edstewardId": null
-  },
-  {
-    "regKey": "REG-207",
+    "regKey": "REG-199",
     "mcpDbId": 267,
     "itemId": "drug-alcohol-testing-of-transportation-employees",
     "name": "Drug & Alcohol Testing of Transportation Employees",
@@ -2898,7 +2800,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-208",
+    "regKey": "REG-200",
     "mcpDbId": 75,
     "itemId": "e-verify-executive-order-13465-amending-executive-",
     "name": "E-Verify Executive Order 13465-Amending Executive Order 12989",
@@ -2912,21 +2814,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-209",
-    "mcpDbId": 269,
-    "itemId": "employee-polygraph-protection-act",
-    "name": "Employee Polygraph Protection Act",
-    "statute": "29 U.S.C. §§ 2001-2009",
-    "category": "Recruitment Hiring & Termination",
-    "topic": "Recruitment Hiring & Termination",
-    "jurisdictionSource": "federal",
-    "stateCode": null,
-    "riskScore": 45,
-    "riskLevel": "MODERATE",
-    "edstewardId": null
-  },
-  {
-    "regKey": "REG-210",
+    "regKey": "REG-201",
     "mcpDbId": 34,
     "itemId": "fair-credit-reporting-act-fcra",
     "name": "Fair Credit Reporting Act (FCRA)",
@@ -2940,7 +2828,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-211",
+    "regKey": "REG-202",
     "mcpDbId": 271,
     "itemId": "federal-volunteer-protection-act",
     "name": "Federal Volunteer Protection Act",
@@ -2954,7 +2842,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-212",
+    "regKey": "REG-203",
     "mcpDbId": 245,
     "itemId": "foreign-agents-registration-act-of-1938",
     "name": "Foreign Agents Registration Act of 1938",
@@ -2968,7 +2856,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-213",
+    "regKey": "REG-204",
     "mcpDbId": 246,
     "itemId": "foreign-corrupt-practices-act-fcpa",
     "name": "Foreign Corrupt Practices Act (FCPA)",
@@ -2982,7 +2870,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-214",
+    "regKey": "REG-205",
     "mcpDbId": 25,
     "itemId": "higher-education-act-institutional-and-financial-a",
     "name": "Higher Education Act: Institutional and financial assistance information for students",
@@ -2996,7 +2884,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-215",
+    "regKey": "REG-206",
     "mcpDbId": 113,
     "itemId": "immigration-and-nationality-act",
     "name": "Immigration and Nationality Act",
@@ -3010,7 +2898,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-216",
+    "regKey": "REG-207",
     "mcpDbId": 86,
     "itemId": "lanham-act",
     "name": "Lanham Act",
@@ -3024,7 +2912,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-217",
+    "regKey": "REG-208",
     "mcpDbId": 223,
     "itemId": "nsf-grant-term-and-condition-september-21-2018",
     "name": "NSF grant term and condition, September 21, 2018",
@@ -3038,7 +2926,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-218",
+    "regKey": "REG-209",
     "mcpDbId": 80,
     "itemId": "non-retaliation-for-disclosure-of-compensation-inf",
     "name": "Non-Retaliation for Disclosure of Compensation Information",
@@ -3052,49 +2940,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-219",
-    "mcpDbId": 318,
-    "itemId": "pennsylvania-english-fluency-in-higher-education-a",
-    "name": "Pennsylvania English Fluency In Higher Education A",
-    "statute": "24 P.S. § 6803 (Act 36 of 1990)",
-    "category": "Academic Programs",
-    "topic": "Academic Programs",
-    "jurisdictionSource": "state",
-    "stateCode": "PA",
-    "riskScore": 45,
-    "riskLevel": "MODERATE",
-    "edstewardId": null
-  },
-  {
-    "regKey": "REG-220",
-    "mcpDbId": 319,
-    "itemId": "pennsylvania-graduation-rates-reporting-act",
-    "name": "Pennsylvania Graduation Rates Reporting Act",
-    "statute": "24 P.S. § 2510-301 (Act 88 of 1986)",
-    "category": "Academic Programs",
-    "topic": "Academic Programs",
-    "jurisdictionSource": "state",
-    "stateCode": "PA",
-    "riskScore": 45,
-    "riskLevel": "MODERATE",
-    "edstewardId": null
-  },
-  {
-    "regKey": "REG-221",
-    "mcpDbId": 321,
-    "itemId": "pennsylvania-higher-education-standards",
-    "name": "Pennsylvania Higher Education Standards",
-    "statute": "22 Pa. Code § 31.1 et seq.",
-    "category": "Academic Programs",
-    "topic": "Academic Programs",
-    "jurisdictionSource": "state",
-    "stateCode": "PA",
-    "riskScore": 45,
-    "riskLevel": "MODERATE",
-    "edstewardId": null
-  },
-  {
-    "regKey": "REG-222",
+    "regKey": "REG-210",
     "mcpDbId": 78,
     "itemId": "small-business-act-and-small-business-investment-a",
     "name": "Small Business Act and Small Business Investment Act of 1958",
@@ -3108,7 +2954,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-223",
+    "regKey": "REG-211",
     "mcpDbId": 87,
     "itemId": "small-webcasters-settlement-act-of-2002",
     "name": "Small Webcasters Settlement Act of 2002",
@@ -3122,7 +2968,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-224",
+    "regKey": "REG-212",
     "mcpDbId": 88,
     "itemId": "technology-education-and-copyright-harmonization-a",
     "name": "Technology Education and Copyright Harmonization Act (TEACH ACT) of 2002",
@@ -3136,7 +2982,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-225",
+    "regKey": "REG-213",
     "mcpDbId": 79,
     "itemId": "trade-sanctions-reform-and-export-enhancement",
     "name": "Trade Sanctions Reform and Export Enhancement",
@@ -3150,7 +2996,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-226",
+    "regKey": "REG-214",
     "mcpDbId": 242,
     "itemId": "trademark-revision-act",
     "name": "Trademark Revision Act",
@@ -3164,7 +3010,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-227",
+    "regKey": "REG-215",
     "mcpDbId": 243,
     "itemId": "u-s-patent-act",
     "name": "U.S. Patent Act",
@@ -3178,7 +3024,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-228",
+    "regKey": "REG-216",
     "mcpDbId": 244,
     "itemId": "visual-artists-rights-act",
     "name": "Visual Artists Rights Act",
@@ -3192,7 +3038,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-229",
+    "regKey": "REG-217",
     "mcpDbId": 273,
     "itemId": "worker-adjustment-and-retraining-notification-act-",
     "name": "Worker Adjustment and Retraining Notification Act (WARN)",
@@ -3206,7 +3052,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-230",
+    "regKey": "REG-218",
     "mcpDbId": 120,
     "itemId": "cafeteria-plan-regulations",
     "name": "Cafeteria Plan Regulations",
@@ -3220,7 +3066,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-231",
+    "regKey": "REG-219",
     "mcpDbId": 121,
     "itemId": "consolidated-omnibus-budget-reconciliation-act-cob",
     "name": "Consolidated Omnibus Budget Reconciliation Act (COBRA)",
@@ -3234,7 +3080,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-232",
+    "regKey": "REG-220",
     "mcpDbId": 122,
     "itemId": "employee-retirement-income-security-act-of-1974-er",
     "name": "Employee Retirement Income Security Act of 1974 (ERISA)",
@@ -3248,7 +3094,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-233",
+    "regKey": "REG-221",
     "mcpDbId": 123,
     "itemId": "medicare-medicaid-and-schip-extension-act-of-2007",
     "name": "Medicare, Medicaid, and SCHIP Extension Act of 2007",
@@ -3262,7 +3108,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-234",
+    "regKey": "REG-222",
     "mcpDbId": 124,
     "itemId": "patient-protection-and-affordable-care-act",
     "name": "Patient Protection and Affordable Care Act",
@@ -3276,7 +3122,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-235",
+    "regKey": "REG-223",
     "mcpDbId": 125,
     "itemId": "the-veterans-readjustment-benefits-act",
     "name": "The Veterans’ Readjustment Benefits Act",
@@ -3290,7 +3136,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-236",
+    "regKey": "REG-224",
     "mcpDbId": 104,
     "itemId": "uniformed-services-employment-and-reemployment-rig",
     "name": "Uniformed Services Employment and Reemployment Rights Act (USERRA)",
@@ -3304,21 +3150,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-237",
-    "mcpDbId": 23,
-    "itemId": "age-discrimination-act-of-1975",
-    "name": "Age Discrimination Act of 1975",
-    "statute": "42 U.S.C. §§ 6101-6107",
-    "category": "Diversity/Affirmative Action",
-    "topic": "Diversity/Affirmative Action",
-    "jurisdictionSource": "federal",
-    "stateCode": null,
-    "riskScore": 40,
-    "riskLevel": "MODERATE",
-    "edstewardId": null
-  },
-  {
-    "regKey": "REG-238",
+    "regKey": "REG-225",
     "mcpDbId": 108,
     "itemId": "age-discrimination-employment-act-of-1967",
     "name": "Age Discrimination Employment Act of 1967",
@@ -3332,7 +3164,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-239",
+    "regKey": "REG-226",
     "mcpDbId": 94,
     "itemId": "age-discrimination-in-employment-act-of-1967",
     "name": "Age Discrimination in Employment Act of 1967",
@@ -3346,7 +3178,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-240",
+    "regKey": "REG-227",
     "mcpDbId": 334,
     "itemId": "california-consumer-privacy-act",
     "name": "California Consumer Privacy Act",
@@ -3360,7 +3192,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-241",
+    "regKey": "REG-228",
     "mcpDbId": 311,
     "itemId": "civil-service-reform-act-of-1978",
     "name": "Civil Service Reform Act of 1978",
@@ -3374,7 +3206,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-242",
+    "regKey": "REG-229",
     "mcpDbId": 332,
     "itemId": "general-data-protection-regulation",
     "name": "General Data Protection Regulation",
@@ -3388,35 +3220,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-243",
-    "mcpDbId": 312,
-    "itemId": "national-labor-relations-act",
-    "name": "National Labor Relations Act",
-    "statute": "29 U.S.C. § 151 et seq.",
-    "category": "Unions",
-    "topic": "Unions",
-    "jurisdictionSource": "federal",
-    "stateCode": null,
-    "riskScore": 40,
-    "riskLevel": "MODERATE",
-    "edstewardId": null
-  },
-  {
-    "regKey": "REG-244",
-    "mcpDbId": 324,
-    "itemId": "pennsylvania-student-consumer-protection",
-    "name": "Pennsylvania Student Consumer Protection",
-    "statute": "24 P.S. § 6601 et seq.",
-    "category": "Student Services",
-    "topic": "Student Services",
-    "jurisdictionSource": "state",
-    "stateCode": "PA",
-    "riskScore": 40,
-    "riskLevel": "MODERATE",
-    "edstewardId": null
-  },
-  {
-    "regKey": "REG-245",
+    "regKey": "REG-230",
     "mcpDbId": 180,
     "itemId": "higher-education-act-code-of-conduct",
     "name": "Higher Education Act: Code of Conduct",
@@ -3430,7 +3234,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-246",
+    "regKey": "REG-231",
     "mcpDbId": 77,
     "itemId": "higher-education-act-foreign-gift-and-contract-rep",
     "name": "Higher Education Act: Foreign Gift and Contract Reports",
@@ -3444,7 +3248,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-247",
+    "regKey": "REG-232",
     "mcpDbId": 204,
     "itemId": "internal-revenue-code-substantiation-and-disclosur",
     "name": "Internal Revenue Code: Substantiation and Disclosure Provisions",
@@ -3458,7 +3262,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-248",
+    "regKey": "REG-233",
     "mcpDbId": 205,
     "itemId": "pension-protection-act",
     "name": "Pension Protection Act",
@@ -3472,7 +3276,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-249",
+    "regKey": "REG-234",
     "mcpDbId": 206,
     "itemId": "philanthropy-protection-act-of-1995",
     "name": "Philanthropy Protection Act of 1995",
@@ -3486,7 +3290,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-250",
+    "regKey": "REG-235",
     "mcpDbId": 58,
     "itemId": "higher-education-act-textbook-informatoin",
     "name": "Higher Education Act: Textbook Informatoin",
@@ -3500,7 +3304,7 @@
     "edstewardId": null
   },
   {
-    "regKey": "REG-251",
+    "regKey": "REG-236",
     "mcpDbId": 26,
     "itemId": "higher-education-act-textbook-information",
     "name": "Higher Education Act: Textbook Information",
@@ -3511,6 +3315,202 @@
     "stateCode": null,
     "riskScore": 29,
     "riskLevel": "LOW",
+    "edstewardId": null
+  },
+  {
+    "regKey": "NJ-001",
+    "mcpDbId": 326,
+    "itemId": "new-jersey-campus-sex-assault-victim-bill-of-rights",
+    "name": "New Jersey Campus Sex Assault Victim Bill Of Rights",
+    "statute": "N.J.S.A. 18A:61E-1 et seq.",
+    "category": "Sexual Misconduct",
+    "topic": "Sexual Misconduct",
+    "jurisdictionSource": "state",
+    "stateCode": "NJ",
+    "riskScore": 78,
+    "riskLevel": "SEVERE",
+    "edstewardId": null
+  },
+  {
+    "regKey": "NJ-002",
+    "mcpDbId": 328,
+    "itemId": "new-jersey-licensure-accreditation-standards",
+    "name": "New Jersey Licensure Accreditation Standards",
+    "statute": "N.J.A.C. 9A:1-1 et seq.",
+    "category": "Accreditation",
+    "topic": "Accreditation",
+    "jurisdictionSource": "state",
+    "stateCode": "NJ",
+    "riskScore": 75,
+    "riskLevel": "SEVERE",
+    "edstewardId": null
+  },
+  {
+    "regKey": "NJ-003",
+    "mcpDbId": 327,
+    "itemId": "new-jersey-hazing-prevention",
+    "name": "New Jersey Hazing Prevention",
+    "statute": "N.J.S.A. 2C:40-3 et seq.",
+    "category": "Campus Safety",
+    "topic": "Campus Safety",
+    "jurisdictionSource": "state",
+    "stateCode": "NJ",
+    "riskScore": 72,
+    "riskLevel": "SEVERE",
+    "edstewardId": null
+  },
+  {
+    "regKey": "NJ-004",
+    "mcpDbId": 330,
+    "itemId": "new-jersey-uniform-crime-reporting",
+    "name": "New Jersey Uniform Crime Reporting",
+    "statute": "N.J.S.A. 52:17B-5",
+    "category": "Campus Safety",
+    "topic": "Campus Safety",
+    "jurisdictionSource": "state",
+    "stateCode": "NJ",
+    "riskScore": 72,
+    "riskLevel": "SEVERE",
+    "edstewardId": null
+  },
+  {
+    "regKey": "NJ-005",
+    "mcpDbId": 329,
+    "itemId": "new-jersey-tuition-aid-grant-program",
+    "name": "New Jersey Tuition Aid Grant Program",
+    "statute": "N.J.A.C. 9A:9-2",
+    "category": "Financial Aid",
+    "topic": "Financial Aid",
+    "jurisdictionSource": "state",
+    "stateCode": "NJ",
+    "riskScore": 65,
+    "riskLevel": "HIGH",
+    "edstewardId": null
+  },
+  {
+    "regKey": "NJ-006",
+    "mcpDbId": 331,
+    "itemId": "new-jersey-veterans-benefits-compliance",
+    "name": "New Jersey Veterans Benefits Compliance",
+    "statute": "N.J.S.A. 18A:62-6",
+    "category": "Financial Aid",
+    "topic": "Financial Aid",
+    "jurisdictionSource": "state",
+    "stateCode": "NJ",
+    "riskScore": 65,
+    "riskLevel": "HIGH",
+    "edstewardId": null
+  },
+  {
+    "regKey": "PA-001",
+    "mcpDbId": 323,
+    "itemId": "pennsylvania-sexual-violence-education-act",
+    "name": "Pennsylvania Sexual Violence Education Act",
+    "statute": "24 P.S. § 20-2001 et seq. (Act 16 of 2014)",
+    "category": "Sexual Misconduct",
+    "topic": "Sexual Misconduct",
+    "jurisdictionSource": "state",
+    "stateCode": "PA",
+    "riskScore": 78,
+    "riskLevel": "SEVERE",
+    "edstewardId": null
+  },
+  {
+    "regKey": "PA-002",
+    "mcpDbId": 322,
+    "itemId": "pennsylvania-institutional-accreditation",
+    "name": "Pennsylvania Institutional Accreditation",
+    "statute": "22 Pa. Code § 31.21",
+    "category": "Accreditation",
+    "topic": "Accreditation",
+    "jurisdictionSource": "state",
+    "stateCode": "PA",
+    "riskScore": 75,
+    "riskLevel": "SEVERE",
+    "edstewardId": null
+  },
+  {
+    "regKey": "PA-003",
+    "mcpDbId": 325,
+    "itemId": "pennsylvania-uniform-crime-reporting-act",
+    "name": "Pennsylvania Uniform Crime Reporting Act",
+    "statute": "18 Pa.C.S. § 9101 et seq.",
+    "category": "Campus Safety",
+    "topic": "Campus Safety",
+    "jurisdictionSource": "state",
+    "stateCode": "PA",
+    "riskScore": 72,
+    "riskLevel": "SEVERE",
+    "edstewardId": null
+  },
+  {
+    "regKey": "PA-004",
+    "mcpDbId": 320,
+    "itemId": "pennsylvania-higher-education-gift-disclosure-act",
+    "name": "Pennsylvania Higher Education Gift Disclosure Act",
+    "statute": "22 Pa. Code § 31.41 (Act 188 of 1982)",
+    "category": "Ethics",
+    "topic": "Ethics",
+    "jurisdictionSource": "state",
+    "stateCode": "PA",
+    "riskScore": 48,
+    "riskLevel": "MODERATE",
+    "edstewardId": null
+  },
+  {
+    "regKey": "PA-005",
+    "mcpDbId": 318,
+    "itemId": "pennsylvania-english-fluency-in-higher-education-a",
+    "name": "Pennsylvania English Fluency In Higher Education A",
+    "statute": "24 P.S. § 6803 (Act 36 of 1990)",
+    "category": "Academic Programs",
+    "topic": "Academic Programs",
+    "jurisdictionSource": "state",
+    "stateCode": "PA",
+    "riskScore": 45,
+    "riskLevel": "MODERATE",
+    "edstewardId": null
+  },
+  {
+    "regKey": "PA-006",
+    "mcpDbId": 319,
+    "itemId": "pennsylvania-graduation-rates-reporting-act",
+    "name": "Pennsylvania Graduation Rates Reporting Act",
+    "statute": "24 P.S. § 2510-301 (Act 88 of 1986)",
+    "category": "Academic Programs",
+    "topic": "Academic Programs",
+    "jurisdictionSource": "state",
+    "stateCode": "PA",
+    "riskScore": 45,
+    "riskLevel": "MODERATE",
+    "edstewardId": null
+  },
+  {
+    "regKey": "PA-007",
+    "mcpDbId": 321,
+    "itemId": "pennsylvania-higher-education-standards",
+    "name": "Pennsylvania Higher Education Standards",
+    "statute": "22 Pa. Code § 31.1 et seq.",
+    "category": "Academic Programs",
+    "topic": "Academic Programs",
+    "jurisdictionSource": "state",
+    "stateCode": "PA",
+    "riskScore": 45,
+    "riskLevel": "MODERATE",
+    "edstewardId": null
+  },
+  {
+    "regKey": "PA-008",
+    "mcpDbId": 324,
+    "itemId": "pennsylvania-student-consumer-protection",
+    "name": "Pennsylvania Student Consumer Protection",
+    "statute": "24 P.S. § 6601 et seq.",
+    "category": "Student Services",
+    "topic": "Student Services",
+    "jurisdictionSource": "state",
+    "stateCode": "PA",
+    "riskScore": 40,
+    "riskLevel": "MODERATE",
     "edstewardId": null
   }
 ]

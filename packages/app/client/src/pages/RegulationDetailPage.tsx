@@ -778,8 +778,8 @@ function RegulationDetailPage() {
                 {regulation.name || regulation.topic}
               </h1>
               <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-                <span className="px-3 py-1 bg-gray-100 rounded-md font-medium">
-                  ID: {regulation.itemId || regulation.item_id || regulation.id || 'N/A'}
+                <span className="px-3 py-1 bg-gray-100 rounded-md font-mono font-semibold">
+                  {(regulation as any).regKey || (regulation as any).reg_key || regulation.id || 'N/A'}
                 </span>
                 {categoryVisible ? (
                   <div className="flex flex-wrap items-center gap-2 sm:gap-4">
@@ -901,6 +901,25 @@ function RegulationDetailPage() {
               </div>
               {/* Additional metadata row */}
               <div className="flex flex-wrap items-center gap-4 mt-3 text-sm">
+                {/* Risk Score */}
+                {(() => {
+                  const riskScore = (regulation as any).riskScore ?? (regulation as any).risk_score;
+                  const riskLevel = ((regulation as any).riskLevel ?? (regulation as any).risk_level ?? '') as string;
+                  if (riskScore == null) return null;
+                  const colorClass =
+                    riskLevel === 'CRITICAL' ? 'bg-red-100 text-red-800 border-red-300' :
+                    riskLevel === 'SEVERE' ? 'bg-orange-100 text-orange-800 border-orange-300' :
+                    riskLevel === 'HIGH' ? 'bg-amber-100 text-amber-800 border-amber-300' :
+                    riskLevel === 'MODERATE' ? 'bg-yellow-100 text-yellow-800 border-yellow-300' :
+                    'bg-green-100 text-green-800 border-green-300';
+                  return (
+                    <div className="flex items-center gap-2">
+                      <span className={`px-2.5 py-0.5 rounded-md text-xs font-semibold border ${colorClass}`}>
+                        Risk: {riskScore} {riskLevel}
+                      </span>
+                    </div>
+                  );
+                })()}
                 {/* Statute */}
                 {regulation?.statute && (
                   <div className="flex items-center gap-2">

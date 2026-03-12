@@ -3,33 +3,48 @@ import Navigation from "@/components/layout/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Bell, Clock, CheckCircle, XCircle, AlertTriangle, ArrowUpDown, ArrowUp, ArrowDown, Filter, Plus, Users } from "lucide-react";
-import React, { useState } from "react";
+import {
+  Bell, Clock, CheckCircle, XCircle, AlertTriangle,
+  ArrowUpDown, ArrowUp, ArrowDown, Filter, Plus, Users,
+  ChevronDown, ChevronUp, ExternalLink,
+} from "lucide-react";
+import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import CreateNotificationModal from "@/components/notifications/create-notification-modal";
 import { Link } from "wouter";
-import { format } from "date-fns";
+import { format, formatDistanceToNow } from "date-fns";
+
+// ── Types ──────────────────────────────────────────────────────
+
+interface AlertTask {
+  id: number;
+  name: string;
+  status: string;
+  priority: string;
+  dueDate: string;
+  assignedRole: string | null;
+  regulationId: number;
+  regulationName: string | null;
+  regulationTopic: string | null;
+}
+
+interface AlertsResponse {
+  overdue: AlertTask[];
+  dueSoon: AlertTask[];
+  counts: { overdue: number; dueSoon: number };
+}
 
 interface NotificationHistoryItem {
   id: number;
   type: string;
-  status: 'pending' | 'sent' | 'failed';
-  priority: 'high' | 'normal' | 'low';
+  status: "pending" | "sent" | "failed";
+  priority: "high" | "normal" | "low";
   content: any;
   createdAt: string;
   sentAt: string | null;
   retryCount: number;
-  regulation: {
-    id: number;
-    name: string;
-    category: string;
-  } | null;
-  user: {
-    id: number;
-    firstName: string;
-    lastName: string;
-    email: string;
-  } | null;
+  regulation: { id: number; name: string; category: string } | null;
+  user: { id: number; firstName: string; lastName: string; email: string } | null;
 }
 
 interface NotificationHistoryResponse {
@@ -39,52 +54,74 @@ interface NotificationHistoryResponse {
   limit: number;
 }
 
-type SortField = 'createdAt' | 'sentAt' | 'type' | 'status' | 'priority';
-type SortOrder = 'asc' | 'desc';
+type SortField = "createdAt" | "sentAt" | "type" | "status" | "priority";
+type SortOrder = "asc" | "desc";
+
+// ── Page ───────────────────────────────────────────────────────
 
 export default function NotificationsPage() {
   const { user } = useAuth();
-  const [sortField, setSortField] = useState<SortField>('createdAt');
-  const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
-  const [statusFilter, setStatusFilter] = useState<'all' | 'sent' | 'pending' | 'failed'>('sent');
+
+  // Alerts state
+  const [alertTab, setAlertTab] = useState<"overdue" | "dueSoon">("overdue");
+  const [alertsExpanded, setAlertsExpanded] = useState(true);
+
+  // Notification history state
+  const [sortField, setSortField] = useState<SortField>("createdAt");
+  const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
+  const [statusFilter, setStatusFilter] = useState<"all" | "sent" | "pending" | "failed">("sent");
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
-  const { data: notificationHistory, isLoading } = useQuery<NotificationHistoryResponse>({
-    queryKey: ["/api/notification-history", { status: statusFilter === 'all' ? undefined : statusFilter, sortBy: sortField, sortOrder }],
-    refetchInterval: 30000, // Refresh every 30 seconds
+  // ── Queries ────────────────────────────────────────────────
+
+  const { data: alerts, isLoading: alertsLoading } = useQuery<AlertsResponse>({
+    queryKey: ["/api/compliance-tasks/alerts"],
+    refetchInterval: 120_000,
+    staleTime: 60_000,
   });
+
+  const { data: notificationHistory, isLoading: historyLoading } = useQuery<NotificationHistoryResponse>({
+    queryKey: ["/api/notification-history", { status: statusFilter === "all" ? undefined : statusFilter, sortBy: sortField, sortOrder }],
+    refetchInterval: 30_000,
+  });
+
+  // ── Handlers ───────────────────────────────────────────────
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
     } else {
       setSortField(field);
-      setSortOrder('desc');
+      setSortOrder("desc");
     }
   };
 
   const getSortIcon = (field: SortField) => {
     if (sortField !== field) return <ArrowUpDown className="h-4 w-4" />;
-    return sortOrder === 'asc' ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />;
+    return sortOrder === "asc" ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />;
   };
+
+  // ── Alert helpers ──────────────────────────────────────────
+
+  const currentAlerts = alertTab === "overdue" ? alerts?.overdue ?? [] : alerts?.dueSoon ?? [];
+  const overdueCount = alerts?.counts.overdue ?? 0;
+  const dueSoonCount = alerts?.counts.dueSoon ?? 0;
+
+  function daysOverdue(dueDate: string) {
+    const diff = Date.now() - new Date(dueDate).getTime();
+    return Math.floor(diff / (1000 * 60 * 60 * 24));
+  }
+
+  // ── Notification history helpers ───────────────────────────
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'sent':
-        return <Badge variant="default" className="bg-green-100 text-green-800 border-green-200">
-          <CheckCircle className="h-3 w-3 mr-1" />
-          Sent
-        </Badge>;
-      case 'pending':
-        return <Badge variant="default" className="bg-yellow-100 text-yellow-800 border-yellow-200">
-          <Clock className="h-3 w-3 mr-1" />
-          Pending
-        </Badge>;
-      case 'failed':
-        return <Badge variant="default" className="bg-red-100 text-red-800 border-red-200">
-          <XCircle className="h-3 w-3 mr-1" />
-          Failed
-        </Badge>;
+      case "sent":
+        return <Badge variant="default" className="bg-green-100 text-green-800 border-green-200"><CheckCircle className="h-3 w-3 mr-1" />Sent</Badge>;
+      case "pending":
+        return <Badge variant="default" className="bg-yellow-100 text-yellow-800 border-yellow-200"><Clock className="h-3 w-3 mr-1" />Pending</Badge>;
+      case "failed":
+        return <Badge variant="default" className="bg-red-100 text-red-800 border-red-200"><XCircle className="h-3 w-3 mr-1" />Failed</Badge>;
       default:
         return <Badge variant="secondary">{status}</Badge>;
     }
@@ -92,179 +129,171 @@ export default function NotificationsPage() {
 
   const getPriorityBadge = (priority: string) => {
     switch (priority) {
-      case 'high':
-        return <Badge variant="destructive">
-          <AlertTriangle className="h-3 w-3 mr-1" />
-          High
-        </Badge>;
-      case 'normal':
+      case "high":
+        return <Badge variant="destructive"><AlertTriangle className="h-3 w-3 mr-1" />High</Badge>;
+      case "normal":
         return <Badge variant="secondary">Normal</Badge>;
-      case 'low':
+      case "low":
         return <Badge variant="outline">Low</Badge>;
       default:
         return <Badge variant="secondary">{priority}</Badge>;
     }
   };
 
-  const getNotificationTitle = (notification: NotificationHistoryItem) => {
-    if (notification.regulation) {
-      return `${notification.type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}: ${notification.regulation.name}`;
-    }
-    
-    // Try to extract title from content
-    if (notification.content && typeof notification.content === 'object') {
-      if (notification.content.title) return notification.content.title;
-      if (notification.content.subject) return notification.content.subject;
-    }
-    
-    return notification.type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+  const getNotificationTitle = (n: NotificationHistoryItem) => {
+    if (n.regulation) return `${n.type.replace(/_/g, " ").replace(/\b\w/g, l => l.toUpperCase())}: ${n.regulation.name}`;
+    if (n.content?.title) return n.content.title;
+    if (n.content?.subject) return n.content.subject;
+    return n.type.replace(/_/g, " ").replace(/\b\w/g, l => l.toUpperCase());
   };
 
-  const getNotificationDescription = (notification: NotificationHistoryItem) => {
-    if (notification.content && typeof notification.content === 'object') {
-      if (notification.content.message) return notification.content.message;
-      if (notification.content.body) return notification.content.body;
-    }
-    
-    if (typeof notification.content === 'string') {
-      return notification.content;
-    }
-    
-    return 'No description available';
+  const getNotificationDescription = (n: NotificationHistoryItem) => {
+    if (n.content?.message) return n.content.message;
+    if (n.content?.body) return n.content.body;
+    if (typeof n.content === "string") return n.content;
+    return "No description available";
   };
+
+  // ── Render ─────────────────────────────────────────────────
 
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
-      
+
       <main className="py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Header */}
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center">
               <Bell className="h-6 w-6 mr-3 text-blue-500" />
-              <h1 className="text-3xl font-bold text-foreground">
-                Notifications
-              </h1>
+              <h1 className="text-3xl font-bold text-foreground">Notifications</h1>
+              {overdueCount > 0 && (
+                <span className="ml-3 flex items-center justify-center min-w-[24px] h-6 px-2 text-sm font-bold text-white bg-red-500 rounded-full">
+                  {overdueCount}
+                </span>
+              )}
             </div>
             <div className="flex items-center gap-3">
-              <Button
-                onClick={() => setIsCreateModalOpen(true)}
-                size="sm"
-                className="flex items-center gap-2"
-              >
+              <Button onClick={() => setIsCreateModalOpen(true)} size="sm" className="flex items-center gap-2">
                 <Plus className="h-4 w-4" />
                 Send Notification
               </Button>
             </div>
           </div>
 
-          {/* Smart Notification System Info - Always Visible */}
-          <Card className="shadow-sm mb-6">
-              <CardHeader>
-                <CardTitle className="text-xl font-semibold flex items-center gap-2">
-                  <CheckCircle className="h-5 w-5 text-green-600" />
-                  Smart Compliance Notification System
+          {/* ════════ COMPLIANCE ALERTS ════════ */}
+          <Card className="shadow-sm mb-6 border-l-4 border-l-red-500">
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-xl font-semibold flex items-center gap-3">
+                  <AlertTriangle className="h-5 w-5 text-red-500" />
+                  Compliance Alerts
                 </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {/* How It Works */}
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <p className="font-medium mb-2 flex items-center gap-2 text-blue-900">
-                        <Clock className="h-4 w-4" />
-                        Notification Schedule:
-                      </p>
-                      <ul className="ml-6 space-y-1 text-sm text-blue-800">
-                        <li>• <strong>90 days before:</strong> Initial notice</li>
-                        <li>• <strong>60 days before:</strong> Second reminder</li>
-                        <li>• <strong>30 days before:</strong> Third reminder</li>
-                        <li>• <strong>7-1 days before:</strong> Daily reminders</li>
-                        <li>• <strong>Final day:</strong> Multiple reminders (morning, afternoon, evening)</li>
-                        <li className="border-t border-red-200 pt-2 mt-2">
-                          <strong className="text-red-700">Overdue Escalation:</strong>
-                        </li>
-                        <li className="text-red-800">• <strong>Day 1 overdue:</strong> Immediate alert to all stakeholders</li>
-                        <li className="text-red-800">• <strong>Days 2-7 overdue:</strong> Daily urgent reminders</li>
-                        <li className="text-red-800">• <strong>Week 2+ overdue:</strong> Weekly critical alerts + executive escalation</li>
-                      </ul>
-                    </div>
-                    
-                    <div>
-                      <p className="font-medium mb-2 flex items-center gap-2 text-blue-900">
-                        <Users className="h-4 w-4" />
-                        Role-Based Escalation:
-                      </p>
-                      <ul className="ml-6 space-y-1 text-sm text-blue-800">
-                        <li>• <strong>90-8 days:</strong> Compliance Officers only</li>
-                        <li>• <strong>7-1 days:</strong> All stakeholders</li>
-                        <li className="text-xs text-blue-600 mt-2">
-                          (CCO, Legal Counsel, Administrators)
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setAlertsExpanded(!alertsExpanded)}
+                  className="text-muted-foreground"
+                >
+                  {alertsExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                </Button>
+              </div>
 
-                {/* System Status */}
-                <div className="grid md:grid-cols-3 gap-4">
-                  <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-                    <div className="flex items-center gap-2">
-                      <CheckCircle className="h-4 w-4 text-green-600" />
-                      <div>
-                        <p className="font-medium text-green-900 text-sm">System Active</p>
-                        <p className="text-xs text-green-700">Monitoring all deadlines</p>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                    <div className="flex items-center gap-2">
-                      <Bell className="h-4 w-4 text-blue-600" />
-                      <div>
-                        <p className="font-medium text-blue-900 text-sm">Email Delivery</p>
-                        <p className="text-xs text-blue-700">Automatic notifications</p>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
-                    <div className="flex items-center gap-2">
-                      <AlertTriangle className="h-4 w-4 text-purple-600" />
-                      <div>
-                        <p className="font-medium text-purple-900 text-sm">Smart Filtering</p>
-                        <p className="text-xs text-purple-700">Only when needed</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+              {/* Tabs: Overdue / Due Soon */}
+              <div className="flex gap-2 mt-3">
+                <button
+                  onClick={() => setAlertTab("overdue")}
+                  className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                    alertTab === "overdue"
+                      ? "bg-red-500 text-white"
+                      : "bg-muted text-muted-foreground hover:bg-muted/80"
+                  }`}
+                >
+                  Overdue{overdueCount > 0 && ` (${overdueCount})`}
+                </button>
+                <button
+                  onClick={() => setAlertTab("dueSoon")}
+                  className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                    alertTab === "dueSoon"
+                      ? "bg-amber-500 text-white"
+                      : "bg-muted text-muted-foreground hover:bg-muted/80"
+                  }`}
+                >
+                  Due Soon{dueSoonCount > 0 && ` (${dueSoonCount})`}
+                </button>
+              </div>
+            </CardHeader>
 
-                {/* Override Controls */}
-                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-                  <div className="flex items-start gap-2">
-                    <AlertTriangle className="h-4 w-4 text-yellow-600 mt-0.5 flex-shrink-0" />
-                    <div>
-                      <p className="font-medium text-yellow-900 text-sm mb-1">Notification Override</p>
-                      <p className="text-xs text-yellow-800">
-                        Compliance officers can disable notifications for specific regulations when appropriate. 
-                        Override controls are available on individual regulation pages.
-                      </p>
-                    </div>
+            {alertsExpanded && (
+              <CardContent className="pt-0">
+                {alertsLoading ? (
+                  <div className="py-8 text-center">
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-red-500 mx-auto mb-3" />
+                    <p className="text-sm text-muted-foreground">Loading alerts...</p>
                   </div>
-                </div>
+                ) : currentAlerts.length === 0 ? (
+                  <div className="py-8 text-center">
+                    <CheckCircle className="h-10 w-10 text-green-400 mx-auto mb-3" />
+                    <p className="text-muted-foreground">
+                      {alertTab === "overdue" ? "No overdue tasks — nice work!" : "No tasks due in the next 7 days."}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-2 max-h-[480px] overflow-y-auto pr-1">
+                    {currentAlerts.map((task) => {
+                      const isOverdue = alertTab === "overdue";
+                      const days = isOverdue ? daysOverdue(task.dueDate) : 0;
+                      const urgencyColor = isOverdue
+                        ? days > 30 ? "border-l-red-700 bg-red-50 dark:bg-red-950/30" : "border-l-red-400 bg-red-50/60 dark:bg-red-950/20"
+                        : "border-l-amber-400 bg-amber-50/60 dark:bg-amber-950/20";
 
-                {/* No Configuration Needed */}
-                <div className="bg-background border border-border rounded-lg p-3 text-center">
-                  <p className="text-sm text-muted-foreground">
-                    <strong>Automatic System:</strong> Monitors compliance deadlines and sends targeted notifications 
-                    based on your role and urgency. Officers can override notifications per regulation as needed.
-                  </p>
-                </div>
+                      return (
+                        <Link key={task.id} href={`/regulations/${task.regulationId}`}>
+                          <div className={`flex items-start gap-4 p-3 rounded-lg border-l-4 ${urgencyColor} cursor-pointer hover:opacity-80 transition-opacity`}>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium text-foreground truncate">{task.name}</p>
+                              <p className="text-xs text-muted-foreground truncate mt-0.5">
+                                {task.regulationName}
+                                {task.regulationTopic ? ` · ${task.regulationTopic}` : ""}
+                              </p>
+                              {task.assignedRole && (
+                                <span className="inline-block mt-1 text-[11px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
+                                  {task.assignedRole}
+                                </span>
+                              )}
+                            </div>
+
+                            <div className="flex-shrink-0 text-right">
+                              {isOverdue ? (
+                                <span className="text-xs font-semibold text-red-600">
+                                  {days}d overdue
+                                </span>
+                              ) : (
+                                <span className="text-xs font-medium text-amber-600">
+                                  {formatDistanceToNow(new Date(task.dueDate), { addSuffix: true })}
+                                </span>
+                              )}
+                              <p className="text-[11px] text-muted-foreground mt-0.5">
+                                {format(new Date(task.dueDate), "MMM d, yyyy")}
+                              </p>
+                            </div>
+
+                            <ExternalLink className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0 mt-0.5" />
+                          </div>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                )}
               </CardContent>
-            </Card>
+            )}
+          </Card>
 
-          {/* Filter and Stats Bar */}
-          <div className="flex items-center justify-between mb-6 p-4 bg-card rounded-lg border">
+          {/* ════════ NOTIFICATION SYSTEM INFO (collapsed by default) ════════ */}
+          <NotificationSystemInfo />
+
+          {/* ════════ NOTIFICATION HISTORY ════════ */}
+          <div className="flex items-center justify-between mb-4 p-4 bg-card rounded-lg border">
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
                 <Filter className="h-4 w-4 text-muted-foreground" />
@@ -281,24 +310,21 @@ export default function NotificationsPage() {
                 </select>
               </div>
             </div>
-            
             <div className="text-sm text-muted-foreground">
-              {notificationHistory ? (
-                <>Showing {notificationHistory.notifications.length} of {notificationHistory.total} notifications</>
-              ) : (
-                'Loading...'
-              )}
+              {notificationHistory
+                ? <>Showing {notificationHistory.notifications.length} of {notificationHistory.total} notifications</>
+                : "Loading..."}
             </div>
           </div>
 
           <Card className="shadow-sm">
             <CardHeader>
-              <CardTitle className="text-xl font-semibold">Notification History</CardTitle>
+              <CardTitle className="text-xl font-semibold">Email Notification History</CardTitle>
             </CardHeader>
             <CardContent className="p-0">
-              {isLoading ? (
+              {historyLoading ? (
                 <div className="p-8 text-center">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-4"></div>
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-4" />
                   <p className="text-muted-foreground">Loading notification history...</p>
                 </div>
               ) : !notificationHistory?.notifications.length ? (
@@ -306,9 +332,7 @@ export default function NotificationsPage() {
                   <Bell className="h-12 w-12 text-gray-300 mx-auto mb-4" />
                   <p className="text-muted-foreground text-lg mb-2">No notifications found</p>
                   <p className="text-muted-foreground text-sm">
-                    {statusFilter === 'all' 
-                      ? 'No notifications have been sent yet.' 
-                      : `No ${statusFilter} notifications found.`}
+                    {statusFilter === "all" ? "No notifications have been sent yet." : `No ${statusFilter} notifications found.`}
                   </p>
                 </div>
               ) : (
@@ -317,48 +341,28 @@ export default function NotificationsPage() {
                     <thead className="bg-background border-b">
                       <tr>
                         <th className="px-6 py-3 text-left">
-                          <button
-                            onClick={() => handleSort('type')}
-                            className="flex items-center gap-2 text-xs font-medium text-muted-foreground uppercase tracking-wider hover:text-foreground"
-                          >
-                            Notification
-                            {getSortIcon('type')}
+                          <button onClick={() => handleSort("type")} className="flex items-center gap-2 text-xs font-medium text-muted-foreground uppercase tracking-wider hover:text-foreground">
+                            Notification {getSortIcon("type")}
                           </button>
                         </th>
                         <th className="px-6 py-3 text-left">
-                          <button
-                            onClick={() => handleSort('status')}
-                            className="flex items-center gap-2 text-xs font-medium text-muted-foreground uppercase tracking-wider hover:text-foreground"
-                          >
-                            Status
-                            {getSortIcon('status')}
+                          <button onClick={() => handleSort("status")} className="flex items-center gap-2 text-xs font-medium text-muted-foreground uppercase tracking-wider hover:text-foreground">
+                            Status {getSortIcon("status")}
                           </button>
                         </th>
                         <th className="px-6 py-3 text-left">
-                          <button
-                            onClick={() => handleSort('priority')}
-                            className="flex items-center gap-2 text-xs font-medium text-muted-foreground uppercase tracking-wider hover:text-foreground"
-                          >
-                            Priority
-                            {getSortIcon('priority')}
+                          <button onClick={() => handleSort("priority")} className="flex items-center gap-2 text-xs font-medium text-muted-foreground uppercase tracking-wider hover:text-foreground">
+                            Priority {getSortIcon("priority")}
                           </button>
                         </th>
                         <th className="px-6 py-3 text-left">
-                          <button
-                            onClick={() => handleSort('createdAt')}
-                            className="flex items-center gap-2 text-xs font-medium text-muted-foreground uppercase tracking-wider hover:text-foreground"
-                          >
-                            Created
-                            {getSortIcon('createdAt')}
+                          <button onClick={() => handleSort("createdAt")} className="flex items-center gap-2 text-xs font-medium text-muted-foreground uppercase tracking-wider hover:text-foreground">
+                            Created {getSortIcon("createdAt")}
                           </button>
                         </th>
                         <th className="px-6 py-3 text-left">
-                          <button
-                            onClick={() => handleSort('sentAt')}
-                            className="flex items-center gap-2 text-xs font-medium text-muted-foreground uppercase tracking-wider hover:text-foreground"
-                          >
-                            Sent
-                            {getSortIcon('sentAt')}
+                          <button onClick={() => handleSort("sentAt")} className="flex items-center gap-2 text-xs font-medium text-muted-foreground uppercase tracking-wider hover:text-foreground">
+                            Sent {getSortIcon("sentAt")}
                           </button>
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
@@ -368,9 +372,9 @@ export default function NotificationsPage() {
                     </thead>
                     <tbody className="bg-card divide-y divide-gray-200">
                       {notificationHistory.notifications.map((notification) => (
-                        <tr 
-                          key={notification.id} 
-                          className={`hover:bg-background ${notification.regulation ? 'cursor-pointer' : ''}`}
+                        <tr
+                          key={notification.id}
+                          className={`hover:bg-background ${notification.regulation ? "cursor-pointer" : ""}`}
                           onClick={() => {
                             if (notification.regulation) {
                               window.location.href = `/regulations/${notification.regulation.id}`;
@@ -379,45 +383,31 @@ export default function NotificationsPage() {
                         >
                           <td className="px-6 py-4">
                             <div className="max-w-xs">
-                              <p className={`text-sm font-medium truncate ${notification.regulation ? 'text-blue-600' : 'text-foreground'}`}>
+                              <p className={`text-sm font-medium truncate ${notification.regulation ? "text-blue-600" : "text-foreground"}`}>
                                 {getNotificationTitle(notification)}
                               </p>
-                              <p className="text-sm text-muted-foreground truncate">
-                                {getNotificationDescription(notification)}
-                              </p>
+                              <p className="text-sm text-muted-foreground truncate">{getNotificationDescription(notification)}</p>
                               {notification.regulation && (
-                                <p className="text-xs text-blue-500 mt-1">
-                                  {notification.regulation.category} →
-                                </p>
+                                <p className="text-xs text-blue-500 mt-1">{notification.regulation.category} →</p>
                               )}
                             </div>
                           </td>
                           <td className="px-6 py-4">
                             {getStatusBadge(notification.status)}
-                            {notification.retryCount > 0 && (
-                              <p className="text-xs text-muted-foreground mt-1">
-                                Retries: {notification.retryCount}
-                              </p>
-                            )}
+                            {notification.retryCount > 0 && <p className="text-xs text-muted-foreground mt-1">Retries: {notification.retryCount}</p>}
                           </td>
-                          <td className="px-6 py-4">
-                            {getPriorityBadge(notification.priority)}
-                          </td>
+                          <td className="px-6 py-4">{getPriorityBadge(notification.priority)}</td>
                           <td className="px-6 py-4 text-sm text-foreground">
-                            {format(new Date(notification.createdAt), 'MMM d, yyyy')}
+                            {format(new Date(notification.createdAt), "MMM d, yyyy")}
                             <br />
-                            <span className="text-xs text-muted-foreground">
-                              {format(new Date(notification.createdAt), 'h:mm a')}
-                            </span>
+                            <span className="text-xs text-muted-foreground">{format(new Date(notification.createdAt), "h:mm a")}</span>
                           </td>
                           <td className="px-6 py-4 text-sm text-foreground">
                             {notification.sentAt ? (
                               <>
-                                {format(new Date(notification.sentAt), 'MMM d, yyyy')}
+                                {format(new Date(notification.sentAt), "MMM d, yyyy")}
                                 <br />
-                                <span className="text-xs text-muted-foreground">
-                                  {format(new Date(notification.sentAt), 'h:mm a')}
-                                </span>
+                                <span className="text-xs text-muted-foreground">{format(new Date(notification.sentAt), "h:mm a")}</span>
                               </>
                             ) : (
                               <span className="text-muted-foreground">Not sent</span>
@@ -426,12 +416,8 @@ export default function NotificationsPage() {
                           <td className="px-6 py-4 text-sm text-foreground">
                             {notification.user ? (
                               <>
-                                <p className="font-medium">
-                                  {notification.user.firstName} {notification.user.lastName}
-                                </p>
-                                <p className="text-xs text-muted-foreground">
-                                  {notification.user.email}
-                                </p>
+                                <p className="font-medium">{notification.user.firstName} {notification.user.lastName}</p>
+                                <p className="text-xs text-muted-foreground">{notification.user.email}</p>
                               </>
                             ) : (
                               <span className="text-muted-foreground">System</span>
@@ -448,11 +434,60 @@ export default function NotificationsPage() {
         </div>
       </main>
 
-      {/* Create Notification Modal */}
-      <CreateNotificationModal
-        isOpen={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
-      />
+      <CreateNotificationModal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} />
     </div>
+  );
+}
+
+// ── Collapsible info card ────────────────────────────────────
+
+function NotificationSystemInfo() {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <Card className="shadow-sm mb-6">
+      <CardHeader className="pb-0 cursor-pointer" onClick={() => setOpen(!open)}>
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-base font-medium flex items-center gap-2 text-muted-foreground">
+            <CheckCircle className="h-4 w-4 text-green-600" />
+            Smart Compliance Notification System
+          </CardTitle>
+          {open ? <ChevronUp className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
+        </div>
+      </CardHeader>
+      {open && (
+        <CardContent className="space-y-4 pt-4">
+          <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+            <div className="grid md:grid-cols-2 gap-4">
+              <div>
+                <p className="font-medium mb-2 flex items-center gap-2 text-blue-900 dark:text-blue-300">
+                  <Clock className="h-4 w-4" /> Notification Schedule:
+                </p>
+                <ul className="ml-6 space-y-1 text-sm text-blue-800 dark:text-blue-400">
+                  <li>• <strong>90 days before:</strong> Initial notice</li>
+                  <li>• <strong>60 days before:</strong> Second reminder</li>
+                  <li>• <strong>30 days before:</strong> Third reminder</li>
+                  <li>• <strong>7-1 days before:</strong> Daily reminders</li>
+                  <li>• <strong>Final day:</strong> Multiple reminders</li>
+                  <li className="border-t border-red-200 dark:border-red-800 pt-2 mt-2"><strong className="text-red-700 dark:text-red-400">Overdue Escalation:</strong></li>
+                  <li className="text-red-800 dark:text-red-400">• <strong>Day 1+:</strong> Immediate stakeholder alerts</li>
+                  <li className="text-red-800 dark:text-red-400">• <strong>Week 2+:</strong> Executive escalation</li>
+                </ul>
+              </div>
+              <div>
+                <p className="font-medium mb-2 flex items-center gap-2 text-blue-900 dark:text-blue-300">
+                  <Users className="h-4 w-4" /> Role-Based Escalation:
+                </p>
+                <ul className="ml-6 space-y-1 text-sm text-blue-800 dark:text-blue-400">
+                  <li>• <strong>90-8 days:</strong> Compliance Officers only</li>
+                  <li>• <strong>7-1 days:</strong> All stakeholders</li>
+                  <li className="text-xs mt-2">(CCO, Legal Counsel, Administrators)</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      )}
+    </Card>
   );
 }

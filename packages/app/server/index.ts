@@ -611,108 +611,40 @@ function startDatabaseMonitoring() {
   
 }
 
-// CRASH PREVENTION: Handle uncaught exceptions and unhandled rejections
+// ERROR HANDLING: Log but don't crash on transient errors
 process.on('uncaughtException', (error) => {
-  console.error('🚨 UNCAUGHT EXCEPTION - Server will attempt to continue:', error);
-  console.error('Stack trace:', error.stack);
-  console.error('Error name:', error.name);
-  console.error('Error message:', error.message);
-  
-  // Log the error but don't crash the server
-  // In production, you might want to restart the server gracefully
-  
-  // Don't exit the process - keep running
-  return false;
+  console.error('🚨 UNCAUGHT EXCEPTION:', error.message);
+  console.error(error.stack);
 });
 
-process.on('unhandledRejection', (reason, promise) => {
-  console.error('🚨 UNHANDLED PROMISE REJECTION at:', promise);
-  console.error('Reason:', reason);
-  
-  // Log the error but don't crash the server
-  
-  // Don't exit the process - keep running
-  return false;
+process.on('unhandledRejection', (reason) => {
+  console.error('🚨 UNHANDLED REJECTION:', reason);
 });
 
-// Handle specific database connection errors
-process.on('warning', (warning) => {
-  console.warn('⚠️  Process warning:', warning.name, warning.message);
-  if (warning.stack) {
-    console.warn('Warning stack:', warning.stack);
+// GRACEFUL SHUTDOWN: Clean up on SIGTERM/SIGINT so the process actually exits
+let isShuttingDown = false;
+
+async function gracefulShutdown(signal: string) {
+  if (isShuttingDown) return;
+  isShuttingDown = true;
+  console.log(`\n${signal} received — shutting down gracefully...`);
+
+  const forceExitTimer = setTimeout(() => {
+    console.error('Graceful shutdown timed out — forcing exit');
+    process.exit(1);
+  }, 5000);
+
+  try {
+    httpServer.close();
+    const { closeDatabaseConnections } = await import('./services/database');
+    await closeDatabaseConnections();
+  } catch (err) {
+    console.error('Error during shutdown:', err);
+  } finally {
+    clearTimeout(forceExitTimer);
+    process.exit(0);
   }
-});
+}
 
-// Override process.exit to prevent accidental crashes
- 
-const _originalExit = process.exit;
-process.exit = ((_code?: number) => {
-  console.error('🚨 PROCESS.EXIT CALLED - Preventing crash! Code:', _code);
-  console.error('Stack trace:', new Error().stack);
-  // Don't actually exit - just log it
-  return undefined as never;
-}) as typeof process.exit;
-
-// Graceful shutdown only on explicit signals
-process.on('SIGTERM', () => {
-  // Don't exit - keep running
-});
-
-process.on('SIGINT', () => {
-  // Don't exit - keep running
-});
-
-// Add additional error handlers
-process.on('beforeExit', (_code) => {
-  // Event logged for debugging
-});
-
-process.on('exit', (_code) => {
-  // Event logged for debugging
-});
-
-// Add domain error handling for synchronous errors
-process.on('multipleResolves', (type, promise, reason) => {
-  console.warn('🚨 MULTIPLE RESOLVES detected:', type, promise, reason);
-});
-
-// Catch any remaining synchronous errors
-process.on('disconnect', () => {
-});
-
-// Add setInterval to keep the process alive and detect crashes
-   
-  const _keepAliveInterval = setInterval(() => {
-  // This ensures the event loop stays active
-  // and prevents the process from exiting unexpectedly
-  const memUsage = process.memoryUsage();
-  if (memUsage.heapUsed > 1000 * 1024 * 1024) { // > 1GB
-    console.warn('🚨 HIGH MEMORY USAGE detected:', Math.round(memUsage.heapUsed / 1024 / 1024), 'MB');
-  }
-}, 60000); // Every minute
-
-// Enhanced error boundary for the entire application
-const originalConsoleError = console.error;
-console.error = (...args) => {
-  originalConsoleError.apply(console, args);
-  
-  // Check if this looks like a crash-inducing error
-  const errorString = args.join(' ');
-  if (errorString.includes('ECONNRESET') || 
-      errorString.includes('ENOTFOUND') || 
-      errorString.includes('ETIMEDOUT') ||
-      errorString.includes('connection terminated') ||
-      errorString.includes('Client has encountered a connection error')) {
-    
-    // Attempt to recover database connections
-    setTimeout(async () => {
-      try {
-        // Force a database health check
-        const { testConnection } = await import('./services/database');
-        await testConnection();
-      } catch (recoveryError) {
-        console.warn('⚠️  Database recovery failed, but server will continue:', recoveryError);
-      }
-    }, 2000);
-  }
-};
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));

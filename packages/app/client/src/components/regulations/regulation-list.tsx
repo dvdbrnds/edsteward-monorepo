@@ -35,17 +35,18 @@ import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 
 // Column definitions for visibility control
-type ColumnKey = 'id' | 'name' | 'category' | 'dro' | 'status' | 'nextDeadline' | 'lastUpdated' | 'jurisdiction' | 'appliesTo';
+type ColumnKey = 'id' | 'name' | 'riskScore' | 'category' | 'dro' | 'status' | 'nextDeadline' | 'lastUpdated' | 'jurisdiction' | 'appliesTo';
 
 interface ColumnDef {
   key: ColumnKey;
   label: string;
-  required?: boolean; // Required columns can't be hidden
+  required?: boolean;
 }
 
 const COLUMN_DEFINITIONS: ColumnDef[] = [
   { key: 'id', label: 'ID' },
-  { key: 'name', label: 'Name', required: true }, // Name should always be visible
+  { key: 'name', label: 'Name', required: true },
+  { key: 'riskScore', label: 'Risk' },
   { key: 'category', label: 'Category' },
   { key: 'dro', label: 'DRO' },
   { key: 'status', label: 'Status' },
@@ -105,13 +106,14 @@ function ColumnHeader({ columnKey, label, sortable, sortKey, activeSortKey, acti
 const getDefaultVisibility = (): Record<ColumnKey, boolean> => ({
   id: true,
   name: true,
+  riskScore: true,
   category: true,
   dro: true,
   status: true,
   nextDeadline: true,
   lastUpdated: true,
   jurisdiction: true,
-  appliesTo: true,
+  appliesTo: false,
 });
 
 interface RegulationListProps {
@@ -301,7 +303,9 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, app
     }
     if (search.trim()) {
       const searchLower = search.toLowerCase();
+      const regKey = ((reg as any).regKey || (reg as any).reg_key || '') as string;
       return (
+        regKey.toLowerCase().includes(searchLower) ||
         reg.itemId?.toLowerCase().includes(searchLower) ||
         reg.name?.toLowerCase().includes(searchLower) ||
         reg.topic?.toLowerCase().includes(searchLower) ||
@@ -316,6 +320,39 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, app
   const sortedRegulations = [...filteredRegulations].sort((a: Regulation, b: Regulation) => {
     if (!sortConfig) return 0;
 
+    // Sort by regKey for the ID column.
+    // REG-XXX entries first (sorted by number), then state codes alphabetically
+    // (each state group sorted by number).
+    if (sortConfig.key === 'id' as any) {
+      const aKey = ((a as any).regKey || (a as any).reg_key || '') as string;
+      const bKey = ((b as any).regKey || (b as any).reg_key || '') as string;
+      const parseKey = (k: string) => {
+        const m = k.match(/^([A-Z]{2,3})-(\d+)$/i);
+        if (!m) return { prefix: k, num: 0 };
+        return { prefix: m[1].toUpperCase(), num: parseInt(m[2], 10) };
+      };
+      const ap = parseKey(aKey);
+      const bp = parseKey(bKey);
+      let comparison: number;
+      if (ap.prefix === bp.prefix) {
+        comparison = ap.num - bp.num;
+      } else {
+        // REG sorts before any state code
+        const aIsReg = ap.prefix === 'REG' ? 0 : 1;
+        const bIsReg = bp.prefix === 'REG' ? 0 : 1;
+        comparison = aIsReg !== bIsReg ? aIsReg - bIsReg : ap.prefix.localeCompare(bp.prefix);
+      }
+      return sortConfig.direction === 'asc' ? comparison : -comparison;
+    }
+
+    // Numeric sort for risk score
+    if (sortConfig.key === 'riskScore' as any) {
+      const aScore = ((a as any).riskScore ?? (a as any).risk_score ?? 0) as number;
+      const bScore = ((b as any).riskScore ?? (b as any).risk_score ?? 0) as number;
+      const comparison = aScore - bScore;
+      return sortConfig.direction === 'asc' ? comparison : -comparison;
+    }
+
     const aValue = a[sortConfig.key];
     const bValue = b[sortConfig.key];
 
@@ -323,7 +360,6 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, app
     if (!aValue) return 1;
     if (!bValue) return -1;
 
-    // Handle date sorting for lastUpdated field
     if (sortConfig.key === 'lastUpdated') {
       const aTime = new Date(aValue as string).getTime();
       const bTime = new Date(bValue as string).getTime();
@@ -635,6 +671,20 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, app
                     />
                   </TableHead>
                 )}
+                {isColumnVisible('riskScore') && (
+                  <TableHead>
+                    <ColumnHeader 
+                      columnKey="riskScore" 
+                      label="Risk" 
+                      sortable 
+                      sortKey={'riskScore' as any} 
+                      activeSortKey={sortConfig?.key ?? null}
+                      activeSortDirection={sortConfig?.direction ?? null}
+                      onSort={handleSort}
+                      onHide={toggleColumn}
+                    />
+                  </TableHead>
+                )}
                 {isColumnVisible('category') && (
                   <TableHead>
                     <ColumnHeader 
@@ -738,8 +788,8 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, app
                   >
                     {isColumnVisible('id') && (
                       <TableCell>
-                        <div className="text-sm text-muted-foreground font-mono">
-                          {regulation.id}
+                        <div className="text-sm font-mono font-semibold text-foreground">
+                          {(regulation as any).regKey || (regulation as any).reg_key || regulation.id}
                         </div>
                       </TableCell>
                     )}
@@ -748,6 +798,26 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, app
                         <div className="text-base font-medium text-foreground">
                           {regulation.name || regulation.statute || 'Untitled Regulation'}
                         </div>
+                      </TableCell>
+                    )}
+                    {isColumnVisible('riskScore') && (
+                      <TableCell>
+                        {(() => {
+                          const score = (regulation as any).riskScore ?? (regulation as any).risk_score;
+                          const level = ((regulation as any).riskLevel ?? (regulation as any).risk_level ?? '') as string;
+                          if (score == null) return <span className="text-muted-foreground text-xs">--</span>;
+                          const colorClass =
+                            level === 'CRITICAL' ? 'bg-red-100 text-red-800 border-red-300' :
+                            level === 'SEVERE' ? 'bg-orange-100 text-orange-800 border-orange-300' :
+                            level === 'HIGH' ? 'bg-amber-100 text-amber-800 border-amber-300' :
+                            level === 'MODERATE' ? 'bg-yellow-100 text-yellow-800 border-yellow-300' :
+                            'bg-green-100 text-green-800 border-green-300';
+                          return (
+                            <Badge variant="outline" className={`text-xs font-medium ${colorClass}`}>
+                              {score} {level}
+                            </Badge>
+                          );
+                        })()}
                       </TableCell>
                     )}
                     {isColumnVisible('category') && (
