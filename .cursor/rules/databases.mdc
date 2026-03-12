@@ -1,0 +1,56 @@
+---
+description: "CRITICAL: Multi-tenant database architecture — production DB differs from local .env"
+globs:
+alwaysApply: true
+---
+
+# Database Architecture
+
+EdSteward is multi-tenant. Each environment/tenant has its own Neon PostgreSQL database. **The local `.env` DATABASE_URL is NOT the production database.**
+
+## CRITICAL: Production vs Local
+
+| What | Neon Host | Used By |
+|------|-----------|---------|
+| **PRODUCTION (Moravian)** | `ep-weathered-term-a5rmi9cx-pooler.us-east-2.aws.neon.tech/neondb` | ECS `edsteward-saml-production` |
+| **Local .env DATABASE_URL** | `ep-summer-pine-ae88mdbc-pooler` | Local dev server, backfill scripts |
+
+**NEVER assume `DATABASE_URL` from `.env` is production.** To get the actual production DB URL:
+```zsh
+aws ecs describe-task-definition --task-definition edsteward-saml-production \
+  --query 'taskDefinition.containerDefinitions[0].environment[?name==`DATABASE_URL`].value' --output text
+```
+
+## All Databases
+
+| Environment | .env Variable | Neon Host Prefix | Schema Version |
+|-------------|---------------|------------------|----------------|
+| Production (Moravian) | _not in .env_ — use ECS | `ep-weathered-term` | Current (has `reg_key`, `statutory_citation`) |
+| Local Dev + **Staging ECS** | `DATABASE_URL` | `ep-summer-pine` | Current |
+| Staging (unused) | `STAGING_DATABASE_URL` | `ep-fancy-scene` | Older (uses `item_id` not `reg_key`) |
+| Dev DB | `DEV_DATABASE_URL` | `ep-square-art` | Older |
+| Wossamotta (demo) | `WOSSAMOTTA_DATABASE_URL` | `ep-damp-brook` | Older |
+| Template | `TEMPLATE_DATABASE_URL` | `ep-divine-cherry` | Older |
+| Template (ECS) | _not in .env_ — use ECS | `ep-weathered-term/template_edsteward` | Older |
+
+**NOTE:** The staging ECS service (`edsteward-staging-cluster`) gets its `DATABASE_URL` from AWS Secrets Manager (`edsteward/staging/database-url`), which currently resolves to `ep-summer-pine` — the same DB as local dev. The `.env` `STAGING_DATABASE_URL` (`ep-fancy-scene`) is NOT what the deployed staging app uses.
+
+## Engine Database
+
+The MCP Engine uses a **local PostgreSQL** database, not Neon:
+- Connection: `postgresql://localhost:5432/mcp_engine`
+- This is the source of truth for regulation data before it syncs to app DBs
+
+## Data Sync Rules
+
+1. **Engine → App**: Engine pushes regulation data to the app via API (`/api/mcp/regulations/sync`) or direct DB writes in backfill scripts
+2. **When writing backfill scripts** that modify app data: always accept the target DB URL as a parameter or explicitly specify which database(s) to update
+3. **After backfilling dev**: remember to also sync to production (`ep-weathered-term`) and staging (`ep-fancy-scene`)
+4. **To verify production data**: query `ep-weathered-term` directly, not `ep-summer-pine`
+
+## Schema Differences
+
+Production and local dev share the latest schema. Staging and other tenants may be behind:
+- `regulations.reg_key`: exists in production + dev, missing in staging (uses `item_id`)
+- `compliance_tasks.statutory_citation`: exists in production + dev, may be missing elsewhere
+- When syncing to older-schema DBs, match on `name` instead of `reg_key`

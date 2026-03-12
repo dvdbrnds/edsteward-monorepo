@@ -1,0 +1,40 @@
+---
+description: "CRITICAL: Production is frozen — all deployments go to staging only"
+alwaysApply: true
+---
+
+# Production Safety — MANDATORY
+
+**Beta testers are actively using the Moravian production instance** (`moravian.edsteward.ai`). Production is effectively frozen.
+
+## The Rule
+
+**ALL code changes deploy to STAGING ONLY.** Never deploy to production unless the user explicitly asks.
+
+- Deploy target: `staging.edsteward.ai` (cluster: `edsteward-staging-cluster`)
+- Production (`moravian.edsteward.ai`) is OFF LIMITS unless the user says otherwise
+- This applies to deployments, database scripts, data syncs — everything
+
+## Development Workflow
+
+1. **Local dev** (`DATABASE_URL` / `ep-summer-pine`) — for coding and local testing
+2. **Staging** (`staging.edsteward.ai` / same `ep-summer-pine` DB via Secrets Manager) — deploy and verify here
+3. **Production** (`ep-weathered-term`) — ONLY when the user explicitly requests it
+
+## Deployment Rules
+
+1. **Staging only** — Use `./scripts/deploy-staging.sh` for all deployments
+2. **Never run `deploy-production.sh`** or any production deploy script unless the user specifically asks
+3. **No destructive migrations** — Schema changes must be additive (new columns with defaults, no drops/renames)
+4. **Smoke test after deploy** — Verify staging health (`/api/health`) after every deployment
+
+## Database Rules
+
+1. **Never run scripts against production** (`ep-weathered-term`) — not even "safe" reads unless asked
+2. **Backfill scripts must be idempotent** — safe to re-run without corrupting existing data
+3. **Accept target DB as a parameter** — never hardcode connection strings
+
+## Code Change Rules
+
+1. **Backward-compatible changes only** — don't break existing endpoints or workflows
+2. **When in doubt, ask** — if a change could affect production or live users, confirm first

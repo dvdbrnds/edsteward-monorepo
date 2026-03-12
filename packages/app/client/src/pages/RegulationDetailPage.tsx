@@ -173,6 +173,7 @@ import { SendAttestationDialog } from "@/components/regulations/send-attestation
 import { ComplianceTasksPanel } from "@/components/regulations/compliance-tasks-panel";
 import { ExecutiveOrdersPanel } from "@/components/regulations/executive-orders-panel";
 import { AuditTrailPanel } from "@/components/regulations/audit-trail-panel";
+import { StatutoryFramework } from "@/components/regulations/statutory-framework";
 import { useAuth } from "@/hooks/use-auth";
 
 const CATEGORIES = [
@@ -250,7 +251,21 @@ function RegulationDetailPage() {
   // Fetch compliance tasks to determine if accordion should be open
   // API returns {tasks, totalTasks, completedTasks, progress}
   const { data: complianceTasksData } = useQuery<{
-    tasks: Array<{ id: number; status: string }>;
+    tasks: Array<{
+      id: number;
+      status: string;
+      title?: string;
+      statutoryCitation?: string | null;
+      statutoryLanguage?: string | null;
+      parentTaskId?: number | null;
+      subTasks?: Array<{
+        id: number;
+        title?: string;
+        statutoryCitation?: string | null;
+        statutoryLanguage?: string | null;
+        parentTaskId?: number | null;
+      }>;
+    }>;
     totalTasks: number;
     completedTasks: number;
     progress: number;
@@ -268,6 +283,42 @@ function RegulationDetailPage() {
   
   // Extract tasks array for backward compatibility
   const complianceTasks = complianceTasksData?.tasks || [];
+
+  // Extract task citations for the statutory framework view
+  const taskCitations = React.useMemo(() => {
+    const citations: Array<{
+      id: number;
+      title: string;
+      statutoryCitation: string;
+      statutoryLanguage?: string | null;
+      parentTaskId?: number | null;
+    }> = [];
+    for (const task of complianceTasks) {
+      if (task.statutoryCitation && task.title) {
+        citations.push({
+          id: task.id,
+          title: task.title,
+          statutoryCitation: task.statutoryCitation,
+          statutoryLanguage: task.statutoryLanguage,
+          parentTaskId: task.parentTaskId,
+        });
+      }
+      if (task.subTasks) {
+        for (const sub of task.subTasks) {
+          if (sub.statutoryCitation && sub.title) {
+            citations.push({
+              id: sub.id,
+              title: sub.title,
+              statutoryCitation: sub.statutoryCitation,
+              statutoryLanguage: sub.statutoryLanguage,
+              parentTaskId: sub.parentTaskId,
+            });
+          }
+        }
+      }
+    }
+    return citations;
+  }, [complianceTasks]);
 
   // Auto-collapse compliance tasks accordion if all tasks are complete
   useEffect(() => {
@@ -1519,14 +1570,23 @@ function RegulationDetailPage() {
                   </div>
                   {fullTextOpen ? <ChevronDown className="h-5 w-5 text-muted-foreground" /> : <ChevronRight className="h-5 w-5 text-muted-foreground" />}
                 </CollapsibleTrigger>
-                <CollapsibleContent className="bg-card rounded-b-lg border-x border-b px-4 pb-4">
-                  <div className="prose prose-sm max-w-none pt-4 text-foreground">
-                    {regulation.regulationText ? (
-                      <div dangerouslySetInnerHTML={{ __html: renderMarkdown(regulation.regulationText) }} />
-                    ) : (
-                      <p className="text-muted-foreground italic">Full regulation text is not available.</p>
-                    )}
-                  </div>
+                <CollapsibleContent className="bg-card rounded-b-lg border-x border-b px-4 pb-4 pt-4">
+                  {regulation?.statute ? (
+                    <StatutoryFramework
+                      statute={regulation.statute}
+                      regulationText={regulation.regulationText}
+                      taskCitations={taskCitations}
+                      renderMarkdown={renderMarkdown}
+                    />
+                  ) : (
+                    <div className="prose prose-sm max-w-none text-foreground">
+                      {regulation.regulationText ? (
+                        <div dangerouslySetInnerHTML={{ __html: renderMarkdown(regulation.regulationText) }} />
+                      ) : (
+                        <p className="text-muted-foreground italic">Full regulation text is not available.</p>
+                      )}
+                    </div>
+                  )}
                 </CollapsibleContent>
               </Collapsible>
 

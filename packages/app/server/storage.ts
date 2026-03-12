@@ -2415,7 +2415,7 @@ export class DatabaseStorage implements IStorage {
           title: "EdSteward Admin Console",
           logoUrl: "/assets/generic-logo.svg",
           faviconUrl: "/favicon.ico",
-          primaryColor: "#dc2626", // Red for admin
+          primaryColor: "#dc2626",
           secondaryColor: "#b91c1c",
           accentColor: "#ef4444",
           loginScreenBackgroundColor: "#fef2f2",
@@ -2424,6 +2424,25 @@ export class DatabaseStorage implements IStorage {
           loginScreenHeroColor: "#991b1b",
         };
         return adminConfig;
+      }
+
+      // Local dev gets its own branding so it's visually distinct from staging/production
+      if (process.env.NODE_ENV === 'development') {
+        const devConfig = {
+          institutionName: "EdSteward Local Dev",
+          title: "EdSteward Local Dev",
+          logoUrl: "/assets/generic-logo.svg",
+          faviconUrl: "/favicon.ico",
+          primaryColor: "#7c3aed",
+          secondaryColor: "#6d28d9",
+          accentColor: "#a78bfa",
+          loginScreenBackgroundColor: "#f5f3ff",
+          loginScreenAccentColor: "#7c3aed",
+          loginScreenTextColor: "#1f2937",
+          loginScreenHeroColor: "#4c1d95",
+          tenantId: "local-dev",
+        };
+        return devConfig;
       }
 
       // Priority 2: Database configuration from tenant-specific or default pool
