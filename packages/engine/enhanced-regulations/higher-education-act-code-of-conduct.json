@@ -30,5 +30,8 @@
   "relationships": [],
   "tags": [
     "Fundraising & Development"
+  ],
+  "applicableInstitutions": [
+    "title-iv-participant"
   ]
 }

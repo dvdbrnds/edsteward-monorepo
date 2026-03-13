@@ -3,6 +3,7 @@ import type { Regulation, Deadline, RegulationAction } from "@shared/schema";
 import { useLocation } from "wouter";
 import { Search, CheckCircle, AlertCircle, Clock, Loader2, ArrowUpDown, ArrowUp, ArrowDown, Check, Globe, Mail, FileText, X, Filter, Eye, EyeOff, Columns, RotateCcw, MapPin } from "lucide-react";
 import { JURISDICTION_SOURCES } from "@/components/filters/enhanced-jurisdiction-filter";
+import { useInstitutionFilter } from "@/hooks/use-institution-filter";
 import { format } from "date-fns";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -119,7 +120,6 @@ const getDefaultVisibility = (): Record<ColumnKey, boolean> => ({
 interface RegulationListProps {
   categoryFilter: string | null;
   jurisdictionFilter: 'federal' | 'state' | null;
-  appliesToFilter?: string[];
 }
 
 type SortConfig = {
@@ -133,7 +133,8 @@ type StatusFilter = 'all' | 'overdue' | 'upcoming' | 'no-deadlines';
 
 const HIDE_COMPLIANT_KEY = 'edsteward-hide-compliant';
 
-export default function RegulationList({ categoryFilter, jurisdictionFilter, appliesToFilter }: RegulationListProps) {
+export default function RegulationList({ categoryFilter, jurisdictionFilter }: RegulationListProps) {
+  const { regulationsQueryKey } = useInstitutionFilter();
   const [search, setSearch] = useState("");
   const [sortConfig, setSortConfig] = useState<SortConfig>({ key: 'lastUpdated', direction: 'desc' });
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
@@ -188,7 +189,7 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, app
   const isColumnVisible = (key: ColumnKey) => columnVisibility[key];
 
   const { data: regulations = [], isLoading: regulationsLoading, error: regulationsError } = useQuery<Regulation[]>({
-    queryKey: ["/api/regulations"],
+    queryKey: regulationsQueryKey,
   });
 
   const { data: deadlinesData = [], isLoading: deadlinesLoading } = useQuery<Deadline[]>({
@@ -281,14 +282,6 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, app
     if (jurisdictionSourceFilter !== 'all') {
       const regSource = reg.jurisdictionSource || 'federal';
       if (regSource !== jurisdictionSourceFilter) return false;
-    }
-    if (appliesToFilter && appliesToFilter.length > 0) {
-      const hasMatch = appliesToFilter.some(filterType => 
-        reg.applicableInstitutions?.includes(filterType)
-      );
-      if (!hasMatch) {
-        return false;
-      }
     }
     // Status filter
     if (statusFilter !== 'all') {
@@ -476,7 +469,7 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, app
     }
   };
 
-  const hasActiveFilters = search || statusFilter !== 'all' || jurisdictionSourceFilter !== 'all' || hideCompliant || categoryFilter || jurisdictionFilter || (appliesToFilter && appliesToFilter.length > 0);
+  const hasActiveFilters = search || statusFilter !== 'all' || jurisdictionSourceFilter !== 'all' || hideCompliant || categoryFilter || jurisdictionFilter;
   const totalCount = Array.isArray(regulations) ? regulations.length : 0;
 
   const clearAllFilters = () => {

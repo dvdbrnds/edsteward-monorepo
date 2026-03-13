@@ -5,6 +5,24 @@ All notable changes to EdSteward are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.1] - 2026-03-12
+
+### Added
+- AI-powered compliance action detection — automatically identifies which of the 4
+  compliance steps (attestation, website publish, community communication, agency
+  submission) each regulation requires based on statutory analysis
+- Template action knowledge base for 17+ key regulations (Clery, FERPA, Title IX,
+  ADA, OSHA, HIPAA, GLBA, PA Act 55, etc.) with curated action requirements
+- Regex fallback detection for regulations not covered by templates or AI pipeline
+- "What's New" changelog page accessible from version badge and user dropdown
+- Engine-to-app action sync — correct action types auto-enabled on regulation delivery
+
+### Changed
+- Regulation actions now reflect actual statutory obligations instead of defaulting
+  to attestation-only
+- Sync and create endpoints preserve existing user completion state when updating
+  action flags from the engine
+
 ## [1.5.0] - 2026-03-09
 
 ### Changed
@@ -374,6 +392,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Version | Date | Milestone |
 |---------|------|-----------|
+| 1.5.1 | 2026-03-12 | Smart compliance actions, changelog page |
 | 1.5.0 | 2026-03-09 | Monorepo migration, API key rotation, security scrub |
 | 1.4.x | 2026-02-12 | MCP schema alignment, task dedup, EO support |
 | 1.2.0 | 2026-01-15 | Demo prep fixes, attestation display |

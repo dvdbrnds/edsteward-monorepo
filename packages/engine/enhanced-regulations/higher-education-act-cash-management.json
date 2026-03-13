@@ -46,5 +46,8 @@
   "relationships": [],
   "tags": [
     "Higher Education Act: Cash Management"
+  ],
+  "applicableInstitutions": [
+    "title-iv-participant"
   ]
 }

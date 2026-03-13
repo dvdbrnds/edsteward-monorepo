@@ -46,5 +46,8 @@
   "relationships": [],
   "tags": [
     "Financial Aid"
+  ],
+  "applicableInstitutions": [
+    "title-iv-participant"
   ]
 }

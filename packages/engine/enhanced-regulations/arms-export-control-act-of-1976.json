@@ -38,5 +38,8 @@
   "relationships": [],
   "tags": [
     "Export Controls"
+  ],
+  "applicableInstitutions": [
+    "research-intensive"
   ]
 }

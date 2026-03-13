@@ -1767,6 +1767,146 @@ const TASK_TEMPLATES = {
 };
 
 /**
+ * Required compliance action types per regulation.
+ * Identifies which of the 4 workflow steps each regulation mandates:
+ *   attestation — always true
+ *   website_publish — must post something publicly online
+ *   community_communication — must notify students/employees/community
+ *   agency_submission — must file/submit to a government agency
+ */
+const REGULATION_ACTIONS = {
+  'clery-act': {
+    attestation: { required: true, reason: 'Institutional compliance certification' },
+    website_publish: { required: true, reason: 'Must publish Annual Security Report on website (20 U.S.C. § 1092(f))' },
+    community_communication: { required: true, reason: 'Must distribute ASR notice to all students and employees annually' },
+    agency_submission: { required: true, reason: 'Must submit crime statistics to Department of Education Campus Safety Survey' },
+  },
+  'ferpa': {
+    attestation: { required: true, reason: 'Institutional compliance certification' },
+    website_publish: { required: true, reason: 'Must publish FERPA rights notification and directory information policy' },
+    community_communication: { required: true, reason: 'Must annually notify students of their FERPA rights' },
+    agency_submission: { required: false, reason: 'No routine agency filing required (complaints go to FPCO)' },
+  },
+  'title-ix': {
+    attestation: { required: true, reason: 'Institutional compliance certification' },
+    website_publish: { required: true, reason: 'Must publish non-discrimination statement, grievance procedures, and coordinator contact on website' },
+    community_communication: { required: true, reason: 'Must notify all students and employees of Title IX rights and coordinator' },
+    agency_submission: { required: false, reason: 'No routine agency filing (OCR complaints are reactive)' },
+  },
+  'americans-with-disabilities-act-of-1990': {
+    attestation: { required: true, reason: 'Institutional compliance certification' },
+    website_publish: { required: true, reason: 'Must publish ADA policy, coordinator contact, and grievance procedures on website' },
+    community_communication: { required: true, reason: 'Must distribute ADA policy to students and employees via handbooks' },
+    agency_submission: { required: false, reason: 'No routine agency filing (complaints go to DOJ/OCR)' },
+  },
+  'occupational-safety-and-health-act-of-1970': {
+    attestation: { required: true, reason: 'Institutional compliance certification' },
+    website_publish: { required: false, reason: 'No website publication required (physical posting of 300A required)' },
+    community_communication: { required: true, reason: 'Must post OSHA 300A summary in conspicuous workplace location' },
+    agency_submission: { required: true, reason: 'Must submit OSHA 300A electronic filing and report severe injuries to OSHA' },
+  },
+  'higher-education-act-title-iv-student-financial-a': {
+    attestation: { required: true, reason: 'Institutional compliance certification' },
+    website_publish: { required: true, reason: 'Must publish consumer information, net price calculator, and gainful employment data on website' },
+    community_communication: { required: true, reason: 'Must provide consumer information disclosures to students and prospective students' },
+    agency_submission: { required: true, reason: 'Must maintain PPA, submit FISAP, and report to Department of Education' },
+  },
+  'health-insurance-portability-and-accountability-ac': {
+    attestation: { required: true, reason: 'Institutional compliance certification' },
+    website_publish: { required: true, reason: 'Must publish Notice of Privacy Practices' },
+    community_communication: { required: true, reason: 'Must distribute Notice of Privacy Practices to patients' },
+    agency_submission: { required: true, reason: 'Must report breaches to HHS Office for Civil Rights' },
+  },
+  'gramm-leach-bliley-act-glba': {
+    attestation: { required: true, reason: 'Institutional compliance certification' },
+    website_publish: { required: false, reason: 'No specific website publication requirement' },
+    community_communication: { required: true, reason: 'Must provide initial and annual privacy notices to students' },
+    agency_submission: { required: true, reason: 'Must document compliance for FTC Safeguards Rule; report to Student Aid Internet Gateway' },
+  },
+  'drug-free-schools-and-communities-act': {
+    attestation: { required: true, reason: 'Institutional compliance certification' },
+    website_publish: { required: true, reason: 'Drug prevention program information should be publicly accessible' },
+    community_communication: { required: true, reason: 'Must distribute annual notification to all students and employees' },
+    agency_submission: { required: true, reason: 'Biennial review must be available to Department of Education upon request' },
+  },
+  'campus-sexual-violence-elimination-act': {
+    attestation: { required: true, reason: 'Institutional compliance certification' },
+    website_publish: { required: true, reason: 'Must publish policy and reporting options on website' },
+    community_communication: { required: true, reason: 'Must provide primary prevention programs to incoming students and new employees' },
+    agency_submission: { required: false, reason: 'No routine agency filing (included in Clery ASR submission)' },
+  },
+  'violence-against-women-reauthorization-act': {
+    attestation: { required: true, reason: 'Institutional compliance certification' },
+    website_publish: { required: true, reason: 'Must publish VAWA definitions and procedures in policy documents accessible online' },
+    community_communication: { required: true, reason: 'Must provide training materials and notification of protective measures' },
+    agency_submission: { required: false, reason: 'No separate agency filing (included in Clery reporting)' },
+  },
+  'family-medical-leave-act': {
+    attestation: { required: true, reason: 'Institutional compliance certification' },
+    website_publish: { required: false, reason: 'No website publication required (physical posting required)' },
+    community_communication: { required: true, reason: 'Must post FMLA notice in conspicuous location and include in employee handbook' },
+    agency_submission: { required: false, reason: 'No routine filing (DOL complaints are reactive)' },
+  },
+  'solomon-amendment': {
+    attestation: { required: true, reason: 'Institutional compliance certification' },
+    website_publish: { required: false, reason: 'No website publication specifically required' },
+    community_communication: { required: true, reason: 'Must notify students of right to opt out of directory information release to military' },
+    agency_submission: { required: false, reason: 'No routine agency filing' },
+  },
+  'higher-education-opportunity-act': {
+    attestation: { required: true, reason: 'Institutional compliance certification' },
+    website_publish: { required: true, reason: 'Must maintain consumer information web page with disclosures' },
+    community_communication: { required: true, reason: 'Must provide voter registration forms and Constitution Day programming' },
+    agency_submission: { required: true, reason: 'Must submit various disclosures to Department of Education' },
+  },
+  'copyright-dmca': {
+    attestation: { required: true, reason: 'Institutional compliance certification' },
+    website_publish: { required: true, reason: 'Must publish copyright policy and legal alternatives information on website' },
+    community_communication: { required: true, reason: 'Must educate students and employees about copyright law' },
+    agency_submission: { required: true, reason: 'Must register DMCA agent with Copyright Office' },
+  },
+  'section-504-of-the-rehabilitation-act-of-1973': {
+    attestation: { required: true, reason: 'Institutional compliance certification' },
+    website_publish: { required: true, reason: 'Must publish Section 504 non-discrimination notice on website' },
+    community_communication: { required: true, reason: 'Must publicize coordinator contact and grievance procedures' },
+    agency_submission: { required: false, reason: 'No routine agency filing (complaints go to OCR)' },
+  },
+  'general-data-protection-regulation': {
+    attestation: { required: true, reason: 'Institutional compliance certification' },
+    website_publish: { required: true, reason: 'Must publish GDPR-compliant privacy notice on website (Articles 13/14)' },
+    community_communication: { required: true, reason: 'Must notify data subjects of their rights and data processing activities' },
+    agency_submission: { required: true, reason: 'Must report data breaches to supervisory authority within 72 hours' },
+  },
+  'pennsylvania-act-55-of-2022': {
+    attestation: { required: true, reason: 'Annual attestation of compliance to PA Department of Education (Section 2006-G)' },
+    website_publish: { required: true, reason: 'Must publish notification of rights and accommodations on public website (Section 2003-G(c))' },
+    community_communication: { required: true, reason: 'Must deliver education program to ALL students annually (Section 2003-G)' },
+    agency_submission: { required: true, reason: 'Must submit annual attestation to PA Department of Education (Section 2006-G)' },
+  },
+};
+
+const REGULATION_ACTIONS_ALIASES = {
+  'ada': 'americans-with-disabilities-act-of-1990',
+  'osha': 'occupational-safety-and-health-act-of-1970',
+  'title-iv': 'higher-education-act-title-iv-student-financial-a',
+  'hipaa': 'health-insurance-portability-and-accountability-ac',
+  'glba': 'gramm-leach-bliley-act-glba',
+  'save-act': 'campus-sexual-violence-elimination-act',
+  'vawa': 'violence-against-women-reauthorization-act',
+  'fmla': 'family-medical-leave-act',
+  'heoa': 'higher-education-opportunity-act',
+  'digital-millennium-copyright-act': 'copyright-dmca',
+  'dmca': 'copyright-dmca',
+  'section-504': 'section-504-of-the-rehabilitation-act-of-1973',
+  'gdpr': 'general-data-protection-regulation',
+  'reg-gdpr-2016-679': 'general-data-protection-regulation',
+  'eu-gdpr': 'general-data-protection-regulation',
+  'jeanne-clery-disclosure-of-campus-security-policy-': 'clery-act',
+  'family-educational-rights-and-privacy-act-ferpa': 'ferpa',
+  'title-ix-of-the-education-amendment-of-1972': 'title-ix',
+};
+
+/**
  * Compliance Task Generator Service
  */
 export class ComplianceTaskGenerator {
@@ -1894,6 +2034,39 @@ export class ComplianceTaskGenerator {
   }
 
   /**
+   * Get required compliance actions for a regulation.
+   * Returns the 4 action types with required/reason for each.
+   * Falls back to attestation-only if no template or AI result is available.
+   */
+  getRequiredActions(regulationSlug, aiExtractedActions = null) {
+    const normalizedSlug = regulationSlug.toLowerCase();
+    
+    // Check direct match first, then aliases
+    const canonicalSlug = REGULATION_ACTIONS_ALIASES[normalizedSlug] || normalizedSlug;
+    const templateActions = REGULATION_ACTIONS[canonicalSlug];
+    
+    if (templateActions) {
+      this.logger.info(`Found action template for ${regulationSlug} → ${Object.entries(templateActions).filter(([,v]) => v.required).map(([k]) => k).join(', ')}`);
+      return templateActions;
+    }
+    
+    // Use AI-extracted actions if available
+    if (aiExtractedActions) {
+      this.logger.info(`Using AI-extracted actions for ${regulationSlug}`);
+      return aiExtractedActions;
+    }
+    
+    // Default: attestation only
+    this.logger.info(`No action template for ${regulationSlug} — defaulting to attestation only`);
+    return {
+      attestation: { required: true, reason: 'Compliance attestation always required' },
+      website_publish: { required: false, reason: 'No specific website publication requirement identified' },
+      community_communication: { required: false, reason: 'No specific community notification requirement identified' },
+      agency_submission: { required: false, reason: 'No specific agency submission requirement identified' },
+    };
+  }
+
+  /**
    * Get all available task templates
    */
   getAvailableTemplates() {
@@ -1907,5 +2080,5 @@ export class ComplianceTaskGenerator {
 }
 
 export default ComplianceTaskGenerator;
-export { ROLES, EVIDENCE_TYPES, TEMPLATE_REGULATIONS, TASK_TEMPLATES };
+export { ROLES, EVIDENCE_TYPES, TEMPLATE_REGULATIONS, TASK_TEMPLATES, REGULATION_ACTIONS, REGULATION_ACTIONS_ALIASES };
 

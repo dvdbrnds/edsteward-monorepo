@@ -46,5 +46,8 @@
   "relationships": [],
   "tags": [
     "Fair and Accurate Credit Transaction Act (FACTA)"
+  ],
+  "applicableInstitutions": [
+    "all-institutions"
   ]
 }

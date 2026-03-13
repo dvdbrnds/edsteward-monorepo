@@ -13,12 +13,8 @@
     "summary": "The TEACH Act (17 U.S.C. § 110(2)) permits accredited nonprofit educational institutions to transmit copyrighted materials during digital distance education without prior permission, subject to technological protection requirements, enrollment restrictions, and institutional copyright policy requirements.",
     "requirements": "## Institutional Requirements\n- Must be an accredited nonprofit educational institution\n- Must have copyright policies in place and actively disseminate them\n- Must provide informational materials about copyright to faculty, students, and staff\n- Must provide notice to students that materials may be protected by copyright\n\n## Transmission Requirements\n- Performances and displays must be made by, at the direction of, or under actual supervision of an instructor\n- Must be an integral part of a class session offered as a regular part of systematic mediated instructional activities\n- Must be directly related to and of material assistance to the teaching content\n- Reception must be limited to students officially enrolled in the course\n\n## Technological Requirements\n- Apply technological measures that reasonably prevent retention of the work beyond the class session\n- Apply technological measures that reasonably prevent unauthorized further dissemination\n- Do not engage in conduct that could interfere with technological measures used by copyright owners\n\n## Content Limitations\n- Only reasonable and limited portions of dramatic literary or musical works may be performed\n- Nondramatic literary or musical works may be performed in their entirety\n- Cannot use materials produced primarily for the digital education market\n- Cannot use works the institution knows or should know were unlawfully made or acquired\n- Cannot use textbooks, coursepacks, or materials typically purchased by students",
     "reportingRequirements": "Institutions must maintain records demonstrating compliance with TEACH Act requirements, including documentation of copyright policies, faculty training completion, and technological protection measures. Annual compliance audits are recommended to verify proper implementation of access controls and copyright notices in learning management systems."
-  }
+  },
+  "applicableInstitutions": [
+    "all-institutions"
+  ]
 }
-
-
-
-
-
-
-

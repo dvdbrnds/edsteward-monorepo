@@ -30,5 +30,8 @@
   "relationships": [],
   "tags": [
     "Human Resources"
+  ],
+  "applicableInstitutions": [
+    "research-intensive"
   ]
 }

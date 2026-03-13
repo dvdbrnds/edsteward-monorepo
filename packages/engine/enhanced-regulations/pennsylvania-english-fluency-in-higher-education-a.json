@@ -1,24 +1,23 @@
 {
   "regulationId": "pennsylvania-english-fluency-in-higher-education-a",
   "schemaVersion": "2.0",
-
   "jurisdiction": {
     "source": "state",
     "countryCode": "US",
-    "stateCodes": ["PA"],
+    "stateCodes": [
+      "PA"
+    ],
     "label": "Pennsylvania",
     "regulatoryBody": "Pennsylvania Department of Education",
     "actNumber": "Act 36 of 1990",
     "applicability": "all"
   },
-
   "enhanced": {
     "fullText": "The Pennsylvania English Fluency in Higher Education Act, codified at 24 P.S. § 2510.1 et seq., establishes mandatory English language proficiency requirements for all instructional faculty at Pennsylvania's higher education institutions. Enacted in 1990 and last amended in 2018, this regulation requires institutions to ensure that students can readily understand their instructors' spoken English in classroom settings.\n\nUnder 24 P.S. § 2510.2, the Act applies to all degree-granting institutions receiving state funding, including state-owned universities, community colleges, and private institutions participating in Pennsylvania Higher Education Assistance Agency programs. The regulation defines 'instructor' broadly to include teaching assistants, adjunct faculty, visiting professors, and any individual providing direct classroom instruction to students enrolled in credit-bearing courses.\n\nKey provisions under 24 P.S. § 2510.3 require institutions to implement comprehensive English proficiency assessment programs. New instructors must demonstrate oral English competency through standardized testing (minimum TOEFL iBT speaking score of 26 or IELTS speaking band score of 8.0) or institutional assessment protocols approved by the Pennsylvania Department of Education. Current faculty identified as having communication difficulties must complete remedial English instruction within 12 months or face employment action.\n\nThe Act establishes student complaint procedures under 24 P.S. § 2510.4, requiring institutions to investigate formal complaints within 30 days and provide written responses. Students may appeal institutional decisions to the Pennsylvania Department of Education within 60 days. Institutions must maintain records of all complaints and remedial actions for five years.\n\nEnforcement mechanisms include state funding penalties for non-compliant institutions. Under 24 P.S. § 2510.6, the Pennsylvania Department of Education may withhold up to 10% of state appropriations for institutions failing to meet compliance standards. Repeat violations may result in suspension from state student aid programs.\n\nRecent 2018 amendments expanded coverage to online instruction and established reciprocity agreements with other states maintaining substantially equivalent standards. The regulation aligns with federal civil rights protections under Title VI of the Civil Rights Act of 1964 (42 U.S.C. § 2000d) while ensuring educational accessibility for Pennsylvania students.",
     "summary": "Pennsylvania statute requiring higher education institutions to ensure English language proficiency of all instructional faculty through assessment, testing, and student complaint procedures, with state funding penalties for non-compliance.",
     "requirements": "## Core Assessment Requirements\n- Conduct English proficiency testing for all new instructional faculty before classroom assignment\n- Maintain TOEFL iBT speaking scores ≥26 or IELTS speaking band scores ≥8.0 for non-native speakers\n- Implement institutional assessment protocols approved by Pennsylvania Department of Education\n- Complete assessments within 30 days of hiring or appointment\n\n## Student Complaint Procedures\n- Establish formal complaint mechanisms for students to report instructor communication issues\n- Investigate all formal complaints within 30-day timeframe\n- Provide written responses to complainants with specific remedial actions\n- Maintain appeal processes allowing Department of Education review\n\n## Faculty Remediation Programs\n- Provide English language improvement resources for faculty not meeting standards\n- Complete remedial instruction within 12-month period\n- Document all remediation efforts and outcomes\n- Implement employment actions for faculty failing to achieve proficiency\n\n## Record Maintenance\n- Retain all proficiency test results and assessment documentation\n- Maintain complaint records and institutional responses for five-year period\n- Document all remedial actions and faculty improvement plans",
     "reportingRequirements": "Annual compliance reports due September 30 to Pennsylvania Department of Education documenting faculty assessments, student complaints, and remedial actions. Immediate notification required for formal student complaints filed with external agencies."
   },
-
   "deadlines": [
     {
       "date": "09-30",
@@ -43,15 +42,12 @@
       "isRecurring": false
     }
   ],
-
   "relationships": [],
-
   "tags": [
     "Academic Programs",
     "Faculty and Staff",
     "Language Requirements"
   ],
-
   "audit": {
     "score": 96,
     "certainty": "A",
@@ -64,5 +60,8 @@
     "timestamp": "2025-12-05T13:35:25.499Z"
   },
   "statute": "24 P.S. § 6803 (Act 36 of 1990)",
-  "topic": "Academic Programs"
+  "topic": "Academic Programs",
+  "applicableInstitutions": [
+    "all-institutions"
+  ]
 }

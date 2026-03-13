@@ -107,7 +107,8 @@ export interface Tenant {
       ssoEnabled?: boolean;
     };
     institutionConfig?: {
-      primaryTypes: string[];
+      primaryType: string | null;
+      characteristics: string[];
       hideNonApplicable: boolean;
       allowUsersToToggle: boolean;
     };
@@ -157,7 +158,8 @@ const TENANT_REGISTRY: Record<string, Tenant> = {
         maxRegulations: 10000
       },
       institutionConfig: {
-        primaryTypes: ['public-universities', 'private-universities'],
+        primaryType: null,
+        characteristics: [],
         hideNonApplicable: true,
         allowUsersToToggle: true
       }
@@ -206,7 +208,8 @@ const TENANT_REGISTRY: Record<string, Tenant> = {
         maxRegulations: 5000
       },
       institutionConfig: {
-        primaryTypes: ['private-universities', 'religious-institutions'],
+        primaryType: 'private-nonprofit-4year',
+        characteristics: ['religious-affiliation', 'intercollegiate-athletics', 'residential-campus', 'title-iv-participant', 'graduate-professional'],
         hideNonApplicable: true,
         allowUsersToToggle: true
       }
@@ -255,7 +258,8 @@ const TENANT_REGISTRY: Record<string, Tenant> = {
         maxRegulations: 5000
       },
       institutionConfig: {
-        primaryTypes: ['private-universities'],
+        primaryType: 'private-nonprofit-4year',
+        characteristics: ['title-iv-participant', 'residential-campus'],
         hideNonApplicable: true,
         allowUsersToToggle: true
       }
@@ -282,7 +286,8 @@ const TENANT_REGISTRY: Record<string, Tenant> = {
         maxRegulations: 9999
       },
       institutionConfig: {
-        primaryTypes: ['public-universities', 'private-universities'],
+        primaryType: null,
+        characteristics: [],
         hideNonApplicable: false,
         allowUsersToToggle: true
       }

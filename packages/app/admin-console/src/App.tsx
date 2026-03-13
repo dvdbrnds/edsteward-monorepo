@@ -22,6 +22,7 @@ import { CustomerManagementPage } from '@/pages/customers/customer-management-pa
 import TenantCreationWizard from '@/pages/customers/tenant-creation-wizard';
 import { FeatureFlagsPage } from '@/pages/features/feature-flags-page';
 import { SystemHealthPage } from '@/pages/system/system-health-page';
+import { InstitutionAssessmentPage } from '@/pages/assessment/institution-assessment-page';
 import { NotFoundPage } from '@/pages/error/not-found-page';
 
 // Hooks
@@ -106,6 +107,9 @@ function App() {
 
                                         {/* System Health */}
                                         <Route path="/system" element={<SystemHealthPage />} />
+
+                                        {/* Institution Assessment (Sales Tool) */}
+                                        <Route path="/assessment" element={<InstitutionAssessmentPage />} />
 
                                         {/* Feature Flag Management */}
                                         <Route path="/features" element={<FeatureFlagsPage />} />

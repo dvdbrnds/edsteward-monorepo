@@ -54,5 +54,9 @@
   "relationships": [],
   "tags": [
     "Campus Sex Crimes Prevention Act (§ 1601 of the Victims of Trafficking and Violence Protection Act of 2000)"
+  ],
+  "applicableInstitutions": [
+    "residential-campus",
+    "title-iv-participant"
   ]
 }

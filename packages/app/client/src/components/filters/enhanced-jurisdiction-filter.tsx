@@ -15,18 +15,24 @@ export const JURISDICTION_SOURCES = [
   { value: "industry-association", label: "Industry Association" }
 ];
 
-export const INSTITUTION_TYPES = [
-  { value: "public-universities", label: "Public Universities" },
-  { value: "private-universities", label: "Private Universities" },
-  { value: "community-colleges", label: "Community Colleges" },
-  { value: "conservatories", label: "Conservatories" },
-  { value: "technical-institutes", label: "Technical Institutes" },
-  { value: "religious-institutions", label: "Religious Institutions" },
-  { value: "for-profit-institutions", label: "For-Profit Institutions" },
-  { value: "research-institutes", label: "Research Institutes" },
-  { value: "professional-schools", label: "Professional Schools" },
-  { value: "all-institutions", label: "All Institution Types" }
+export const INSTITUTION_TYPES_FILTER = [
+  { value: "public-4year", label: "Public University (4-year)" },
+  { value: "private-nonprofit-4year", label: "Private Nonprofit University (4-year)" },
+  { value: "public-2year", label: "Public Community College (2-year)" },
+  { value: "private-nonprofit-2year", label: "Private Nonprofit College (2-year)" },
+  { value: "private-for-profit", label: "For-Profit Institution" },
+  { value: "religious-affiliation", label: "Religious Affiliation" },
+  { value: "research-intensive", label: "Research Intensive" },
+  { value: "graduate-professional", label: "Graduate / Professional" },
+  { value: "intercollegiate-athletics", label: "Intercollegiate Athletics" },
+  { value: "online-distance-ed", label: "Online / Distance Ed" },
+  { value: "medical-health-programs", label: "Medical / Health Programs" },
+  { value: "residential-campus", label: "Residential Campus" },
+  { value: "title-iv-participant", label: "Title IV Participant" },
 ];
+
+// Keep backward-compatible export name
+export const INSTITUTION_TYPES = INSTITUTION_TYPES_FILTER;
 
 interface EnhancedJurisdictionFilterProps {
   jurisdictionSourceFilter: string;

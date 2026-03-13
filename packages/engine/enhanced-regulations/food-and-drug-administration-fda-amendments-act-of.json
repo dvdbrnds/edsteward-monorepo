@@ -46,5 +46,9 @@
   "relationships": [],
   "tags": [
     "Research"
+  ],
+  "applicableInstitutions": [
+    "medical-health-programs",
+    "research-intensive"
   ]
 }

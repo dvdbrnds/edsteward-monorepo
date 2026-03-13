@@ -12,10 +12,13 @@ import {
   syncControl,
   notificationQueue,
   versionConflicts,
+  institutionConfigurations,
   type EvidenceFile,
   type InsertEvidenceFile,
   type NoteHistory,
-  type InsertNoteHistory
+  type InsertNoteHistory,
+  type InstitutionConfiguration,
+  type InsertInstitutionConfiguration,
 } from "@shared/schema";
 
 import type {
@@ -877,6 +880,38 @@ export class DatabaseStorage implements IStorage {
         
         console.log(`   📊 Task sync complete: ${insertedCount} new, ${updatedCount} updated, ${preservedCount} preserved (completed)`);
         console.log(`   👤 Auto-assigned ${autoAssignedCount} tasks based on role mappings`);
+      }
+
+      // 3.55. Apply engine-provided regulation actions if present in mcpPayload
+      const mcpRegActions = ((update as any).mcpPayload || {}).regulationActions;
+      if (mcpRegActions && typeof mcpRegActions === 'object') {
+        const hasDeadlines = !!update.filingDeadlines;
+        const newActions = [
+          { type: 'attestation', enabled: true, required: true, status: 'pending' },
+          { type: 'website_publish', enabled: !!mcpRegActions.website_publish?.required, required: !!mcpRegActions.website_publish?.required, status: 'pending' },
+          { type: 'community_communication', enabled: !!mcpRegActions.community_communication?.required, required: !!mcpRegActions.community_communication?.required, status: 'pending' },
+          { type: 'agency_submission', enabled: !!mcpRegActions.agency_submission?.required || hasDeadlines, required: !!mcpRegActions.agency_submission?.required || hasDeadlines, status: 'pending' },
+        ];
+        
+        // Merge with existing actions to preserve completion state
+        const existingActionsRes = await this.pool.query(
+          `SELECT actions FROM regulations WHERE id = $1`,
+          [update.regulationId]
+        );
+        const existingActions = existingActionsRes.rows[0]?.actions;
+        const mergedActions = existingActions && Array.isArray(existingActions)
+          ? newActions.map(na => {
+              const ea = existingActions.find((a: any) => a.type === na.type);
+              return ea ? { ...ea, enabled: na.enabled, required: na.required } : na;
+            })
+          : newActions;
+        
+        await this.pool.query(
+          `UPDATE regulations SET actions = $1 WHERE id = $2`,
+          [JSON.stringify(mergedActions), update.regulationId]
+        );
+        const enabledTypes = mergedActions.filter((a: any) => a.enabled).map((a: any) => a.type);
+        console.log(`🎯 Applied engine regulation actions: ${enabledTypes.join(', ')}`);
       }
 
       // 3.6. Apply Executive Orders if present in metadata (MCP Engine sync Jan 2026)
@@ -2617,6 +2652,74 @@ export class DatabaseStorage implements IStorage {
     await this.db
       .delete(notifications)
       .where(eq(notifications.id, id));
+  }
+
+  async getInstitutionConfig(tenantId: string): Promise<InstitutionConfiguration | null> {
+    try {
+      const result = await this.pool.query(
+        `SELECT * FROM institution_configurations WHERE tenant_id = $1 LIMIT 1`,
+        [tenantId]
+      );
+      if (result.rows.length === 0) return null;
+      const row = result.rows[0];
+      return {
+        id: row.id,
+        tenantId: row.tenant_id,
+        primaryType: row.primary_type,
+        characteristics: row.characteristics || [],
+        hideNonApplicable: row.hide_non_applicable,
+        allowUsersToToggle: row.allow_users_to_toggle,
+        createdAt: row.created_at,
+        updatedAt: row.updated_at,
+      };
+    } catch (error) {
+      console.error("Error fetching institution config:", error);
+      return null;
+    }
+  }
+
+  async upsertInstitutionConfig(config: Omit<InsertInstitutionConfiguration, 'id' | 'createdAt' | 'updatedAt'>): Promise<InstitutionConfiguration> {
+    const result = await this.pool.query(`
+      INSERT INTO institution_configurations (tenant_id, primary_type, characteristics, hide_non_applicable, allow_users_to_toggle, updated_at)
+      VALUES ($1, $2, $3, $4, $5, NOW())
+      ON CONFLICT (tenant_id) DO UPDATE SET
+        primary_type = EXCLUDED.primary_type,
+        characteristics = EXCLUDED.characteristics,
+        hide_non_applicable = EXCLUDED.hide_non_applicable,
+        allow_users_to_toggle = EXCLUDED.allow_users_to_toggle,
+        updated_at = NOW()
+      RETURNING *
+    `, [
+      config.tenantId,
+      config.primaryType || null,
+      JSON.stringify(config.characteristics || []),
+      config.hideNonApplicable ?? true,
+      config.allowUsersToToggle ?? true,
+    ]);
+    const row = result.rows[0];
+    return {
+      id: row.id,
+      tenantId: row.tenant_id,
+      primaryType: row.primary_type,
+      characteristics: row.characteristics || [],
+      hideNonApplicable: row.hide_non_applicable,
+      allowUsersToToggle: row.allow_users_to_toggle,
+      createdAt: row.created_at,
+      updatedAt: row.updated_at,
+    };
+  }
+
+  async getRegulationsForInstitutionTypes(types: string[]): Promise<Regulation[]> {
+    if (types.length === 0) return this.getRegulations();
+    const placeholders = types.map((_, i) => `$${i + 1}`).join(', ');
+    const query = `
+      SELECT * FROM regulations
+      WHERE applicable_institutions @> '"all-institutions"'::jsonb
+      OR ${types.map((_, i) => `applicable_institutions @> $${i + 1}::jsonb`).join(' OR ')}
+      ORDER BY last_updated DESC
+    `;
+    const result = await this.pool.query(query, types.map(t => JSON.stringify([t])));
+    return result.rows as Regulation[];
   }
 
 }

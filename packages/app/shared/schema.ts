@@ -13,20 +13,50 @@ export const JURISDICTION_SOURCES = [
   "industry-association"
 ] as const;
 
-export const INSTITUTION_TYPES = [
-  "public-universities",
-  "private-universities", 
-  "community-colleges",
-  "conservatories",
-  "technical-institutes",
-  "religious-institutions",
-  "for-profit-institutions",
-  "research-institutes",
-  "professional-schools",
-  "all-institutions"
+// Primary classification: mutually exclusive sector/level (select one)
+export const INSTITUTION_PRIMARY_TYPES = [
+  "public-4year",
+  "private-nonprofit-4year",
+  "public-2year",
+  "private-nonprofit-2year",
+  "private-for-profit",
 ] as const;
 
+// Institutional characteristics: additive flags that trigger additional regulations
+export const INSTITUTION_CHARACTERISTICS = [
+  "religious-affiliation",
+  "research-intensive",
+  "graduate-professional",
+  "intercollegiate-athletics",
+  "online-distance-ed",
+  "medical-health-programs",
+  "residential-campus",
+  "title-iv-participant",
+] as const;
+
+// Combined: all possible institution type tags (used for regulation applicableInstitutions)
+export const INSTITUTION_TYPES = [
+  ...INSTITUTION_PRIMARY_TYPES,
+  ...INSTITUTION_CHARACTERISTICS,
+  "all-institutions",
+] as const;
+
+// Legacy type mapping for migration
+export const LEGACY_TYPE_MIGRATION: Record<string, string[]> = {
+  "public-universities": ["public-4year"],
+  "private-universities": ["private-nonprofit-4year"],
+  "community-colleges": ["public-2year"],
+  "for-profit-institutions": ["private-for-profit"],
+  "religious-institutions": ["religious-affiliation"],
+  "research-institutes": ["research-intensive"],
+  "conservatories": ["private-nonprofit-4year"],
+  "technical-institutes": ["private-for-profit"],
+  "professional-schools": ["graduate-professional"],
+};
+
 export type JurisdictionSource = typeof JURISDICTION_SOURCES[number];
+export type InstitutionPrimaryType = typeof INSTITUTION_PRIMARY_TYPES[number];
+export type InstitutionCharacteristic = typeof INSTITUTION_CHARACTERISTICS[number];
 export type InstitutionType = typeof INSTITUTION_TYPES[number];
 
 // Add source interface
@@ -228,7 +258,7 @@ export const regulations = pgTable("regulations", {
   requirements: text("requirements"),
   category: text("category").notNull(),
   jurisdictionSource: text("jurisdiction_source").notNull().default("federal"), // federal | state | international | private-organization | accreditor | etc.
-  applicableInstitutions: jsonb("applicable_institutions").$type<string[]>(), // ["public-universities", "private-universities", "community-colleges", "conservatories", etc.]
+  applicableInstitutions: jsonb("applicable_institutions").$type<string[]>(), // ["all-institutions"] or specific types from INSTITUTION_TYPES (primary + characteristics)
   dro: text("dro").notNull().default(""),
   isApplicable: boolean("is_applicable").notNull().default(true),
   originationDate: timestamp("origination_date"),
@@ -386,6 +416,21 @@ export const guides = pgTable("guides", {
   lastUpdated: timestamp("last_updated").defaultNow(),
   createdBy: integer("created_by").notNull(),
 });
+
+// Institution configuration per tenant
+export const institutionConfigurations = pgTable("institution_configurations", {
+  id: serial("id").primaryKey(),
+  tenantId: text("tenant_id").notNull().unique(),
+  primaryType: text("primary_type"), // one of INSTITUTION_PRIMARY_TYPES
+  characteristics: jsonb("characteristics").$type<string[]>().notNull().default([]),
+  hideNonApplicable: boolean("hide_non_applicable").notNull().default(true),
+  allowUsersToToggle: boolean("allow_users_to_toggle").notNull().default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type InstitutionConfiguration = typeof institutionConfigurations.$inferSelect;
+export type InsertInstitutionConfiguration = typeof institutionConfigurations.$inferInsert;
 
 // Notes schema is already defined above
 

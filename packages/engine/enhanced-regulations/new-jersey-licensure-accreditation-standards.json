@@ -56,5 +56,8 @@
     "timestamp": "2025-12-05T15:56:07.519Z"
   },
   "statute": "N.J.A.C. 9A:1-1 et seq.",
-  "topic": "Accreditation"
+  "topic": "Accreditation",
+  "applicableInstitutions": [
+    "all-institutions"
+  ]
 }

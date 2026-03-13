@@ -747,6 +747,53 @@ app.delete('/api/customers/:id/sso', requireAuth, async (req, res) => {
 });
 
 // =============================================================================
+// INSTITUTION ASSESSMENT ROUTES (proxy to engine Customer API)
+// =============================================================================
+
+const ENGINE_CUSTOMER_API = process.env.ENGINE_CUSTOMER_API_URL || 'http://localhost:3060';
+
+app.get('/api/assessment/search', requireAuth, async (req: Request, res: Response) => {
+  try {
+    const q = req.query.q as string;
+    const limit = req.query.limit || '10';
+    if (!q) return res.status(400).json({ error: 'Query parameter "q" is required' });
+
+    const response = await fetch(`${ENGINE_CUSTOMER_API}/api/assessment/search?q=${encodeURIComponent(q)}&limit=${limit}`);
+    const data = await response.json();
+    res.json(data);
+  } catch (error) {
+    console.error('Assessment search proxy error:', error);
+    res.status(502).json({ error: 'Failed to reach engine assessment service' });
+  }
+});
+
+app.get('/api/assessment/institution/:id', requireAuth, async (req: Request, res: Response) => {
+  try {
+    const response = await fetch(`${ENGINE_CUSTOMER_API}/api/assessment/institution/${req.params.id}`);
+    const data = await response.json();
+    res.json(data);
+  } catch (error) {
+    console.error('Assessment lookup proxy error:', error);
+    res.status(502).json({ error: 'Failed to reach engine assessment service' });
+  }
+});
+
+app.post('/api/assessment/classify', requireAuth, async (req: Request, res: Response) => {
+  try {
+    const response = await fetch(`${ENGINE_CUSTOMER_API}/api/assessment/classify`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(req.body),
+    });
+    const data = await response.json();
+    res.json(data);
+  } catch (error) {
+    console.error('Assessment classify proxy error:', error);
+    res.status(502).json({ error: 'Failed to reach engine assessment service' });
+  }
+});
+
+// =============================================================================
 // USER ROUTES (Cross-tenant)
 // =============================================================================
 

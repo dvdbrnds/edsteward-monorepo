@@ -30,5 +30,8 @@
   "relationships": [],
   "tags": [
     "Program Integrity Rules"
+  ],
+  "applicableInstitutions": [
+    "title-iv-participant"
   ]
 }

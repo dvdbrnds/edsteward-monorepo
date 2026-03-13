@@ -30,5 +30,8 @@
   "relationships": [],
   "tags": [
     "Immigration"
+  ],
+  "applicableInstitutions": [
+    "all-institutions"
   ]
 }

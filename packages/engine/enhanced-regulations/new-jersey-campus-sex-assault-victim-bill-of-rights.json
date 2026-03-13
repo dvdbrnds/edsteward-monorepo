@@ -72,5 +72,8 @@
     "timestamp": "2025-12-05T15:53:33.504Z"
   },
   "statute": "N.J.S.A. 18A:61E-1 et seq.",
-  "topic": "Sexual Misconduct"
+  "topic": "Sexual Misconduct",
+  "applicableInstitutions": [
+    "all-institutions"
+  ]
 }

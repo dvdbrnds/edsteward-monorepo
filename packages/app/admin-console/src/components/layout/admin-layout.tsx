@@ -11,6 +11,7 @@ interface AdminLayoutProps {
 const navigationItems = [
   { name: 'Dashboard', href: '/dashboard', icon: '📊' },
   { name: 'Customers', href: '/customers', icon: '🏢' },
+  { name: 'Assessment', href: '/assessment', icon: '🎯' },
   { name: 'Users', href: '/users', icon: '👥' },
   { name: 'System Health', href: '/system', icon: '🔧' },
 ];

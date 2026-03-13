@@ -30,5 +30,8 @@
   "relationships": [],
   "tags": [
     "Immigration,Recruitment Hiring & Termination"
+  ],
+  "applicableInstitutions": [
+    "all-institutions"
   ]
 }

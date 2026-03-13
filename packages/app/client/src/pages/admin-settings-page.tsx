@@ -29,6 +29,7 @@ import { BrandingSettingsV2 } from "@/components/admin/branding-settings";
 import { BackupManagement } from "@/components/admin/backup-management";
 import { NotificationSchedulerSettings } from "@/components/admin/notification-scheduler-settings";
 import { RoleAssignmentsSettings } from "@/components/admin/role-assignments-settings";
+import { RoleMappingReference } from "@/components/admin/role-mapping-reference";
 import { ComplianceDocuments } from "@/components/admin/compliance-documents";
 import {
   Table,
@@ -476,8 +477,6 @@ export default function SystemSettingsPage() {
               <TabsTrigger value="institution" className="flex-shrink-0">Institution</TabsTrigger>
               <TabsTrigger value="branding" className="flex-shrink-0">Branding</TabsTrigger>
               <TabsTrigger value="notifications" className="flex-shrink-0">Notifications</TabsTrigger>
-              <TabsTrigger value="email" className="flex-shrink-0">Email</TabsTrigger>
-              <TabsTrigger value="sms" className="flex-shrink-0">SMS</TabsTrigger>
               <TabsTrigger value="users" className="flex-shrink-0">Users</TabsTrigger>
               <TabsTrigger value="roles" className="flex-shrink-0">Roles</TabsTrigger>
               <TabsTrigger value="compliance" className="flex-shrink-0">Compliance</TabsTrigger>
@@ -487,7 +486,6 @@ export default function SystemSettingsPage() {
 
             <TabsContent value="institution">
               <InstitutionSettings 
-                tenantId="admin"
                 onConfigUpdate={() => {
                   toast({
                     title: "Institution Settings Updated",
@@ -510,56 +508,90 @@ export default function SystemSettingsPage() {
             </TabsContent>
 
             <TabsContent value="notifications">
-              <NotificationSchedulerSettings />
-            </TabsContent>
+              <div className="space-y-6">
+                <NotificationSchedulerSettings />
 
-            <TabsContent value="email">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Email Configuration</CardTitle>
-                  <CardDescription>
-                    Configure the email server settings for notifications.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmitEmailConfig)} className="space-y-4">
-                      <FormField
-                        control={form.control}
-                        name="host"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>SMTP Host</FormLabel>
-                            <FormControl>
-                              <Input placeholder="smtp.example.com" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Email Configuration</CardTitle>
+                    <CardDescription>
+                      SMTP server settings used to send notification emails.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Form {...form}>
+                      <form onSubmit={form.handleSubmit(onSubmitEmailConfig)} className="space-y-4">
                         <FormField
                           control={form.control}
-                          name="port"
+                          name="host"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Port</FormLabel>
+                              <FormLabel>SMTP Host</FormLabel>
                               <FormControl>
-                                <Input
-                                  type="number"
-                                  {...field}
-                                  onChange={(e) => {
-                                    const port = parseInt(e.target.value);
-                                    field.onChange(port);
-                                    // Auto-set secure based on port
-                                    if (port === 465) {
-                                      form.setValue('secure', true);
-                                    } else if (port === 587 || port === 25) {
-                                      form.setValue('secure', false);
-                                    }
-                                  }}
-                                />
+                                <Input placeholder="smtp.example.com" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <FormField
+                            control={form.control}
+                            name="port"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Port</FormLabel>
+                                <FormControl>
+                                  <Input
+                                    type="number"
+                                    {...field}
+                                    onChange={(e) => {
+                                      const port = parseInt(e.target.value);
+                                      field.onChange(port);
+                                      if (port === 465) {
+                                        form.setValue('secure', true);
+                                      } else if (port === 587 || port === 25) {
+                                        form.setValue('secure', false);
+                                      }
+                                    }}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={form.control}
+                            name="secure"
+                            render={({ field }) => (
+                              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
+                                <div className="space-y-0.5">
+                                  <FormLabel>Use SSL/TLS</FormLabel>
+                                  <FormDescription className="text-xs">
+                                    Port 465 = ON, Port 587 = OFF
+                                  </FormDescription>
+                                </div>
+                                <FormControl>
+                                  <Switch
+                                    checked={field.value}
+                                    onCheckedChange={field.onChange}
+                                  />
+                                </FormControl>
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+
+                        <FormField
+                          control={form.control}
+                          name="username"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Username</FormLabel>
+                              <FormControl>
+                                <Input {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -568,213 +600,175 @@ export default function SystemSettingsPage() {
 
                         <FormField
                           control={form.control}
-                          name="secure"
+                          name="password"
                           render={({ field }) => (
-                            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
-                              <div className="space-y-0.5">
-                                <FormLabel>Use SSL/TLS</FormLabel>
-                                <FormDescription className="text-xs">
-                                  Port 465 = ON, Port 587 = OFF
-                                </FormDescription>
-                              </div>
+                            <FormItem>
+                              <FormLabel>Password</FormLabel>
                               <FormControl>
-                                <Switch
-                                  checked={field.value}
-                                  onCheckedChange={field.onChange}
-                                />
+                                <Input type="password" {...field} />
                               </FormControl>
+                              <FormMessage />
                             </FormItem>
                           )}
                         />
-                      </div>
 
-                      <FormField
-                        control={form.control}
-                        name="username"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Username</FormLabel>
-                            <FormControl>
-                              <Input {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="password"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Password</FormLabel>
-                            <FormControl>
-                              <Input type="password" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="from"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>From Address</FormLabel>
-                            <FormControl>
-                              <Input type="email" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <Button type="submit">
-                        Save Email Configuration
-                      </Button>
-                    </form>
-                  </Form>
-
-                  {/* Test Email Section */}
-                  <div className="mt-6 pt-6 border-t">
-                    <h4 className="font-medium mb-3">Test Email Configuration</h4>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Send a test email to verify your SMTP settings are working correctly.
-                    </p>
-                    <div className="flex gap-3 items-end">
-                      <div className="flex-1">
-                        <label className="text-sm font-medium mb-1 block">Send Test To</label>
-                        <Input 
-                          type="email"
-                          placeholder="test@example.com"
-                          value={testEmailAddress}
-                          onChange={(e) => setTestEmailAddress(e.target.value)}
+                        <FormField
+                          control={form.control}
+                          name="from"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>From Address</FormLabel>
+                              <FormControl>
+                                <Input type="email" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
                         />
-                      </div>
-                      <Button 
-                        type="button" 
-                        variant="outline"
-                        disabled={!testEmailAddress || isSendingTest}
-                        onClick={async () => {
-                          if (!testEmailAddress) {
-                            toast({
-                              title: "Email Required",
-                              description: "Please enter an email address to send the test to.",
-                              variant: "destructive",
-                            });
-                            return;
-                          }
-                          setIsSendingTest(true);
-                          toast({
-                            title: "Sending...",
-                            description: `Sending test email to ${testEmailAddress}`,
-                          });
-                          try {
-                            const response = await fetch("/api/admin/email-config/test", {
-                              method: "POST",
-                              headers: { "Content-Type": "application/json" },
-                              body: JSON.stringify({ to: testEmailAddress })
-                            });
-                            const data = await response.json();
-                            if (response.ok) {
+
+                        <Button type="submit">
+                          Save Email Configuration
+                        </Button>
+                      </form>
+                    </Form>
+
+                    <div className="mt-6 pt-6 border-t">
+                      <h4 className="font-medium mb-3">Test Email Configuration</h4>
+                      <p className="text-sm text-muted-foreground mb-4">
+                        Send a test email to verify your SMTP settings are working correctly.
+                      </p>
+                      <div className="flex gap-3 items-end">
+                        <div className="flex-1">
+                          <label className="text-sm font-medium mb-1 block">Send Test To</label>
+                          <Input 
+                            type="email"
+                            placeholder="test@example.com"
+                            value={testEmailAddress}
+                            onChange={(e) => setTestEmailAddress(e.target.value)}
+                          />
+                        </div>
+                        <Button 
+                          type="button" 
+                          variant="outline"
+                          disabled={!testEmailAddress || isSendingTest}
+                          onClick={async () => {
+                            if (!testEmailAddress) {
                               toast({
-                                title: "✅ Test Email Sent!",
-                                description: `Check ${testEmailAddress} for the test message.`,
-                              });
-                            } else {
-                              toast({
-                                title: "❌ Test Failed",
-                                description: data.error || "Failed to send test email. Check your SMTP settings.",
+                                title: "Email Required",
+                                description: "Please enter an email address to send the test to.",
                                 variant: "destructive",
                               });
+                              return;
                             }
-                          } catch {
+                            setIsSendingTest(true);
                             toast({
-                              title: "❌ Error",
-                              description: "Failed to send test email. Check server logs for details.",
-                              variant: "destructive",
+                              title: "Sending...",
+                              description: `Sending test email to ${testEmailAddress}`,
                             });
-                          } finally {
-                            setIsSendingTest(false);
-                          }
-                        }}
-                      >
-                        {isSendingTest ? (
-                          <>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Sending...
-                          </>
-                        ) : (
-                          "Send Test Email"
-                        )}
-                      </Button>
+                            try {
+                              const response = await fetch("/api/admin/email-config/test", {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({ to: testEmailAddress })
+                              });
+                              const data = await response.json();
+                              if (response.ok) {
+                                toast({
+                                  title: "✅ Test Email Sent!",
+                                  description: `Check ${testEmailAddress} for the test message.`,
+                                });
+                              } else {
+                                toast({
+                                  title: "❌ Test Failed",
+                                  description: data.error || "Failed to send test email. Check your SMTP settings.",
+                                  variant: "destructive",
+                                });
+                              }
+                            } catch {
+                              toast({
+                                title: "❌ Error",
+                                description: "Failed to send test email. Check server logs for details.",
+                                variant: "destructive",
+                              });
+                            } finally {
+                              setIsSendingTest(false);
+                            }
+                          }}
+                        >
+                          {isSendingTest ? (
+                            <>
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              Sending...
+                            </>
+                          ) : (
+                            "Send Test Email"
+                          )}
+                        </Button>
+                      </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
+                  </CardContent>
+                </Card>
 
-            <TabsContent value="sms">
-              <Card>
-                <CardHeader>
-                  <CardTitle>SMS Configuration (Twilio)</CardTitle>
-                  <CardDescription>
-                    Configure Twilio for SMS notifications.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Form {...twilioForm}>
-                    <form onSubmit={twilioForm.handleSubmit(onSubmitTwilioConfig)} className="space-y-4">
-                      <FormField
-                        control={twilioForm.control}
-                        name="accountSid"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Account SID</FormLabel>
-                            <FormControl>
-                              <Input {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                <Card>
+                  <CardHeader>
+                    <CardTitle>SMS Configuration (Twilio)</CardTitle>
+                    <CardDescription>
+                      Configure Twilio for SMS notifications.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Form {...twilioForm}>
+                      <form onSubmit={twilioForm.handleSubmit(onSubmitTwilioConfig)} className="space-y-4">
+                        <FormField
+                          control={twilioForm.control}
+                          name="accountSid"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Account SID</FormLabel>
+                              <FormControl>
+                                <Input {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
 
-                      <FormField
-                        control={twilioForm.control}
-                        name="authToken"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Auth Token</FormLabel>
-                            <FormControl>
-                              <Input type="password" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                        <FormField
+                          control={twilioForm.control}
+                          name="authToken"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Auth Token</FormLabel>
+                              <FormControl>
+                                <Input type="password" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
 
-                      <FormField
-                        control={twilioForm.control}
-                        name="phoneNumber"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Phone Number</FormLabel>
-                            <FormControl>
-                              <Input placeholder="+1234567890" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                        <FormField
+                          control={twilioForm.control}
+                          name="phoneNumber"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Phone Number</FormLabel>
+                              <FormControl>
+                                <Input placeholder="+1234567890" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
 
-                      <Button type="submit">
-                        Save SMS Configuration
-                      </Button>
-                    </form>
-                  </Form>
-                </CardContent>
-              </Card>
+                        <Button type="submit">
+                          Save SMS Configuration
+                        </Button>
+                      </form>
+                    </Form>
+                  </CardContent>
+                </Card>
+              </div>
             </TabsContent>
 
             <TabsContent value="users">
@@ -1006,7 +1000,10 @@ export default function SystemSettingsPage() {
             </TabsContent>
 
             <TabsContent value="roles">
-              <RoleAssignmentsSettings />
+              <div className="space-y-6">
+                <RoleMappingReference />
+                <RoleAssignmentsSettings />
+              </div>
             </TabsContent>
 
             <TabsContent value="compliance">

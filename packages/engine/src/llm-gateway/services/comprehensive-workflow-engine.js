@@ -636,6 +636,9 @@ export async function executeComprehensiveWorkflow(regulationSlug, existingData 
         per: p.per || 'violation'
       })),
       
+      // REQUIRED ACTIONS — which compliance workflow steps this regulation mandates
+      requiredActions: extractionResult.requiredActions || null,
+      
       // Risk assessment (if available)
       riskAssessment: existingData?.riskAssessment || {
         score: 0,

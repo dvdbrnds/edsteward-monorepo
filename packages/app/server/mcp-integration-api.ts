@@ -12,6 +12,30 @@ import { normalizeCategory } from './services/category-normalizer';
  * This API allows communication between the MCP Orchestrator and the local client
  * @param app Express application
  */
+/**
+ * Merge engine-provided action flags with existing actions, preserving completion state.
+ * New enabled/required flags come from the engine; status/completedBy/completedAt are kept.
+ */
+function mergeActionsWithExisting(
+  existingActions: any[] | null,
+  engineActions: Array<{ type: string; enabled: boolean; required: boolean; status: string; dueDate?: string }>
+): any[] {
+  if (!existingActions || !Array.isArray(existingActions)) return engineActions;
+  
+  return engineActions.map(engineAction => {
+    const existing = existingActions.find((a: any) => a.type === engineAction.type);
+    if (existing) {
+      return {
+        ...existing,
+        enabled: engineAction.enabled,
+        required: engineAction.required,
+        dueDate: engineAction.dueDate || existing.dueDate,
+      };
+    }
+    return engineAction;
+  });
+}
+
 export function setupMCPIntegrationApi(app: express.Application) {
   // Helper: Get tenant-aware storage and db from request
   // CRITICAL: All MCP routes must use these instead of global imports
@@ -826,9 +850,10 @@ export function setupMCPIntegrationApi(app: express.Application) {
       // Generate itemId if not provided
       const itemId = data.itemId || `REG-${data.name.replace(/[^a-zA-Z0-9]/g, '-').substring(0, 30).toUpperCase()}-${Date.now()}`;
       
-      // Build default actions based on regulation characteristics
+      // Build actions from engine-provided regulationActions, or fall back to defaults
       const hasDeadlines = data.filingDeadlines && data.filingDeadlines.length > 0;
       const firstDeadline = hasDeadlines ? data.filingDeadlines[0] : null;
+      const engineActions = data.regulationActions;
       const defaultActions = [
         {
           type: 'attestation' as const,
@@ -838,24 +863,27 @@ export function setupMCPIntegrationApi(app: express.Application) {
         },
         {
           type: 'website_publish' as const,
-          enabled: false,
-          required: false,
+          enabled: !!engineActions?.website_publish?.required,
+          required: !!engineActions?.website_publish?.required,
           status: 'pending' as const,
         },
         {
           type: 'community_communication' as const,
-          enabled: false,
-          required: false,
+          enabled: !!engineActions?.community_communication?.required,
+          required: !!engineActions?.community_communication?.required,
           status: 'pending' as const,
         },
         {
           type: 'agency_submission' as const,
-          enabled: hasDeadlines,
-          required: hasDeadlines,
+          enabled: !!engineActions?.agency_submission?.required || hasDeadlines,
+          required: !!engineActions?.agency_submission?.required || hasDeadlines,
           status: 'pending' as const,
           dueDate: firstDeadline?.date || undefined,
         },
       ];
+      if (engineActions) {
+        console.log(`🎯 Using engine-provided actions: ${defaultActions.filter(a => a.enabled).map(a => a.type).join(', ')}`);
+      }
       
       // Resolve camelCase vs snake_case agency fields
       const resolvedAgencyName = data.agencyName || data.agency_name || null;
@@ -1275,15 +1303,19 @@ export function setupMCPIntegrationApi(app: express.Application) {
       let regulationId: number;
       let regulationRecord: any;
       
-      // Build default actions
+      // Build actions from engine-provided regulationActions, or fall back to defaults
       const hasDeadlines = data.filingDeadlines && data.filingDeadlines.length > 0;
       const firstDeadline = hasDeadlines ? data.filingDeadlines[0] : null;
+      const syncEngineActions = data.regulationActions;
       const defaultActions = [
         { type: 'attestation' as const, enabled: true, required: true, status: 'pending' as const },
-        { type: 'website_publish' as const, enabled: false, required: false, status: 'pending' as const },
-        { type: 'community_communication' as const, enabled: false, required: false, status: 'pending' as const },
-        { type: 'agency_submission' as const, enabled: hasDeadlines, required: hasDeadlines, status: 'pending' as const, dueDate: firstDeadline?.date },
+        { type: 'website_publish' as const, enabled: !!syncEngineActions?.website_publish?.required, required: !!syncEngineActions?.website_publish?.required, status: 'pending' as const },
+        { type: 'community_communication' as const, enabled: !!syncEngineActions?.community_communication?.required, required: !!syncEngineActions?.community_communication?.required, status: 'pending' as const },
+        { type: 'agency_submission' as const, enabled: !!syncEngineActions?.agency_submission?.required || hasDeadlines, required: !!syncEngineActions?.agency_submission?.required || hasDeadlines, status: 'pending' as const, dueDate: firstDeadline?.date },
       ];
+      if (syncEngineActions) {
+        console.log(`🎯 Sync: using engine-provided actions: ${defaultActions.filter(a => a.enabled).map(a => a.type).join(', ')}`);
+      }
       
       if (isUpdate) {
         // UPDATE existing regulation
@@ -1357,8 +1389,10 @@ export function setupMCPIntegrationApi(app: express.Application) {
             // Universal reg_key
             regKey: regKey || existingReg[0].regKey,
             lastUpdated: new Date(),
-            // Keep existing actions if not provided
-            actions: existingReg[0].actions || defaultActions,
+            // Use engine-provided actions to update enabled/required flags, but preserve completion state
+            actions: syncEngineActions
+              ? mergeActionsWithExisting(existingReg[0].actions, defaultActions)
+              : (existingReg[0].actions || defaultActions),
           })
           .where(eq(regulations.id, existingReg[0].id))
           .returning();

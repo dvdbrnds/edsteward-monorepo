@@ -30,5 +30,8 @@
   "relationships": [],
   "tags": [
     "Health Care and Insurance"
+  ],
+  "applicableInstitutions": [
+    "all-institutions"
   ]
 }

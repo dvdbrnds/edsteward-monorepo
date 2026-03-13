@@ -30,5 +30,8 @@
   "relationships": [],
   "tags": [
     "Retirement"
+  ],
+  "applicableInstitutions": [
+    "all-institutions"
   ]
 }

@@ -1,27 +1,23 @@
 {
   "regulationId": "pennsylvania-act-55-of-2022-sexual-violence-higher-ed",
   "schemaVersion": "2.0",
-
   "jurisdiction": {
     "source": "state",
     "countryCode": "US",
-    "stateCodes": ["PA"],
+    "stateCodes": [
+      "PA"
+    ],
     "label": "Pennsylvania",
     "regulatoryBody": "Pennsylvania Department of Education",
     "actNumber": "Act 55 of 2022",
     "applicability": "all"
   },
-
   "enhanced": {
     "fullText": "Pennsylvania Act 55 of 2022 (HB 1642, P.L. 620) amended Article XX-G of the Public School Code of 1949 to establish comprehensive requirements for institutions of higher education and private licensed schools regarding sexual violence, dating violence, domestic violence, and stalking education, prevention, and response.\n\nUnder Section 2003-G, all institutions of higher education and private licensed schools must establish and implement an evidence-based education program for all students addressing sexual violence, dating violence, domestic violence, and stalking. Institutions must consult with a local rape crisis center and domestic violence program when developing or implementing the program. The Pennsylvania Department of Education, in consultation with the Pennsylvania Coalition Against Rape (PCAR) and the Pennsylvania Coalition Against Domestic Violence (PCADV), maintains an online clearinghouse of model education programs and resources.\n\nThe education program must include: (1) discussion of sexual violence, dating violence, domestic violence, and stalking; (2) discussion of consent, including that the victim is not at fault; (3) drug and alcohol-facilitated sexual violence awareness; (4) risk education and personal protection information; (5) how and where to get assistance, including medical treatment and evidence collection; (6) information on pregnancy and sexual disease transmission; (7) campus and community resources including police, health centers, rape crisis centers, and counseling services; (8) a promise of confidentiality to the extent allowable by law; and (9) information on confidential resources for victims.\n\nSection 2003-G.1 requires each institution to adopt a formal definition of consent as part of its code of conduct or sexual misconduct/harassment policy.\n\nSection 2004-G mandates at least one follow-up program for students in the education program during the school year, which may include lectures, interactive learning, institutional activities, videos, and educational materials on prevention and awareness.\n\nSection 2006-G requires institutions to report to the Department of Education on implementation of both the education program and memoranda of understanding through the annual attestation of compliance.\n\nSection 2007-G establishes the critical memorandum of understanding (MOU) requirement. Each institution must enter into and maintain an MOU with at least one rape crisis center (as defined in 42 Pa.C.S. § 5945.1) and one domestic violence program (as defined in 23 Pa.C.S. § 6102) for its main campus and each branch campus. The MOU must address: (1) developing sexual misconduct policies, programming, and training for students and employees; (2) providing off-campus alternatives for free, confidential services including crisis counseling, longer-term counseling, support navigating reporting options, legal assistance, sexual violence protection orders, protection from intimidation orders, crime victims' compensation, forensic rape exams by sexual assault nurse examiners, and other victim services; (3) ensuring students and employees are notified of available support services on and off campus; (4) cooperation and cross-training between the institution and crisis centers on responding to reports, investigating, adjudicating misconduct, and providing support; and (5) consulting in development or implementation of the education program.\n\nMOUs may include fee structures for confidential victim services, and institutions may apply for It's On Us PA grants to offset costs. The Department may grant good-faith waivers where institutions can attest they acted in good faith but were unable to obtain a signed memorandum.\n\nInstitutions without full-time students must still maintain MOUs and programming for employees. The act applies to all Pennsylvania institutions of higher education including public, private, independent, State System institutions, State-related universities, community colleges, and private licensed schools.",
-
     "summary": "PA Act 55 of 2022 requires all Pennsylvania higher education institutions to implement evidence-based sexual violence prevention education programs in consultation with local rape crisis centers and domestic violence programs, adopt a formal consent definition, and maintain memoranda of understanding with at least one rape crisis center and one domestic violence program per campus for coordinated victim services, cross-training, and policy development.",
-
     "requirements": "## Education Program (Section 2003-G)\n- Establish and implement evidence-based education program for ALL students covering sexual violence, dating violence, domestic violence, and stalking\n- Consult with local rape crisis center and domestic violence program in development\n- Cover all required topics: consent, drug/alcohol-facilitated violence, risk education, assistance resources, confidentiality, victim services\n- Conduct at least one follow-up program per school year (Section 2004-G)\n\n## Consent Definition (Section 2003-G.1)\n- Adopt formal definition of consent in code of conduct or sexual misconduct/harassment policy\n\n## Notification Requirements (Section 2003-G(c))\n- Make concise notification of rights, accommodations, and protective measures available in writing and on public website\n- Include information on counseling, advocacy, legal assistance, reporting options, protection orders, and crime victims' compensation\n\n## Memoranda of Understanding (Section 2007-G)\n- Maintain MOU with at least one rape crisis center AND one domestic violence program for main campus and each branch campus\n- MOU must address: policy development, off-campus victim services, notification of services, cooperation and cross-training, education program consultation\n- Off-campus services must include: crisis counseling, longer-term counseling, legal assistance, protection orders, forensic rape exams, crime victims' compensation\n- Institutions without full-time students must maintain MOUs and programming for employees\n\n## Reporting (Section 2006-G)\n- Report to PA Department of Education on education program implementation and MOU status through annual attestation of compliance",
-
     "reportingRequirements": "Annual attestation of compliance to the Pennsylvania Department of Education covering: (1) implementation status of the education program under Section 2003-G; (2) status of memoranda of understanding under Section 2007-G; (3) follow-up programming conducted during the year. Good-faith waivers available from the Department for institutions unable to obtain signed MOUs despite documented attempts."
   },
-
   "deadlines": [
     {
       "date": "2023-07-01",
@@ -56,7 +52,6 @@
       "recurrenceFrequency": "annual"
     }
   ],
-
   "relationships": [
     {
       "targetSlug": "title-ix-of-the-education-amendment-of-1972",
@@ -79,7 +74,6 @@
       "notes": "Works alongside federal Clery Act campus safety reporting with state-level MOU and education requirements"
     }
   ],
-
   "tags": [
     "Campus Safety and Security",
     "Sexual Misconduct",
@@ -87,7 +81,6 @@
     "Title IX Related",
     "Violence Prevention"
   ],
-
   "audit": {
     "score": 95,
     "certainty": "A",
@@ -99,7 +92,9 @@
     },
     "timestamp": "2026-03-03T00:00:00.000Z"
   },
-
   "statute": "24 P.S. § 20-2001-G et seq. (Act 55 of 2022, P.L. 620, Article XX-G)",
-  "topic": "Sexual Misconduct"
+  "topic": "Sexual Misconduct",
+  "applicableInstitutions": [
+    "all-institutions"
+  ]
 }

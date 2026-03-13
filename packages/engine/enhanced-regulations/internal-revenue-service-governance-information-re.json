@@ -30,5 +30,8 @@
   "relationships": [],
   "tags": [
     "Governance"
+  ],
+  "applicableInstitutions": [
+    "all-institutions"
   ]
 }

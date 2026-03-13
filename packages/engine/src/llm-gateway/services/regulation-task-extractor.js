@@ -648,7 +648,13 @@ Return a JSON object with this EXACT structure (no markdown, no code fences):
   ],
   "penalties": [
     { "type": "monetary|administrative|funding|criminal", "description": "Penalty description", "amount": "$X or null" }
-  ]
+  ],
+  "requiredActions": {
+    "attestation": { "required": true, "reason": "Brief reason" },
+    "website_publish": { "required": false, "reason": "Brief reason — set true if regulation requires posting/publishing anything on the institution website" },
+    "community_communication": { "required": false, "reason": "Brief reason — set true if regulation requires notifying students, employees, or the public" },
+    "agency_submission": { "required": false, "reason": "Brief reason — set true if regulation requires filing/submitting to a government agency" }
+  }
 }
 
 CRITICAL RULES:
@@ -661,7 +667,14 @@ CRITICAL RULES:
 - Include penalties if specifically mentioned in this regulation
 - Every task must be specific and verifiable, not vague
 - Every task MUST include a statutoryCitation referencing the specific section of ${statute || 'the statute'} that requires this action
-- assignedRole MUST be chosen from the provided canonical list — do not invent new role titles`;
+- assignedRole MUST be chosen from the provided canonical list — do not invent new role titles
+
+REQUIRED ACTIONS — Identify which compliance workflow steps this regulation mandates:
+- "attestation" is ALWAYS required (set to true) — every regulation needs a compliance sign-off
+- "website_publish": Set to true if the regulation requires publishing policies, notices, reports, or disclosures on the institution's public website (e.g., "post on website", "make publicly available online", "publish on institution's website")
+- "community_communication": Set to true if the regulation requires notifying, distributing to, or communicating with students, employees, or the public (e.g., "annual notification to all students", "distribute to employees", "public statement", "notify community")
+- "agency_submission": Set to true if the regulation requires filing reports, submitting data, or sending documentation to a government agency (e.g., "submit to Department of Education", "file with state agency", "report to OCR", "annual submission to...")
+- For each action, provide a brief reason citing the specific requirement from the regulation text`;
 
   try {
     const response = await callLLM(prompt, { 
@@ -710,6 +723,7 @@ export async function extractComplianceRequirements(regulationSlug, regulationTe
     tasks: [],
     deadlines: [],
     penalties: [],
+    requiredActions: null,
     
     // Analysis metadata
     analysis: {
@@ -855,9 +869,22 @@ export async function extractComplianceRequirements(regulationSlug, regulationTe
           }
         }
         
+        if (aiResult.requiredActions) {
+          result.requiredActions = {
+            attestation: { required: true, reason: aiResult.requiredActions.attestation?.reason || 'Compliance attestation always required' },
+            website_publish: { required: !!aiResult.requiredActions.website_publish?.required, reason: aiResult.requiredActions.website_publish?.reason || '' },
+            community_communication: { required: !!aiResult.requiredActions.community_communication?.required, reason: aiResult.requiredActions.community_communication?.reason || '' },
+            agency_submission: { required: !!aiResult.requiredActions.agency_submission?.required, reason: aiResult.requiredActions.agency_submission?.reason || '' },
+          };
+        }
+        
         result.analysis.method = 'ai_extraction';
         result.analysis.confidence = Math.min(90, 60 + result.tasks.length);
+        const actionSummary = result.requiredActions 
+          ? Object.entries(result.requiredActions).filter(([,v]) => v.required).map(([k]) => k).join(', ')
+          : 'attestation only';
         console.log(`   ✅ AI extraction produced ${result.tasks.length} tasks, ${result.deadlines.length} deadlines, ${result.penalties.length} penalties`);
+        console.log(`   🎯 Required actions: ${actionSummary}`);
       } else {
         console.log(`   ⚠️ AI extraction returned no results — keeping regex results`);
       }
@@ -867,13 +894,37 @@ export async function extractComplianceRequirements(regulationSlug, regulationTe
   const duration = Date.now() - startTime;
   result.analysis.duration = `${duration}ms`;
   
+  // If no AI requiredActions were produced, fall back to text-analysis heuristics
+  if (!result.requiredActions) {
+    const lowerText = (regulationText || '').toLowerCase();
+    result.requiredActions = {
+      attestation: { required: true, reason: 'Compliance attestation always required' },
+      website_publish: {
+        required: /\b(publish|post|display|make available)\b.{0,40}\b(website|online|web page|internet|publicly)\b/i.test(regulationText || ''),
+        reason: 'Detected from regulation text patterns'
+      },
+      community_communication: {
+        required: /\b(notify|notification|distribute|disseminate|inform|communicate)\b.{0,40}\b(student|employee|community|public|campus|all\s+(?:students|employees))\b/i.test(regulationText || ''),
+        reason: 'Detected from regulation text patterns'
+      },
+      agency_submission: {
+        required: /\b(submit|file|report to|send to|provide to)\b.{0,40}\b(department|agency|secretary|commission|office of|bureau)\b/i.test(regulationText || ''),
+        reason: 'Detected from regulation text patterns'
+      },
+    };
+  }
+  
   // Summary
+  const finalActions = result.requiredActions 
+    ? Object.entries(result.requiredActions).filter(([,v]) => v.required).map(([k]) => k).join(', ')
+    : 'attestation only';
   console.log(`\n${'═'.repeat(70)}`);
   console.log(`  ✅ EXTRACTION COMPLETE`);
   console.log(`  ⏱️  Duration: ${duration}ms`);
   console.log(`  📋 Tasks: ${result.tasks.length} (${result.tasks.filter(t => !t.parentTempId).length} sections, ${result.tasks.filter(t => t.parentTempId).length} subtasks)`);
   console.log(`  📅 Deadlines: ${result.deadlines.length}`);
   console.log(`  ⚠️  Penalties: ${result.penalties.length}`);
+  console.log(`  🎯 Required Actions: ${finalActions}`);
   console.log(`  🎯 Confidence: ${result.analysis.confidence}%`);
   console.log(`${'═'.repeat(70)}\n`);
   

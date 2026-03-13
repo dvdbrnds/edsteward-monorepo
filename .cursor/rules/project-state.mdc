@@ -12,7 +12,7 @@ alwaysApply: true
 
 | Component | Version |
 |-----------|---------|
-| EdSteward App | STABLE v1.5.0 |
+| EdSteward App | BETA v1.5.1 |
 | MCP Engine | v5.3.0 |
 
 ## Workspace Packages

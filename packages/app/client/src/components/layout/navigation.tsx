@@ -24,6 +24,7 @@ import {
   X,
   Sun,
   Moon,
+  Sparkles,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -152,9 +153,11 @@ export default function Navigation() {
                     <span className="text-xl font-bold text-white hover:text-gray-200 transition-colors ml-3">
                       Compliance Portal
                     </span>
-                    <span className="ml-2 px-2 py-0.5 text-xs font-semibold bg-amber-500 text-white rounded-full">
-                      {FULL_VERSION}
-                    </span>
+                    <Link href="/changelog">
+                      <span className="ml-2 px-2 py-0.5 text-xs font-semibold bg-amber-500 text-white rounded-full hover:bg-amber-400 transition-colors cursor-pointer" title="View changelog">
+                        {FULL_VERSION}
+                      </span>
+                    </Link>
                   </button>
                 </Link>
               </div>
@@ -240,6 +243,12 @@ export default function Navigation() {
                   <DropdownMenuItem className="flex items-center cursor-pointer">
                     <Settings className="mr-2 h-4 w-4" />
                     <span>Account Settings</span>
+                  </DropdownMenuItem>
+                </Link>
+                <Link href="/changelog">
+                  <DropdownMenuItem className="flex items-center cursor-pointer">
+                    <Sparkles className="mr-2 h-4 w-4" />
+                    <span>What's New</span>
                   </DropdownMenuItem>
                 </Link>
                 <DropdownMenuItem

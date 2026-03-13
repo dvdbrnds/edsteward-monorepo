@@ -30,5 +30,8 @@
   "relationships": [],
   "tags": [
     "Academic Programs"
+  ],
+  "applicableInstitutions": [
+    "title-iv-participant"
   ]
 }

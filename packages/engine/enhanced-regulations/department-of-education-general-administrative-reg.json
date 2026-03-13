@@ -46,5 +46,8 @@
   "relationships": [],
   "tags": [
     "Grants Management"
+  ],
+  "applicableInstitutions": [
+    "title-iv-participant"
   ]
 }

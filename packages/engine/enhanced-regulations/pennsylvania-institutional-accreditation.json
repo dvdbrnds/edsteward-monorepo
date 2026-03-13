@@ -1,17 +1,17 @@
 {
   "regulationId": "pennsylvania-institutional-accreditation",
   "schemaVersion": "2.0",
-
   "jurisdiction": {
     "source": "state",
     "countryCode": "US",
-    "stateCodes": ["PA"],
+    "stateCodes": [
+      "PA"
+    ],
     "label": "Pennsylvania",
     "regulatoryBody": "Pennsylvania State Board of Education",
     "actNumber": null,
     "applicability": "all"
   },
-
   "enhanced": {
     "fullText": "Pennsylvania's Institutional Accreditation Requirements, codified in 22 Pa. Code Chapter 36, establish the fundamental framework for higher education institutions operating within the Commonwealth. These regulations ensure that all degree-granting institutions meet minimum standards of educational quality, financial stability, and administrative competence while protecting students and maintaining the integrity of Pennsylvania's higher education system.\n\nThe regulation applies to all institutions seeking to operate in Pennsylvania and grant degrees, certificates, or diplomas. This includes private colleges and universities, proprietary schools, religious institutions, and branch campuses of out-of-state institutions. Public institutions, while subject to different oversight mechanisms, must also demonstrate compliance with core accreditation principles.\n\nInstitutions must obtain authorization from the Pennsylvania Department of Education before commencing operations or offering new degree programs. This authorization process requires demonstration of regional or national accreditation from an agency recognized by the U.S. Department of Education. Acceptable accrediting bodies include the Middle States Commission on Higher Education, which serves as the primary regional accreditor for Pennsylvania institutions, as well as specialized accreditors for specific professional programs.\n\nThe financial stability requirement mandates that institutions demonstrate adequate financial resources to fulfill their educational commitments. Institutions must submit audited financial statements prepared by certified public accountants, maintain appropriate surety bonds or escrow accounts, and provide evidence of sufficient cash flow to operate effectively. Institutions showing signs of financial distress may be required to provide additional financial assurances or face restrictions on enrollment or program offerings.\n\nFaculty qualifications represent another critical component of the regulation. Institutions must employ faculty members with appropriate academic credentials, typically requiring master's degrees for undergraduate instruction and doctoral degrees for graduate programs. Faculty-to-student ratios must be maintained at reasonable levels to ensure quality instruction, and institutions must demonstrate ongoing professional development opportunities for their academic staff.\n\nPhysical facilities and learning resources must meet established standards for educational delivery. This includes adequate classroom space, library resources, laboratory facilities where applicable, and technological infrastructure to support the institution's educational mission. Distance education programs must demonstrate equivalent resource allocation and student support services.\n\nStudent services requirements encompass admissions standards, academic advising, financial aid administration, and student records management. Institutions must maintain accurate transcripts, provide clear information about program requirements and costs, and establish fair policies for student grievances and appeals. Consumer protection measures require transparent disclosure of graduation rates, employment outcomes, and program costs.\n\nThe regulation establishes comprehensive oversight mechanisms through the Department of Education's Division of Higher and Career Education. Regular monitoring includes annual reporting requirements, periodic site visits, and investigation of complaints. The Department maintains authority to conduct announced or unannounced inspections, review institutional records, and interview administrators, faculty, and students.\n\nEnforcement actions for non-compliance may include warnings, probationary status, fines, suspension of authorization, or complete revocation of operating authority. Institutions facing enforcement actions have appeal rights through established administrative procedures, but must continue compliance efforts during any appeal process.\n\nRenewal of institutional authorization typically occurs on a five-year cycle, requiring institutions to demonstrate continued compliance with all regulatory requirements. The renewal process includes comprehensive review of institutional effectiveness, financial stability, and maintenance of accreditation status. Institutions must submit renewal applications at least twelve months before expiration to ensure continuity of operations.\n\nSpecial provisions address institutional changes such as ownership transfers, merger activities, or significant program modifications. These changes require prior approval from the Department and may trigger additional review requirements. Institutions must notify the Department within specified timeframes of any material changes to their operations, governance, or financial status.\n\nThe regulation also addresses closure procedures, requiring institutions to develop teach-out plans for current students, maintain permanent academic records, and provide appropriate financial arrangements for student refunds. Closure notification requirements protect student interests and ensure orderly transitions.\n\nCompliance costs vary based on institutional size and complexity but typically include application fees, annual assessment fees, and costs associated with maintaining required documentation and reporting. Institutions must budget for ongoing compliance activities including staff time for regulatory reporting and potential costs of remedial actions.\n\nRecent amendments have strengthened oversight of online education programs, enhanced financial monitoring requirements, and expanded consumer protection measures. These changes reflect evolving higher education landscapes and increased emphasis on student outcomes and institutional accountability.\n\nInstitutions should establish robust compliance management systems including designated compliance officers, regular internal audits, and comprehensive policy documentation. Proactive compliance management reduces regulatory risks and supports institutional mission fulfillment while maintaining positive relationships with regulatory authorities.",
     "summary": "Pennsylvania's Institutional Accreditation Requirements (22 Pa. Code Ch. 36) mandate that all degree-granting institutions obtain Department of Education authorization and maintain recognized accreditation. Key requirements include demonstrated financial stability through audited statements and surety bonds, qualified faculty with appropriate credentials, adequate physical facilities and learning resources, comprehensive student services, and transparent consumer disclosures. The Department conducts ongoing oversight through annual reporting, site visits, and complaint investigations. Non-compliance may result in warnings, probation, fines, or revocation of operating authority. Authorization renewal occurs every five years with comprehensive institutional review. Institutions must notify the Department of material changes and maintain detailed compliance documentation.",
@@ -29,7 +29,6 @@
     ],
     "reportingRequirements": "Annual institutional reports must be submitted by March 31st each year, including enrollment statistics, financial data, faculty qualifications, and student outcome metrics. Audited financial statements are due within 120 days of fiscal year end. Material change notifications must be filed within 30 days of occurrence. Authorization renewal applications must be submitted 12 months before current authorization expires (typically every 5 years). Quarterly financial reports may be required for institutions under financial monitoring. Immediate notification (within 48 hours) is required for any events threatening institutional operations, including loss of accreditation, significant financial difficulties, or closure decisions. Site visit scheduling and documentation must be provided within 10 business days of Department request."
   },
-
   "deadlines": [
     {
       "date": "03-31",
@@ -62,19 +61,19 @@
       "isRecurring": false
     }
   ],
-
   "relationships": [],
-
   "tags": [
     "Accreditation",
     "Institutional Effectiveness"
   ],
-
   "audit": {
     "score": 95,
     "certainty": "A",
     "timestamp": "2025-12-05T15:32:44.404Z"
   },
   "statute": "22 Pa. Code § 31.21",
-  "topic": "Accreditation"
+  "topic": "Accreditation",
+  "applicableInstitutions": [
+    "all-institutions"
+  ]
 }

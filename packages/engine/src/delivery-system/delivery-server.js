@@ -17,6 +17,9 @@ import { normalizeRole as normalizeRoleShared } from '../utils/role-normalizer.j
 import pg from 'pg';
 import { RegulationDeliveryEngine, REGULATION_EVENTS } from './regulation-delivery-engine.js';
 import { EdStewardIntegration } from './edsteward-integration.js';
+import ComplianceTaskGenerator from '../services/compliance-task-generator.js';
+
+const taskGenerator = new ComplianceTaskGenerator();
 
 const { Pool } = pg;
 
@@ -600,13 +603,26 @@ class DeliveryServer {
             })),
 
             // ═══════════════════════════════════════════════════════════
+            // REGULATION ACTIONS — Which compliance workflow steps apply
+            // The app uses these to auto-enable the correct action types
+            // ═══════════════════════════════════════════════════════════
+            regulationActions: taskGenerator.getRequiredActions(
+              regulationId,
+              regulationContent.requiredActions || null
+            ),
+
+            // ═══════════════════════════════════════════════════════════
             // ADDITIONAL METADATA
             // ═══════════════════════════════════════════════════════════
             bespokeSource: !!regulationContent._bespokeSource,
             taskSyncMode: regulationContent._bespokeSource ? 'replace' : 'merge',
             agencyDepartment: regulationContent.agencyDepartment || regulationContent.agency_department || '',
             regulationUrl: regulationContent.regulationUrl || regulationContent.regulation_url || '',
-            applicableInstitutions: regulationContent.applicableInstitutions || regulationContent.applicable_institutions || '',
+            applicableInstitutions: Array.isArray(regulationContent.applicableInstitutions)
+              ? regulationContent.applicableInstitutions
+              : Array.isArray(regulationContent.applicable_institutions)
+                ? regulationContent.applicable_institutions
+                : ['all-institutions'],
             applicableForms: Array.isArray(regulationContent.applicableForms) ? regulationContent.applicableForms : [],
             sections: Array.isArray(regulationContent.sections) ? regulationContent.sections : [],
             lovvLevel: regulationContent.lovvLevel || regulationContent.lovv_level || '',
@@ -1208,6 +1224,7 @@ class DeliveryServer {
           effectiveDate: regulation.effective_date,
           bespokeSource: !!bespokeConfig,
           complianceTasks,
+          regulationActions: taskGenerator.getRequiredActions(regulationSlug),
           deadlines,
           penalties,
           responsibleRoles,
@@ -1400,7 +1417,8 @@ class DeliveryServer {
               jurisdictionSource: reg.jurisdiction_source || 'federal',
               summary: reg.summary || '',
               regulationText: reg.regulation_text || '',
-              complianceTasks: hierarchicalTasks
+              complianceTasks: hierarchicalTasks,
+              regulationActions: taskGenerator.getRequiredActions(reg.reg_key || reg.name),
             };
             
             if (!dryRun) {

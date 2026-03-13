@@ -2,147 +2,166 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Building2, Save, AlertCircle, Eye, EyeOff } from "lucide-react";
-import { INSTITUTION_TYPES } from "@shared/schema";
+import { Building2, Save, AlertCircle, Eye, EyeOff, Check } from "lucide-react";
+import { INSTITUTION_PRIMARY_TYPES, INSTITUTION_CHARACTERISTICS } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 interface InstitutionConfig {
-  primaryTypes: string[];
+  primaryType: string | null;
+  characteristics: string[];
   hideNonApplicable: boolean;
   allowUsersToToggle: boolean;
 }
 
+const PRIMARY_TYPE_META: Record<string, { label: string; description: string }> = {
+  "public-4year": {
+    label: "Public University (4-year)",
+    description: "State-funded/governed institution granting bachelor's degrees or higher",
+  },
+  "private-nonprofit-4year": {
+    label: "Private Nonprofit University (4-year)",
+    description: "Private, not-for-profit institution granting bachelor's degrees or higher",
+  },
+  "public-2year": {
+    label: "Public Community College (2-year)",
+    description: "State-funded institution primarily granting associate degrees",
+  },
+  "private-nonprofit-2year": {
+    label: "Private Nonprofit College (2-year)",
+    description: "Private, not-for-profit institution primarily granting associate degrees",
+  },
+  "private-for-profit": {
+    label: "For-Profit Institution",
+    description: "Proprietary institution — subject to gainful employment rules, 90/10, heightened DOE oversight",
+  },
+};
+
+const CHARACTERISTIC_META: Record<string, { label: string; description: string }> = {
+  "religious-affiliation": {
+    label: "Religious Affiliation",
+    description: "Faith-based institution — eligible for Title IX religious exemptions",
+  },
+  "research-intensive": {
+    label: "Research Intensive (R1/R2)",
+    description: "High research activity — export controls, research integrity, IRB/IACUC emphasis",
+  },
+  "graduate-professional": {
+    label: "Graduate / Professional Programs",
+    description: "Offers graduate or professional degree programs",
+  },
+  "intercollegiate-athletics": {
+    label: "Intercollegiate Athletics",
+    description: "NCAA/NAIA member — Title IX athletics equity, EADA reporting",
+  },
+  "online-distance-ed": {
+    label: "Online / Distance Education",
+    description: "Significant online presence — state authorization reciprocity (SARA)",
+  },
+  "medical-health-programs": {
+    label: "Medical / Health Programs",
+    description: "Medical school, nursing, or health sciences — HIPAA emphasis, clinical compliance",
+  },
+  "residential-campus": {
+    label: "Residential Campus",
+    description: "Has on-campus housing — expanded Clery geography, fire safety, housing regulations",
+  },
+  "title-iv-participant": {
+    label: "Title IV Participant",
+    description: "Participates in federal student aid — the gating factor for most federal compliance",
+  },
+};
+
 interface InstitutionSettingsProps {
-  tenantId: string;
-  currentConfig?: InstitutionConfig;
-  onConfigUpdate?: (config: InstitutionConfig) => void;
+  onConfigUpdate?: () => void;
 }
 
-const INSTITUTION_TYPE_LABELS: Record<string, string> = {
-  "public-universities": "Public Universities",
-  "private-universities": "Private Universities",
-  "community-colleges": "Community Colleges",
-  "conservatories": "Conservatories",
-  "technical-institutes": "Technical Institutes",
-  "religious-institutions": "Religious Institutions",
-  "for-profit-institutions": "For-Profit Institutions",
-  "research-institutes": "Research Institutes",
-  "professional-schools": "Professional Schools",
-  "all-institutions": "All Institution Types"
-};
-
-const INSTITUTION_TYPE_DESCRIPTIONS: Record<string, string> = {
-  "public-universities": "State-funded four-year institutions",
-  "private-universities": "Private four-year institutions",
-  "community-colleges": "Two-year colleges and community colleges",
-  "conservatories": "Music, arts, and performance schools",
-  "technical-institutes": "Technical and vocational schools",
-  "religious-institutions": "Faith-based educational institutions",
-  "for-profit-institutions": "For-profit educational institutions",
-  "research-institutes": "Research-focused institutions",
-  "professional-schools": "Graduate and professional schools",
-  "all-institutions": "Regulations that apply to all institution types"
-};
-
-export function InstitutionSettings({ tenantId, currentConfig, onConfigUpdate }: InstitutionSettingsProps) {
+export function InstitutionSettings({ onConfigUpdate }: InstitutionSettingsProps) {
   const { toast } = useToast();
-  const [config, setConfig] = useState<InstitutionConfig>({
-    primaryTypes: currentConfig?.primaryTypes || [],
-    hideNonApplicable: currentConfig?.hideNonApplicable ?? true,
-    allowUsersToToggle: currentConfig?.allowUsersToToggle ?? true
+  const queryClient = useQueryClient();
+
+  const { data: savedConfig, isLoading: isLoadingConfig } = useQuery<InstitutionConfig>({
+    queryKey: ["/api/institution-config/types"],
+    queryFn: async () => {
+      const res = await fetch("/api/institution-config/types");
+      if (!res.ok) throw new Error("Failed to load config");
+      const data = await res.json();
+      return data.config;
+    },
   });
-  const [isLoading, setIsLoading] = useState(false);
-  const [hasChanges, setHasChanges] = useState(false);
+
+  const [config, setConfig] = useState<InstitutionConfig>({
+    primaryType: null,
+    characteristics: [],
+    hideNonApplicable: true,
+    allowUsersToToggle: true,
+  });
 
   useEffect(() => {
-    if (currentConfig) {
-      setConfig({
-        primaryTypes: currentConfig.primaryTypes || [],
-        hideNonApplicable: currentConfig.hideNonApplicable ?? true,
-        allowUsersToToggle: currentConfig.allowUsersToToggle ?? true
-      });
+    if (savedConfig) {
+      setConfig(savedConfig);
     }
-  }, [currentConfig]);
+  }, [savedConfig]);
 
-  useEffect(() => {
-    const hasChanged = 
-      JSON.stringify(config.primaryTypes.sort()) !== JSON.stringify((currentConfig?.primaryTypes || []).sort()) ||
-      config.hideNonApplicable !== (currentConfig?.hideNonApplicable ?? true) ||
-      config.allowUsersToToggle !== (currentConfig?.allowUsersToToggle ?? true);
-    setHasChanges(hasChanged);
-  }, [config, currentConfig]);
+  const saveMutation = useMutation({
+    mutationFn: async (cfg: InstitutionConfig) => {
+      const res = await fetch("/api/institution-config/types", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(cfg),
+      });
+      if (!res.ok) throw new Error("Failed to save");
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/institution-config/types"] });
+      queryClient.invalidateQueries({ predicate: (query) =>
+        typeof query.queryKey[0] === 'string' && (query.queryKey[0] as string).startsWith('/api/regulations')
+      });
+      toast({ title: "Settings Updated", description: "Institution configuration saved successfully." });
+      onConfigUpdate?.();
+    },
+    onError: () => {
+      toast({ title: "Error", description: "Failed to save institution configuration.", variant: "destructive" });
+    },
+  });
 
-  const handleTypeToggle = (type: string, checked: boolean) => {
+  const hasChanges = JSON.stringify(config) !== JSON.stringify(savedConfig);
+
+  const handleCharacteristicToggle = (char: string, checked: boolean) => {
     setConfig(prev => ({
       ...prev,
-      primaryTypes: checked 
-        ? [...prev.primaryTypes, type]
-        : prev.primaryTypes.filter(t => t !== type)
+      characteristics: checked
+        ? [...prev.characteristics, char]
+        : prev.characteristics.filter(c => c !== char),
     }));
-  };
-
-  const handleSelectAll = () => {
-    const allTypes = INSTITUTION_TYPES.filter(type => type !== 'all-institutions');
-    setConfig(prev => ({
-      ...prev,
-      primaryTypes: allTypes
-    }));
-  };
-
-  const handleClearAll = () => {
-    setConfig(prev => ({
-      ...prev,
-      primaryTypes: []
-    }));
-  };
-
-  const handleSave = async () => {
-    setIsLoading(true);
-    try {
-      const response = await fetch(`/api/tenants/${tenantId}/institution-config`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(config),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to update institution configuration');
-      }
-
-      toast({
-        title: "Settings Updated",
-        description: "Institution configuration has been saved successfully.",
-      });
-
-      onConfigUpdate?.(config);
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to update institution configuration. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
   };
 
   const getRegulationImpact = () => {
-    if (config.primaryTypes.length === 0) {
-      return "All regulations will be visible to users.";
+    if (!config.primaryType && config.characteristics.length === 0) {
+      return "No institution type selected — all regulations will be visible.";
     }
+    const typeCount = (config.primaryType ? 1 : 0) + config.characteristics.length;
     if (config.hideNonApplicable) {
-      return `Only regulations applicable to ${config.primaryTypes.length} selected institution type(s) will be shown by default.`;
+      return `Only regulations applicable to your ${typeCount} selected type/characteristic(s) will be shown by default.`;
     }
-    return "All regulations will be visible, but filtering preferences will be saved.";
+    return "All regulations will be visible, but your institution profile will be saved for filtering.";
   };
+
+  if (isLoadingConfig) {
+    return (
+      <Card>
+        <CardContent className="py-12 text-center text-muted-foreground">
+          Loading institution configuration...
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -153,77 +172,108 @@ export function InstitutionSettings({ tenantId, currentConfig, onConfigUpdate }:
             <CardTitle>Institution Type Configuration</CardTitle>
           </div>
           <CardDescription>
-            Configure your institution's primary types to automatically filter relevant regulations.
-            This helps reduce clutter by hiding regulations that don't apply to your institution.
+            Define your institution's classification to automatically filter regulations.
+            Only regulations that apply to your institution type will be shown by default.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          {/* Institution Type Selection */}
+
+          {/* Tier 1: Primary Classification */}
           <div>
-            <div className="flex items-center justify-between mb-4">
-              <Label className="text-base font-medium">Primary Institution Types</Label>
-              <div className="flex space-x-2">
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={handleSelectAll}
-                  disabled={config.primaryTypes.length === INSTITUTION_TYPES.length - 1}
-                >
-                  Select All
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={handleClearAll}
-                  disabled={config.primaryTypes.length === 0}
-                >
-                  Clear All
-                </Button>
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {INSTITUTION_TYPES.filter(type => type !== 'all-institutions').map((type) => {
-                const isSelected = config.primaryTypes.includes(type);
+            <Label className="text-base font-medium">Primary Classification</Label>
+            <p className="text-sm text-muted-foreground mb-4">
+              Select the one category that best describes your institution's sector and level.
+            </p>
+            <div className="grid grid-cols-1 gap-3">
+              {INSTITUTION_PRIMARY_TYPES.map((type) => {
+                const meta = PRIMARY_TYPE_META[type];
+                const isSelected = config.primaryType === type;
                 return (
-                  <div
+                  <button
                     key={type}
+                    type="button"
+                    onClick={() => setConfig(prev => ({
+                      ...prev,
+                      primaryType: prev.primaryType === type ? null : type,
+                    }))}
                     className={cn(
-                      "flex items-start space-x-3 p-4 rounded-lg border transition-colors",
-                      isSelected 
-                        ? "bg-blue-50 border-blue-200 dark:bg-blue-950 dark:border-blue-800" 
-                        : "bg-background border-border dark:bg-gray-900 dark:border-gray-700"
+                      "flex items-center gap-4 p-4 rounded-lg border text-left transition-colors",
+                      isSelected
+                        ? "bg-blue-50 border-blue-300 dark:bg-blue-950 dark:border-blue-700"
+                        : "bg-background border-border hover:bg-muted/50 dark:bg-gray-900 dark:border-gray-700"
                     )}
                   >
-                    <Checkbox
-                      id={`institution-${type}`}
-                      checked={isSelected}
-                      onCheckedChange={(checked) => handleTypeToggle(type, checked as boolean)}
-                      className="mt-1"
-                    />
-                    <div className="flex-1">
-                      <Label 
-                        htmlFor={`institution-${type}`}
-                        className="font-medium cursor-pointer"
-                      >
-                        {INSTITUTION_TYPE_LABELS[type]}
-                      </Label>
-                      <p className="text-sm text-muted-foreground dark:text-muted-foreground mt-1">
-                        {INSTITUTION_TYPE_DESCRIPTIONS[type]}
-                      </p>
+                    <div className={cn(
+                      "flex items-center justify-center h-5 w-5 rounded-full border-2 shrink-0",
+                      isSelected
+                        ? "bg-blue-600 border-blue-600"
+                        : "border-gray-300 dark:border-gray-600"
+                    )}>
+                      {isSelected && <Check className="h-3 w-3 text-white" />}
                     </div>
-                  </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium text-sm">{meta?.label || type}</div>
+                      <div className="text-xs text-muted-foreground mt-0.5">{meta?.description}</div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <Separator />
+
+          {/* Tier 2: Characteristics */}
+          <div>
+            <Label className="text-base font-medium">Institutional Characteristics</Label>
+            <p className="text-sm text-muted-foreground mb-4">
+              Select all characteristics that apply. Each triggers additional regulatory requirements.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {INSTITUTION_CHARACTERISTICS.map((char) => {
+                const meta = CHARACTERISTIC_META[char];
+                const isSelected = config.characteristics.includes(char);
+                return (
+                  <button
+                    key={char}
+                    type="button"
+                    onClick={() => handleCharacteristicToggle(char, !isSelected)}
+                    className={cn(
+                      "flex items-start gap-3 p-4 rounded-lg border text-left transition-colors",
+                      isSelected
+                        ? "bg-blue-50 border-blue-300 dark:bg-blue-950 dark:border-blue-700"
+                        : "bg-background border-border hover:bg-muted/50 dark:bg-gray-900 dark:border-gray-700"
+                    )}
+                  >
+                    <div className={cn(
+                      "flex items-center justify-center h-5 w-5 rounded-md border-2 shrink-0 mt-0.5",
+                      isSelected
+                        ? "bg-blue-600 border-blue-600"
+                        : "border-gray-300 dark:border-gray-600"
+                    )}>
+                      {isSelected && <Check className="h-3 w-3 text-white" />}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium text-sm">{meta?.label || char}</div>
+                      <div className="text-xs text-muted-foreground mt-0.5">{meta?.description}</div>
+                    </div>
+                  </button>
                 );
               })}
             </div>
 
-            {config.primaryTypes.length > 0 && (
+            {(config.primaryType || config.characteristics.length > 0) && (
               <div className="mt-4">
-                <Label className="text-sm font-medium text-foreground dark:text-gray-300">Selected Types:</Label>
+                <Label className="text-sm font-medium text-foreground dark:text-gray-300">Your Profile:</Label>
                 <div className="flex flex-wrap gap-2 mt-2">
-                  {config.primaryTypes.map((type) => (
-                    <Badge key={type} variant="secondary" className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-                      {INSTITUTION_TYPE_LABELS[type]}
+                  {config.primaryType && (
+                    <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                      {PRIMARY_TYPE_META[config.primaryType]?.label || config.primaryType}
+                    </Badge>
+                  )}
+                  {config.characteristics.map((char) => (
+                    <Badge key={char} variant="secondary">
+                      {CHARACTERISTIC_META[char]?.label || char}
                     </Badge>
                   ))}
                 </div>
@@ -236,7 +286,7 @@ export function InstitutionSettings({ tenantId, currentConfig, onConfigUpdate }:
           {/* Filtering Behavior */}
           <div className="space-y-4">
             <Label className="text-base font-medium">Filtering Behavior</Label>
-            
+
             <div className="space-y-4">
               <div className="flex items-center justify-between p-4 rounded-lg border bg-background dark:bg-gray-900">
                 <div className="flex-1">
@@ -250,8 +300,8 @@ export function InstitutionSettings({ tenantId, currentConfig, onConfigUpdate }:
                       Hide Non-Applicable Regulations by Default
                     </Label>
                   </div>
-                  <p className="text-sm text-muted-foreground dark:text-muted-foreground mt-1">
-                    When enabled, only regulations that apply to your selected institution types will be shown by default.
+                  <p className="text-sm text-muted-foreground mt-1">
+                    When enabled, only regulations that apply to your institution type will be shown by default.
                     Users can still access all regulations using the filter controls.
                   </p>
                 </div>
@@ -267,8 +317,8 @@ export function InstitutionSettings({ tenantId, currentConfig, onConfigUpdate }:
                   <Label htmlFor="allow-user-toggle" className="font-medium cursor-pointer">
                     Allow Users to Toggle Filtering
                   </Label>
-                  <p className="text-sm text-muted-foreground dark:text-muted-foreground mt-1">
-                    When enabled, users can toggle between showing only applicable regulations and showing all regulations.
+                  <p className="text-sm text-muted-foreground mt-1">
+                    When enabled, users can toggle between showing only applicable regulations and showing all.
                     When disabled, the filtering behavior is enforced for all users.
                   </p>
                 </div>
@@ -293,21 +343,21 @@ export function InstitutionSettings({ tenantId, currentConfig, onConfigUpdate }:
 
           {/* Save Button */}
           <div className="flex justify-end">
-            <Button 
-              onClick={handleSave}
-              disabled={!hasChanges || isLoading}
+            <Button
+              onClick={() => saveMutation.mutate(config)}
+              disabled={!hasChanges || saveMutation.isPending}
               className="flex items-center space-x-2"
             >
-              {isLoading ? (
+              {saveMutation.isPending ? (
                 <div className="animate-spin h-4 w-4 border-2 border-current border-t-transparent rounded-full" />
               ) : (
                 <Save className="h-4 w-4" />
               )}
-              <span>{isLoading ? 'Saving...' : 'Save Configuration'}</span>
+              <span>{saveMutation.isPending ? 'Saving...' : 'Save Configuration'}</span>
             </Button>
           </div>
         </CardContent>
       </Card>
     </div>
   );
-} 
+}

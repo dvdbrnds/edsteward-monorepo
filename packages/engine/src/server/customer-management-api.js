@@ -1050,6 +1050,52 @@ app.get('/api/inquisitor/health', (req, res) => {
   });
 });
 
+// ====== INSTITUTION ASSESSMENT ENDPOINTS ======
+import { searchInstitutions, getInstitution, getApplicableRegulationCount } from '../services/institution-assessment.js';
+
+app.get('/api/assessment/search', async (req, res) => {
+  try {
+    const { q, limit } = req.query;
+    if (!q) return res.status(400).json({ error: 'Query parameter "q" is required' });
+    const results = await searchInstitutions(q, parseInt(limit) || 10);
+    res.json({ success: true, ...results });
+  } catch (error) {
+    console.error('Assessment search error:', error);
+    res.status(500).json({ error: 'Failed to search institutions', details: error.message });
+  }
+});
+
+app.get('/api/assessment/institution/:id', async (req, res) => {
+  try {
+    const institution = await getInstitution(req.params.id);
+    if (!institution) return res.status(404).json({ error: 'Institution not found' });
+
+    const regCount = await getApplicableRegulationCount(institution.allTypes);
+    res.json({
+      success: true,
+      institution,
+      regulations: regCount,
+    });
+  } catch (error) {
+    console.error('Assessment lookup error:', error);
+    res.status(500).json({ error: 'Failed to look up institution', details: error.message });
+  }
+});
+
+app.post('/api/assessment/classify', async (req, res) => {
+  try {
+    const { types } = req.body;
+    if (!types || !Array.isArray(types)) {
+      return res.status(400).json({ error: '"types" array is required' });
+    }
+    const regCount = await getApplicableRegulationCount(types);
+    res.json({ success: true, regulations: regCount });
+  } catch (error) {
+    console.error('Assessment classify error:', error);
+    res.status(500).json({ error: 'Failed to classify', details: error.message });
+  }
+});
+
 // Start server
 const PORT = process.env.CUSTOMER_API_PORT || 3060;
 
@@ -1063,6 +1109,9 @@ app.listen(PORT, () => {
   console.log(`   GET  /api/delivery/preview/:customerId - Preview bulk delivery`);
   console.log(`   POST /api/delivery/bulk/:customerId - Execute bulk delivery`);
   console.log(`   GET  /api/delivery/status/:deliveryId - Check delivery status`);
+  console.log(`   GET  /api/assessment/search?q=name - Search institutions`);
+  console.log(`   GET  /api/assessment/institution/:id - Get institution details + classification`);
+  console.log(`   POST /api/assessment/classify - Get regulation count for types`);
 });
 
 export default app;

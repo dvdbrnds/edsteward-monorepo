@@ -494,6 +494,60 @@ export function registerRoutes(app: express.Application): Server {
     });
   });
 
+  // Institution type configuration endpoints (persisted per-tenant)
+  app.get('/api/institution-config/types', async (req, res) => {
+    try {
+      const tenantId = req.tenantId || 'default';
+      const tenantStorage = getDatabaseStorage(req.tenantId);
+      const config = await tenantStorage.getInstitutionConfig(tenantId);
+      if (config) {
+        res.json({
+          success: true,
+          config: {
+            primaryType: config.primaryType,
+            characteristics: config.characteristics || [],
+            hideNonApplicable: config.hideNonApplicable,
+            allowUsersToToggle: config.allowUsersToToggle,
+          },
+        });
+      } else {
+        // Fall back to tenant registry defaults
+        const tenant = (req as any).tenant;
+        const defaults = tenant?.settings?.institutionConfig;
+        res.json({
+          success: true,
+          config: {
+            primaryType: defaults?.primaryType || null,
+            characteristics: defaults?.characteristics || [],
+            hideNonApplicable: defaults?.hideNonApplicable ?? true,
+            allowUsersToToggle: defaults?.allowUsersToToggle ?? true,
+          },
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching institution config:', error);
+      res.status(500).json({ error: 'Failed to fetch institution configuration' });
+    }
+  });
+
+  app.put('/api/institution-config/types', async (req, res) => {
+    try {
+      const { primaryType, characteristics, hideNonApplicable, allowUsersToToggle } = req.body;
+      const tenantStorage = getDatabaseStorage(req.tenantId);
+      const config = await tenantStorage.upsertInstitutionConfig({
+        tenantId: req.tenantId || 'default',
+        primaryType: primaryType || null,
+        characteristics: characteristics || [],
+        hideNonApplicable: hideNonApplicable ?? true,
+        allowUsersToToggle: allowUsersToToggle ?? true,
+      });
+      res.json({ success: true, config });
+    } catch (error) {
+      console.error('Error saving institution config:', error);
+      res.status(500).json({ error: 'Failed to save institution configuration' });
+    }
+  });
+
   // Tenant branding endpoints - Available to all tenants for their own branding
   app.get('/api/admin/branding', async (req, res) => {
     try {

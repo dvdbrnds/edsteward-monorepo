@@ -16,5 +16,8 @@
       "deadlines": 70
     },
     "timestamp": "2025-12-04T16:34:25.853Z"
-  }
+  },
+  "applicableInstitutions": [
+    "all-institutions"
+  ]
 }

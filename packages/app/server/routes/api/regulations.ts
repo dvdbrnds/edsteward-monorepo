@@ -56,6 +56,7 @@ router.get("/", async (req: any, res) => {
       jurisdiction, // Legacy support
       jurisdictionSource,
       institutionType,
+      institutionTypes, // comma-separated list of types for multi-type filtering
       category,
       search,
       applicable,
@@ -89,8 +90,22 @@ router.get("/", async (req: any, res) => {
       regulations = regulations.filter((reg: Regulation) => reg.jurisdictionSource === jurisdictionSource);
     }
     
-    // New institution type filter
-    if (institutionType && typeof institutionType === 'string') {
+    // Multi-type institution filter (comma-separated)
+    if (institutionTypes && typeof institutionTypes === 'string') {
+      const types = institutionTypes.split(',').map(t => t.trim()).filter(Boolean);
+      if (types.length > 0) {
+        regulations = regulations.filter((reg: Regulation) => {
+          const institutions = Array.isArray(reg.applicableInstitutions)
+            ? reg.applicableInstitutions
+            : [];
+          if (institutions.length === 0) return true;
+          if (institutions.includes('all-institutions')) return true;
+          return types.some(t => institutions.includes(t));
+        });
+      }
+    }
+    // Legacy single institution type filter
+    else if (institutionType && typeof institutionType === 'string') {
       regulations = regulations.filter((reg: Regulation) => {
         if (!reg.applicableInstitutions) return false;
         const institutions = Array.isArray(reg.applicableInstitutions) 

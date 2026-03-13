@@ -2,10 +2,13 @@ import { useQuery } from "@tanstack/react-query";
 import type { Regulation, Deadline } from "@shared/schema";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FileText, Clock, AlertTriangle, CheckCircle } from "lucide-react";
+import { useInstitutionFilter } from "@/hooks/use-institution-filter";
 
 export default function DashboardStats() {
+  const { regulationsQueryKey } = useInstitutionFilter();
+
   const { data: regulations, isLoading: regulationsLoading } = useQuery<Regulation[]>({
-    queryKey: ["/api/regulations"],
+    queryKey: regulationsQueryKey,
   });
 
   const { data: deadlines, isLoading: deadlinesLoading } = useQuery<Deadline[]>({

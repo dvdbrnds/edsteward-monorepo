@@ -10,6 +10,7 @@ import MyTasks from "@/components/dashboard/my-tasks";
 import PendingAttestations from "@/components/dashboard/pending-attestations";
 import DeadlineCalendar from "@/components/dashboard/deadline-calendar";
 import RegulationList from "@/components/regulations/regulation-list";
+import { AppliesToFilter } from "@/components/filters/applies-to-filter";
 import { WidgetSettings } from "@/components/dashboard/widget-settings";
 import { DraggableWidget } from "@/components/dashboard/draggable-widget";
 import { DashboardWidgetsProvider, useDashboardWidgets, type WidgetId } from "@/hooks/use-dashboard-widgets";
@@ -252,9 +253,12 @@ function DraggableDashboardWidgets({ selectedCategory, setSelectedCategory }: {
         case 'regulationList':
           return (
             <div>
-              <h2 className="text-2xl font-bold text-foreground mb-4">
-                {selectedCategory ? `${selectedCategory} Regulations` : 'All Regulations'}
-              </h2>
+              <div className="flex flex-col gap-3 mb-4">
+                <h2 className="text-2xl font-bold text-foreground">
+                  {selectedCategory ? `${selectedCategory} Regulations` : 'All Regulations'}
+                </h2>
+                <AppliesToFilter />
+              </div>
               <RegulationList
                 categoryFilter={selectedCategory}
                 jurisdictionFilter={null}

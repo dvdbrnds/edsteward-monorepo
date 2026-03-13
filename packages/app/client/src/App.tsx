@@ -32,6 +32,7 @@ import TrusteesDashboard from "@/pages/trustees-dashboard";
 import AttestationPage from "@/pages/attestation-page";
 import TaskPage from "@/pages/task-page";
 import TaskAnalyticsPage from "@/pages/task-analytics-page";
+import ChangelogPage from "@/pages/changelog-page";
 import ExecutiveDashboardPage from "@/pages/executive-dashboard-page";
 import ExecutiveOrdersPage from "@/pages/executive-orders-page";
 import { ProtectedRoute } from "./lib/protected-route";
@@ -102,6 +103,7 @@ function AppContent() {
               
               {/* User Account Settings */}
               <ProtectedRoute path="/account/settings" component={AccountSettingsPage} />
+              <ProtectedRoute path="/changelog" component={ChangelogPage} />
               
               {/* System Settings - Available to all tenants */}
               <ProtectedRoute path="/admin/settings" component={AdminSettingsPage} />

@@ -348,6 +348,9 @@ export class EdStewardIntegration {
       // Compliance Tasks (if generated, null if template or simple)
       complianceTasks: taskResult.tasks,
       
+      // Regulation Actions — which compliance workflow steps this regulation requires
+      regulationActions: this.taskGenerator.getRequiredActions(slug),
+      
       // Metadata with audit scores, template hint, tasks info, etc.
       metadata: {
         // Federal Register enhancement
@@ -489,14 +492,17 @@ export class EdStewardIntegration {
       summary: regulationData.summary,
       requirements: this.formatRequirements(regulationData.requirements),
       filingDeadlines: regulationData.filingDeadlines || [],
-      complianceTasks: taskResult.tasks || regulationData.complianceTasks || []
+      complianceTasks: taskResult.tasks || regulationData.complianceTasks || [],
+      regulationActions: this.taskGenerator.getRequiredActions(slug),
     };
     
+    const enabledActions = Object.entries(payload.regulationActions).filter(([,v]) => v.required).map(([k]) => k);
     console.log(`📋 Create Payload:`);
     console.log(`   Name: ${payload.name}`);
     console.log(`   Category: ${payload.category}`);
     console.log(`   Jurisdiction: ${payload.jurisdictionSource}`);
     console.log(`   Tasks: ${payload.complianceTasks?.length || 0}`);
+    console.log(`   Actions: ${enabledActions.join(', ')}`);
     
     return await this.sendCreate(payload);
   }
