@@ -396,10 +396,14 @@ const AttestationPage: React.FC = () => {
                   </span>
                 </div>
               )}
-              {task.assignedRole && (
+              {(task.responsibleOffice || task.assignedRole) && (
                 <div className="flex items-center gap-2">
                   <Building2 className="h-4 w-4 text-slate-400" />
-                  <span className="text-sm text-slate-600">Suggested: {task.assignedRole}</span>
+                  <span className="text-sm text-slate-600">
+                    {task.responsibleOffice
+                      ? `${task.responsibleOffice}${task.assignedRole ? ` — ${task.assignedRole}` : ''}`
+                      : `Suggested: ${task.assignedRole}`}
+                  </span>
                 </div>
               )}
             </div>

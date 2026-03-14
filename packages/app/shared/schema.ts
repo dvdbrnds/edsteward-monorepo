@@ -1174,6 +1174,10 @@ export const complianceTasks = pgTable("compliance_tasks", {
   assignedTo: integer("assigned_to").references(() => users.id), // DRI for this specific task
   assignedRole: text("assigned_role"), // Suggested role for default assignment (may differ from statutoryRole)
   
+  // Canonical responsible office (inherited from role_assignments or regulation)
+  responsibleOffice: text("responsible_office"), // e.g., "Office of General Counsel"
+  responsibleOfficeEmail: text("responsible_office_email"), // e.g., counsel@institution.edu
+  
   // Scheduling
   dueDate: timestamp("due_date"),
   recurringSchedule: text("recurring_schedule"), // 'annual', 'quarterly', 'monthly', 'daily', or cron expression
@@ -1322,12 +1326,16 @@ export const roleAssignments = pgTable("role_assignments", {
   // Display name for UI
   displayName: text("display_name"), // e.g., "Office of the Registrar"
   
-  // Default assignee for this role
-  defaultUserId: integer("default_user_id").references(() => users.id), // Primary person for this role
+  // Canonical office contact (where general correspondence goes)
+  officeName: text("office_name"), // e.g., "Office of General Counsel"
+  officeEmail: text("office_email"), // e.g., counsel@institution.edu
   
-  // For external assignees (not in system)
-  defaultEmail: text("default_email"), // Email if person not in users table
-  defaultName: text("default_name"), // Name for display/emails
+  // Default assignee (DRI) for this role — signs attestations
+  defaultUserId: integer("default_user_id").references(() => users.id),
+  
+  // For external DRIs (not in system)
+  defaultEmail: text("default_email"),
+  defaultName: text("default_name"),
   
   // Backup/escalation contact
   backupUserId: integer("backup_user_id").references(() => users.id),

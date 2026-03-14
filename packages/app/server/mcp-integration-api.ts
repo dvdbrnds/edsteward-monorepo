@@ -1,7 +1,7 @@
 import express, { type Request, Response } from "express";
 import { getDatabaseStorage, getTenantDb } from "./services/database";
 import { sql, eq } from "drizzle-orm";
-import { regulations, complianceTasks, executiveOrders as executiveOrdersTable, eoRegulationImpacts } from "@shared/schema";
+import { regulations, complianceTasks, roleAssignments, executiveOrders as executiveOrdersTable, eoRegulationImpacts } from "@shared/schema";
 import { syslog, LogLevel, LogFacility } from './services/syslog';
 import { z } from "zod";
 import { ValidationLevel } from "@shared/schema";
@@ -969,34 +969,57 @@ export function setupMCPIntegrationApi(app: express.Application) {
       if (data.complianceTasks && data.complianceTasks.length > 0) {
         console.log(`📝 Creating ${data.complianceTasks.length} compliance tasks...`);
         
-        // Helper: build task values from canonical 21-field schema
+        // Preload role_assignments for office field resolution
+        const createRoleRows = await db.select({
+          roleName: roleAssignments.roleName,
+          officeName: roleAssignments.officeName,
+          officeEmail: roleAssignments.officeEmail,
+        }).from(roleAssignments);
+        const createOfficeByRole = new Map<string, { officeName: string | null; officeEmail: string | null }>();
+        for (const ra of createRoleRows) {
+          createOfficeByRole.set(ra.roleName.toLowerCase(), { officeName: ra.officeName, officeEmail: ra.officeEmail });
+        }
+        const createResolveOffice = (assignedRole: string | null) => {
+          if (assignedRole) {
+            const match = createOfficeByRole.get(assignedRole.toLowerCase());
+            if (match?.officeName || match?.officeEmail) return match;
+          }
+          return { officeName: null, officeEmail: null };
+        };
+        
         // parentRole cascades the parent's assignedRole to subtasks that don't have their own
-        const buildTaskValues = (task: typeof data.complianceTasks[0], parentId?: number, parentRole?: string | null) => ({
-          regulationId: newRegulation.id,
-          parentTaskId: parentId || null,
-          taskId: task.taskId || null,
-          title: task.title,
-          description: task.description || null,
-          instructions: task.instructions || null,
-          category: task.category || null,
-          assignedRole: task.assignedRole || parentRole || null,
-          statutoryRole: task.statutoryRole || null,
-          statutoryCitation: task.statutoryCitation || null,
-          requirementType: task.requirementType || 'requirement',
-          dueDate: task.dueDate ? new Date(task.dueDate) : null,
-          recurringSchedule: task.recurringSchedule || null,
-          reminderDays: task.reminderDays || 30,
-          priority: task.priority || 'medium',
-          evidenceRequired: task.evidenceRequired || false,
-          evidenceType: task.evidenceType || 'none',
-          evidenceInstructions: task.evidenceInstructions || null,
-          estimatedEffort: task.estimatedEffort || null,
-          deliverable: task.deliverable || null,
-          deliverableTemplateUrl: task.deliverableTemplateUrl || null,
-          sortOrder: task.sortOrder || 0,
-          status: 'pending',
-          isTemplate: false,
-        });
+        const buildTaskValues = (task: typeof data.complianceTasks[0], parentId?: number, parentRole?: string | null) => {
+          const effectiveRole = task.assignedRole || parentRole || null;
+          const office = createResolveOffice(effectiveRole);
+          return {
+            regulationId: newRegulation.id,
+            parentTaskId: parentId || null,
+            taskId: task.taskId || null,
+            title: task.title,
+            description: task.description || null,
+            instructions: task.instructions || null,
+            category: task.category || null,
+            assignedRole: effectiveRole,
+            responsibleOffice: office.officeName,
+            responsibleOfficeEmail: office.officeEmail,
+            statutoryRole: task.statutoryRole || null,
+            statutoryCitation: task.statutoryCitation || null,
+            requirementType: task.requirementType || 'requirement',
+            dueDate: task.dueDate ? new Date(task.dueDate) : null,
+            recurringSchedule: task.recurringSchedule || null,
+            reminderDays: task.reminderDays || 30,
+            priority: task.priority || 'medium',
+            evidenceRequired: task.evidenceRequired || false,
+            evidenceType: task.evidenceType || 'none',
+            evidenceInstructions: task.evidenceInstructions || null,
+            estimatedEffort: task.estimatedEffort || null,
+            deliverable: task.deliverable || null,
+            deliverableTemplateUrl: task.deliverableTemplateUrl || null,
+            sortOrder: task.sortOrder || 0,
+            status: 'pending',
+            isTemplate: false,
+          };
+        };
         
         // Track parent roles for cascading to subtasks
         const parentRoleMap = new Map<string, string>();
@@ -1587,9 +1610,32 @@ export function setupMCPIntegrationApi(app: express.Application) {
           return null;
         };
 
+        // Preload role_assignments for office field resolution
+        const roleAssignmentRows = await db.select({
+          roleName: roleAssignments.roleName,
+          officeName: roleAssignments.officeName,
+          officeEmail: roleAssignments.officeEmail,
+        }).from(roleAssignments);
+        const officeByRole = new Map<string, { officeName: string | null; officeEmail: string | null }>();
+        for (const ra of roleAssignmentRows) {
+          officeByRole.set(ra.roleName.toLowerCase(), { officeName: ra.officeName, officeEmail: ra.officeEmail });
+        }
+        const regOffice = regulationRecord?.responsibleOffice || null;
+        const regOfficeEmail = regulationRecord?.responsibleOfficeEmail || null;
+
+        const resolveOffice = (assignedRole: string | null) => {
+          if (assignedRole) {
+            const match = officeByRole.get(assignedRole.toLowerCase());
+            if (match?.officeName || match?.officeEmail) return match;
+          }
+          return { officeName: regOffice, officeEmail: regOfficeEmail };
+        };
+
         // parentRole cascades the parent's assignedRole to subtasks that don't have their own
         const buildSyncTaskValues = (task: any, parentId?: number, parentRole?: string | null) => {
           const ev = resolveEvidence(task);
+          const effectiveRole = task.assignedRole || parentRole || null;
+          const office = resolveOffice(effectiveRole);
           return {
             regulationId,
             parentTaskId: parentId || null,
@@ -1598,7 +1644,9 @@ export function setupMCPIntegrationApi(app: express.Application) {
             description: task.description || null,
             instructions: task.instructions || null,
             category: task.category || null,
-            assignedRole: task.assignedRole || parentRole || null,
+            assignedRole: effectiveRole,
+            responsibleOffice: office.officeName,
+            responsibleOfficeEmail: office.officeEmail,
             statutoryRole: task.statutoryRole || null,
             statutoryCitation: task.statutoryCitation || null,
             statutoryLanguage: task.statutoryLanguage || null,
@@ -1622,11 +1670,15 @@ export function setupMCPIntegrationApi(app: express.Application) {
         
         const buildUpdateFields = (task: any, parentRole?: string | null) => {
           const ev = resolveEvidence(task);
+          const effectiveRole = task.assignedRole || parentRole || null;
+          const office = resolveOffice(effectiveRole);
           return {
             description: task.description || null,
             instructions: task.instructions || null,
             category: task.category || null,
-            assignedRole: task.assignedRole || parentRole || null,
+            assignedRole: effectiveRole,
+            responsibleOffice: office.officeName,
+            responsibleOfficeEmail: office.officeEmail,
             statutoryRole: task.statutoryRole || null,
             statutoryCitation: task.statutoryCitation || null,
             statutoryLanguage: task.statutoryLanguage || null,
@@ -1667,6 +1719,8 @@ export function setupMCPIntegrationApi(app: express.Application) {
                 instructions = ${updates.instructions},
                 category = ${updates.category},
                 assigned_role = ${updates.assignedRole},
+                responsible_office = ${updates.responsibleOffice},
+                responsible_office_email = ${updates.responsibleOfficeEmail},
                 statutory_role = ${updates.statutoryRole},
                 statutory_citation = ${updates.statutoryCitation},
                 statutory_language = ${updates.statutoryLanguage},
@@ -1718,6 +1772,8 @@ export function setupMCPIntegrationApi(app: express.Application) {
                       instructions = ${subUpdates.instructions},
                       category = ${subUpdates.category},
                       assigned_role = ${subUpdates.assignedRole},
+                      responsible_office = ${subUpdates.responsibleOffice},
+                      responsible_office_email = ${subUpdates.responsibleOfficeEmail},
                       statutory_role = ${subUpdates.statutoryRole},
                       statutory_citation = ${subUpdates.statutoryCitation},
                       statutory_language = ${subUpdates.statutoryLanguage},
@@ -1777,6 +1833,8 @@ export function setupMCPIntegrationApi(app: express.Application) {
                 instructions = ${updates.instructions},
                 category = ${updates.category},
                 assigned_role = ${updates.assignedRole},
+                responsible_office = ${updates.responsibleOffice},
+                responsible_office_email = ${updates.responsibleOfficeEmail},
                 statutory_role = ${updates.statutoryRole},
                 statutory_citation = ${updates.statutoryCitation},
                 statutory_language = ${updates.statutoryLanguage},

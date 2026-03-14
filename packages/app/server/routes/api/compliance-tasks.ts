@@ -2536,6 +2536,20 @@ router.post('/attestation/:token/attest', async (req: Request, res: Response) =>
       newValue: 'completed',
     });
 
+    // Notify office email of completed attestation (fire-and-forget)
+    if (task.responsibleOfficeEmail && task.responsibleOfficeEmail !== attestationToken.email) {
+      import('../services/email').then(({ emailService }) => {
+        const attester = attestationToken.recipientName || attestationToken.email;
+        emailService.sendEmail({
+          to: task.responsibleOfficeEmail!,
+          subject: `Task Attested: ${task.title}`,
+          html: `<p>The compliance task <strong>${task.title}</strong> has been attested by ${attester} on ${now.toLocaleString()}.</p>`,
+        }).catch(err => {
+          console.error('[Attestation] Error sending office CC notification:', err);
+        });
+      }).catch(() => {});
+    }
+
     // Check if all tasks are now completed for this regulation - notify DRI/CCO
     if (task.regulationId) {
       checkAndNotifyRegulationReadyForAttestation(task.regulationId, req.tenantId).catch(err => {

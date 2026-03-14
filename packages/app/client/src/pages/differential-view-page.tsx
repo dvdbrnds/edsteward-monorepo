@@ -660,10 +660,12 @@ const DifferentialViewPage: React.FC<DifferentialViewPageProps> = ({ isDemo = fa
                                     </span>
                                     <div>
                                       <h3 className="font-bold text-slate-900">{parentTask.title}</h3>
-                                      {(parentTask.assigned_role || parentTask.assignedRole) && (
+                                      {(parentTask.responsible_office || parentTask.responsibleOffice || parentTask.assigned_role || parentTask.assignedRole) && (
                                         <span className="text-xs text-slate-600 flex items-center gap-1 mt-0.5">
                                           <User className="h-3 w-3" />
-                                          {parentTask.assigned_role || parentTask.assignedRole}
+                                          {(parentTask.responsible_office || parentTask.responsibleOffice)
+                                            ? `${parentTask.responsible_office || parentTask.responsibleOffice}${(parentTask.assigned_role || parentTask.assignedRole) ? ` — ${parentTask.assigned_role || parentTask.assignedRole}` : ''}`
+                                            : parentTask.assigned_role || parentTask.assignedRole}
                                         </span>
                                       )}
                                     </div>
@@ -744,10 +746,12 @@ const DifferentialViewPage: React.FC<DifferentialViewPageProps> = ({ isDemo = fa
                                             )}
                                             
                                             <div className="flex flex-wrap items-center gap-3 mt-1.5 text-[10px] text-slate-400">
-                                              {(subtask.assigned_role || subtask.assignedRole) && (
+                                              {(subtask.responsible_office || subtask.responsibleOffice || subtask.assigned_role || subtask.assignedRole) && (
                                                 <span className="flex items-center gap-1">
                                                   <User className="h-2.5 w-2.5" />
-                                                  {subtask.assigned_role || subtask.assignedRole}
+                                                  {(subtask.responsible_office || subtask.responsibleOffice)
+                                                    ? `${subtask.responsible_office || subtask.responsibleOffice}${(subtask.assigned_role || subtask.assignedRole) ? ` — ${subtask.assigned_role || subtask.assignedRole}` : ''}`
+                                                    : subtask.assigned_role || subtask.assignedRole}
                                                 </span>
                                               )}
                                               {(subtask.due_date || subtask.dueDate) && (

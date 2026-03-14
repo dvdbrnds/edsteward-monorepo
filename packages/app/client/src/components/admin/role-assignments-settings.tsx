@@ -54,6 +54,8 @@ interface RoleAssignment {
   id: number;
   roleName: string;
   displayName: string | null;
+  officeName: string | null;
+  officeEmail: string | null;
   defaultUserId: number | null;
   defaultEmail: string | null;
   defaultName: string | null;
@@ -95,6 +97,8 @@ export function RoleAssignmentsSettings() {
   
   // Form state for editing
   const [formData, setFormData] = useState({
+    officeName: '',
+    officeEmail: '',
     defaultUserId: '',
     defaultEmail: '',
     defaultName: '',
@@ -109,6 +113,8 @@ export function RoleAssignmentsSettings() {
   const [newRoleData, setNewRoleData] = useState({
     roleName: '',
     displayName: '',
+    officeName: '',
+    officeEmail: '',
     defaultUserId: '',
     defaultEmail: '',
     defaultName: '',
@@ -182,6 +188,8 @@ export function RoleAssignmentsSettings() {
       setNewRoleData({
         roleName: '',
         displayName: '',
+        officeName: '',
+        officeEmail: '',
         defaultUserId: '',
         defaultEmail: '',
         defaultName: '',
@@ -225,6 +233,8 @@ export function RoleAssignmentsSettings() {
   const openEditDialog = (role: RoleAssignment) => {
     setEditingRole(role);
     setFormData({
+      officeName: role.officeName || '',
+      officeEmail: role.officeEmail || '',
       defaultUserId: role.defaultUserId?.toString() || '',
       defaultEmail: role.defaultEmail || '',
       defaultName: role.defaultName || '',
@@ -242,6 +252,8 @@ export function RoleAssignmentsSettings() {
     updateMutation.mutate({
       id: editingRole.id,
       data: {
+        officeName: formData.officeName || null,
+        officeEmail: formData.officeEmail || null,
         defaultUserId: formData.defaultUserId ? parseInt(formData.defaultUserId) : null,
         defaultEmail: formData.defaultEmail || null,
         defaultName: formData.defaultName || null,
@@ -348,8 +360,9 @@ export function RoleAssignmentsSettings() {
             <TableHeader>
               <TableRow>
                 <TableHead>Role</TableHead>
+                <TableHead>Canonical Office</TableHead>
                 <TableHead>Category</TableHead>
-                <TableHead>Default Assignee</TableHead>
+                <TableHead>DRI (Attestation Signer)</TableHead>
                 <TableHead className="text-center">Auto-Assign</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
@@ -364,6 +377,16 @@ export function RoleAssignmentsSettings() {
                         <div className="text-sm text-muted-foreground">{role.displayName}</div>
                       )}
                     </div>
+                  </TableCell>
+                  <TableCell>
+                    {(role.officeName || role.officeEmail) ? (
+                      <div>
+                        {role.officeName && <div className="font-medium text-sm">{role.officeName}</div>}
+                        {role.officeEmail && <div className="text-xs text-muted-foreground">{role.officeEmail}</div>}
+                      </div>
+                    ) : (
+                      <span className="text-xs text-muted-foreground">Not set</span>
+                    )}
                   </TableCell>
                   <TableCell>
                     {role.category && (
@@ -426,7 +449,7 @@ export function RoleAssignmentsSettings() {
               ))}
               {(!filteredAssignments || filteredAssignments.length === 0) && (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
                     No role assignments found
                   </TableCell>
                 </TableRow>
@@ -447,8 +470,34 @@ export function RoleAssignmentsSettings() {
           </DialogHeader>
 
           <div className="space-y-4 py-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="edit-office-name">Canonical Office Name</Label>
+                <Input
+                  id="edit-office-name"
+                  value={formData.officeName}
+                  onChange={(e) => setFormData(prev => ({ ...prev, officeName: e.target.value }))}
+                  placeholder="e.g., Office of General Counsel"
+                />
+              </div>
+              <div>
+                <Label htmlFor="edit-office-email">Canonical Office Email</Label>
+                <Input
+                  id="edit-office-email"
+                  value={formData.officeEmail}
+                  onChange={(e) => setFormData(prev => ({ ...prev, officeEmail: e.target.value }))}
+                  placeholder="e.g., counsel@institution.edu"
+                />
+              </div>
+            </div>
+            <p className="text-xs text-muted-foreground -mt-2">
+              The canonical office is the institutional contact for this role. The DRI below signs attestations.
+            </p>
+
+            <Separator />
+
             <div>
-              <Label>Assign to User (from system)</Label>
+              <Label>DRI — Assign to User (from system)</Label>
               <Select
                 value={formData.defaultUserId || "_none_"}
                 onValueChange={(value) => setFormData(prev => ({ 
@@ -581,8 +630,34 @@ export function RoleAssignmentsSettings() {
               />
             </div>
 
+            <Separator />
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label>Canonical Office Name</Label>
+                <Input
+                  value={newRoleData.officeName}
+                  onChange={(e) => setNewRoleData(prev => ({ ...prev, officeName: e.target.value }))}
+                  placeholder="e.g., Office of General Counsel"
+                />
+              </div>
+              <div>
+                <Label>Canonical Office Email</Label>
+                <Input
+                  value={newRoleData.officeEmail}
+                  onChange={(e) => setNewRoleData(prev => ({ ...prev, officeEmail: e.target.value }))}
+                  placeholder="e.g., counsel@institution.edu"
+                />
+              </div>
+            </div>
+            <p className="text-xs text-muted-foreground -mt-2">
+              The canonical office is the institutional contact. The DRI below signs attestations.
+            </p>
+
+            <Separator />
+
             <div>
-              <Label>Assign to User</Label>
+              <Label>DRI — Assign to User</Label>
               <Select
                 value={newRoleData.defaultUserId || "_none_"}
                 onValueChange={(value) => setNewRoleData(prev => ({ 

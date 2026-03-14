@@ -479,7 +479,7 @@ export default function SystemSettingsPage() {
               <TabsTrigger value="notifications" className="flex-shrink-0">Notifications</TabsTrigger>
               <TabsTrigger value="users" className="flex-shrink-0">Users</TabsTrigger>
               <TabsTrigger value="roles" className="flex-shrink-0">Roles</TabsTrigger>
-              <TabsTrigger value="compliance" className="flex-shrink-0">Compliance</TabsTrigger>
+              <TabsTrigger value="compliance" className="flex-shrink-0">HECVAT</TabsTrigger>
               <TabsTrigger value="backups" className="flex-shrink-0">Backups</TabsTrigger>
               <TabsTrigger value="logs" className="flex-shrink-0">Logs</TabsTrigger>
             </TabsList>

@@ -580,20 +580,28 @@ export function TaskDetailDialog({
                     {task.assignedRole && (
                       <div className="text-xs text-muted-foreground">
                         Suggested role: <span className="font-medium">{task.assignedRole}</span>
+                        {task.responsibleOffice && (
+                          <span className="ml-1">({task.responsibleOffice})</span>
+                        )}
                       </div>
                     )}
                   </div>
                 ) : (
                   <>
                     <div className="font-medium">
-                      {task.assignedUser 
-                        ? (task.assignedUser.firstName && task.assignedUser.lastName
-                            ? `${task.assignedUser.firstName} ${task.assignedUser.lastName}`
-                            : task.assignedUser.username)
-                        : task.assignedRole || 'Unassigned'}
+                      {task.responsibleOffice && task.assignedUser
+                        ? `${task.responsibleOffice} — ${task.assignedUser.firstName && task.assignedUser.lastName ? `${task.assignedUser.firstName} ${task.assignedUser.lastName}` : task.assignedUser.username}`
+                        : task.responsibleOffice || (task.assignedUser 
+                            ? (task.assignedUser.firstName && task.assignedUser.lastName
+                                ? `${task.assignedUser.firstName} ${task.assignedUser.lastName}`
+                                : task.assignedUser.username)
+                            : task.assignedRole || 'Unassigned')}
                     </div>
                     {task.assignedUser?.email && (
                       <div className="text-xs text-muted-foreground">{task.assignedUser.email}</div>
+                    )}
+                    {task.responsibleOfficeEmail && (
+                      <div className="text-xs text-muted-foreground">{task.responsibleOfficeEmail}</div>
                     )}
                     {!task.assignedUser && task.assignedRole && (
                       <div className="text-xs text-amber-600 mt-1">

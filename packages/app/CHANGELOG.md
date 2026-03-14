@@ -5,6 +5,39 @@ All notable changes to EdSteward are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.5] - 2026-03-14
+
+### Added
+- Canonical office vs DRI (Directly Responsible Individual) separation for
+  compliance tasks — reports reference the office (e.g., "Office of General
+  Counsel"), while attestation signing is assigned to a specific individual
+- New `office_name` and `office_email` columns on `role_assignments`; new
+  `responsible_office` and `responsible_office_email` columns on `compliance_tasks`
+- Office information auto-populated from role assignments during MCP sync
+- Attestation completion now CCs the responsible office email
+- Admin console institution assessment tool with compliance analyzer, external
+  checks, and website scanner services
+
+### Changed
+- Task display across the app now shows "Office — DRI Name" format (task list,
+  detail dialog, differential view, notifications, attestation page)
+- Role assignments admin UI includes canonical office name/email fields with
+  clear DRI vs office labeling
+- "Compliance" tab in admin settings renamed to "HECVAT" for clarity
+
+### Fixed
+- **Backup/restore system completely rewritten for safety** — restores previously
+  could destroy the database with no recovery path (search_path poisoning from
+  pg_dump on Neon pooled connections, and missing safety net on failed restores)
+- Restore now creates an automatic safety backup before touching any data;
+  if the restore fails or verification fails, the original data is recovered
+  automatically
+- pg_dump output sanitized at creation time to strip `set_config('search_path')`
+  and Neon-specific `\restrict` commands that poison pooled connections
+- Restore UI now shows real-time progress with phase indicators (safety backup →
+  applying data → verifying) instead of silently dismissing the dialog
+- Dialog stays open during restore and cannot be accidentally closed
+
 ## [1.5.1] - 2026-03-12
 
 ### Added

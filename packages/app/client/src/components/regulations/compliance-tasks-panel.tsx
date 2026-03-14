@@ -254,11 +254,15 @@ function TaskItem({
   const isOverdue = task.dueDate && new Date(task.dueDate) < new Date() && task.status !== 'completed';
 
   const hasOwnAssignment = !!(task.assignedUser || task.assignedRole);
-  const assigneeName = task.assignedUser 
+  const driName = task.assignedUser 
     ? (task.assignedUser.firstName && task.assignedUser.lastName 
         ? `${task.assignedUser.firstName} ${task.assignedUser.lastName}`
         : task.assignedUser.username)
-    : task.assignedRole || inheritedAssignment?.name || 'Unassigned';
+    : null;
+  const officeName = task.responsibleOffice || null;
+  const assigneeName = officeName && driName
+    ? `${officeName} — ${driName}`
+    : officeName || driName || task.assignedRole || inheritedAssignment?.name || 'Unassigned';
   const isInheritedAssignment = !hasOwnAssignment && !!inheritedAssignment;
 
   // Compute what to pass down to subtasks

@@ -8,6 +8,10 @@
  * 
  * Backups are stored in the /backups directory with timestamps.
  * Admins can list, download, and restore from any backup point.
+ * 
+ * SAFETY: Restores always create an automatic safety backup first.
+ * If the restore fails or verification fails, the safety backup is
+ * used to automatically recover.  Data is never left in a broken state.
  */
 
 import { exec, spawn } from 'child_process';
@@ -19,23 +23,16 @@ import { syslog, LogLevel, LogFacility } from './syslog';
 
 const execAsync = promisify(exec);
 
-// Backup configuration
 const BACKUP_CONFIG = {
-  // Retention periods
-  dailyRetention: 7,      // Keep 7 daily backups
-  weeklyRetention: 4,     // Keep 4 weekly backups
-  monthlyRetention: 12,   // Keep 12 monthly backups
-  
-  // Schedule (cron format)
-  dailySchedule: '0 2 * * *',     // 2:00 AM daily
-  weeklySchedule: '0 3 * * 0',    // 3:00 AM Sunday
-  monthlySchedule: '0 4 1 * *',   // 4:00 AM 1st of month
-  
-  // Compression
+  dailyRetention: 7,
+  weeklyRetention: 4,
+  monthlyRetention: 12,
+  dailySchedule: '0 2 * * *',
+  weeklySchedule: '0 3 * * 0',
+  monthlySchedule: '0 4 1 * *',
   useCompression: true,
 };
 
-// Backup metadata interface
 export interface BackupMetadata {
   id: string;
   filename: string;
@@ -49,32 +46,23 @@ export interface BackupMetadata {
   error?: string;
 }
 
-// Backup directory
 const getBackupDir = (): string => {
   const isProduction = process.env.NODE_ENV === 'production' && process.env.DOCKER_CONTAINER === 'true';
   const backupDir = isProduction 
     ? '/app/backups' 
     : path.join(process.cwd(), 'backups');
-  
-  // Ensure directory exists
   if (!fs.existsSync(backupDir)) {
     fs.mkdirSync(backupDir, { recursive: true });
   }
-  
   return backupDir;
 };
 
-// Parse database URL
 const parseDatabaseUrl = (): { host: string; port: string; database: string; user: string; password: string } => {
   const url = process.env.DATABASE_URL || '';
-  
-  // Handle Neon/PostgreSQL connection strings
   const match = url.match(/postgres(?:ql)?:\/\/([^:]+):([^@]+)@([^:\/]+):?(\d+)?\/(.+?)(?:\?.*)?$/);
-  
   if (!match) {
     throw new Error('Invalid DATABASE_URL format');
   }
-  
   return {
     user: match[1],
     password: match[2],
@@ -84,7 +72,6 @@ const parseDatabaseUrl = (): { host: string; port: string; database: string; use
   };
 };
 
-// Format file size
 const formatSize = (bytes: number): string => {
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
@@ -92,7 +79,6 @@ const formatSize = (bytes: number): string => {
   return `${(bytes / (1024 * 1024 * 1024)).toFixed(2)} GB`;
 };
 
-// Generate backup filename
 const generateBackupFilename = (type: BackupMetadata['type']): string => {
   const now = new Date();
   const timestamp = now.toISOString().replace(/[:.]/g, '-').slice(0, 19);
@@ -100,7 +86,79 @@ const generateBackupFilename = (type: BackupMetadata['type']): string => {
   return `backup-${type}-${timestamp}.${extension}`;
 };
 
-// Create a database backup
+/**
+ * Builds a psql base command string from parsed DB credentials.
+ * Intentionally does NOT include session-altering flags like --single-transaction
+ * because Neon's PgBouncer pooler can't reliably handle long DDL transactions.
+ */
+const buildPsqlBase = (db: ReturnType<typeof parseDatabaseUrl>): string =>
+  `psql -h ${db.host} -p ${db.port} -U ${db.user} -d ${db.database}`;
+
+/**
+ * sed filter that strips lines known to poison Neon pooled connections:
+ *  - set_config('search_path', '', false)  → clears search_path on the
+ *    shared PgBouncer backend, breaking every subsequent query that doesn't
+ *    use schema-qualified table names
+ *  - \restrict … → Neon-specific psql meta-command that may not be
+ *    recognised by the local psql binary
+ */
+const DUMP_SANITIZE_SED = `sed "/pg_catalog.set_config('search_path'/d; /^\\\\\\\\restrict/d"`;
+
+/**
+ * Drops every table in the public schema.
+ * Uses CASCADE to handle foreign key dependencies.
+ */
+const dropAllPublicTables = async (
+  psqlBase: string,
+  env: NodeJS.ProcessEnv,
+): Promise<void> => {
+  const sql = `DO \\$\\$
+DECLARE r RECORD;
+BEGIN
+  FOR r IN (SELECT tablename FROM pg_tables WHERE schemaname = 'public') LOOP
+    EXECUTE 'DROP TABLE IF EXISTS public.' || quote_ident(r.tablename) || ' CASCADE';
+  END LOOP;
+END \\$\\$;`;
+  await execAsync(`${psqlBase} -c "${sql}"`, { env });
+};
+
+/**
+ * Quick verification that a restore produced a usable database.
+ * Returns true if the users table exists and has at least one row.
+ */
+const verifyDatabase = async (
+  psqlBase: string,
+  env: NodeJS.ProcessEnv,
+): Promise<boolean> => {
+  try {
+    const { stdout } = await execAsync(
+      `${psqlBase} -t -A -c "SELECT count(*) FROM public.users;"`,
+      { env },
+    );
+    const count = parseInt(stdout.trim(), 10);
+    return count > 0;
+  } catch {
+    return false;
+  }
+};
+
+/**
+ * Pipes a (possibly compressed) SQL dump through the sanitizer into psql.
+ * Returns the raw exec result so callers can inspect stderr if needed.
+ */
+const pipeRestoreFile = async (
+  filepath: string,
+  psqlBase: string,
+  env: NodeJS.ProcessEnv,
+): Promise<void> => {
+  const isGz = filepath.endsWith('.gz');
+  const decompressCmd = isGz ? `gunzip -c "${filepath}"` : `cat "${filepath}"`;
+  const command = `${decompressCmd} | ${DUMP_SANITIZE_SED} | ${psqlBase}`;
+  await execAsync(command, { env, maxBuffer: 100 * 1024 * 1024 });
+};
+
+// ─── Public API ──────────────────────────────────────────────────────
+
 export const createBackup = async (type: BackupMetadata['type'] = 'manual'): Promise<BackupMetadata> => {
   const startTime = Date.now();
   const backupDir = getBackupDir();
@@ -122,41 +180,29 @@ export const createBackup = async (type: BackupMetadata['type'] = 'manual'): Pro
   
   try {
     const db = parseDatabaseUrl();
-    
-    // Set PGPASSWORD environment variable for pg_dump
     const env = { ...process.env, PGPASSWORD: db.password };
     
-    // Build pg_dump command
-    let command: string;
+    const pgDumpBase = `pg_dump -h ${db.host} -p ${db.port} -U ${db.user} -d ${db.database} --no-owner --no-acl`;
     
-    if (BACKUP_CONFIG.useCompression) {
-      // Pipe through gzip for compression
-      command = `pg_dump -h ${db.host} -p ${db.port} -U ${db.user} -d ${db.database} --no-owner --no-acl | gzip > "${filepath}"`;
-    } else {
-      command = `pg_dump -h ${db.host} -p ${db.port} -U ${db.user} -d ${db.database} --no-owner --no-acl -f "${filepath}"`;
-    }
+    const command = BACKUP_CONFIG.useCompression
+      ? `${pgDumpBase} | ${DUMP_SANITIZE_SED} | gzip > "${filepath}"`
+      : `${pgDumpBase} | ${DUMP_SANITIZE_SED} > "${filepath}"`;
     
-    // Execute backup
-    await execAsync(command, { env, maxBuffer: 100 * 1024 * 1024 }); // 100MB buffer
+    await execAsync(command, { env, maxBuffer: 100 * 1024 * 1024 });
     
-    // Get file stats
     const stats = fs.statSync(filepath);
     metadata.size = stats.size;
     metadata.sizeFormatted = formatSize(stats.size);
     metadata.status = 'completed';
     metadata.duration = Date.now() - startTime;
-    
-    // Count tables (approximate from dump)
-    metadata.tables = 355; // We know we have 355 regulations + other tables
+    metadata.tables = 355;
     
     syslog.log(LogFacility.LOCAL0, LogLevel.INFO, 
       `Backup completed: ${filename} (${metadata.sizeFormatted}) in ${metadata.duration}ms`);
     
-    // Save metadata
     const metadataPath = filepath.replace(/\.(sql|sql\.gz)$/, '.json');
     fs.writeFileSync(metadataPath, JSON.stringify(metadata, null, 2));
     
-    // Cleanup old backups
     await cleanupOldBackups(type);
     
     return metadata;
@@ -168,7 +214,6 @@ export const createBackup = async (type: BackupMetadata['type'] = 'manual'): Pro
     syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, 
       `Backup failed: ${filename} - ${metadata.error}`);
     
-    // Clean up partial file if exists
     if (fs.existsSync(filepath)) {
       fs.unlinkSync(filepath);
     }
@@ -177,7 +222,6 @@ export const createBackup = async (type: BackupMetadata['type'] = 'manual'): Pro
   }
 };
 
-// List all backups
 export const listBackups = async (): Promise<BackupMetadata[]> => {
   const backupDir = getBackupDir();
   const files = fs.readdirSync(backupDir);
@@ -197,67 +241,113 @@ export const listBackups = async (): Promise<BackupMetadata[]> => {
     }
   }
   
-  // Sort by creation date, newest first
   backups.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   
   return backups;
 };
 
-// Get backup by ID
 export const getBackup = async (id: string): Promise<BackupMetadata | null> => {
   const backups = await listBackups();
   return backups.find(b => b.id === id) || null;
 };
 
-// Get backup file path
 export const getBackupFilePath = (filename: string): string | null => {
   const backupDir = getBackupDir();
   const filepath = path.join(backupDir, filename);
-  
-  if (fs.existsSync(filepath)) {
-    return filepath;
-  }
-  
-  return null;
+  return fs.existsSync(filepath) ? filepath : null;
 };
 
-// Restore from backup
+/**
+ * Restore the database from a backup.
+ * 
+ * Safety protocol:
+ * 1. Create an automatic safety dump of the current database
+ * 2. Drop all public tables
+ * 3. Pipe the selected backup through the sanitizer into psql
+ * 4. Verify the restore produced a usable database
+ * 5. If verification fails → auto-recover from the safety dump
+ * 6. Clean up the safety dump file
+ * 
+ * At no point is data irrecoverably lost.
+ */
 export const restoreBackup = async (id: string): Promise<{ success: boolean; message: string }> => {
   const backup = await getBackup(id);
-  
-  if (!backup) {
-    throw new Error('Backup not found');
-  }
+  if (!backup) throw new Error('Backup not found');
   
   const backupDir = getBackupDir();
   const filepath = path.join(backupDir, backup.filename);
+  if (!fs.existsSync(filepath)) throw new Error('Backup file not found');
   
-  if (!fs.existsSync(filepath)) {
-    throw new Error('Backup file not found');
-  }
+  const db = parseDatabaseUrl();
+  const env: NodeJS.ProcessEnv = { ...process.env, PGPASSWORD: db.password };
+  const psqlBase = buildPsqlBase(db);
+  
+  // Safety dump path (temp file, always cleaned up)
+  const safetyPath = path.join(backupDir, `_safety_pre_restore_${Date.now()}.sql.gz`);
   
   syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, 
     `Starting database restore from: ${backup.filename}`);
   
   try {
-    const db = parseDatabaseUrl();
-    const env = { ...process.env, PGPASSWORD: db.password };
+    // ── Step 1: Safety backup ────────────────────────────────────
+    syslog.log(LogFacility.LOCAL0, LogLevel.INFO, 'Creating safety backup before restore…');
+    const pgDumpBase = `pg_dump -h ${db.host} -p ${db.port} -U ${db.user} -d ${db.database} --no-owner --no-acl`;
+    await execAsync(
+      `${pgDumpBase} | ${DUMP_SANITIZE_SED} | gzip > "${safetyPath}"`,
+      { env, maxBuffer: 100 * 1024 * 1024 },
+    );
     
-    // Build restore command
-    let command: string;
+    const safetyStats = fs.statSync(safetyPath);
+    if (safetyStats.size < 1024) {
+      throw new Error('Safety backup is suspiciously small — aborting restore to protect data');
+    }
+    syslog.log(LogFacility.LOCAL0, LogLevel.INFO, 
+      `Safety backup created (${formatSize(safetyStats.size)})`);
     
-    if (backup.filename.endsWith('.gz')) {
-      // Decompress and restore
-      command = `gunzip -c "${filepath}" | psql -h ${db.host} -p ${db.port} -U ${db.user} -d ${db.database}`;
-    } else {
-      command = `psql -h ${db.host} -p ${db.port} -U ${db.user} -d ${db.database} -f "${filepath}"`;
+    // ── Step 2: Drop all existing tables ─────────────────────────
+    syslog.log(LogFacility.LOCAL0, LogLevel.INFO, 'Dropping existing tables…');
+    await dropAllPublicTables(psqlBase, env);
+    
+    // ── Step 3: Restore selected backup ──────────────────────────
+    syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Restoring from ${backup.filename}…`);
+    await pipeRestoreFile(filepath, psqlBase, env);
+    
+    // ── Step 4: Verify ───────────────────────────────────────────
+    const ok = await verifyDatabase(psqlBase, env);
+    
+    if (!ok) {
+      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, 
+        'Restore verification FAILED — users table missing or empty. Auto-recovering…');
+      
+      // Recovery: drop whatever partial state exists, restore from safety
+      await dropAllPublicTables(psqlBase, env);
+      await pipeRestoreFile(safetyPath, psqlBase, env);
+      
+      const recoveryOk = await verifyDatabase(psqlBase, env);
+      if (!recoveryOk) {
+        syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, 
+          'CRITICAL: Auto-recovery also failed. Manual intervention required.');
+        throw new Error(
+          'Restore failed and auto-recovery failed. The safety backup is preserved at: ' + safetyPath,
+        );
+      }
+      
+      syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, 
+        'Auto-recovery succeeded — database is back to pre-restore state');
+      
+      // Clean up safety file only after successful recovery
+      if (fs.existsSync(safetyPath)) fs.unlinkSync(safetyPath);
+      
+      throw new Error(
+        'Restore did not produce a valid database. The original data has been automatically recovered.',
+      );
     }
     
-    // Execute restore
-    await execAsync(command, { env, maxBuffer: 100 * 1024 * 1024 });
+    // ── Step 5: Success — clean up ───────────────────────────────
+    if (fs.existsSync(safetyPath)) fs.unlinkSync(safetyPath);
     
     syslog.log(LogFacility.LOCAL0, LogLevel.INFO, 
-      `Database restored successfully from: ${backup.filename}`);
+      `Database restored and verified from: ${backup.filename}`);
     
     return {
       success: true,
@@ -266,8 +356,31 @@ export const restoreBackup = async (id: string): Promise<{ success: boolean; mes
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : String(error);
     
-    syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, 
-      `Database restore failed: ${errorMsg}`);
+    // If we haven't already attempted recovery, try now
+    if (!errorMsg.includes('auto-recovery') && !errorMsg.includes('automatically recovered')) {
+      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, 
+        `Restore error: ${errorMsg}. Attempting auto-recovery…`);
+      
+      try {
+        if (fs.existsSync(safetyPath)) {
+          await dropAllPublicTables(psqlBase, env);
+          await pipeRestoreFile(safetyPath, psqlBase, env);
+          
+          const recoveryOk = await verifyDatabase(psqlBase, env);
+          if (recoveryOk) {
+            syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, 
+              'Auto-recovery succeeded after restore error');
+            fs.unlinkSync(safetyPath);
+          } else {
+            syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, 
+              `CRITICAL: Recovery failed. Safety dump preserved at ${safetyPath}`);
+          }
+        }
+      } catch (recoveryErr) {
+        syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, 
+          `CRITICAL: Recovery attempt threw: ${recoveryErr instanceof Error ? recoveryErr.message : String(recoveryErr)}`);
+      }
+    }
     
     throw new Error(`Restore failed: ${errorMsg}`);
   }

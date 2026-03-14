@@ -256,9 +256,11 @@ export default function NotificationsPage() {
                                 {task.regulationName}
                                 {task.regulationTopic ? ` · ${task.regulationTopic}` : ""}
                               </p>
-                              {task.assignedRole && (
+                              {(task.responsibleOffice || task.assignedRole) && (
                                 <span className="inline-block mt-1 text-[11px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
-                                  {task.assignedRole}
+                                  {task.responsibleOffice
+                                    ? `${task.responsibleOffice}${task.assignedRole ? ` — ${task.assignedRole}` : ''}`
+                                    : task.assignedRole}
                                 </span>
                               )}
                             </div>

@@ -30,6 +30,8 @@ router.get('/', requireAuth, async (req: Request, res: Response) => {
       id: roleAssignments.id,
       roleName: roleAssignments.roleName,
       displayName: roleAssignments.displayName,
+      officeName: roleAssignments.officeName,
+      officeEmail: roleAssignments.officeEmail,
       defaultUserId: roleAssignments.defaultUserId,
       defaultEmail: roleAssignments.defaultEmail,
       defaultName: roleAssignments.defaultName,
@@ -87,6 +89,8 @@ router.get('/by-role/:roleName', requireAuth, async (req: Request, res: Response
       id: roleAssignments.id,
       roleName: roleAssignments.roleName,
       displayName: roleAssignments.displayName,
+      officeName: roleAssignments.officeName,
+      officeEmail: roleAssignments.officeEmail,
       defaultUserId: roleAssignments.defaultUserId,
       defaultEmail: roleAssignments.defaultEmail,
       defaultName: roleAssignments.defaultName,
@@ -147,6 +151,8 @@ router.post('/', requireAdmin, async (req: Request, res: Response) => {
     const {
       roleName,
       displayName,
+      officeName,
+      officeEmail,
       defaultUserId,
       defaultEmail,
       defaultName,
@@ -173,6 +179,8 @@ router.post('/', requireAdmin, async (req: Request, res: Response) => {
     const [newAssignment] = await db.insert(roleAssignments).values({
       roleName,
       displayName,
+      officeName: officeName || null,
+      officeEmail: officeEmail || null,
       defaultUserId: defaultUserId || null,
       defaultEmail: defaultEmail || null,
       defaultName: defaultName || null,
@@ -213,6 +221,8 @@ router.patch('/:id', requireAdmin, async (req: Request, res: Response) => {
     };
 
     if (updates.displayName !== undefined) updateData.displayName = updates.displayName;
+    if (updates.officeName !== undefined) updateData.officeName = updates.officeName || null;
+    if (updates.officeEmail !== undefined) updateData.officeEmail = updates.officeEmail || null;
     if (updates.defaultUserId !== undefined) updateData.defaultUserId = updates.defaultUserId || null;
     if (updates.defaultEmail !== undefined) updateData.defaultEmail = updates.defaultEmail || null;
     if (updates.defaultName !== undefined) updateData.defaultName = updates.defaultName || null;
@@ -277,6 +287,8 @@ router.post('/resolve', requireAuth, async (req: Request, res: Response) => {
     const [assignment] = await db.select({
       id: roleAssignments.id,
       roleName: roleAssignments.roleName,
+      officeName: roleAssignments.officeName,
+      officeEmail: roleAssignments.officeEmail,
       defaultUserId: roleAssignments.defaultUserId,
       defaultEmail: roleAssignments.defaultEmail,
       defaultName: roleAssignments.defaultName,
@@ -302,7 +314,11 @@ router.post('/resolve', requireAuth, async (req: Request, res: Response) => {
       });
     }
 
-    // Return assignee info
+    const officeInfo = {
+      officeName: assignment.officeName || null,
+      officeEmail: assignment.officeEmail || null,
+    };
+
     if (assignment.defaultUserId && assignment.defaultUser?.id) {
       return res.json({
         found: true,
@@ -311,6 +327,7 @@ router.post('/resolve', requireAuth, async (req: Request, res: Response) => {
         userId: assignment.defaultUserId,
         email: assignment.defaultUser.email,
         name: `${assignment.defaultUser.firstName || ''} ${assignment.defaultUser.lastName || ''}`.trim() || assignment.defaultUser.username,
+        ...officeInfo,
       });
     } else if (assignment.defaultEmail) {
       return res.json({
@@ -319,6 +336,7 @@ router.post('/resolve', requireAuth, async (req: Request, res: Response) => {
         assigneeType: 'external',
         email: assignment.defaultEmail,
         name: assignment.defaultName || assignment.defaultEmail.split('@')[0],
+        ...officeInfo,
       });
     }
 
@@ -349,6 +367,8 @@ router.post('/bulk-resolve', requireAuth, async (req: Request, res: Response) =>
     // Get all assignments
     const assignments = await db.select({
       roleName: roleAssignments.roleName,
+      officeName: roleAssignments.officeName,
+      officeEmail: roleAssignments.officeEmail,
       defaultUserId: roleAssignments.defaultUserId,
       defaultEmail: roleAssignments.defaultEmail,
       defaultName: roleAssignments.defaultName,
@@ -376,6 +396,8 @@ router.post('/bulk-resolve', requireAuth, async (req: Request, res: Response) =>
       email?: string;
       name?: string;
       assigneeType?: 'user' | 'external';
+      officeName?: string | null;
+      officeEmail?: string | null;
     }> = {};
 
     for (const roleName of roleNames) {
@@ -386,6 +408,11 @@ router.post('/bulk-resolve', requireAuth, async (req: Request, res: Response) =>
         continue;
       }
 
+      const officeInfo = {
+        officeName: assignment.officeName || null,
+        officeEmail: assignment.officeEmail || null,
+      };
+
       if (assignment.defaultUserId && assignment.defaultUser?.id) {
         results[roleName] = {
           found: true,
@@ -393,6 +420,7 @@ router.post('/bulk-resolve', requireAuth, async (req: Request, res: Response) =>
           userId: assignment.defaultUserId,
           email: assignment.defaultUser.email,
           name: `${assignment.defaultUser.firstName || ''} ${assignment.defaultUser.lastName || ''}`.trim(),
+          ...officeInfo,
         };
       } else if (assignment.defaultEmail) {
         results[roleName] = {
@@ -400,6 +428,7 @@ router.post('/bulk-resolve', requireAuth, async (req: Request, res: Response) =>
           assigneeType: 'external',
           email: assignment.defaultEmail,
           name: assignment.defaultName || undefined,
+          ...officeInfo,
         };
       } else {
         results[roleName] = { found: false };

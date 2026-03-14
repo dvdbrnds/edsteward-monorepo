@@ -10,7 +10,7 @@
  * - Deleting backups
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
   Database, 
@@ -24,7 +24,10 @@ import {
   HardDrive,
   Upload,
   RotateCcw,
-  Shield
+  Shield,
+  Loader2,
+  ShieldCheck,
+  XCircle
 } from 'lucide-react';
 import { format, formatDistanceToNow } from 'date-fns';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -89,17 +92,44 @@ const statusColors: Record<string, string> = {
   in_progress: 'bg-yellow-100 text-yellow-800',
 };
 
+type RestorePhase = 'confirm' | 'running' | 'success' | 'error';
+
 export function BackupManagement() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [restoreId, setRestoreId] = useState<string | null>(null);
+  const [restorePhase, setRestorePhase] = useState<RestorePhase>('confirm');
+  const [restoreError, setRestoreError] = useState<string>('');
+  const [restoreElapsed, setRestoreElapsed] = useState(0);
+  const restoreTimer = useRef<ReturnType<typeof setInterval> | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+
+  useEffect(() => {
+    return () => { if (restoreTimer.current) clearInterval(restoreTimer.current); };
+  }, []);
+
+  const startRestoreTimer = () => {
+    setRestoreElapsed(0);
+    restoreTimer.current = setInterval(() => setRestoreElapsed(s => s + 1), 1000);
+  };
+  const stopRestoreTimer = () => {
+    if (restoreTimer.current) { clearInterval(restoreTimer.current); restoreTimer.current = null; }
+  };
+
+  const closeRestoreDialog = () => {
+    if (restorePhase === 'running') return;
+    setRestoreId(null);
+    setRestorePhase('confirm');
+    setRestoreError('');
+    setRestoreElapsed(0);
+    stopRestoreTimer();
+  };
 
   // Fetch backup status
   const { data: statusData, isLoading: statusLoading } = useQuery<{ success: boolean; status: BackupStatus }>({
     queryKey: ['backup-status'],
     queryFn: () => apiRequest('GET', '/api/backups/status'),
-    refetchInterval: 60000, // Refresh every minute
+    refetchInterval: 60000,
   });
 
   // Fetch backup list
@@ -132,21 +162,23 @@ export function BackupManagement() {
   const restoreBackupMutation = useMutation({
     mutationFn: (id: string) => apiRequest('POST', `/api/backups/${id}/restore`),
     onSuccess: () => {
-      toast({
-        title: 'Restore Complete',
-        description: 'Database has been restored successfully. You may need to refresh the page.',
-      });
-      setRestoreId(null);
+      stopRestoreTimer();
+      setRestorePhase('success');
+      queryClient.invalidateQueries({ queryKey: ['backups'] });
+      queryClient.invalidateQueries({ queryKey: ['backup-status'] });
     },
     onError: (error: Error) => {
-      toast({
-        title: 'Restore Failed',
-        description: error.message || 'Failed to restore backup.',
-        variant: 'destructive',
-      });
-      setRestoreId(null);
+      stopRestoreTimer();
+      setRestoreError(error.message || 'Failed to restore backup.');
+      setRestorePhase('error');
     },
   });
+
+  const handleRestoreConfirm = (backupId: string) => {
+    setRestorePhase('running');
+    startRestoreTimer();
+    restoreBackupMutation.mutate(backupId);
+  };
 
   // Delete backup mutation
   const deleteBackupMutation = useMutation({
@@ -416,48 +448,116 @@ export function BackupManagement() {
                         </Button>
                         
                         {/* Restore Dialog */}
-                        <AlertDialog open={restoreId === backup.id} onOpenChange={(open) => !open && setRestoreId(null)}>
+                        <AlertDialog open={restoreId === backup.id} onOpenChange={(open) => { if (!open) closeRestoreDialog(); }}>
                           <AlertDialogTrigger asChild>
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => setRestoreId(backup.id)}
+                              onClick={() => { setRestoreId(backup.id); setRestorePhase('confirm'); }}
                               title="Restore from this backup"
                             >
                               <RotateCcw className="h-4 w-4" />
                             </Button>
                           </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle className="flex items-center gap-2 text-amber-600">
-                                <AlertTriangle className="h-5 w-5" />
-                                Restore Database?
-                              </AlertDialogTitle>
-                              <AlertDialogDescription>
-                                This will restore the database from <strong>{backup.filename}</strong>.
-                                <br /><br />
-                                <span className="text-red-600 font-semibold">
-                                  Warning: All current data will be replaced with the backup data.
-                                </span>
-                                <br /><br />
-                                Consider creating a new backup before proceeding.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Cancel</AlertDialogCancel>
-                              <AlertDialogAction
-                                onClick={() => restoreBackupMutation.mutate(backup.id)}
-                                className="bg-amber-600 hover:bg-amber-700"
-                                disabled={restoreBackupMutation.isPending}
-                              >
-                                {restoreBackupMutation.isPending ? (
-                                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                                ) : (
-                                  <RotateCcw className="h-4 w-4 mr-2" />
-                                )}
-                                Restore Database
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
+                          <AlertDialogContent onEscapeKeyDown={(e) => { if (restorePhase === 'running') e.preventDefault(); }}>
+
+                            {/* ── Confirm phase ── */}
+                            {restorePhase === 'confirm' && (
+                              <>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle className="flex items-center gap-2 text-amber-600">
+                                    <AlertTriangle className="h-5 w-5" />
+                                    Restore Database?
+                                  </AlertDialogTitle>
+                                  <AlertDialogDescription asChild>
+                                    <div>
+                                      <p>This will restore the database from <strong>{backup.filename}</strong>.</p>
+                                      <p className="mt-2 text-red-600 font-semibold">
+                                        All current data will be replaced with the backup data.
+                                      </p>
+                                      <p className="mt-2 text-muted-foreground text-xs">
+                                        A safety backup is created automatically before the restore begins.
+                                        If anything goes wrong, your data will be recovered automatically.
+                                      </p>
+                                    </div>
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <Button
+                                    onClick={() => handleRestoreConfirm(backup.id)}
+                                    className="bg-amber-600 hover:bg-amber-700 text-white"
+                                  >
+                                    <RotateCcw className="h-4 w-4 mr-2" />
+                                    Restore Database
+                                  </Button>
+                                </AlertDialogFooter>
+                              </>
+                            )}
+
+                            {/* ── Running phase ── */}
+                            {restorePhase === 'running' && (
+                              <div className="py-6 flex flex-col items-center gap-4 text-center">
+                                <Loader2 className="h-10 w-10 animate-spin text-amber-600" />
+                                <div>
+                                  <p className="text-lg font-semibold">Restoring Database…</p>
+                                  <p className="text-sm text-muted-foreground mt-1">
+                                    {restoreElapsed < 10
+                                      ? 'Creating safety backup…'
+                                      : restoreElapsed < 25
+                                        ? 'Applying backup data…'
+                                        : 'Verifying restore…'}
+                                  </p>
+                                  <p className="text-xs text-muted-foreground mt-2 tabular-nums">
+                                    Elapsed: {restoreElapsed}s
+                                  </p>
+                                </div>
+                                <p className="text-xs text-muted-foreground max-w-xs">
+                                  Do not close this page. If the restore fails, your data will be recovered automatically.
+                                </p>
+                              </div>
+                            )}
+
+                            {/* ── Success phase ── */}
+                            {restorePhase === 'success' && (
+                              <>
+                                <div className="py-6 flex flex-col items-center gap-4 text-center">
+                                  <ShieldCheck className="h-10 w-10 text-green-600" />
+                                  <div>
+                                    <p className="text-lg font-semibold text-green-700">Restore Complete</p>
+                                    <p className="text-sm text-muted-foreground mt-1">
+                                      Database restored from {backup.filename} in {restoreElapsed}s.
+                                    </p>
+                                  </div>
+                                </div>
+                                <AlertDialogFooter>
+                                  <Button onClick={() => { closeRestoreDialog(); window.location.reload(); }}>
+                                    Refresh Page
+                                  </Button>
+                                </AlertDialogFooter>
+                              </>
+                            )}
+
+                            {/* ── Error phase ── */}
+                            {restorePhase === 'error' && (
+                              <>
+                                <div className="py-6 flex flex-col items-center gap-4 text-center">
+                                  <XCircle className="h-10 w-10 text-red-600" />
+                                  <div>
+                                    <p className="text-lg font-semibold text-red-700">Restore Failed</p>
+                                    <p className="text-sm text-muted-foreground mt-1 max-w-sm">
+                                      {restoreError}
+                                    </p>
+                                  </div>
+                                </div>
+                                <AlertDialogFooter>
+                                  <Button variant="outline" onClick={closeRestoreDialog}>
+                                    Close
+                                  </Button>
+                                </AlertDialogFooter>
+                              </>
+                            )}
+
                           </AlertDialogContent>
                         </AlertDialog>
 

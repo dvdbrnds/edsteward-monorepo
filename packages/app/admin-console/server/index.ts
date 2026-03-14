@@ -60,7 +60,7 @@ import {
 } from './services/tenant-provisioning.js';
 
 const app = express();
-const PORT = process.env.ADMIN_PORT || 4000;
+const PORT = process.env.PORT || process.env.ADMIN_PORT || 4000;
 const server = createServer(app);
 
 // =============================================================================
@@ -747,10 +747,139 @@ app.delete('/api/customers/:id/sso', requireAuth, async (req, res) => {
 });
 
 // =============================================================================
-// INSTITUTION ASSESSMENT ROUTES (proxy to engine Customer API)
+// INSTITUTION ASSESSMENT (self-contained — calls College Scorecard API directly)
 // =============================================================================
 
-const ENGINE_CUSTOMER_API = process.env.ENGINE_CUSTOMER_API_URL || 'http://localhost:3060';
+const SCORECARD_API = 'https://api.data.gov/ed/collegescorecard/v1/schools';
+const SCORECARD_KEY = process.env.COLLEGE_SCORECARD_API_KEY || 'DEMO_KEY';
+
+const SCORECARD_FIELDS = [
+  'id', 'school.name', 'school.city', 'school.state', 'school.zip',
+  'school.school_url', 'school.ownership', 'school.carnegie_basic',
+  'school.carnegie_size_setting', 'school.religious_affiliation',
+  'school.degrees_awarded.predominant', 'school.degrees_awarded.highest',
+  'school.online_only', 'school.main_campus', 'school.branches',
+  'school.accreditor', 'school.accreditor_code',
+  'school.title_iv.approval_date', 'school.under_investigation',
+  'latest.student.size', 'latest.student.enrollment.all',
+  'latest.admissions.admission_rate.overall',
+  'latest.cost.tuition.in_state', 'latest.cost.tuition.out_of_state',
+  'latest.aid.pell_grant_rate', 'latest.aid.federal_loan_rate',
+  'latest.completion.rate_suppressed.overall',
+  'latest.student.retention_rate.four_year.full_time',
+  'latest.student.retention_rate.lt_four_year.full_time',
+  'latest.repayment.3_yr_repayment.overall',
+  'latest.aid.median_debt.completers.overall',
+].join(',');
+
+const OWNERSHIP_MAP: Record<number, string> = { 1: 'Public', 2: 'Private nonprofit', 3: 'Private for-profit' };
+
+const CARNEGIE_MAP: Record<number, string> = {
+  15: 'Doctoral Universities: Very High Research Activity', 16: 'Doctoral Universities: High Research Activity',
+  17: 'Doctoral/Professional Universities', 18: "Master's Colleges & Universities: Larger Programs",
+  19: "Master's Colleges & Universities: Medium Programs", 20: "Master's Colleges & Universities: Smaller Programs",
+  21: "Baccalaureate Colleges: Arts & Sciences Focus", 22: "Baccalaureate Colleges: Diverse Fields",
+  23: "Baccalaureate/Associate's Colleges",
+  24: "Associate's Colleges: High Transfer-High Traditional", 25: "Associate's Colleges: High Transfer-Mixed Traditional",
+  26: "Associate's Colleges: High Transfer-High Nontraditional",
+  33: 'Special Focus: Theological Seminaries', 34: 'Special Focus: Medical Schools & Centers',
+  35: 'Special Focus: Health Professions Schools', 36: 'Special Focus: Engineering Schools',
+  37: 'Special Focus: Technology-Related Schools', 38: 'Special Focus: Business & Management Schools',
+  39: 'Special Focus: Arts, Music & Design Schools', 40: 'Special Focus: Law Schools',
+  41: 'Special Focus: Other', [-2]: 'Not applicable / Not classified',
+};
+
+const RELIGIOUS_MAP: Record<number, string> = {
+  22: 'American Baptist', 24: 'American Lutheran', 27: 'Baptist', 30: 'Church of Christ',
+  33: 'Church of God', 34: 'Churches of Christ', 36: 'Christian Church (Disciples of Christ)',
+  37: 'Evangelical Christian', 40: 'Evangelical Lutheran Church', 44: 'Moravian Church',
+  48: 'Methodist', 52: 'Pentecostal Holiness Church', 54: 'Presbyterian Church (USA)',
+  55: 'Protestant Episcopal', 58: 'Religious Society of Friends', 60: 'Roman Catholic',
+  61: 'Seventh Day Adventist', 65: 'United Methodist', 66: 'United Church of Christ',
+  67: 'Wesleyan', 71: 'Assemblies of God', 73: 'Christian Reformed',
+  79: 'Jewish', 80: 'Latter Day Saints', 81: 'Lutheran Church - Missouri Synod',
+  84: 'Other Protestant', 88: 'Undenominational', 91: 'Not applicable',
+  92: 'Southern Baptist', 95: 'Non-denominational', 97: 'Christian',
+  99: 'Other (non-religious)', 100: 'Interdenominational', 101: 'Muslim',
+};
+
+function classifyFromScorecard(data: any) {
+  const ownership = data['school.ownership'];
+  const carnegie = data['school.carnegie_basic'];
+  const religious = data['school.religious_affiliation'];
+  const predominant = data['school.degrees_awarded.predominant'];
+  const highest = data['school.degrees_awarded.highest'];
+  const onlineOnly = data['school.online_only'];
+  const titleIvDate = data['school.title_iv.approval_date'];
+  const size = data['latest.student.size'];
+
+  let primaryType: string;
+  if (ownership === 3) primaryType = 'private-for-profit';
+  else if (ownership === 1) primaryType = (predominant <= 2 || (carnegie >= 24 && carnegie <= 32)) ? 'public-2year' : 'public-4year';
+  else primaryType = (predominant <= 2 || (carnegie >= 24 && carnegie <= 32)) ? 'private-nonprofit-2year' : 'private-nonprofit-4year';
+
+  const characteristics: string[] = [];
+  if (religious && religious !== 91 && religious !== 99) characteristics.push('religious-affiliation');
+  if (carnegie === 15 || carnegie === 16) characteristics.push('research-intensive');
+  if (highest >= 4 || carnegie === 17 || (carnegie >= 18 && carnegie <= 20)) characteristics.push('graduate-professional');
+  if (carnegie === 34 || carnegie === 35) characteristics.push('medical-health-programs');
+  if (onlineOnly === 1) characteristics.push('online-distance-ed');
+  if (titleIvDate) characteristics.push('title-iv-participant');
+  if (size >= 500 && predominant >= 3 && !onlineOnly) characteristics.push('residential-campus');
+
+  return { primaryType, characteristics };
+}
+
+function mapScorecardResult(r: any) {
+  const classification = classifyFromScorecard(r);
+  return {
+    id: r.id, name: r['school.name'], city: r['school.city'], state: r['school.state'],
+    zip: r['school.zip'], website: r['school.school_url'],
+    ownership: OWNERSHIP_MAP[r['school.ownership']] || 'Unknown', ownershipCode: r['school.ownership'],
+    carnegieClassification: CARNEGIE_MAP[r['school.carnegie_basic']] || 'Not classified',
+    carnegieCode: r['school.carnegie_basic'],
+    religiousAffiliation: RELIGIOUS_MAP[r['school.religious_affiliation']] || null,
+    religiousAffiliationCode: r['school.religious_affiliation'],
+    predominantDegree: r['school.degrees_awarded.predominant'],
+    highestDegree: r['school.degrees_awarded.highest'],
+    accreditor: r['school.accreditor'], titleIvApprovalDate: r['school.title_iv.approval_date'],
+    onlineOnly: r['school.online_only'] === 1, mainCampus: r['school.main_campus'] === 1,
+    branches: r['school.branches'], studentSize: r['latest.student.size'],
+    admissionRate: r['latest.admissions.admission_rate.overall'],
+    tuitionInState: r['latest.cost.tuition.in_state'], tuitionOutOfState: r['latest.cost.tuition.out_of_state'],
+    pellGrantRate: r['latest.aid.pell_grant_rate'],
+    federalLoanRate: r['latest.aid.federal_loan_rate'],
+    completionRate: r['latest.completion.rate_suppressed.overall'],
+    retentionRate: r['latest.student.retention_rate.four_year.full_time']
+      ?? r['latest.student.retention_rate.lt_four_year.full_time'],
+    repaymentRate: r['latest.repayment.3_yr_repayment.overall'],
+    medianDebt: r['latest.aid.median_debt.completers.overall'],
+    underInvestigation: r['school.under_investigation'],
+    accreditorCode: r['school.accreditor_code'],
+    classification, allTypes: [classification.primaryType, ...classification.characteristics],
+  };
+}
+
+async function getRegulationCountForTypes(types: string[]): Promise<{ total: number; applicable: number }> {
+  const pool = getAdminPool();
+  try {
+    const totalRes = await pool.query('SELECT COUNT(*) as count FROM regulations');
+    const total = parseInt(totalRes.rows[0].count);
+
+    const placeholders = types.map((_, i) => `$${i + 1}`).join(', ');
+    const applicableRes = await pool.query(
+      `SELECT COUNT(*) as count FROM regulations
+       WHERE applicable_institutions IS NULL
+       OR applicable_institutions::jsonb @> '"all-institutions"'::jsonb
+       OR EXISTS (SELECT 1 FROM jsonb_array_elements_text(applicable_institutions::jsonb) elem WHERE elem IN (${placeholders}))`,
+      types
+    );
+    return { total, applicable: parseInt(applicableRes.rows[0].count) };
+  } catch (error) {
+    console.error('Regulation count query error:', error);
+    return { total: 0, applicable: 0 };
+  }
+}
 
 app.get('/api/assessment/search', requireAuth, async (req: Request, res: Response) => {
   try {
@@ -758,38 +887,121 @@ app.get('/api/assessment/search', requireAuth, async (req: Request, res: Respons
     const limit = req.query.limit || '10';
     if (!q) return res.status(400).json({ error: 'Query parameter "q" is required' });
 
-    const response = await fetch(`${ENGINE_CUSTOMER_API}/api/assessment/search?q=${encodeURIComponent(q)}&limit=${limit}`);
+    const url = `${SCORECARD_API}?school.name=${encodeURIComponent(q)}&fields=${SCORECARD_FIELDS}&api_key=${SCORECARD_KEY}&per_page=${limit}&sort=latest.student.size:desc`;
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`Scorecard API: ${response.status}`);
     const data = await response.json();
-    res.json(data);
-  } catch (error) {
-    console.error('Assessment search proxy error:', error);
-    res.status(502).json({ error: 'Failed to reach engine assessment service' });
+
+    res.json({ success: true, total: data.metadata.total, results: data.results.map(mapScorecardResult) });
+  } catch (error: any) {
+    console.error('Assessment search error:', error);
+    res.status(500).json({ error: 'Failed to search institutions', details: error.message });
   }
 });
 
 app.get('/api/assessment/institution/:id', requireAuth, async (req: Request, res: Response) => {
   try {
-    const response = await fetch(`${ENGINE_CUSTOMER_API}/api/assessment/institution/${req.params.id}`);
+    const url = `${SCORECARD_API}?id=${req.params.id}&fields=${SCORECARD_FIELDS}&api_key=${SCORECARD_KEY}`;
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`Scorecard API: ${response.status}`);
     const data = await response.json();
-    res.json(data);
-  } catch (error) {
-    console.error('Assessment lookup proxy error:', error);
-    res.status(502).json({ error: 'Failed to reach engine assessment service' });
+    if (data.results.length === 0) return res.status(404).json({ error: 'Institution not found' });
+
+    const institution = mapScorecardResult(data.results[0]);
+    const regulations = await getRegulationCountForTypes(institution.allTypes);
+    res.json({ success: true, institution, regulations });
+  } catch (error: any) {
+    console.error('Assessment lookup error:', error);
+    res.status(500).json({ error: 'Failed to look up institution', details: error.message });
   }
 });
 
 app.post('/api/assessment/classify', requireAuth, async (req: Request, res: Response) => {
   try {
-    const response = await fetch(`${ENGINE_CUSTOMER_API}/api/assessment/classify`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(req.body),
-    });
-    const data = await response.json();
-    res.json(data);
-  } catch (error) {
-    console.error('Assessment classify proxy error:', error);
-    res.status(502).json({ error: 'Failed to reach engine assessment service' });
+    const { types } = req.body;
+    if (!types || !Array.isArray(types)) return res.status(400).json({ error: '"types" array is required' });
+    const regulations = await getRegulationCountForTypes(types);
+    res.json({ success: true, regulations });
+  } catch (error: any) {
+    console.error('Assessment classify error:', error);
+    res.status(500).json({ error: 'Failed to classify', details: error.message });
+  }
+});
+
+// =============================================================================
+// WEBSITE COMPLIANCE SCAN
+// =============================================================================
+
+import { crawlWebsite } from './services/website-scanner.js';
+import { analyzeCompliance } from './services/compliance-analyzer.js';
+import { generateExternalIndicators, analyzeAccessibilityFromHtml } from './services/external-checks.js';
+
+app.post('/api/assessment/compliance-scan', requireAuth, async (req: Request, res: Response) => {
+  try {
+    const { websiteUrl, institutionTypes, institutionName, institutionData } = req.body;
+    if (!websiteUrl) return res.status(400).json({ error: '"websiteUrl" is required' });
+    if (!institutionTypes || !Array.isArray(institutionTypes)) {
+      return res.status(400).json({ error: '"institutionTypes" array is required' });
+    }
+    if (!institutionName) return res.status(400).json({ error: '"institutionName" is required' });
+
+    if (!process.env.ANTHROPIC_API_KEY) {
+      return res.status(503).json({ error: 'ANTHROPIC_API_KEY not configured — compliance scanning unavailable' });
+    }
+
+    console.log(`\n🔍 Starting compliance scan for ${institutionName} (${websiteUrl})`);
+    console.log(`   Institution types: ${institutionTypes.join(', ')}`);
+
+    const crawlResult = await crawlWebsite(websiteUrl);
+    console.log(`   Crawled ${crawlResult.pagesScanned} pages in ${crawlResult.durationMs}ms`);
+
+    if (crawlResult.pagesScanned === 0) {
+      return res.status(422).json({
+        error: 'Could not crawl the institution website',
+        details: crawlResult.errors,
+      });
+    }
+
+    // Run website compliance analysis and external checks in parallel
+    const [report, accessibilityResult] = await Promise.all([
+      analyzeCompliance(
+        crawlResult.pages,
+        institutionName,
+        institutionTypes,
+        websiteUrl,
+        { pagesScanned: crawlResult.pagesScanned, durationMs: crawlResult.durationMs },
+      ),
+      Promise.resolve(
+        analyzeAccessibilityFromHtml(
+          crawlResult.pages
+            .filter(p => p.rawHtml)
+            .slice(0, 10)
+            .map(p => ({ url: p.url, html: p.rawHtml }))
+        )
+      ),
+    ]);
+
+    // Generate external indicators from College Scorecard data + accessibility
+    if (institutionData) {
+      const externalResult = generateExternalIndicators(institutionData, accessibilityResult);
+      report.externalIndicators = externalResult.indicators;
+      report.accessibilityScore = externalResult.accessibilityScore;
+      report.financialHealthScore = externalResult.financialHealthScore;
+      report.externalSummary = {
+        totalChecks: externalResult.summary.totalChecks,
+        passing: externalResult.summary.passing,
+        warnings: externalResult.summary.warnings,
+        failing: externalResult.summary.failing,
+      };
+      console.log(`   External checks: ${externalResult.summary.passing} pass, ${externalResult.summary.warnings} warn, ${externalResult.summary.failing} fail | Accessibility: ${externalResult.accessibilityScore}/100`);
+    }
+
+    console.log(`   Analysis complete: ${report.overallGrade} (${report.overallScore}%) — ${report.compliantCount} compliant, ${report.partialCount} partial, ${report.nonCompliantCount} non-compliant`);
+
+    res.json({ success: true, report });
+  } catch (error: any) {
+    console.error('Compliance scan error:', error);
+    res.status(500).json({ error: 'Compliance scan failed', details: error.message });
   }
 });
 
@@ -1379,6 +1591,7 @@ app.post('/api/tenants/:tenantId/restore', requireAuth, async (req, res) => {
 // SYSTEM ROUTES
 // =============================================================================
 
+app.get('/health', (_req, res) => { res.json({ status: 'ok' }); });
 app.get('/api/health', (req, res) => {
   const ecsCredentials = checkEcsCredentials();
   
@@ -1676,6 +1889,17 @@ app.post('/api/sync/dev-to-template', requireAuth, async (req, res) => {
 // =============================================================================
 // ERROR HANDLER
 // =============================================================================
+
+// In production, serve the built frontend static files and SPA fallback
+if (process.env.NODE_ENV === 'production') {
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = dirname(__filename);
+  const staticDir = join(__dirname, '..', 'public');
+  app.use(express.static(staticDir));
+  app.get('*', (_req: Request, res: Response) => {
+    res.sendFile(join(staticDir, 'index.html'));
+  });
+}
 
 app.use((err: any, req: Request, res: Response, _next: NextFunction) => {
   console.error('Server error:', err);
