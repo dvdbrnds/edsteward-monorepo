@@ -5,6 +5,26 @@ All notable changes to EdSteward are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.6] - 2026-03-14
+
+### Added
+- **Federal circuit court interpretation tracking** — EdSteward now tracks how
+  different federal circuit courts interpret each regulation, highlighting
+  circuit splits and binding precedent that varies by geographic location
+- Circuit interpretations panel on each regulation detail page, showing your
+  institution's circuit alongside other circuits' rulings
+- Active circuit split alerts when circuits disagree on the same regulation
+- CCO review workflow for incoming circuit interpretations (review, address, dismiss)
+- Impact severity and interpretation type badges (stricter, broader, narrower,
+  divergent, vacated) for quick triage
+- MCP Engine delivers circuit interpretation data alongside regulation updates
+- Initial circuit data for Title IX, FERPA, Clery Act, and GLBA
+
+### Changed
+- All 300 regulation console pages in the MCP Engine now include circuit
+  court interpretation sections and executive order sections
+- Fixed a redirect bug affecting all Engine console pages
+
 ## [1.5.5] - 2026-03-14
 
 ### Added
@@ -425,6 +445,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Version | Date | Milestone |
 |---------|------|-----------|
+| 1.5.6 | 2026-03-14 | Circuit court interpretations, console sync |
+| 1.5.5 | 2026-03-14 | Office/DRI separation, backup safety, assessment tool |
 | 1.5.1 | 2026-03-12 | Smart compliance actions, changelog page |
 | 1.5.0 | 2026-03-09 | Monorepo migration, API key rotation, security scrub |
 | 1.4.x | 2026-02-12 | MCP schema alignment, task dedup, EO support |

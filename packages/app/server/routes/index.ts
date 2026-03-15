@@ -1,7 +1,11 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import { Server } from 'http';
 import { createServer } from 'http';
 import { setupWebSocketServer } from '../websocket-server';
+import { desc, sql, gte } from 'drizzle-orm';
+import { users } from '../../shared/schema';
+import { getDbForRequest } from '../services/database';
+import { requireAuth, requireAdmin } from '../middleware/role-based-auth';
 
 import { log } from '../vite';
 import { setupAuth } from '../auth';
@@ -405,6 +409,53 @@ export function registerRoutes(app: express.Application): Server {
   app.use('/api/feature-flags', featureFlagsRouter); // Feature flag management
   app.use('/api/my-data', dataExportRouter); // Self-service data export (HECVAT PRIV-03)
   app.use('/api/demo-requests', demoRequestsRouter); // Public demo request form from edsteward.com
+
+  // Active users — check who's online before deploying
+  app.get('/api/admin/active-users', requireAuth, requireAdmin, async (req: Request, res: Response) => {
+    try {
+      const db = getDbForRequest(req);
+      const minutes = parseInt(req.query.minutes as string) || 15;
+      const cutoff = new Date(Date.now() - minutes * 60 * 1000);
+
+      const activeUsers = await db.select({
+        id: users.id,
+        username: users.username,
+        firstName: users.firstName,
+        lastName: users.lastName,
+        email: users.email,
+        role: users.role,
+        lastActiveAt: users.lastActiveAt,
+        lastLogin: users.lastLogin,
+      })
+      .from(users)
+      .where(gte(users.lastActiveAt, cutoff))
+      .orderBy(desc(users.lastActiveAt));
+
+      const allRecent = await db.select({
+        id: users.id,
+        username: users.username,
+        firstName: users.firstName,
+        lastName: users.lastName,
+        role: users.role,
+        lastActiveAt: users.lastActiveAt,
+      })
+      .from(users)
+      .where(sql`${users.lastActiveAt} IS NOT NULL`)
+      .orderBy(desc(users.lastActiveAt))
+      .limit(20);
+
+      res.json({
+        activeNow: activeUsers,
+        activeCount: activeUsers.length,
+        windowMinutes: minutes,
+        recentUsers: allRecent,
+        checkedAt: new Date().toISOString(),
+      });
+    } catch (error: any) {
+      console.error('Error fetching active users:', error);
+      res.status(500).json({ error: 'Failed to fetch active users' });
+    }
+  });
 
   // Note: AWS Tenant Management was removed - belongs in separate admin-console app at admin.edsteward.ai
   

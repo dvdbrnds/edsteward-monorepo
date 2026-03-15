@@ -17,8 +17,10 @@ import { createServer } from 'http';
 import { setupWebSocketServer } from './websocket-server';
 import { institutionConfig, validateConfig } from './config/institution';
 import { configureAuth } from './auth/single-tenant-auth';
-import { testConnection } from './services/database';
+import { testConnection, getDbForRequest } from './services/database';
 import { registerRoutes } from './routes';
+import { users } from '../shared/schema';
+import { eq } from 'drizzle-orm';
 import { startTaskScheduler } from './services/task-scheduler';
 import { apiLimiter, authLimiter, tenantQuotaLimiter } from './middleware/rate-limiter';
 import { tenantMiddleware } from './middleware/tenant';
@@ -133,6 +135,25 @@ app.use(session({
 // Passport middleware
 app.use(passport.initialize());
 app.use(passport.session());
+
+// Track user activity — updates last_active_at, throttled to once per 2 min per user
+const activityThrottle = new Map<number, number>();
+app.use((req: any, _res: any, next: any) => {
+  if (req.user?.id && req.path.startsWith('/api/')) {
+    const now = Date.now();
+    const last = activityThrottle.get(req.user.id) || 0;
+    if (now - last > 120_000) {
+      activityThrottle.set(req.user.id, now);
+      const db = getDbForRequest(req);
+      db.update(users)
+        .set({ lastActiveAt: new Date() })
+        .where(eq(users.id, req.user.id))
+        .execute()
+        .catch(() => {});
+    }
+  }
+  next();
+});
 
 // CRITICAL: Tenant detection middleware MUST run BEFORE authentication routes
 // This sets req.tenant and req.tenantId based on subdomain

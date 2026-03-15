@@ -203,6 +203,7 @@ export const users = pgTable("users", {
   providerId: text("provider_id"),
   identityProvider: text("identity_provider"),
   lastLogin: timestamp("last_login"),
+  lastActiveAt: timestamp("last_active_at"),
   // MFA fields
   mfaSecret: text("mfa_secret"), // TOTP secret key (encrypted)
   mfaEnabled: boolean("mfa_enabled").notNull().default(false),
