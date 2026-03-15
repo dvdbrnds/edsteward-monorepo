@@ -178,15 +178,21 @@ import { StatutoryFramework } from "@/components/regulations/statutory-framework
 import { useAuth } from "@/hooks/use-auth";
 
 const CATEGORIES = [
-  "Other",
-  "Campus Safety",
-  "Accounting",
-  "Human Resources",
-  "Student Life",
   "Academic Programs",
-  "Admissions",
   "Athletics",
+  "Campus Safety",
+  "Civil Rights",
+  "Environmental Health & Safety",
+  "Ethics & Governance",
+  "Finance",
   "Financial Aid",
+  "Human Resources",
+  "Information Technology",
+  "Intellectual Property",
+  "Research",
+  "Sexual Violence Prevention",
+  "Student Services",
+  "Other",
 ];
 
 
@@ -787,11 +793,11 @@ function RegulationDetailPage() {
                     <div className="flex items-center gap-2">
                       <span className="text-xs text-muted-foreground">Category:</span>
                       <Select
-                        defaultValue={regulation.category || "Other"}
+                        value={regulation.category && CATEGORIES.includes(regulation.category) ? regulation.category : undefined}
                         onValueChange={(value) => categoryMutation.mutate(value)}
                       >
-                        <SelectTrigger className="w-[180px] bg-gray-100 border rounded-md hover:bg-background transition-colors">
-                          <SelectValue />
+                        <SelectTrigger className="w-[220px] bg-gray-100 border rounded-md hover:bg-background transition-colors">
+                          <SelectValue placeholder={regulation.category || "Select category"} />
                         </SelectTrigger>
                         <SelectContent>
                           {CATEGORIES.map((category) => (

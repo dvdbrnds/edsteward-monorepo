@@ -64,6 +64,19 @@ print_banner "EdSteward Staging Deployment" "STAGING"
 # Pre-flight checks
 run_preflight_checks
 
+# Check regulation ID alignment with production
+if [[ -x "$SCRIPT_DIR/check-regulation-id-alignment.sh" ]]; then
+    log "Checking regulation ID alignment with production..."
+    if ! "$SCRIPT_DIR/check-regulation-id-alignment.sh"; then
+        warn "Regulation IDs are misaligned with production!"
+        warn "See: packages/app/scripts/db-align/README.md"
+        if ! confirm_prompt "Deploy anyway?"; then
+            echo "Aborted."
+            exit 0
+        fi
+    fi
+fi
+
 # Check for uncommitted changes (warning only for staging)
 check_uncommitted_changes
 

@@ -48,6 +48,21 @@ The MCP Engine uses a **local PostgreSQL** database, not Neon:
 3. **After backfilling dev**: remember to also sync to production (`ep-weathered-term`) and staging (`ep-fancy-scene`)
 4. **To verify production data**: query `ep-weathered-term` directly, not `ep-summer-pine`
 
+## CRITICAL: Regulation ID Alignment
+
+**Production and local dev MUST have identical numeric `id` values for the same regulations.** Features like circuit interpretations, executive order impacts, and compliance tasks all use `regulation_id` foreign keys. If IDs diverge, data seeded locally becomes meaningless in production.
+
+### Rules
+1. **Never truncate/re-seed the `regulations` table** without exporting production first
+2. **New regulations** added locally get IDs > production max — that's safe
+3. **New regulations** in production must be synced to local before further dev
+4. **Before deploying**: run `./scripts/check-regulation-id-alignment.sh` (automated in deploy-staging.sh)
+5. **If drift is detected**: follow the procedure in `scripts/db-align/README.md`
+
+### Alignment was last verified: 2026-03-14
+- 242 production regulations, all IDs match local
+- 39 local-only regulations (test/extra) at IDs 390+
+
 ## Schema Differences
 
 Production and local dev share the latest schema. Staging and other tenants may be behind:
