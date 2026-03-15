@@ -172,6 +172,7 @@ import { EscalateIssueDialog } from "@/components/regulations/escalate-issue-dia
 import { SendAttestationDialog } from "@/components/regulations/send-attestation-dialog";
 import { ComplianceTasksPanel } from "@/components/regulations/compliance-tasks-panel";
 import { ExecutiveOrdersPanel } from "@/components/regulations/executive-orders-panel";
+import { CircuitInterpretationsPanel } from "@/components/regulations/circuit-interpretations-panel";
 import { AuditTrailPanel } from "@/components/regulations/audit-trail-panel";
 import { StatutoryFramework } from "@/components/regulations/statutory-framework";
 import { useAuth } from "@/hooks/use-auth";
@@ -1331,6 +1332,12 @@ function RegulationDetailPage() {
 
               {/* EXECUTIVE ORDERS (MCP Engine Jan 2026) */}
               <ExecutiveOrdersPanel
+                regulationId={regulation.id}
+                isAdmin={isRegulationAdmin}
+              />
+
+              {/* CIRCUIT COURT INTERPRETATIONS (MCP Engine Mar 2026) */}
+              <CircuitInterpretationsPanel
                 regulationId={regulation.id}
                 isAdmin={isRegulationAdmin}
               />

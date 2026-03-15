@@ -59,6 +59,49 @@ export type InstitutionPrimaryType = typeof INSTITUTION_PRIMARY_TYPES[number];
 export type InstitutionCharacteristic = typeof INSTITUTION_CHARACTERISTICS[number];
 export type InstitutionType = typeof INSTITUTION_TYPES[number];
 
+// ===== FEDERAL CIRCUIT COURTS =====
+// The 13 federal judicial circuits — determines which appellate court governs an institution's jurisdiction.
+// Circuit interpretations of federal regulations create binding precedent within their territory.
+export const FEDERAL_CIRCUITS: Record<number, { name: string; states: string[] }> = {
+  1:  { name: "First Circuit",      states: ["ME", "MA", "NH", "RI", "PR"] },
+  2:  { name: "Second Circuit",     states: ["CT", "NY", "VT"] },
+  3:  { name: "Third Circuit",      states: ["DE", "NJ", "PA", "VI"] },
+  4:  { name: "Fourth Circuit",     states: ["MD", "NC", "SC", "VA", "WV"] },
+  5:  { name: "Fifth Circuit",      states: ["LA", "MS", "TX"] },
+  6:  { name: "Sixth Circuit",      states: ["KY", "MI", "OH", "TN"] },
+  7:  { name: "Seventh Circuit",    states: ["IL", "IN", "WI"] },
+  8:  { name: "Eighth Circuit",     states: ["AR", "IA", "MN", "MO", "NE", "ND", "SD"] },
+  9:  { name: "Ninth Circuit",      states: ["AK", "AZ", "CA", "GU", "HI", "ID", "MT", "NV", "OR", "WA"] },
+  10: { name: "Tenth Circuit",      states: ["CO", "KS", "NM", "OK", "UT", "WY"] },
+  11: { name: "Eleventh Circuit",   states: ["AL", "FL", "GA"] },
+  12: { name: "D.C. Circuit",       states: ["DC"] },
+  13: { name: "Federal Circuit",    states: [] },
+};
+
+const _stateToCircuit: Record<string, number> = {};
+for (const [circuit, { states }] of Object.entries(FEDERAL_CIRCUITS)) {
+  for (const st of states) _stateToCircuit[st] = Number(circuit);
+}
+
+/** Derive the federal circuit number from a two-letter state/territory code. Returns undefined for unknown codes. */
+export function getCircuitForState(stateCode: string): number | undefined {
+  return _stateToCircuit[stateCode.toUpperCase()];
+}
+
+/** Get full circuit info (name + states) by circuit number. */
+export function getCircuitInfo(circuitNumber: number) {
+  return FEDERAL_CIRCUITS[circuitNumber];
+}
+
+export const CIRCUIT_INTERPRETATION_TYPES = ["stricter", "broader", "narrower", "divergent", "vacated"] as const;
+export type CircuitInterpretationType = typeof CIRCUIT_INTERPRETATION_TYPES[number];
+
+export const CIRCUIT_INTERPRETATION_STATUS = ["active", "overruled", "superseded", "pending_review"] as const;
+export type CircuitInterpretationStatus = typeof CIRCUIT_INTERPRETATION_STATUS[number];
+
+export const CIRCUIT_SPLIT_STATUS = ["active", "resolved", "pending_scotus"] as const;
+export type CircuitSplitStatus = typeof CIRCUIT_SPLIT_STATUS[number];
+
 // Add source interface
 export interface RegulationSource {
   url: string;
@@ -423,6 +466,7 @@ export const institutionConfigurations = pgTable("institution_configurations", {
   tenantId: text("tenant_id").notNull().unique(),
   primaryType: text("primary_type"), // one of INSTITUTION_PRIMARY_TYPES
   characteristics: jsonb("characteristics").$type<string[]>().notNull().default([]),
+  stateCode: text("state_code"), // Two-letter state code — determines federal circuit via getCircuitForState()
   hideNonApplicable: boolean("hide_non_applicable").notNull().default(true),
   allowUsersToToggle: boolean("allow_users_to_toggle").notNull().default(true),
   createdAt: timestamp("created_at").defaultNow(),
@@ -1538,6 +1582,109 @@ export const demoRequests = pgTable("demo_requests", {
 export const insertDemoRequestSchema = createInsertSchema(demoRequests);
 export type DemoRequest = typeof demoRequests.$inferSelect;
 export type InsertDemoRequest = z.infer<typeof insertDemoRequestSchema>;
+
+// ===== CIRCUIT COURT INTERPRETATIONS (Mar 2026) =====
+// Federal circuit courts create binding precedent that modifies how regulations apply
+// within their territory. Different circuits may interpret the same regulation differently,
+// creating "circuit splits" that affect institutional compliance obligations.
+
+export const circuitInterpretations = pgTable("circuit_interpretations", {
+  id: serial("id").primaryKey(),
+  regulationId: integer("regulation_id").notNull().references(() => regulations.id, { onDelete: 'cascade' }),
+  circuitNumber: integer("circuit_number").notNull(), // 1-13 per FEDERAL_CIRCUITS
+
+  // Case law identification
+  caseName: text("case_name").notNull(),
+  caseYear: integer("case_year"),
+  caseCitation: text("case_citation"),
+  courtLevel: text("court_level").notNull().default("circuit"), // circuit, district, supreme
+
+  // Interpretation content
+  interpretationType: text("interpretation_type").notNull(), // stricter, broader, narrower, divergent, vacated
+  summary: text("summary").notNull(),
+  complianceImplication: text("compliance_implication"),
+  affectedRequirements: jsonb("affected_requirements").$type<string[]>(),
+
+  // Impact assessment
+  impactSeverity: text("impact_severity").notNull(), // critical, high, medium, low
+  status: text("status").notNull().default("active"),
+  isCircuitSplit: boolean("is_circuit_split").default(false),
+  splitId: integer("split_id"), // FK to circuit_splits (added after table definition)
+
+  // Source and attribution
+  sourceUrl: text("source_url"),
+  assessedBy: text("assessed_by"),
+  confidenceScore: text("confidence_score"),
+
+  // CCO review workflow
+  reviewStatus: text("review_status").notNull().default("pending"),
+  reviewedBy: integer("reviewed_by").references(() => users.id),
+  reviewedAt: timestamp("reviewed_at"),
+  reviewNotes: text("review_notes"),
+
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => {
+  return {
+    regulationIdx: index("ci_regulation_idx").on(table.regulationId),
+    circuitIdx: index("ci_circuit_idx").on(table.circuitNumber),
+    statusIdx: index("ci_status_idx").on(table.status),
+    reviewStatusIdx: index("ci_review_status_idx").on(table.reviewStatus),
+    regCircuitIdx: index("ci_reg_circuit_idx").on(table.regulationId, table.circuitNumber),
+  };
+});
+
+export const insertCircuitInterpretationSchema = createInsertSchema(circuitInterpretations).extend({
+  circuitNumber: z.number().int().min(1).max(13),
+  caseName: z.string().min(1, "Case name is required"),
+  interpretationType: z.enum(CIRCUIT_INTERPRETATION_TYPES),
+  summary: z.string().min(1, "Summary is required"),
+  impactSeverity: z.enum(["critical", "high", "medium", "low"]),
+  status: z.enum(CIRCUIT_INTERPRETATION_STATUS).default("active"),
+  courtLevel: z.enum(["circuit", "district", "supreme"]).default("circuit"),
+  reviewStatus: z.enum(["pending", "reviewed", "addressed", "dismissed"]).default("pending"),
+});
+
+export type CircuitInterpretation = typeof circuitInterpretations.$inferSelect;
+export type InsertCircuitInterpretation = z.infer<typeof insertCircuitInterpretationSchema>;
+
+// ===== CIRCUIT SPLITS =====
+// Groups related circuit interpretations where courts have reached different conclusions.
+// Tracks whether SCOTUS may resolve the split.
+
+export const circuitSplits = pgTable("circuit_splits", {
+  id: serial("id").primaryKey(),
+  regulationId: integer("regulation_id").notNull().references(() => regulations.id, { onDelete: 'cascade' }),
+
+  title: text("title").notNull(),
+  description: text("description"),
+  affectedCircuits: jsonb("affected_circuits").$type<number[]>(),
+
+  // SCOTUS tracking
+  scotusPetitionPending: boolean("scotus_petition_pending").default(false),
+  scotusCertGranted: boolean("scotus_cert_granted").default(false),
+  scotusCaseInfo: text("scotus_case_info"),
+
+  status: text("status").notNull().default("active"),
+  resolvedBy: text("resolved_by"),
+  resolvedAt: timestamp("resolved_at"),
+
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => {
+  return {
+    regulationIdx: index("cs_regulation_idx").on(table.regulationId),
+    statusIdx: index("cs_status_idx").on(table.status),
+  };
+});
+
+export const insertCircuitSplitSchema = createInsertSchema(circuitSplits).extend({
+  title: z.string().min(1, "Title is required"),
+  status: z.enum(CIRCUIT_SPLIT_STATUS).default("active"),
+});
+
+export type CircuitSplit = typeof circuitSplits.$inferSelect;
+export type InsertCircuitSplit = z.infer<typeof insertCircuitSplitSchema>;
 
 // ===== SINGLE-TENANT ARCHITECTURE =====
 // Single-tenant configuration is handled via environment variables and config files

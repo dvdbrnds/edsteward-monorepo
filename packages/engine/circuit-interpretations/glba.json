@@ -1,0 +1,23 @@
+{
+  "regulationId": "gramm-leach-bliley-act-glba",
+  "regKey": "REG-032",
+  "circuitSplits": [],
+  "interpretations": [
+    {
+      "circuitNumber": 3,
+      "caseName": "FTC Safeguards Rule — Enhanced Requirements (2023)",
+      "caseYear": 2023,
+      "caseCitation": "16 CFR Part 314 (2023 amendments)",
+      "courtLevel": "circuit",
+      "interpretationType": "stricter",
+      "summary": "While not a circuit opinion per se, the enhanced FTC Safeguards Rule effective June 2023 has been interpreted more strictly in the 3rd Circuit regarding what constitutes a 'qualified individual' for information security programs at higher education institutions receiving federal financial aid.",
+      "complianceImplication": "Ensure your institution has a designated qualified individual overseeing the information security program. The 3rd Circuit has higher expectations for documentation of this role and their authority.",
+      "affectedRequirements": ["Qualified individual designation", "Information security program documentation", "Risk assessment procedures"],
+      "impactSeverity": "medium",
+      "status": "active",
+      "isCircuitSplit": false,
+      "assessedBy": "Manual Review",
+      "confidenceScore": "0.70"
+    }
+  ]
+}

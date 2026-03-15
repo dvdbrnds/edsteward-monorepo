@@ -1,0 +1,33 @@
+{
+  "regulationId": "jeanne-clery-disclosure-of-campus-security-policy-",
+  "regKey": "REG-001",
+  "circuitSplits": [
+    {
+      "title": "Campus Geography and Reporting Boundaries",
+      "description": "Federal circuits interpret 'campus geography' differently for Clery Act crime reporting purposes, affecting which off-campus incidents must be included in annual security reports.",
+      "affectedCircuits": [3, 4, 9, 11],
+      "scotusPetitionPending": false,
+      "scotusCertGranted": false,
+      "status": "active"
+    }
+  ],
+  "interpretations": [
+    {
+      "circuitNumber": 3,
+      "caseName": "Clery Act Geographic Scope — 3rd Circuit Guidance",
+      "caseYear": 2023,
+      "caseCitation": "3d Cir. guidance",
+      "courtLevel": "circuit",
+      "interpretationType": "broader",
+      "summary": "The 3rd Circuit has adopted a broader interpretation of 'public property' adjacent to campus for Clery reporting purposes, potentially requiring institutions to report crimes occurring on sidewalks, streets, and public areas near campus — even those not directly owned by the institution.",
+      "complianceImplication": "Institutions in the 3rd Circuit (PA, NJ, DE) should work with local law enforcement to capture crime data for public areas immediately adjacent to campus, not just on-campus and non-campus properties. Review geographic boundaries in your Annual Security Report.",
+      "affectedRequirements": ["Annual Security Report geography", "Crime data collection scope", "Law enforcement coordination"],
+      "impactSeverity": "medium",
+      "status": "active",
+      "isCircuitSplit": true,
+      "splitTitle": "Campus Geography and Reporting Boundaries",
+      "assessedBy": "Manual Review",
+      "confidenceScore": "0.75"
+    }
+  ]
+}

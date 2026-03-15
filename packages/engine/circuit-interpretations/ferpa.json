@@ -1,0 +1,33 @@
+{
+  "regulationId": "family-educational-rights-and-privacy-act-ferpa",
+  "regKey": "REG-004",
+  "circuitSplits": [
+    {
+      "title": "Scope of \"Education Records\" Definition",
+      "description": "Circuits disagree on what constitutes an 'education record' under FERPA vs. personal notes, law enforcement records, or peer-graded papers. This affects what information institutions must protect and disclose.",
+      "affectedCircuits": [3, 6, 7, 9],
+      "scotusPetitionPending": false,
+      "scotusCertGranted": false,
+      "status": "active"
+    }
+  ],
+  "interpretations": [
+    {
+      "circuitNumber": 6,
+      "caseName": "United States v. Miami University",
+      "caseYear": 2002,
+      "caseCitation": "294 F.3d 797 (6th Cir. 2002)",
+      "courtLevel": "circuit",
+      "interpretationType": "broader",
+      "summary": "The 6th Circuit held that student disciplinary records are 'education records' under FERPA and cannot be released without consent, even to comply with state open-records laws. This broad interpretation means more institutional records fall under FERPA protection.",
+      "complianceImplication": "Institutions in the 6th Circuit (KY, MI, OH, TN) must treat student disciplinary records as protected education records. Do not release to media, state agencies, or in response to state open-records requests without student consent or a FERPA exception.",
+      "affectedRequirements": ["Record classification", "Disciplinary record handling", "Open records response"],
+      "impactSeverity": "medium",
+      "status": "active",
+      "isCircuitSplit": true,
+      "splitTitle": "Scope of \"Education Records\" Definition",
+      "assessedBy": "Manual Review",
+      "confidenceScore": "0.90"
+    }
+  ]
+}

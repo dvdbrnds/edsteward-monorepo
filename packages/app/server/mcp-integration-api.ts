@@ -1,7 +1,7 @@
 import express, { type Request, Response } from "express";
 import { getDatabaseStorage, getTenantDb } from "./services/database";
-import { sql, eq } from "drizzle-orm";
-import { regulations, complianceTasks, roleAssignments, executiveOrders as executiveOrdersTable, eoRegulationImpacts } from "@shared/schema";
+import { sql, eq, and } from "drizzle-orm";
+import { regulations, complianceTasks, roleAssignments, executiveOrders as executiveOrdersTable, eoRegulationImpacts, circuitInterpretations, circuitSplits } from "@shared/schema";
 import { syslog, LogLevel, LogFacility } from './services/syslog';
 import { z } from "zod";
 import { ValidationLevel } from "@shared/schema";
@@ -2155,6 +2155,178 @@ export function setupMCPIntegrationApi(app: express.Application) {
       console.error('Error fetching regulation hashes:', error);
       syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, 'Error fetching regulation hashes', { error: String(error) });
       res.status(500).json({ error: 'Failed to fetch regulation hashes' });
+    }
+  });
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // CIRCUIT COURT INTERPRETATIONS SYNC (Mar 2026)
+  // Receives circuit interpretation data from MCP Engine delivery pipeline
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  /**
+   * POST /api/mcp/circuit-interpretations/sync
+   *
+   * Receives circuit court interpretation data from the MCP Engine.
+   * Upserts interpretations and splits — idempotent by caseName + circuitNumber + regulationId.
+   */
+  app.post('/api/mcp/circuit-interpretations/sync', basicAuthMCP, async (req: Request, res: Response) => {
+    const timestamp = new Date().toISOString();
+    console.log(`\n========================================`);
+    console.log(`🏛️  [${timestamp}] MCP CIRCUIT INTERPRETATIONS SYNC`);
+    console.log(`========================================`);
+
+    try {
+      const db = getDb(req);
+      const { circuitData } = req.body;
+
+      if (!Array.isArray(circuitData) || circuitData.length === 0) {
+        return res.status(400).json({ error: 'circuitData array is required' });
+      }
+
+      let totalInterpretations = 0;
+      let totalSplits = 0;
+      let created = 0;
+      let skipped = 0;
+      const errors: string[] = [];
+
+      for (const regData of circuitData) {
+        const regKey = regData.regKey;
+        const regSlug = regData.regulationId;
+
+        // Resolve to EdSteward regulation ID
+        const [reg] = await db.select({ id: regulations.id, name: regulations.name })
+          .from(regulations)
+          .where(regKey ? eq(regulations.regKey, regKey) : eq(regulations.itemId, regSlug));
+
+        if (!reg) {
+          errors.push(`Regulation ${regKey || regSlug} not found`);
+          continue;
+        }
+
+        console.log(`   📋 Processing ${reg.name} (${regKey})`);
+
+        // Upsert circuit splits
+        for (const splitData of (regData.circuitSplits || [])) {
+          totalSplits++;
+          const [existing] = await db.select({ id: circuitSplits.id })
+            .from(circuitSplits)
+            .where(and(
+              eq(circuitSplits.regulationId, reg.id),
+              eq(circuitSplits.title, splitData.title),
+            ));
+
+          if (existing) {
+            // Update existing split
+            await db.update(circuitSplits)
+              .set({
+                description: splitData.description,
+                affectedCircuits: splitData.affectedCircuits,
+                scotusPetitionPending: splitData.scotusPetitionPending || false,
+                scotusCertGranted: splitData.scotusCertGranted || false,
+                status: splitData.status || 'active',
+                updatedAt: new Date(),
+              })
+              .where(eq(circuitSplits.id, existing.id));
+            skipped++;
+          } else {
+            await db.insert(circuitSplits).values({
+              regulationId: reg.id,
+              title: splitData.title,
+              description: splitData.description,
+              affectedCircuits: splitData.affectedCircuits,
+              scotusPetitionPending: splitData.scotusPetitionPending || false,
+              scotusCertGranted: splitData.scotusCertGranted || false,
+              status: splitData.status || 'active',
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            });
+            created++;
+          }
+        }
+
+        // Build a map of split titles to IDs for linking interpretations
+        const splitRows = await db.select({ id: circuitSplits.id, title: circuitSplits.title })
+          .from(circuitSplits)
+          .where(eq(circuitSplits.regulationId, reg.id));
+        const splitTitleToId = new Map(splitRows.map(s => [s.title, s.id]));
+
+        // Upsert circuit interpretations
+        for (const interp of (regData.interpretations || [])) {
+          totalInterpretations++;
+          const [existing] = await db.select({ id: circuitInterpretations.id })
+            .from(circuitInterpretations)
+            .where(and(
+              eq(circuitInterpretations.regulationId, reg.id),
+              eq(circuitInterpretations.circuitNumber, interp.circuitNumber),
+              eq(circuitInterpretations.caseName, interp.caseName),
+            ));
+
+          const splitId = interp.splitTitle ? (splitTitleToId.get(interp.splitTitle) || null) : null;
+
+          if (existing) {
+            await db.update(circuitInterpretations)
+              .set({
+                caseYear: interp.caseYear,
+                caseCitation: interp.caseCitation,
+                courtLevel: interp.courtLevel || 'circuit',
+                interpretationType: interp.interpretationType,
+                summary: interp.summary,
+                complianceImplication: interp.complianceImplication,
+                affectedRequirements: interp.affectedRequirements,
+                impactSeverity: interp.impactSeverity,
+                status: interp.status || 'active',
+                isCircuitSplit: interp.isCircuitSplit || false,
+                splitId,
+                sourceUrl: interp.sourceUrl,
+                assessedBy: interp.assessedBy,
+                confidenceScore: interp.confidenceScore,
+                updatedAt: new Date(),
+              })
+              .where(eq(circuitInterpretations.id, existing.id));
+            skipped++;
+          } else {
+            await db.insert(circuitInterpretations).values({
+              regulationId: reg.id,
+              circuitNumber: interp.circuitNumber,
+              caseName: interp.caseName,
+              caseYear: interp.caseYear,
+              caseCitation: interp.caseCitation,
+              courtLevel: interp.courtLevel || 'circuit',
+              interpretationType: interp.interpretationType,
+              summary: interp.summary,
+              complianceImplication: interp.complianceImplication,
+              affectedRequirements: interp.affectedRequirements,
+              impactSeverity: interp.impactSeverity,
+              status: interp.status || 'active',
+              isCircuitSplit: interp.isCircuitSplit || false,
+              splitId,
+              sourceUrl: interp.sourceUrl,
+              assessedBy: interp.assessedBy,
+              confidenceScore: interp.confidenceScore,
+              reviewStatus: 'pending',
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            });
+            created++;
+          }
+        }
+      }
+
+      console.log(`   ✅ Sync complete: ${created} created, ${skipped} updated, ${errors.length} errors`);
+
+      res.json({
+        success: true,
+        totalInterpretations,
+        totalSplits,
+        created,
+        updated: skipped,
+        errors,
+        timestamp,
+      });
+    } catch (error) {
+      console.error('Error syncing circuit interpretations:', error);
+      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, 'Error syncing circuit interpretations from MCP Engine', { error: String(error) });
+      res.status(500).json({ error: 'Failed to sync circuit interpretations' });
     }
   });
   

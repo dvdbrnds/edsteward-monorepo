@@ -83,6 +83,34 @@ class DeliveryServer {
     return normalizeRoleShared(role);
   }
 
+  /**
+   * Load circuit court interpretation data for a regulation from JSON files.
+   * Files live in circuit-interpretations/ keyed by regulation slug.
+   */
+  loadCircuitInterpretations(regulationSlug) {
+    if (!regulationSlug) return null;
+    const needle = regulationSlug.toLowerCase();
+    try {
+      const ciDir = path.join(__dirname, '../../circuit-interpretations');
+      const files = fs.readdirSync(ciDir).filter(f => f.endsWith('.json'));
+      for (const file of files) {
+        const data = JSON.parse(fs.readFileSync(path.join(ciDir, file), 'utf8'));
+        const rid = (data.regulationId || '').toLowerCase();
+        const rk = (data.regKey || '').toLowerCase();
+        const fname = file.replace('.json', '').toLowerCase();
+        if (rid === needle || rk === needle || fname === needle ||
+            rid.startsWith(needle) || needle.startsWith(rid) ||
+            rid.includes(needle) || needle.includes(rid)) {
+          console.log(`   🏛️  Loaded ${data.interpretations?.length || 0} circuit interpretations, ${data.circuitSplits?.length || 0} splits`);
+          return data;
+        }
+      }
+    } catch (err) {
+      // Not found or parse error — circuit data is optional
+    }
+    return null;
+  }
+
   setupMiddleware() {
     this.app.use(cors({
       origin: ['http://localhost:3050', 'http://localhost:3000', 'http://localhost:3010'],
@@ -585,6 +613,12 @@ class DeliveryServer {
             relatedRegulations: Array.isArray(regulationContent.relatedRegulations) ? regulationContent.relatedRegulations : [],
 
             // ═══════════════════════════════════════════════════════════
+            // CIRCUIT COURT INTERPRETATIONS
+            // Loaded from circuit-interpretations/ JSON files
+            // ═══════════════════════════════════════════════════════════
+            circuitInterpretations: this.loadCircuitInterpretations(slug),
+
+            // ═══════════════════════════════════════════════════════════
             // PENALTIES & RESPONSIBLE ROLES (from bespoke config)
             // ═══════════════════════════════════════════════════════════
             penalties: (regulationContent.penalties || []).map(p => ({
@@ -671,6 +705,23 @@ class DeliveryServer {
           });
 
           console.log(`   ${response.ok ? '✅' : '❌'} ${customer.name}: ${response.status}`);
+
+          // Also sync circuit interpretations if data exists for this regulation
+          const circuitData = this.loadCircuitInterpretations(slug);
+          if (circuitData && response.ok) {
+            try {
+              const ciHeaders = { ...headers };
+              const ciUrl = `${customer.url}/api/mcp/circuit-interpretations/sync`;
+              const ciResponse = await fetch(ciUrl, {
+                method: 'POST',
+                headers: ciHeaders,
+                body: JSON.stringify({ circuitData: [circuitData] })
+              });
+              console.log(`   ${ciResponse.ok ? '🏛️' : '⚠️'} Circuit interpretations sync: ${ciResponse.status}`);
+            } catch (ciErr) {
+              console.log(`   ⚠️ Circuit sync failed (non-critical): ${ciErr.message}`);
+            }
+          }
         } catch (error) {
           results.push({
             customerId: customer.id,
@@ -692,6 +743,129 @@ class DeliveryServer {
         failedCount: targetCustomers.length - successCount,
         results,
         timestamp: new Date().toISOString()
+      });
+    });
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // CIRCUIT COURT INTERPRETATIONS
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    // List all circuit interpretation data files available in the Engine
+    this.app.get('/api/circuit-interpretations', async (req, res) => {
+      try {
+        const ciDir = path.join(__dirname, '../../circuit-interpretations');
+        const files = fs.readdirSync(ciDir).filter(f => f.endsWith('.json'));
+        const allData = files.map(f => {
+          const data = JSON.parse(fs.readFileSync(path.join(ciDir, f), 'utf8'));
+          return {
+            file: f,
+            regulationId: data.regulationId,
+            regKey: data.regKey,
+            interpretationCount: data.interpretations?.length || 0,
+            splitCount: data.circuitSplits?.length || 0,
+            circuits: [...new Set((data.interpretations || []).map(i => i.circuitNumber))].sort((a, b) => a - b),
+          };
+        });
+
+        res.json({
+          total: allData.length,
+          totalInterpretations: allData.reduce((s, d) => s + d.interpretationCount, 0),
+          totalSplits: allData.reduce((s, d) => s + d.splitCount, 0),
+          regulations: allData,
+          timestamp: new Date().toISOString(),
+        });
+      } catch (error) {
+        console.error('Error listing circuit interpretations:', error);
+        res.status(500).json({ error: 'Failed to list circuit interpretations' });
+      }
+    });
+
+    // Get circuit interpretation data for a specific regulation
+    this.app.get('/api/circuit-interpretations/:regulationSlug', async (req, res) => {
+      const { regulationSlug } = req.params;
+      const data = this.loadCircuitInterpretations(regulationSlug);
+      if (!data) {
+        return res.status(404).json({ error: `No circuit interpretations found for ${regulationSlug}` });
+      }
+      res.json(data);
+    });
+
+    // Push circuit interpretations to EdSteward customer(s)
+    this.app.post('/api/circuit-interpretations/push', async (req, res) => {
+      const { customerIds, pushToAll = true } = req.body;
+
+      const targetCustomers = pushToAll
+        ? this.customers.filter(c => c.enabled)
+        : this.customers.filter(c => customerIds?.includes(c.id));
+
+      if (targetCustomers.length === 0) {
+        return res.status(400).json({ error: 'No target customers found' });
+      }
+
+      // Load all circuit interpretation files
+      const ciDir = path.join(__dirname, '../../circuit-interpretations');
+      let allCircuitData = [];
+      try {
+        const files = fs.readdirSync(ciDir).filter(f => f.endsWith('.json'));
+        allCircuitData = files.map(f => JSON.parse(fs.readFileSync(path.join(ciDir, f), 'utf8')));
+      } catch (err) {
+        return res.status(500).json({ error: 'Failed to load circuit interpretation files' });
+      }
+
+      console.log(`\n🏛️  Pushing ${allCircuitData.length} circuit interpretation packages to ${targetCustomers.length} customer(s)`);
+
+      const results = [];
+      for (const customer of targetCustomers) {
+        try {
+          const headers = { 'Content-Type': 'application/json' };
+          const mcpApiKey = process.env.MCP_API_KEY || '';
+          if (mcpApiKey) {
+            headers['X-MCP-API-Key'] = mcpApiKey;
+          } else if (customer.auth?.method === 'basic') {
+            headers['Authorization'] = `Basic ${Buffer.from(`${customer.auth.username}:${customer.auth.password}`).toString('base64')}`;
+          }
+
+          const pushUrl = `${customer.url}/api/mcp/circuit-interpretations/sync`;
+          console.log(`   📡 Sending to ${pushUrl}`);
+
+          const response = await fetch(pushUrl, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify({
+              circuitData: allCircuitData,
+              mcpEngineTimestamp: new Date().toISOString(),
+            }),
+          });
+
+          let responseData;
+          try { responseData = await response.json(); } catch { responseData = {}; }
+
+          results.push({
+            customerId: customer.id,
+            customerName: customer.name,
+            success: response.ok,
+            statusCode: response.status,
+            response: responseData,
+          });
+
+          console.log(`   ${response.ok ? '✅' : '❌'} ${customer.name}: ${response.status}`);
+        } catch (error) {
+          results.push({
+            customerId: customer.id,
+            customerName: customer.name,
+            success: false,
+            error: error.message,
+          });
+          console.error(`   ❌ ${customer.name}: ${error.message}`);
+        }
+      }
+
+      res.json({
+        success: results.some(r => r.success),
+        totalRegulations: allCircuitData.length,
+        totalInterpretations: allCircuitData.reduce((s, d) => s + (d.interpretations?.length || 0), 0),
+        results,
+        timestamp: new Date().toISOString(),
       });
     });
 

@@ -1,11 +1,10 @@
 <!DOCTYPE html>
-<!-- REDIRECT: This console has been replaced by the bespoke v2 version -->
+<!-- MCP Engine Console - ALL REAL API CALLS -->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <script>window.location.replace(window.location.href.replace('-console.html', '-console-v2.html'));</script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Redirecting to Clery Act Console...</title>
+    <title>Jeanne Clery Disclosure of Campus Security Policy and Campus Crime Statistics Act - MCP Engine Console</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         
@@ -1675,6 +1674,18 @@
                                     </div>
                                     <div id="data-eo-expanded" style="display: none; padding: 16px; max-height: 400px; overflow-y: auto; background: #fffbeb;">
                                         <div id="data-eo-list" style="font-size: 13px; color: #1e293b;"></div>
+                                    </div>
+                                </div>
+
+                                <!-- SECTION 6.6: Circuit Court Interpretations -->
+                                <div id="ci-section" style="margin-bottom: 24px; background: #ede9fe; border-radius: 12px; border: 1px solid #8b5cf6; overflow: hidden; display: none;">
+                                    <div onclick="toggleCISection()" style="padding: 16px 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, #6d28d9 0%, #8b5cf6 100%); color: white;">
+                                        <h4 style="margin: 0; font-size: 14px; color: white;">🏛️ Circuit Court Interpretations (<span id="data-ci-count">0</span>)</h4>
+                                        <span id="ci-toggle" style="font-size: 12px; color: white;">▼ Expand</span>
+                                    </div>
+                                    <div id="data-ci-expanded" style="display: none; padding: 16px; max-height: 500px; overflow-y: auto; background: #f5f3ff;">
+                                        <div id="data-ci-splits" style="margin-bottom: 16px;"></div>
+                                        <div id="data-ci-list" style="font-size: 13px; color: #1e293b;"></div>
                                     </div>
                                 </div>
                     
@@ -4238,6 +4249,98 @@
                 console.error('Error loading Executive Orders:', error);
             }
         }
+
+        function toggleCISection() {
+            const expanded = document.getElementById('data-ci-expanded');
+            const toggle = document.getElementById('ci-toggle');
+            if (expanded.style.display === 'none') {
+                expanded.style.display = 'block';
+                toggle.textContent = '▲ Collapse';
+            } else {
+                expanded.style.display = 'none';
+                toggle.textContent = '▼ Expand';
+            }
+        }
+
+        async function loadCircuitInterpretations() {
+            const slug = REGULATION_SLUG;
+            const regKey = REG_KEY;
+            if (!slug && !regKey) return;
+
+            try {
+                const response = await fetch(`http://localhost:3003/api/circuit-interpretations/${regKey || slug}`);
+                if (!response.ok) return;
+
+                const data = await response.json();
+                const interpretations = data.interpretations || [];
+                const splits = data.circuitSplits || [];
+
+                if (interpretations.length === 0 && splits.length === 0) return;
+
+                document.getElementById('ci-section').style.display = 'block';
+                document.getElementById('data-ci-count').textContent = interpretations.length;
+
+                const severityColors = {
+                    critical: '#dc2626',
+                    high: '#ea580c',
+                    medium: '#f59e0b',
+                    low: '#10b981'
+                };
+
+                const typeLabels = {
+                    stricter: '🔒 Stricter',
+                    broader: '📐 Broader',
+                    narrower: '🔍 Narrower',
+                    divergent: '↔️ Divergent',
+                    vacated: '❌ Vacated'
+                };
+
+                if (splits.length > 0) {
+                    const splitsEl = document.getElementById('data-ci-splits');
+                    splitsEl.innerHTML = '<div style="font-weight: 600; color: #4c1d95; margin-bottom: 10px; font-size: 13px;">⚖️ Active Circuit Splits</div>' +
+                        splits.map(s => `
+                            <div style="background: white; border-radius: 8px; padding: 14px; margin-bottom: 10px; border-left: 4px solid #dc2626; box-shadow: 0 1px 3px rgba(0,0,0,0.08);">
+                                <div style="font-weight: 600; color: #1e293b; font-size: 13px; margin-bottom: 4px;">${s.title}</div>
+                                <div style="font-size: 12px; color: #475569; margin-bottom: 6px;">${s.description || ''}</div>
+                                <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                                    ${(s.affectedCircuits || []).map(c => `<span style="background: #fef2f2; color: #991b1b; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 500;">Circuit ${c}</span>`).join('')}
+                                    ${s.scotusPetitionPending ? '<span style="background: #fef3c7; color: #92400e; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;">⚠ SCOTUS Petition Pending</span>' : ''}
+                                </div>
+                            </div>
+                        `).join('');
+                }
+
+                const listEl = document.getElementById('data-ci-list');
+                listEl.innerHTML = '<div style="font-weight: 600; color: #4c1d95; margin-bottom: 10px; font-size: 13px;">📜 Court Rulings</div>' +
+                    interpretations.map(ci => {
+                        const sevColor = severityColors[ci.impactSeverity] || '#6b7280';
+                        const typeLabel = typeLabels[ci.interpretationType] || ci.interpretationType;
+                        return `
+                            <div style="background: white; border-radius: 8px; padding: 14px; margin-bottom: 10px; border-left: 4px solid ${sevColor}; box-shadow: 0 1px 3px rgba(0,0,0,0.08);">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
+                                    <div>
+                                        <div style="font-weight: 600; color: #1e293b; font-size: 13px;">${ci.caseName}</div>
+                                        <div style="color: #64748b; font-size: 11px; margin-top: 2px;">${ci.caseCitation || ''} ${ci.caseYear ? '(' + ci.caseYear + ')' : ''}</div>
+                                    </div>
+                                    <div style="display: flex; gap: 6px; align-items: center; flex-shrink: 0;">
+                                        <span style="background: #ede9fe; color: #5b21b6; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 500;">Circuit ${ci.circuitNumber}</span>
+                                        <span style="background: ${sevColor}; color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; text-transform: uppercase;">${ci.impactSeverity}</span>
+                                    </div>
+                                </div>
+                                <div style="font-size: 12px; color: #475569; margin-bottom: 6px;">
+                                    ${typeLabel} &bull; ${ci.courtLevel || 'circuit'} court
+                                </div>
+                                <div style="font-size: 12px; color: #334155; background: #f8fafc; padding: 8px; border-radius: 4px; margin-bottom: 6px;">${ci.summary}</div>
+                                ${ci.complianceImplication ? `<div style="font-size: 11px; color: #1e40af; background: #eff6ff; padding: 6px 8px; border-radius: 4px;"><strong>Compliance:</strong> ${ci.complianceImplication}</div>` : ''}
+                            </div>
+                        `;
+                    }).join('');
+
+                addConsoleLog(`🏛️ Found ${interpretations.length} circuit interpretation(s) and ${splits.length} split(s)`, 'warning');
+            } catch (error) {
+                console.error('Error loading Circuit Interpretations:', error);
+            }
+        }
         
         // TAB 1: Load Complete Data (All Rich Data)
         async function loadCompleteData() {
@@ -6139,6 +6242,10 @@
             
             // Load the first tab (Regulation Text)
             loadRegulationText();
+
+            // Load Executive Orders and Circuit Interpretations for this regulation
+            loadExecutiveOrders();
+            loadCircuitInterpretations();
             
             // Initialize WebSocket for real-time updates
             initializeWebSocketConnection();
