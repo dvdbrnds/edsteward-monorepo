@@ -186,11 +186,11 @@ const CATEGORIES = [
   "Ethics & Governance",
   "Finance",
   "Financial Aid",
+  "Fundraising & Development",
   "Human Resources",
   "Information Technology",
   "Intellectual Property",
   "Research",
-  "Sexual Violence Prevention",
   "Student Services",
   "Other",
 ];

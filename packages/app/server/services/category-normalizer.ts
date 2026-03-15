@@ -63,23 +63,23 @@ async function refreshCache() {
 function fuzzyMatch(incoming: string): { canonicalId: number; canonicalName: string; confidence: number } | null {
   const normalized = incoming.toLowerCase().trim();
   
-  // Keywords to canonical category mapping
+  // Keywords to canonical category mapping (names must match canonical_categories.name)
   const keywordMap: Record<string, string[]> = {
-    'Academic Programs': ['academic', 'education', 'curriculum', 'accreditation', 'admissions', 'degree', 'program'],
-    'Human Resources': ['hr', 'human resources', 'employment', 'hiring', 'termination', 'benefits', 'wages', 'salary', 'labor', 'union', 'immigration', 'employee'],
-    'Finance & Accounting': ['finance', 'financial', 'accounting', 'tax', 'budget', 'fiscal', 'treasury'],
-    'Campus Safety & Security': ['safety', 'security', 'police', 'clery', 'emergency', 'crime'],
-    'Information Technology': ['it', 'information technology', 'technology', 'cyber', 'data', 'privacy', 'computer', 'network', 'ferpa'],
-    'Research & Grants': ['research', 'grant', 'sponsored', 'export', 'irb', 'iacuc', 'scientific'],
-    'Environmental Health & Safety': ['environmental', 'ehs', 'hazard', 'osha', 'chemical', 'radiation', 'biosafety'],
-    'Financial Aid': ['financial aid', 'title iv', 'student aid', 'pell', 'loan', 'scholarship', 'fafsa'],
-    'Civil Rights & Compliance': ['civil rights', 'title ix', 'discrimination', 'ada', 'disability', 'diversity', 'affirmative', 'sexual', 'harassment', 'equal opportunity'],
+    'Academic Programs': ['academic', 'curriculum', 'accreditation', 'degree', 'program', 'textbook', 'credit hour', 'gainful employment', 'state authorization'],
+    'Human Resources': ['hr', 'human resources', 'employment', 'hiring', 'termination', 'benefits', 'wages', 'salary', 'labor', 'union', 'immigration', 'employee', 'erisa', 'cobra', 'fmla', 'pension', 'annuit'],
+    'Finance': ['finance', 'accounting', 'tax', 'budget', 'fiscal', 'treasury', 'antitrust', 'sarbanes', 'sox', 'irs', 'telemarketing'],
+    'Campus Safety': ['campus safety', 'security', 'police', 'clery', 'emergency', 'crime', 'drug-free school', 'homeland security'],
+    'Information Technology': ['information technology', 'cyber', 'data privacy', 'computer', 'network', 'ferpa', 'glba', 'hipaa', 'gdpr', 'hitech', 'fisma', 'electronic communication'],
+    'Research': ['research', 'grant', 'sponsored', 'export control', 'irb', 'iacuc', 'scientific', 'bayh-dole', 'animal welfare', 'clinical trial', 'misconduct'],
+    'Environmental Health & Safety': ['environmental', 'ehs', 'hazard', 'osha', 'chemical', 'radiation', 'biosafety', 'clean air', 'clean water', 'toxic', 'asbestos', 'lead', 'pollution', 'waste'],
+    'Financial Aid': ['financial aid', 'title iv', 'student aid', 'pell', 'loan', 'scholarship', 'fafsa', 'cohort default', 'borrower defense', 'work study', 'perkins', 'plus loan'],
+    'Civil Rights': ['civil rights', 'title ix', 'discrimination', 'ada', 'disability', 'diversity', 'affirmative', 'sexual violence', 'harassment', 'equal opportunity', 'rehabilitation act', 'section 504'],
     'Contracts & Procurement': ['contract', 'procurement', 'purchasing', 'vendor', 'bid', 'rfp'],
-    'Intellectual Property': ['intellectual property', 'ip', 'copyright', 'trademark', 'patent', 'technology transfer', 'licensing'],
-    'Ethics & Governance': ['ethics', 'governance', 'board', 'lobbying', 'political', 'conflict of interest', 'compliance'],
-    'Fundraising & Development': ['fundraising', 'development', 'donor', 'gift', 'advancement', 'charitable'],
-    'Athletics': ['athletic', 'ncaa', 'sports', 'varsity', 'intercollegiate'],
-    'Student Services': ['student service', 'student affairs', 'housing', 'residence', 'auxiliary', 'dining', 'international student'],
+    'Intellectual Property': ['intellectual property', 'copyright', 'trademark', 'patent', 'technology transfer', 'licensing', 'dmca', 'lanham'],
+    'Ethics & Governance': ['ethics', 'governance', 'board', 'lobbying', 'political', 'conflict of interest', 'foreign gift', 'foreign agent', 'foia', 'freedom of information', 'sentencing guideline', 'fcpa', 'audit', 'record retention'],
+    'Fundraising & Development': ['fundraising', 'development', 'donor', 'gift annuity', 'advancement', 'charitable'],
+    'Athletics': ['athletic', 'ncaa', 'sports', 'varsity', 'intercollegiate', 'eada'],
+    'Student Services': ['student service', 'student affairs', 'housing', 'residence', 'auxiliary', 'dining', 'international student', 'sevis', 'servicemember readmission'],
   };
   
   let bestMatch: { canonicalName: string; score: number } | null = null;
