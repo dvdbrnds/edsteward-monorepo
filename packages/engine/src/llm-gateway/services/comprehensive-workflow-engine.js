@@ -610,6 +610,8 @@ export async function executeComprehensiveWorkflow(regulationSlug, existingData 
         deadline: task.deadline || null,
         evidenceRequired: task.evidenceRequired,
         evidenceType: task.evidenceType,
+        isConfidential: task.isConfidential || false,
+        confidentialDataTypes: task.confidentialDataTypes || [],
         sortOrder: task.sortOrder
       })),
       

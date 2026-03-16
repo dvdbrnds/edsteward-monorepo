@@ -94,12 +94,12 @@ export default function Navigation() {
   });
 
   const links = [
-    { href: "/", label: "Dashboard", icon: LayoutDashboard, badge: badges.totalUrgent },
-    { href: "/analytics", label: "Analytics", icon: BarChart3, badge: 0 },
-    { href: "/notifications", label: "Notifications", icon: Bell, badge: badges.overdueAlerts },
+    { href: "/", label: "Dashboard", icon: LayoutDashboard, badge: badges.totalUrgent, tourId: "nav-dashboard" },
+    { href: "/analytics", label: "Analytics", icon: BarChart3, badge: 0, tourId: "nav-analytics" },
+    { href: "/notifications", label: "Notifications", icon: Bell, badge: badges.overdueAlerts, tourId: "nav-notifications" },
     ...(user?.role?.toLowerCase() === "admin" || user?.role?.toLowerCase() === "compliance_officer"
       ? [
-        { href: "/regulations/updates", label: "Regulation Updates", icon: FileText, badge: badges.pendingUpdates },
+        { href: "/regulations/updates", label: "Regulation Updates", icon: FileText, badge: badges.pendingUpdates, tourId: "nav-reg-updates" },
       ]
       : []),
     ...(user?.role?.toLowerCase() === "admin"
@@ -173,6 +173,7 @@ export default function Navigation() {
                     <Link key={link.href} href={link.href}>
                       <Button
                         variant="ghost"
+                        data-tour={link.tourId}
                         className={`${isActive
                           ? "text-white border-b-2 border-white"
                           : "text-gray-300 hover:text-white hover:border-b-2 hover:border-border"

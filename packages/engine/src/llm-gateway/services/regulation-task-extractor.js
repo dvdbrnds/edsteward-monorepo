@@ -640,9 +640,11 @@ Return a JSON object with this EXACT structure (no markdown, no code fences):
       "priority": "critical|high|medium",
       "assignedRole": "MUST be one of: Compliance Officer, General Counsel, CFO, HR Director, Title IX Coordinator, Clery Compliance Officer, Financial Aid Director, IT Security Officer, Campus Police Chief, Registrar, VP Academic Affairs, VP Student Affairs, Dean of Students, Privacy Officer, President, Disability Services Coordinator, Emergency Management Director, Facilities Director, Environmental Compliance Officer, Fire Safety Officer, Export Control Officer, Research Compliance Officer, Training Coordinator, Procurement Director, Internal Auditor, International Programs Director, Institutional Research Director, Library Director, Ethics Officer, Communications Director, Government Relations, Board Compensation Committee, Technology Transfer Officer, Title VI Coordinator, Admissions Director, Curriculum Coordinator",
       "statutoryCitation": "The specific section of ${statute || 'the statute'} that requires this (e.g., '20 U.S.C. § 1092(f)(1)', '34 CFR 106.8(a)')",
+      "isConfidential": false,
+      "confidentialDataTypes": [],
       "deadline": { "type": "annual|quarterly|monthly|event-triggered|one-time", "date": "MM-DD or null", "description": "When this is due" },
       "subtasks": [
-        { "title": "Specific action item", "description": "Details", "priority": "critical|high|medium", "statutoryCitation": "Specific subsection if different from parent" }
+        { "title": "Specific action item", "description": "Details", "priority": "critical|high|medium", "statutoryCitation": "Specific subsection if different from parent", "isConfidential": false, "confidentialDataTypes": [] }
       ]
     }
   ],
@@ -668,6 +670,12 @@ CRITICAL RULES:
 - Every task must be specific and verifiable, not vague
 - Every task MUST include a statutoryCitation referencing the specific section of ${statute || 'the statute'} that requires this action
 - assignedRole MUST be chosen from the provided canonical list — do not invent new role titles
+
+CONFIDENTIAL DATA DETECTION:
+- Set "isConfidential" to true for tasks where the evidence/deliverable involves protected or sensitive data that should NOT be uploaded into a compliance platform
+- "confidentialDataTypes" is an array from: student_records, conduct_reports, financial_aid, health_records, employment_records, legal_proceedings, research_data, donor_information, security_plans, other
+- Examples of confidential tasks: submitting student records to an agency, maintaining conduct case files, handling FERPA-protected data, collecting health/disability documentation, managing financial aid records
+- When isConfidential is true, the institution will provide a reference to the external system (e.g. "See Maxient") instead of uploading the actual document
 
 REQUIRED ACTIONS — Identify which compliance workflow steps this regulation mandates:
 - "attestation" is ALWAYS required (set to true) — every regulation needs a compliance sign-off
@@ -814,6 +822,9 @@ export async function extractComplianceRequirements(regulationSlug, regulationTe
         for (const section of aiResult.sections) {
           const parentTempId = generateTaskId('ai-section');
           
+          const sectionIsConfidential = !!section.isConfidential;
+          const sectionConfidentialTypes = Array.isArray(section.confidentialDataTypes) ? section.confidentialDataTypes : [];
+          
           result.tasks.push({
             tempId: parentTempId,
             title: section.title,
@@ -824,13 +835,18 @@ export async function extractComplianceRequirements(regulationSlug, regulationTe
             statutoryCitation: section.statutoryCitation || '',
             deadline: section.deadline || null,
             evidenceRequired: true,
-            evidenceType: 'document',
+            evidenceType: sectionIsConfidential ? 'external_reference' : 'document',
+            isConfidential: sectionIsConfidential,
+            confidentialDataTypes: sectionConfidentialTypes,
             sortOrder: sortOrder++,
             extractedFrom: 'ai_analysis'
           });
           
           if (section.subtasks) {
             for (const subtask of section.subtasks) {
+              const subtaskIsConfidential = subtask.isConfidential ?? sectionIsConfidential;
+              const subtaskConfidentialTypes = Array.isArray(subtask.confidentialDataTypes) ? subtask.confidentialDataTypes : sectionConfidentialTypes;
+              
               result.tasks.push({
                 tempId: generateTaskId('ai-task'),
                 parentTempId,
@@ -841,7 +857,9 @@ export async function extractComplianceRequirements(regulationSlug, regulationTe
                 assignedRole: normalizeRole(subtask.assignedRole || section.assignedRole || 'Compliance Officer'),
                 statutoryCitation: subtask.statutoryCitation || section.statutoryCitation || '',
                 evidenceRequired: true,
-                evidenceType: 'document',
+                evidenceType: subtaskIsConfidential ? 'external_reference' : 'document',
+                isConfidential: subtaskIsConfidential,
+                confidentialDataTypes: subtaskConfidentialTypes,
                 sortOrder: sortOrder++,
                 extractedFrom: 'ai_analysis'
               });

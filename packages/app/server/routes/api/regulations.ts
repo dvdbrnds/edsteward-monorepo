@@ -2,8 +2,8 @@ import express from 'express';
 import fs from 'fs';
 import { storage } from '../../storage';
 import { getDatabaseStorage, getDbForRequest } from '../../services/database';
-import { evidenceFiles } from '@shared/schema';
-import { eq, and, sql } from 'drizzle-orm';
+import { evidenceFiles, disabledRegulations, regulationFeedback, regulations as regulationsTable } from '@shared/schema';
+import { eq, and, sql, desc, inArray } from 'drizzle-orm';
 import { syslog, LogLevel, LogFacility } from '../../services/syslog';
 import type { Regulation } from '@shared/schema';
 import { 
@@ -67,6 +67,21 @@ router.get("/", async (req: any, res) => {
     } = req.query;
 
     let regulations = await tenantStorage.getRegulations();
+    
+    // Filter out disabled regulations (unless explicitly requested)
+    const includeDisabled = req.query.includeDisabled === 'true';
+    if (!includeDisabled) {
+      try {
+        const db = getDbForRequest(req);
+        const disabled = await db.select({ regulationId: disabledRegulations.regulationId }).from(disabledRegulations);
+        const disabledIds = new Set(disabled.map(d => d.regulationId));
+        if (disabledIds.size > 0) {
+          regulations = regulations.filter((reg: Regulation) => !disabledIds.has(reg.id));
+        }
+      } catch (_e) {
+        // Table may not exist yet — skip filtering
+      }
+    }
     
     // Filter by ownership for compliance officers (admins see all)
     // Compliance officers only see regulations specifically assigned to them
@@ -789,4 +804,131 @@ router.post('/:id/submit-to-agency', requireAuth, async (req, res) => {
   }
 });
 
-export default router; 
+// ===== DISABLE/ENABLE REGULATION PER INSTITUTION =====
+
+router.post('/:regulationId/disable', requireAdmin, async (req: any, res) => {
+  try {
+    const db = getDbForRequest(req);
+    const regulationId = parseInt(req.params.regulationId);
+    const { reason } = req.body;
+
+    const existing = await db.select().from(disabledRegulations)
+      .where(eq(disabledRegulations.regulationId, regulationId))
+      .limit(1);
+
+    if (existing.length > 0) {
+      return res.status(409).json({ error: 'Regulation is already disabled' });
+    }
+
+    const [result] = await db.insert(disabledRegulations).values({
+      regulationId,
+      disabledBy: req.user!.id,
+      reason: reason || null,
+    }).returning();
+
+    res.json({ success: true, disabled: result });
+  } catch (error) {
+    console.error('Error disabling regulation:', error);
+    res.status(500).json({ error: 'Failed to disable regulation' });
+  }
+});
+
+router.post('/:regulationId/enable', requireAdmin, async (req: any, res) => {
+  try {
+    const db = getDbForRequest(req);
+    const regulationId = parseInt(req.params.regulationId);
+
+    await db.delete(disabledRegulations)
+      .where(eq(disabledRegulations.regulationId, regulationId));
+
+    res.json({ success: true, regulationId });
+  } catch (error) {
+    console.error('Error enabling regulation:', error);
+    res.status(500).json({ error: 'Failed to enable regulation' });
+  }
+});
+
+router.get('/:regulationId/disabled', requireAuth, async (req: any, res) => {
+  try {
+    const db = getDbForRequest(req);
+    const regulationId = parseInt(req.params.regulationId);
+
+    const result = await db.select().from(disabledRegulations)
+      .where(eq(disabledRegulations.regulationId, regulationId))
+      .limit(1);
+
+    res.json({ isDisabled: result.length > 0, record: result[0] || null });
+  } catch (error) {
+    console.error('Error checking disabled status:', error);
+    res.status(500).json({ error: 'Failed to check disabled status' });
+  }
+});
+
+// ===== REGULATION FEEDBACK =====
+
+router.post('/:regulationId/feedback', requireAuth, async (req: any, res) => {
+  try {
+    const db = getDbForRequest(req);
+    const regulationId = parseInt(req.params.regulationId);
+    const { feedbackType, feedbackText } = req.body;
+
+    if (!feedbackText || !feedbackText.trim()) {
+      return res.status(400).json({ error: 'Feedback text is required' });
+    }
+
+    const [result] = await db.insert(regulationFeedback).values({
+      regulationId,
+      userId: req.user!.id,
+      feedbackType: feedbackType || 'other',
+      feedbackText: feedbackText.trim(),
+      status: 'pending',
+    }).returning();
+
+    res.json({ success: true, feedback: result });
+  } catch (error) {
+    console.error('Error submitting feedback:', error);
+    res.status(500).json({ error: 'Failed to submit feedback' });
+  }
+});
+
+router.get('/:regulationId/feedback', requireAuth, async (req: any, res) => {
+  try {
+    const db = getDbForRequest(req);
+    const regulationId = parseInt(req.params.regulationId);
+
+    const feedback = await db.select().from(regulationFeedback)
+      .where(eq(regulationFeedback.regulationId, regulationId))
+      .orderBy(desc(regulationFeedback.createdAt));
+
+    res.json(feedback);
+  } catch (error) {
+    console.error('Error fetching feedback:', error);
+    res.status(500).json({ error: 'Failed to fetch feedback' });
+  }
+});
+
+router.patch('/:regulationId/feedback/:feedbackId', requireAdmin, async (req: any, res) => {
+  try {
+    const db = getDbForRequest(req);
+    const feedbackId = parseInt(req.params.feedbackId);
+    const { status, reviewNotes } = req.body;
+
+    const [result] = await db.update(regulationFeedback)
+      .set({
+        status: status || 'reviewed',
+        reviewedBy: req.user!.id,
+        reviewedAt: new Date(),
+        reviewNotes: reviewNotes || null,
+        updatedAt: new Date(),
+      })
+      .where(eq(regulationFeedback.id, feedbackId))
+      .returning();
+
+    res.json({ success: true, feedback: result });
+  } catch (error) {
+    console.error('Error updating feedback:', error);
+    res.status(500).json({ error: 'Failed to update feedback' });
+  }
+});
+
+export default router;

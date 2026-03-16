@@ -150,7 +150,8 @@ import {
   ListTodo,
   FileCheck,
   CalendarClock,
-  RotateCcw
+  RotateCcw,
+  EyeOff
 } from "lucide-react";
 import {
   Collapsible,
@@ -226,6 +227,9 @@ function RegulationDetailPage() {
   const [historyOpen, setHistoryOpen] = useState(false);
   const [auditOpen, setAuditOpen] = useState(false);
   const [fullTextOpen, setFullTextOpen] = useState(() => window.location.hash === '#full-regulation-text');
+  const [showFeedbackDialog, setShowFeedbackDialog] = useState(false);
+  const [feedbackType, setFeedbackType] = useState<string>('other');
+  const [feedbackText, setFeedbackText] = useState('');
   
   const regulationId = location.split("/")[2];
   const isAdmin = user?.role?.toLowerCase() === "admin";
@@ -348,9 +352,65 @@ function RegulationDetailPage() {
   // Primary DRI has admin-like controls but ONLY for their assigned regulation
   const isOwner = regulation?.isOwner || false;
   const isRegulationAdmin = isAdmin || isOwner;
-  
-  
-  
+
+  // Disabled regulation status
+  const { data: disabledStatus } = useQuery<{ isDisabled: boolean; record: any }>({
+    queryKey: ['/api/regulations', regulationId, 'disabled'],
+    queryFn: async () => {
+      const res = await fetch(`/api/regulations/${regulationId}/disabled`);
+      if (!res.ok) return { isDisabled: false, record: null };
+      return res.json();
+    },
+    enabled: !!regulationId && !!user,
+  });
+
+  const disableMutation = useMutation({
+    mutationFn: async (reason: string) => {
+      const res = await fetch(`/api/regulations/${regulationId}/disable`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reason }),
+      });
+      if (!res.ok) throw new Error('Failed to disable regulation');
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/regulations', regulationId, 'disabled'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/regulations'] });
+    },
+  });
+
+  const enableMutation = useMutation({
+    mutationFn: async () => {
+      const res = await fetch(`/api/regulations/${regulationId}/enable`, {
+        method: 'POST',
+      });
+      if (!res.ok) throw new Error('Failed to enable regulation');
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/regulations', regulationId, 'disabled'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/regulations'] });
+    },
+  });
+
+  const feedbackMutation = useMutation({
+    mutationFn: async ({ feedbackType, feedbackText }: { feedbackType: string; feedbackText: string }) => {
+      const res = await fetch(`/api/regulations/${regulationId}/feedback`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ feedbackType, feedbackText }),
+      });
+      if (!res.ok) throw new Error('Failed to submit feedback');
+      return res.json();
+    },
+    onSuccess: () => {
+      setShowFeedbackDialog(false);
+      setFeedbackText('');
+      setFeedbackType('other');
+    },
+  });
+
   // Ensure actions is always available (initialize if missing) - kept for attestation logic
   const _actions = regulation?.actions || [];
   
@@ -985,6 +1045,14 @@ function RegulationDetailPage() {
                 <Printer className="h-4 w-4" />
                 Print Report
               </Button>
+              <Button
+                variant="outline"
+                className="flex items-center justify-center gap-2"
+                onClick={() => setShowFeedbackDialog(true)}
+              >
+                <MessageSquare className="h-4 w-4" />
+                Share Feedback
+              </Button>
               {isRegulationAdmin && (
                 <>
                   <Button
@@ -1005,7 +1073,67 @@ function RegulationDetailPage() {
                   </Button>
                 </>
               )}
+              {isAdmin && (
+                <Button
+                  variant={disabledStatus?.isDisabled ? "default" : "outline"}
+                  className={`flex items-center justify-center gap-2 ${disabledStatus?.isDisabled ? 'bg-green-600 hover:bg-green-700 text-white' : 'text-red-600 border-red-200 hover:bg-red-50'}`}
+                  onClick={() => {
+                    if (disabledStatus?.isDisabled) {
+                      enableMutation.mutate();
+                    } else {
+                      const reason = window.prompt('Reason for disabling this regulation (optional):');
+                      if (reason !== null) disableMutation.mutate(reason);
+                    }
+                  }}
+                  disabled={disableMutation.isPending || enableMutation.isPending}
+                >
+                  {disabledStatus?.isDisabled ? (
+                    <><EyeOff className="h-4 w-4" /> Re-enable Regulation</>
+                  ) : (
+                    <><EyeOff className="h-4 w-4" /> Disable for Institution</>
+                  )}
+                </Button>
+              )}
             </div>
+
+            {/* Feedback Dialog */}
+            {showFeedbackDialog && (
+              <div className="bg-card border rounded-lg p-4 space-y-3">
+                <h3 className="font-semibold text-sm">Share Feedback About This Regulation</h3>
+                <select
+                  value={feedbackType}
+                  onChange={(e) => setFeedbackType(e.target.value)}
+                  className="w-full border rounded-md p-2 text-sm bg-background"
+                >
+                  <option value="correction">Correction</option>
+                  <option value="clarification">Clarification</option>
+                  <option value="additional_context">Additional Context</option>
+                  <option value="inapplicable">Not Applicable to Us</option>
+                  <option value="other">Other</option>
+                </select>
+                <textarea
+                  value={feedbackText}
+                  onChange={(e) => setFeedbackText(e.target.value)}
+                  placeholder="Share what you know about this regulation that could help improve EdSteward's coverage..."
+                  className="w-full border rounded-md p-2 text-sm min-h-[80px] bg-background"
+                />
+                <div className="flex gap-2 justify-end">
+                  <Button variant="ghost" size="sm" onClick={() => { setShowFeedbackDialog(false); setFeedbackText(''); }}>
+                    Cancel
+                  </Button>
+                  <Button
+                    size="sm"
+                    disabled={!feedbackText.trim() || feedbackMutation.isPending}
+                    onClick={() => feedbackMutation.mutate({ feedbackType, feedbackText })}
+                  >
+                    {feedbackMutation.isPending ? 'Submitting...' : 'Submit Feedback'}
+                  </Button>
+                </div>
+                {feedbackMutation.isSuccess && (
+                  <p className="text-sm text-green-600">Feedback submitted — thank you!</p>
+                )}
+              </div>
+            )}
 
             {/* ═══════════════════════════════════════════════════════════════════
                 HERO SECTION - Compliance Status + Quick Actions

@@ -29,6 +29,21 @@
       },
       "enabled": true,
       "subscriptions": ["all"]
+    },
+    {
+      "id": "desales-prod",
+      "name": "DeSales University (Production)",
+      "shortName": "DeSales Prod",
+      "url": "https://desales.edsteward.ai",
+      "apiEndpoint": "/api/regulation-updates",
+      "type": "production",
+      "auth": {
+        "method": "basic",
+        "username": "mcp-engine",
+        "password": "SET_VIA_EDSTEWARD_PASSWORD_ENV"
+      },
+      "enabled": false,
+      "subscriptions": ["all"]
     }
   ],
   "defaults": {

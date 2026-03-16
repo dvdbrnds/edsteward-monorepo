@@ -69,6 +69,17 @@ const FALLBACK_TENANTS: Record<string, { tenant: Partial<Tenant>; databaseUrl: s
     },
     databaseUrl: process.env.STAGING_DATABASE_URL || process.env.DATABASE_URL || '',
   },
+  'desales': {
+    tenant: {
+      id: 'desales',
+      name: 'DeSales University',
+      domain: 'desales.edu',
+      subdomain: 'desales',
+      databaseName: 'edsteward_desales',
+      status: 'active',
+    },
+    databaseUrl: process.env.DESALES_DATABASE_URL || process.env.DATABASE_URL || '',
+  },
   'admin': {
     tenant: {
       id: 'admin',

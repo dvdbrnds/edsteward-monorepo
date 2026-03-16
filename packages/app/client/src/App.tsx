@@ -4,6 +4,7 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/hooks/use-auth";
+import { ProductTour } from "@/components/onboarding/product-tour";
 import { PageLayout } from "@/components/layout/page-layout";
 import { useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts";
 import { KeyboardShortcutsDialog } from "@/components/ui/keyboard-shortcuts-dialog";
@@ -142,6 +143,7 @@ export default function App() {
             <AppContent />
           </PageLayout>
           <Toaster />
+          <ProductTour />
         </AuthProvider>
       </QueryClientProvider>
     </ErrorBoundary>

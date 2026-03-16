@@ -778,11 +778,13 @@ const pendingTaskSchema = z.object({
   evidenceRequired: z.boolean().optional(),
   evidenceType: z.string().optional(),
   evidenceInstructions: z.string().optional(),
+  isConfidential: z.boolean().optional(),
+  confidentialDataTypes: z.array(z.string()).optional().nullable(),
   estimatedEffort: z.string().optional(),
   deliverable: z.string().optional(),
   deliverableTemplateUrl: z.string().optional(),
   sortOrder: z.number().optional(),
-  source: z.string().optional(),                    // "rules-engine", "llm-extractor", "manual"
+  source: z.string().optional(),
 }).passthrough();
 
 export const insertRegulationUpdateSchema = createInsertSchema(regulationUpdates).extend({
@@ -1182,7 +1184,9 @@ export type InsertAttestationToken = z.infer<typeof insertAttestationTokenSchema
 // Supports sub-tasks, per-task DRIs, flexible evidence requirements
 
 export const TASK_STATUS = ['pending', 'in_progress', 'completed', 'overdue', 'blocked', 'not_applicable'] as const;
-export const EVIDENCE_TYPE = ['none', 'document', 'link', 'screenshot', 'attestation', 'form'] as const;
+export const EVIDENCE_TYPE = ['none', 'document', 'link', 'screenshot', 'attestation', 'form', 'external_reference', 'self_attestation'] as const;
+export const CONFIDENTIAL_DATA_TYPE = ['student_records', 'conduct_reports', 'financial_aid', 'health_records', 'employment_records', 'legal_proceedings', 'research_data', 'donor_information', 'security_plans', 'other'] as const;
+export type ConfidentialDataType = typeof CONFIDENTIAL_DATA_TYPE[number];
 export const TASK_PRIORITY = ['low', 'medium', 'high', 'critical'] as const;
 export const REQUIREMENT_TYPE = ['requirement', 'best_practice'] as const;
 export const ATTESTATION_STATUS = ['not_required', 'pending', 'attested', 'rejected'] as const;
@@ -1243,8 +1247,14 @@ export const complianceTasks = pgTable("compliance_tasks", {
   
   // Evidence requirements
   evidenceRequired: boolean("evidence_required").default(false),
-  evidenceType: text("evidence_type").default('none'), // What kind of evidence is needed
-  evidenceInstructions: text("evidence_instructions"), // Specific guidance on what to upload
+  evidenceType: text("evidence_type").default('none'),
+  evidenceInstructions: text("evidence_instructions"),
+  
+  // Confidential evidence handling — tasks that involve sensitive data (FERPA, conduct, health, etc.)
+  isConfidential: boolean("is_confidential").default(false),
+  confidentialDataTypes: jsonb("confidential_data_types").$type<string[]>(),
+  externalSystemReference: text("external_system_reference"),
+
   // MCP Engine expanded task fields (Feb 2026 schema alignment)
   estimatedEffort: text("estimated_effort"), // e.g., "2-4 hours", "1 week"
   deliverable: text("deliverable"), // Expected output description
@@ -1280,10 +1290,64 @@ export const insertComplianceTaskSchema = createInsertSchema(complianceTasks).ex
   priority: z.enum(TASK_PRIORITY).default('medium'),
   requirementType: z.enum(REQUIREMENT_TYPE).default('requirement'),
   attestationStatus: z.enum(ATTESTATION_STATUS).default('not_required'),
+  isConfidential: z.boolean().default(false),
+  confidentialDataTypes: z.array(z.enum(CONFIDENTIAL_DATA_TYPE)).optional().nullable(),
+  externalSystemReference: z.string().optional().nullable(),
 });
 
 export type ComplianceTask = typeof complianceTasks.$inferSelect;
 export type InsertComplianceTask = z.infer<typeof insertComplianceTaskSchema>;
+
+// ===== DISABLED REGULATIONS (per-institution opt-out) =====
+export const disabledRegulations = pgTable("disabled_regulations", {
+  id: serial("id").primaryKey(),
+  regulationId: integer("regulation_id").notNull().references(() => regulations.id),
+  disabledBy: integer("disabled_by").notNull().references(() => users.id),
+  reason: text("reason"),
+  disabledAt: timestamp("disabled_at").notNull().defaultNow(),
+}, (table) => {
+  return {
+    regulationIdIdx: index("disabled_regulations_regulation_id_idx").on(table.regulationId),
+    uniqueRegulation: index("disabled_regulations_unique_idx").on(table.regulationId),
+  };
+});
+
+export type DisabledRegulation = typeof disabledRegulations.$inferSelect;
+
+// ===== REGULATION FEEDBACK (institutional knowledge sharing) =====
+export const FEEDBACK_TYPE = ['correction', 'clarification', 'additional_context', 'inapplicable', 'other'] as const;
+export const FEEDBACK_STATUS = ['pending', 'reviewed', 'incorporated', 'dismissed'] as const;
+export type FeedbackType = typeof FEEDBACK_TYPE[number];
+export type FeedbackStatus = typeof FEEDBACK_STATUS[number];
+
+export const regulationFeedback = pgTable("regulation_feedback", {
+  id: serial("id").primaryKey(),
+  regulationId: integer("regulation_id").notNull().references(() => regulations.id),
+  userId: integer("user_id").notNull().references(() => users.id),
+  feedbackType: text("feedback_type").notNull().default('other'),
+  feedbackText: text("feedback_text").notNull(),
+  status: text("status").notNull().default('pending'),
+  reviewedBy: integer("reviewed_by").references(() => users.id),
+  reviewedAt: timestamp("reviewed_at"),
+  reviewNotes: text("review_notes"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+}, (table) => {
+  return {
+    regulationIdIdx: index("regulation_feedback_regulation_id_idx").on(table.regulationId),
+    userIdIdx: index("regulation_feedback_user_id_idx").on(table.userId),
+    statusIdx: index("regulation_feedback_status_idx").on(table.status),
+  };
+});
+
+export const insertRegulationFeedbackSchema = createInsertSchema(regulationFeedback).extend({
+  feedbackType: z.enum(FEEDBACK_TYPE).default('other'),
+  feedbackText: z.string().min(1, "Feedback text is required"),
+  status: z.enum(FEEDBACK_STATUS).default('pending'),
+});
+
+export type RegulationFeedback = typeof regulationFeedback.$inferSelect;
+export type InsertRegulationFeedback = z.infer<typeof insertRegulationFeedbackSchema>;
 
 // ===== TASK EVIDENCE =====
 // Evidence uploads for compliance tasks

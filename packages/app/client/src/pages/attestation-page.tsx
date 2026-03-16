@@ -60,6 +60,9 @@ interface AttestationData {
     evidenceRequired: boolean;
     evidenceType: string;
     evidenceInstructions: string | null;
+    isConfidential: boolean;
+    confidentialDataTypes: string[] | null;
+    externalSystemReference: string | null;
     assignedRole: string | null;
     attestationStatus: string;
     regulation: {
@@ -91,6 +94,7 @@ const AttestationPage: React.FC = () => {
   const [evidenceDescription, setEvidenceDescription] = useState('');
   const [uploadSuccess, setUploadSuccess] = useState(false);
   const [evidenceOpen, setEvidenceOpen] = useState(true);
+  const [externalReference, setExternalReference] = useState('');
   const attestationCardRef = useRef<HTMLDivElement>(null);
 
   // Fetch attestation data
@@ -170,6 +174,34 @@ const AttestationPage: React.FC = () => {
       setLinkUrl('');
       setLinkTitle('');
       setEvidenceDescription('');
+      refetch();
+      setTimeout(() => setUploadSuccess(false), 3000);
+      collapseAndScrollToAttestation();
+    },
+  });
+
+  // Save external system reference (for confidential tasks)
+  const saveExternalReferenceMutation = useMutation({
+    mutationFn: async () => {
+      if (!externalReference.trim()) throw new Error('Please specify where this evidence is maintained');
+      const response = await fetch(`/api/compliance-tasks/attestation/${token}/evidence`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          linkUrl: `external-ref://${externalReference.trim()}`,
+          linkTitle: `External System: ${externalReference.trim()}`,
+          description: `Confidential evidence maintained in: ${externalReference.trim()}`,
+        }),
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to save reference');
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      setUploadSuccess(true);
+      setExternalReference('');
       refetch();
       setTimeout(() => setUploadSuccess(false), 3000);
       collapseAndScrollToAttestation();
@@ -423,7 +455,10 @@ const AttestationPage: React.FC = () => {
                     ) : (
                       <FileUp className="h-5 w-5 text-amber-600" />
                     )}
-                    Evidence Upload
+                    {task.isConfidential ? 'Evidence Reference' : 'Evidence Upload'}
+                    {task.isConfidential && (
+                      <Badge variant="secondary" className="ml-2 bg-amber-100 text-amber-700 border-amber-200">Confidential</Badge>
+                    )}
                     {task.evidenceRequired && existingEvidence.length === 0 && (
                       <Badge variant="destructive" className="ml-2">Required</Badge>
                     )}
@@ -495,129 +530,189 @@ const AttestationPage: React.FC = () => {
                 </Alert>
               )}
 
-              {/* File Upload Drop Zone - auto-uploads on selection */}
-              <div
-                onClick={() => !uploadFileMutation.isPending && fileInputRef.current?.click()}
-                onDrop={handleDrop}
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-                className={`
-                  relative rounded-lg border-2 border-dashed transition-all duration-200
-                  ${uploadFileMutation.isPending
-                    ? 'border-blue-300 bg-blue-50/50 cursor-wait'
-                    : isDragging
-                      ? 'border-blue-400 bg-blue-50 cursor-pointer'
-                      : 'border-slate-300 bg-slate-50/50 hover:border-blue-300 hover:bg-blue-50/30 cursor-pointer'
-                  }
-                  p-6
-                `}
-              >
-                <input
-                  ref={fileInputRef}
-                  id="evidence-file"
-                  type="file"
-                  onChange={handleFileChange}
-                  className="sr-only"
-                  disabled={uploadFileMutation.isPending}
-                />
-                {uploadFileMutation.isPending ? (
-                  <div className="text-center">
-                    <Loader2 className="mx-auto h-8 w-8 text-blue-500 animate-spin" />
-                    <p className="mt-2 text-sm font-medium text-blue-700">
-                      Uploading {selectedFile?.name}...
-                    </p>
-                    <p className="mt-1 text-xs text-blue-400">
-                      {selectedFile ? `${(selectedFile.size / 1024).toFixed(1)} KB` : ''}
-                    </p>
-                  </div>
-                ) : (
-                  <div className="text-center">
-                    <Upload className={`mx-auto h-8 w-8 ${isDragging ? 'text-blue-500' : 'text-slate-400'}`} />
-                    <p className="mt-2 text-sm font-medium text-slate-700">
-                      Click to choose a file{' '}
-                      <span className="text-slate-400 font-normal">or drag and drop</span>
-                    </p>
-                    <p className="mt-1 text-xs text-slate-400">PDF, DOC, XLS, images up to 10MB</p>
-                  </div>
-                )}
-              </div>
+              {task.isConfidential ? (
+                <>
+                  {/* Confidential Evidence — External Reference Input */}
+                  <Alert className="bg-amber-50 border-amber-200">
+                    <Shield className="h-4 w-4 text-amber-600" />
+                    <AlertTitle className="text-amber-800">Confidential Evidence</AlertTitle>
+                    <AlertDescription className="text-amber-700">
+                      This task involves protected data{task.confidentialDataTypes && task.confidentialDataTypes.length > 0
+                        ? ` (${task.confidentialDataTypes.map(t => t.replace(/_/g, ' ')).join(', ')})`
+                        : ''
+                      }. Instead of uploading the actual documents, specify the system or location where this evidence is maintained.
+                    </AlertDescription>
+                  </Alert>
 
-              {uploadFileMutation.error && (
-                <Alert variant="destructive">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertDescription>{(uploadFileMutation.error as Error).message}</AlertDescription>
-                </Alert>
-              )}
-
-              {/* Divider */}
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-slate-200" />
-                </div>
-                <div className="relative flex justify-center text-xs">
-                  <span className="bg-white px-3 text-slate-400 uppercase tracking-wider">or add a link</span>
-                </div>
-              </div>
-
-              {/* Link Fields - Always Visible */}
-              <div className="space-y-3">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <Label htmlFor="link-url" className="text-xs text-slate-500">Link URL</Label>
-                    <Input
-                      id="link-url"
-                      type="url"
-                      value={linkUrl}
-                      onChange={(e) => setLinkUrl(e.target.value)}
-                      placeholder="https://..."
-                      className="mt-1"
-                    />
+                  <div className="space-y-3">
+                    <div>
+                      <Label htmlFor="external-ref" className="text-sm font-medium text-slate-700">
+                        Where is this evidence maintained?
+                      </Label>
+                      <Input
+                        id="external-ref"
+                        value={externalReference}
+                        onChange={(e) => setExternalReference(e.target.value)}
+                        placeholder='e.g., "See Maxient — Case #1234" or "Banner Student Records"'
+                        className="mt-1"
+                      />
+                      <p className="mt-1 text-xs text-slate-400">
+                        Name the system, office, or location where confidential records are stored
+                      </p>
+                    </div>
+                    <Button
+                      onClick={() => saveExternalReferenceMutation.mutate()}
+                      disabled={!externalReference.trim() || saveExternalReferenceMutation.isPending}
+                      size="sm"
+                    >
+                      {saveExternalReferenceMutation.isPending ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          Saving...
+                        </>
+                      ) : (
+                        <>
+                          <Shield className="h-4 w-4 mr-2" />
+                          Save Reference
+                        </>
+                      )}
+                    </Button>
                   </div>
-                  <div>
-                    <Label htmlFor="link-title" className="text-xs text-slate-500">Link Title</Label>
-                    <Input
-                      id="link-title"
-                      value={linkTitle}
-                      onChange={(e) => setLinkTitle(e.target.value)}
-                      placeholder="Name of the document or resource"
-                      className="mt-1"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <Label htmlFor="evidence-desc" className="text-xs text-slate-500">Description (optional)</Label>
-                  <Input
-                    id="evidence-desc"
-                    value={evidenceDescription}
-                    onChange={(e) => setEvidenceDescription(e.target.value)}
-                    placeholder="Brief description of this evidence"
-                    className="mt-1"
-                  />
-                </div>
-                <Button
-                  onClick={() => addLinkMutation.mutate()}
-                  disabled={!linkUrl || addLinkMutation.isPending}
-                  size="sm"
-                >
-                  {addLinkMutation.isPending ? (
-                    <>
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Adding...
-                    </>
-                  ) : (
-                    <>
-                      <LinkIcon className="h-4 w-4 mr-2" />
-                      Add Link
-                    </>
+
+                  {saveExternalReferenceMutation.error && (
+                    <Alert variant="destructive">
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertDescription>{(saveExternalReferenceMutation.error as Error).message}</AlertDescription>
+                    </Alert>
                   )}
-                </Button>
-              </div>
+                </>
+              ) : (
+                <>
+                  {/* Standard File Upload Drop Zone */}
+                  <div
+                    onClick={() => !uploadFileMutation.isPending && fileInputRef.current?.click()}
+                    onDrop={handleDrop}
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    className={`
+                      relative rounded-lg border-2 border-dashed transition-all duration-200
+                      ${uploadFileMutation.isPending
+                        ? 'border-blue-300 bg-blue-50/50 cursor-wait'
+                        : isDragging
+                          ? 'border-blue-400 bg-blue-50 cursor-pointer'
+                          : 'border-slate-300 bg-slate-50/50 hover:border-blue-300 hover:bg-blue-50/30 cursor-pointer'
+                      }
+                      p-6
+                    `}
+                  >
+                    <input
+                      ref={fileInputRef}
+                      id="evidence-file"
+                      type="file"
+                      onChange={handleFileChange}
+                      className="sr-only"
+                      disabled={uploadFileMutation.isPending}
+                    />
+                    {uploadFileMutation.isPending ? (
+                      <div className="text-center">
+                        <Loader2 className="mx-auto h-8 w-8 text-blue-500 animate-spin" />
+                        <p className="mt-2 text-sm font-medium text-blue-700">
+                          Uploading {selectedFile?.name}...
+                        </p>
+                        <p className="mt-1 text-xs text-blue-400">
+                          {selectedFile ? `${(selectedFile.size / 1024).toFixed(1)} KB` : ''}
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="text-center">
+                        <Upload className={`mx-auto h-8 w-8 ${isDragging ? 'text-blue-500' : 'text-slate-400'}`} />
+                        <p className="mt-2 text-sm font-medium text-slate-700">
+                          Click to choose a file{' '}
+                          <span className="text-slate-400 font-normal">or drag and drop</span>
+                        </p>
+                        <p className="mt-1 text-xs text-slate-400">PDF, DOC, XLS, images up to 10MB</p>
+                      </div>
+                    )}
+                  </div>
 
-              {addLinkMutation.error && (
-                <Alert variant="destructive">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertDescription>{(addLinkMutation.error as Error).message}</AlertDescription>
-                </Alert>
+                  {uploadFileMutation.error && (
+                    <Alert variant="destructive">
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertDescription>{(uploadFileMutation.error as Error).message}</AlertDescription>
+                    </Alert>
+                  )}
+
+                  {/* Divider */}
+                  <div className="relative">
+                    <div className="absolute inset-0 flex items-center">
+                      <div className="w-full border-t border-slate-200" />
+                    </div>
+                    <div className="relative flex justify-center text-xs">
+                      <span className="bg-white px-3 text-slate-400 uppercase tracking-wider">or add a link</span>
+                    </div>
+                  </div>
+
+                  {/* Link Fields */}
+                  <div className="space-y-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <Label htmlFor="link-url" className="text-xs text-slate-500">Link URL</Label>
+                        <Input
+                          id="link-url"
+                          type="url"
+                          value={linkUrl}
+                          onChange={(e) => setLinkUrl(e.target.value)}
+                          placeholder="https://..."
+                          className="mt-1"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="link-title" className="text-xs text-slate-500">Link Title</Label>
+                        <Input
+                          id="link-title"
+                          value={linkTitle}
+                          onChange={(e) => setLinkTitle(e.target.value)}
+                          placeholder="Name of the document or resource"
+                          className="mt-1"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <Label htmlFor="evidence-desc" className="text-xs text-slate-500">Description (optional)</Label>
+                      <Input
+                        id="evidence-desc"
+                        value={evidenceDescription}
+                        onChange={(e) => setEvidenceDescription(e.target.value)}
+                        placeholder="Brief description of this evidence"
+                        className="mt-1"
+                      />
+                    </div>
+                    <Button
+                      onClick={() => addLinkMutation.mutate()}
+                      disabled={!linkUrl || addLinkMutation.isPending}
+                      size="sm"
+                    >
+                      {addLinkMutation.isPending ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          Adding...
+                        </>
+                      ) : (
+                        <>
+                          <LinkIcon className="h-4 w-4 mr-2" />
+                          Add Link
+                        </>
+                      )}
+                    </Button>
+                  </div>
+
+                  {addLinkMutation.error && (
+                    <Alert variant="destructive">
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertDescription>{(addLinkMutation.error as Error).message}</AlertDescription>
+                    </Alert>
+                  )}
+                </>
               )}
 
               {deleteEvidenceMutation.error && (

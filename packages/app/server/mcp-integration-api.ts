@@ -550,8 +550,10 @@ export function setupMCPIntegrationApi(app: express.Application) {
     reminderDays: z.number().optional(),
     evidenceRequired: z.boolean().optional(),
     evidenceType: z.string().optional(),
-    evidenceInstructions: z.string().optional(),       // What to upload as proof
-    estimatedEffort: z.string().optional(),            // Time estimate
+    evidenceInstructions: z.string().optional(),
+    isConfidential: z.boolean().optional(),
+    confidentialDataTypes: z.array(z.string()).optional().nullable(),
+    estimatedEffort: z.string().optional(),
     deliverable: z.string().optional(),                // Expected output
     deliverableTemplateUrl: z.string().optional(),     // Template download link
     sortOrder: z.number().optional(),
@@ -1012,6 +1014,8 @@ export function setupMCPIntegrationApi(app: express.Application) {
             evidenceRequired: task.evidenceRequired || false,
             evidenceType: task.evidenceType || 'none',
             evidenceInstructions: task.evidenceInstructions || null,
+            isConfidential: task.isConfidential || false,
+            confidentialDataTypes: task.confidentialDataTypes || null,
             estimatedEffort: task.estimatedEffort || null,
             deliverable: task.deliverable || null,
             deliverableTemplateUrl: task.deliverableTemplateUrl || null,
@@ -1658,6 +1662,8 @@ export function setupMCPIntegrationApi(app: express.Application) {
             evidenceRequired: ev.flag,
             evidenceType: task.evidenceType || 'none',
             evidenceInstructions: ev.instructions,
+            isConfidential: task.isConfidential || false,
+            confidentialDataTypes: task.confidentialDataTypes || null,
             estimatedEffort: task.estimatedEffort || null,
             deliverable: task.deliverable || null,
             deliverableTemplateUrl: task.deliverableTemplateUrl || null,
@@ -1687,6 +1693,8 @@ export function setupMCPIntegrationApi(app: express.Application) {
             evidenceRequired: ev.flag,
             evidenceType: task.evidenceType || 'none',
             evidenceInstructions: ev.instructions,
+            isConfidential: task.isConfidential || false,
+            confidentialDataTypes: task.confidentialDataTypes || null,
             estimatedEffort: task.estimatedEffort || null,
             deliverable: task.deliverable || null,
             deliverableTemplateUrl: task.deliverableTemplateUrl || null,
