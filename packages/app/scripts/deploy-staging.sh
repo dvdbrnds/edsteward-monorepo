@@ -96,6 +96,14 @@ if [[ "$VERSION" == "$CURRENT_VERSION" ]]; then
     fi
 fi
 
+# ============================================================================
+# SCHEMA SYNC — ensure staging DB has all columns/tables the new code expects
+# ============================================================================
+step "Schema Sync: Checking staging database schema..."
+node "$SCRIPT_DIR/sync-schema.js" --staging || {
+    warn "Schema sync encountered errors (non-fatal). Proceeding with deployment."
+}
+
 echo ""
 step "1/6 - Building Frontend"
 clear_port 3000

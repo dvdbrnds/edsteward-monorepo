@@ -115,6 +115,15 @@ check_deployment_in_progress "$CLUSTER_NAME" "$SERVICE_NAME"
 echo ""
 success "All safety gates passed!"
 
+# ============================================================================
+# SCHEMA SYNC — ensure production DB has all columns/tables the new code expects
+# ============================================================================
+echo ""
+step "Schema Sync: Checking production database schema..."
+node "$SCRIPT_DIR/sync-schema.js" --production || {
+    warn "Schema sync encountered errors (non-fatal). Proceeding with deployment."
+}
+
 # Show deployment summary and get confirmation
 show_production_deploy_summary "$VERSION" "$CURRENT_VERSION"
 confirm_production_deploy "$VERSION"

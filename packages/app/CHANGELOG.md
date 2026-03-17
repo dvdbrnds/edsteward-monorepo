@@ -524,6 +524,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Version | Date | Milestone |
 |---------|------|-----------|
+| 1.5.11 | 2026-03-17 | RCPT TO email pre-verification |
+| 1.5.10 | 2026-03-17 | Email bounce handling, delivery tracking, escalation |
+| 1.5.9 | 2026-03-16 | Deadline timeline indicators |
+| 1.5.8 | 2026-03-16 | Confidential evidence, disable regs, feedback, product tour |
 | 1.5.6 | 2026-03-14 | Circuit court interpretations, console sync |
 | 1.5.5 | 2026-03-14 | Office/DRI separation, backup safety, assessment tool |
 | 1.5.1 | 2026-03-12 | Smart compliance actions, changelog page |
