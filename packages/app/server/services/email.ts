@@ -1,4 +1,6 @@
 import nodemailer from 'nodemailer';
+import dns from 'dns';
+import net from 'net';
 import { db } from '../db';
 import { emailConfigs, emailDeliveryLog, users } from '@shared/schema';
 import { eq } from 'drizzle-orm';
@@ -37,6 +39,148 @@ function classifySmtpError(error: any): { code: string; bounceType: 'permanent' 
   }
 
   return { code: codeStr || 'UNKNOWN', bounceType: 'permanent' };
+}
+
+interface RecipientVerifyResult {
+  valid: boolean;
+  code?: string;
+  message?: string;
+}
+
+// Cache RCPT TO results for 10 minutes to avoid hammering MX servers
+const verifyCache = new Map<string, { result: RecipientVerifyResult; expires: number }>();
+const VERIFY_CACHE_TTL = 10 * 60 * 1000;
+const VERIFY_TIMEOUT_MS = 8000;
+
+function resolveMx(domain: string): Promise<dns.MxRecord[]> {
+  return new Promise((resolve, reject) => {
+    dns.resolveMx(domain, (err, addresses) => {
+      if (err) reject(err);
+      else resolve(addresses || []);
+    });
+  });
+}
+
+/**
+ * Verify a recipient exists by connecting to their MX server and issuing RCPT TO.
+ * Returns { valid: true } if the server accepts, { valid: false, code, message } if rejected.
+ * Errors and timeouts are treated as inconclusive (valid: true) — we don't block sends on uncertainty.
+ */
+async function verifyRecipientSmtp(email: string, fromEmail: string): Promise<RecipientVerifyResult> {
+  const cached = verifyCache.get(email);
+  if (cached && cached.expires > Date.now()) {
+    return cached.result;
+  }
+
+  const domain = email.split('@')[1];
+  if (!domain) {
+    return { valid: false, code: 'INVALID', message: 'No domain in email address' };
+  }
+
+  let mxRecords: dns.MxRecord[];
+  try {
+    mxRecords = await resolveMx(domain);
+    if (mxRecords.length === 0) {
+      const result: RecipientVerifyResult = { valid: false, code: 'NO_MX', message: `No MX records found for ${domain}` };
+      verifyCache.set(email, { result, expires: Date.now() + VERIFY_CACHE_TTL });
+      return result;
+    }
+  } catch (err: any) {
+    if (err.code === 'ENOTFOUND' || err.code === 'ENODATA') {
+      const result: RecipientVerifyResult = { valid: false, code: 'NO_MX', message: `Domain ${domain} has no MX records` };
+      verifyCache.set(email, { result, expires: Date.now() + VERIFY_CACHE_TTL });
+      return result;
+    }
+    // DNS error — inconclusive, allow the send
+    console.warn(`[EmailVerify] DNS lookup failed for ${domain}: ${err.message}`);
+    return { valid: true };
+  }
+
+  // Sort by priority (lowest = highest priority)
+  mxRecords.sort((a, b) => a.priority - b.priority);
+  const mxHost = mxRecords[0].exchange;
+
+  return new Promise<RecipientVerifyResult>((resolve) => {
+    const socket = new net.Socket();
+    let phase: 'greeting' | 'ehlo' | 'mailfrom' | 'rcptto' | 'quit' | 'done' = 'greeting';
+    let buffer = '';
+    let settled = false;
+
+    const finish = (result: RecipientVerifyResult) => {
+      if (settled) return;
+      settled = true;
+      verifyCache.set(email, { result, expires: Date.now() + VERIFY_CACHE_TTL });
+      try { socket.write('QUIT\r\n'); } catch { /* ignore */ }
+      socket.destroy();
+      resolve(result);
+    };
+
+    const timer = setTimeout(() => {
+      console.warn(`[EmailVerify] Timeout verifying ${email} via ${mxHost}`);
+      finish({ valid: true }); // inconclusive
+    }, VERIFY_TIMEOUT_MS);
+
+    socket.on('error', () => {
+      clearTimeout(timer);
+      finish({ valid: true }); // inconclusive
+    });
+
+    socket.on('close', () => {
+      clearTimeout(timer);
+      if (!settled) finish({ valid: true });
+    });
+
+    socket.on('data', (data) => {
+      buffer += data.toString();
+      // SMTP responses end with \r\n; multi-line use "250-" continuation
+      if (!buffer.includes('\r\n')) return;
+      const lines = buffer.split('\r\n');
+      buffer = lines.pop() || '';
+
+      for (const line of lines) {
+        if (!line) continue;
+        const code = line.substring(0, 3);
+        const isContinuation = line[3] === '-';
+        if (isContinuation) continue; // wait for final line of multi-line response
+
+        if (phase === 'greeting') {
+          if (code.startsWith('2')) {
+            phase = 'ehlo';
+            socket.write('EHLO edsteward.ai\r\n');
+          } else {
+            finish({ valid: true }); // server not cooperative, inconclusive
+          }
+        } else if (phase === 'ehlo') {
+          if (code.startsWith('2')) {
+            phase = 'mailfrom';
+            socket.write(`MAIL FROM:<${fromEmail}>\r\n`);
+          } else {
+            finish({ valid: true });
+          }
+        } else if (phase === 'mailfrom') {
+          if (code.startsWith('2')) {
+            phase = 'rcptto';
+            socket.write(`RCPT TO:<${email}>\r\n`);
+          } else {
+            finish({ valid: true });
+          }
+        } else if (phase === 'rcptto') {
+          clearTimeout(timer);
+          if (code.startsWith('2')) {
+            finish({ valid: true });
+          } else if (code.startsWith('5')) {
+            // 550 = mailbox doesn't exist, 551 = user not local, 553 = mailbox name not allowed
+            finish({ valid: false, code, message: line });
+          } else {
+            // 4xx = temp error, treat as inconclusive
+            finish({ valid: true });
+          }
+        }
+      }
+    });
+
+    socket.connect(25, mxHost);
+  });
 }
 
 export class EmailService {
@@ -148,6 +292,23 @@ export class EmailService {
       const config = await this.getEmailConfig();
       if (!config) {
         throw new Error('Email configuration not found');
+      }
+
+      // Pre-flight: verify recipient's domain has MX records and probe via RCPT TO.
+      // Catches non-existent domains and addresses at providers that enforce recipient validation.
+      // NOTE: Servers with catch-all/relay configs (e.g., Exchange accepting all local recipients,
+      // or Gmail relay) will return 250 for any address — those bounces are only detectable later.
+      try {
+        const verify = await verifyRecipientSmtp(recipientTo, config.fromEmail);
+        if (!verify.valid) {
+          console.warn(`[EmailService] Recipient verification failed for ${recipientTo}: ${verify.code} ${verify.message}`);
+          const verifyError = new Error(`Recipient verification failed: ${verify.code} - ${verify.message}`);
+          (verifyError as any).responseCode = verify.code;
+          throw verifyError;
+        }
+      } catch (verifyErr: any) {
+        if (verifyErr.responseCode) throw verifyErr;
+        console.warn(`[EmailService] RCPT TO probe error (non-fatal): ${verifyErr.message}`);
       }
 
       const isHtml = emailOptions?.html ?? emailContent.trim().startsWith('<');
