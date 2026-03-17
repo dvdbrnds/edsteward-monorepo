@@ -31,6 +31,7 @@ import { NotificationSchedulerSettings } from "@/components/admin/notification-s
 import { RoleAssignmentsSettings } from "@/components/admin/role-assignments-settings";
 import { RoleMappingReference } from "@/components/admin/role-mapping-reference";
 import { ComplianceDocuments } from "@/components/admin/compliance-documents";
+import { EmailDeliveryIssues } from "@/components/admin/email-delivery-issues";
 import {
   Table,
   TableBody,
@@ -509,6 +510,8 @@ export default function SystemSettingsPage() {
 
             <TabsContent value="notifications">
               <div className="space-y-6">
+                <EmailDeliveryIssues />
+
                 <NotificationSchedulerSettings />
 
                 <Card>

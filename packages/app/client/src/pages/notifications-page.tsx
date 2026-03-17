@@ -3,8 +3,9 @@ import Navigation from "@/components/layout/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import {
-  Bell, Clock, CheckCircle, XCircle, AlertTriangle,
+  Bell, Clock, CheckCircle, XCircle, AlertTriangle, Mail,
   ArrowUpDown, ArrowUp, ArrowDown, Filter, Plus, Users,
   ChevronDown, ChevronUp, ExternalLink,
 } from "lucide-react";
@@ -84,6 +85,18 @@ export default function NotificationsPage() {
     queryKey: ["/api/notification-history", { status: statusFilter === "all" ? undefined : statusFilter, sortBy: sortField, sortOrder }],
     refetchInterval: 30_000,
   });
+
+  const { data: deliveryIssues } = useQuery<{ summary: { bounced: number; failed: number } }>({
+    queryKey: ["/api/admin/email-delivery-issues", "summary"],
+    queryFn: async () => {
+      const res = await fetch("/api/admin/email-delivery-issues?days=30&limit=1");
+      if (!res.ok) return { summary: { bounced: 0, failed: 0 } };
+      return res.json();
+    },
+    refetchInterval: 120_000,
+    staleTime: 60_000,
+  });
+  const bounceCount = (deliveryIssues?.summary?.bounced ?? 0) + (deliveryIssues?.summary?.failed ?? 0);
 
   // ── Handlers ───────────────────────────────────────────────
 
@@ -318,6 +331,21 @@ export default function NotificationsPage() {
                 : "Loading..."}
             </div>
           </div>
+
+          {bounceCount > 0 && (
+            <Alert variant="destructive" className="mb-6">
+              <Mail className="h-4 w-4" />
+              <AlertTitle>{bounceCount} email delivery {bounceCount === 1 ? "issue" : "issues"} in the last 30 days</AlertTitle>
+              <AlertDescription className="flex items-center justify-between">
+                <span>Some notification emails failed to deliver. DRI contacts may not have received important compliance notifications.</span>
+                <Link href="/admin/settings">
+                  <Button variant="outline" size="sm" className="ml-4 whitespace-nowrap">
+                    View Issues
+                  </Button>
+                </Link>
+              </AlertDescription>
+            </Alert>
+          )}
 
           <Card className="shadow-sm">
             <CardHeader>

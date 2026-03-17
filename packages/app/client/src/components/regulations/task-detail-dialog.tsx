@@ -76,6 +76,7 @@ interface User {
   email: string;
   firstName: string | null;
   lastName: string | null;
+  emailStatus?: string;
 }
 
 interface TaskEvidence {
@@ -598,7 +599,15 @@ export function TaskDetailDialog({
                             : task.assignedRole || 'Unassigned')}
                     </div>
                     {task.assignedUser?.email && (
-                      <div className="text-xs text-muted-foreground">{task.assignedUser.email}</div>
+                      <div className="text-xs text-muted-foreground flex items-center gap-1">
+                        {task.assignedUser.email}
+                        {task.assignedUser.emailStatus === 'bounced' && (
+                          <span className="inline-flex items-center gap-0.5 text-red-600 font-medium" title="Emails to this address are bouncing">
+                            <AlertCircle className="h-3 w-3" />
+                            bounced
+                          </span>
+                        )}
+                      </div>
                     )}
                     {task.responsibleOfficeEmail && (
                       <div className="text-xs text-muted-foreground">{task.responsibleOfficeEmail}</div>

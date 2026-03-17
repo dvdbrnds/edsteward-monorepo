@@ -1,6 +1,43 @@
 import nodemailer from 'nodemailer';
 import { db } from '../db';
-import { emailConfigs } from '@shared/schema';
+import { emailConfigs, emailDeliveryLog, users } from '@shared/schema';
+import { eq } from 'drizzle-orm';
+import type { EmailType } from '@shared/schema';
+
+export interface EmailSendResult {
+  success: boolean;
+  messageId?: string;
+  smtpResponseCode?: string;
+  errorMessage?: string;
+  bounceType?: 'permanent' | 'transient';
+  deliveryLogId?: number;
+}
+
+export interface EmailTrackingContext {
+  emailType?: EmailType;
+  relatedEntityType?: 'regulation' | 'compliance_task';
+  relatedEntityId?: number;
+  recipientUserId?: number;
+}
+
+function classifySmtpError(error: any): { code: string; bounceType: 'permanent' | 'transient' } {
+  const responseCode = error.responseCode || error.code;
+  const codeStr = String(responseCode || '');
+
+  if (codeStr.startsWith('5')) {
+    return { code: codeStr, bounceType: 'permanent' };
+  }
+  if (codeStr.startsWith('4')) {
+    return { code: codeStr, bounceType: 'transient' };
+  }
+
+  // Non-SMTP errors (network, DNS, timeout)
+  if (error.code === 'ECONNREFUSED' || error.code === 'ETIMEDOUT' || error.code === 'ENOTFOUND') {
+    return { code: error.code, bounceType: 'transient' };
+  }
+
+  return { code: codeStr || 'UNKNOWN', bounceType: 'permanent' };
+}
 
 export class EmailService {
   private transporter: nodemailer.Transporter | null = null;
@@ -35,7 +72,6 @@ export class EmailService {
         },
       });
 
-      // Verify the connection
       await this.transporter.verify();
       console.log('[EmailService] SMTP connection verified successfully');
       return true;
@@ -46,26 +82,58 @@ export class EmailService {
     }
   }
 
-  async sendEmail(to: string | Record<string, any>, subject?: string, content?: string, options?: { html?: boolean; cc?: string }) {
-    try {
-      // Handle both positional args and object-style args
-      let recipientTo: string;
-      let emailSubject: string;
-      let emailContent: string;
-      let emailOptions: { html?: boolean; cc?: string } | undefined;
+  private parseEmailArgs(to: string | Record<string, any>, subject?: string, content?: string, options?: { html?: boolean; cc?: string }) {
+    let recipientTo: string;
+    let emailSubject: string;
+    let emailContent: string;
+    let emailOptions: { html?: boolean; cc?: string } | undefined;
 
-      if (typeof to === 'object' && to !== null) {
-        // Object-style call: sendEmail({ to, subject, html, cc })
-        recipientTo = to.to;
-        emailSubject = to.subject;
-        emailContent = to.html || to.text || to.content || '';
-        emailOptions = { html: !!to.html, cc: to.cc };
-      } else {
-        // Positional args: sendEmail(to, subject, content, options)
-        recipientTo = to;
-        emailSubject = subject!;
-        emailContent = content!;
-        emailOptions = options;
+    if (typeof to === 'object' && to !== null) {
+      recipientTo = to.to;
+      emailSubject = to.subject;
+      emailContent = to.html || to.text || to.content || '';
+      emailOptions = { html: !!to.html, cc: to.cc };
+    } else {
+      recipientTo = to;
+      emailSubject = subject!;
+      emailContent = content!;
+      emailOptions = options;
+    }
+
+    return { recipientTo, emailSubject, emailContent, emailOptions };
+  }
+
+  /**
+   * Tracked email send — logs to email_delivery_log, captures SMTP codes, triggers escalation on bounce.
+   */
+  async sendEmailTracked(
+    to: string | Record<string, any>,
+    subject?: string,
+    content?: string,
+    options?: { html?: boolean; cc?: string },
+    tracking?: EmailTrackingContext
+  ): Promise<EmailSendResult> {
+    const { recipientTo, emailSubject, emailContent, emailOptions } = this.parseEmailArgs(to, subject, content, options);
+
+    let logId: number | undefined;
+
+    try {
+      // Insert pending delivery log entry
+      try {
+        const [logEntry] = await db.insert(emailDeliveryLog).values({
+          recipientEmail: recipientTo,
+          recipientUserId: tracking?.recipientUserId ?? null,
+          emailType: tracking?.emailType ?? 'other',
+          relatedEntityType: tracking?.relatedEntityType ?? null,
+          relatedEntityId: tracking?.relatedEntityId ?? null,
+          subject: emailSubject,
+          status: 'sent',
+          sentAt: new Date(),
+          statusUpdatedAt: new Date(),
+        }).returning({ id: emailDeliveryLog.id });
+        logId = logEntry.id;
+      } catch (logError) {
+        console.error('[EmailService] Failed to create delivery log entry:', logError);
       }
 
       console.log(`[EmailService] Sending email to=${recipientTo}, subject="${emailSubject}"`);
@@ -82,7 +150,6 @@ export class EmailService {
         throw new Error('Email configuration not found');
       }
 
-      // Determine if content is HTML (auto-detect or use option)
       const isHtml = emailOptions?.html ?? emailContent.trim().startsWith('<');
       
       const mailOptions: nodemailer.SendMailOptions = {
@@ -97,7 +164,6 @@ export class EmailService {
 
       if (isHtml) {
         mailOptions.html = emailContent;
-        // Create plain text fallback by stripping HTML
         mailOptions.text = emailContent.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
       } else {
         mailOptions.text = emailContent;
@@ -106,11 +172,116 @@ export class EmailService {
       const info = await this.transporter!.sendMail(mailOptions);
 
       console.log(`[EmailService] Email sent successfully: messageId=${info.messageId} to=${recipientTo}`);
-      return true;
-    } catch (error) {
-      console.error(`[EmailService] Email send failed:`, error);
-      return false;
+
+      // Update log with success
+      if (logId) {
+        try {
+          await db.update(emailDeliveryLog)
+            .set({
+              status: 'delivered',
+              smtpMessageId: info.messageId,
+              statusUpdatedAt: new Date(),
+            })
+            .where(eq(emailDeliveryLog.id, logId));
+        } catch (updateErr) {
+          console.error('[EmailService] Failed to update delivery log:', updateErr);
+        }
+      }
+
+      return {
+        success: true,
+        messageId: info.messageId,
+        deliveryLogId: logId,
+      };
+
+    } catch (error: any) {
+      const { code, bounceType } = classifySmtpError(error);
+      const errorMessage = error.message || String(error);
+
+      console.error(`[EmailService] Email send failed (code=${code}, bounceType=${bounceType}):`, errorMessage);
+
+      // Update log with failure
+      if (logId) {
+        try {
+          await db.update(emailDeliveryLog)
+            .set({
+              status: 'bounced',
+              smtpResponseCode: code,
+              errorMessage: errorMessage.substring(0, 1000),
+              bounceType,
+              statusUpdatedAt: new Date(),
+            })
+            .where(eq(emailDeliveryLog.id, logId));
+        } catch (updateErr) {
+          console.error('[EmailService] Failed to update delivery log with error:', updateErr);
+        }
+      }
+
+      // Flag user email as bounced for permanent failures
+      if (bounceType === 'permanent' && tracking?.recipientUserId) {
+        try {
+          await db.update(users)
+            .set({ emailStatus: 'bounced', updatedAt: new Date() })
+            .where(eq(users.id, tracking.recipientUserId));
+          console.log(`[EmailService] Flagged user ${tracking.recipientUserId} email as bounced`);
+        } catch (flagErr) {
+          console.error('[EmailService] Failed to flag user email status:', flagErr);
+        }
+      }
+
+      // Trigger escalation asynchronously (don't block return)
+      this.triggerBounceEscalation(recipientTo, emailSubject, code, errorMessage, bounceType, tracking, logId).catch(
+        err => console.error('[EmailService] Escalation trigger failed:', err)
+      );
+
+      return {
+        success: false,
+        smtpResponseCode: code,
+        errorMessage,
+        bounceType,
+        deliveryLogId: logId,
+      };
     }
+  }
+
+  /**
+   * Trigger escalation for a bounced email. Imported lazily to avoid circular deps.
+   */
+  private async triggerBounceEscalation(
+    recipientEmail: string,
+    subject: string,
+    smtpCode: string,
+    errorMessage: string,
+    bounceType: 'permanent' | 'transient',
+    tracking?: EmailTrackingContext,
+    logId?: number
+  ) {
+    try {
+      const { handleEmailBounce } = await import('./email-escalation');
+      await handleEmailBounce({
+        recipientEmail,
+        subject,
+        smtpCode,
+        errorMessage,
+        bounceType,
+        emailType: tracking?.emailType,
+        relatedEntityType: tracking?.relatedEntityType,
+        relatedEntityId: tracking?.relatedEntityId,
+        recipientUserId: tracking?.recipientUserId,
+        deliveryLogId: logId,
+      });
+    } catch (err) {
+      console.error('[EmailService] Failed to import/run escalation handler:', err);
+    }
+  }
+
+  /**
+   * Backward-compatible wrapper — returns boolean like the old API.
+   * All existing callers continue to work unchanged.
+   */
+  async sendEmail(to: string | Record<string, any>, subject?: string, content?: string, options?: { html?: boolean; cc?: string }): Promise<boolean> {
+    const result = await this.sendEmailTracked(to, subject, content, options);
+    return result.success;
   }
 }
 

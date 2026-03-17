@@ -5,6 +5,39 @@ All notable changes to EdSteward are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.10] - 2026-03-17
+
+### Added
+- **Email bounce handling system** — all outbound emails are now logged to an
+  `email_delivery_log` table with SMTP response codes, message IDs, and delivery
+  status tracking
+- **Automatic bounce escalation** — when an email to a DRI bounces (SMTP 5xx),
+  the system automatically notifies the regulation/task escalation contact and
+  all CCO/admin users, and creates an in-app notification
+- **User email status tracking** — `users.email_status` column flags addresses
+  as `valid`, `bounced`, or `unverified`; permanent SMTP rejections auto-flag
+  the user
+- **Delivery issues admin panel** — new "Email Delivery Issues" section at the
+  top of the Notifications tab in admin settings, showing delivered/bounced/failed
+  counts, a filterable table of issues, and a "Resolve" action that resets the
+  user's email status
+- **Bounce warning on notifications page** — red alert banner when unresolved
+  delivery issues exist, linking to the admin panel
+- **DRI email status indicator** — task detail dialog shows a red "bounced"
+  badge next to any assigned user whose email is flagged, giving CCOs immediate
+  visibility into unreachable DRIs
+- Admin API endpoints: `GET /api/admin/email-delivery-issues` and
+  `POST /api/admin/email-delivery-issues/:id/resolve`
+
+### Changed
+- `EmailService.sendEmail()` now delegates to `sendEmailTracked()` internally,
+  logging every send attempt while preserving backward compatibility (still
+  returns boolean)
+- Task notifications, deadline notifications, attestation emails, compliance
+  task emails, and manual notifications all pass entity context to the delivery
+  tracker for richer audit data
+- `compliance_tasks` API queries now include `emailStatus` in user selects
+
 ## [1.5.9] - 2026-03-16
 
 ### Added

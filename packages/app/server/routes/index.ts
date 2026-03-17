@@ -871,6 +871,128 @@ export function registerRoutes(app: express.Application): Server {
     }
   });
 
+  // Email delivery issues — bounced/failed emails from email_delivery_log
+  app.get('/api/admin/email-delivery-issues', async (req, res) => {
+    try {
+      const { emailDeliveryLog, users: usersTable, regulations, complianceTasks } = await import('@shared/schema');
+      const { desc, eq, or, sql, and, gte } = await import('drizzle-orm');
+      const { db } = await import('../db');
+
+      const { status = 'all', limit = '50', offset = '0', days = '30' } = req.query as Record<string, string>;
+
+      const sinceDate = new Date();
+      sinceDate.setDate(sinceDate.getDate() - parseInt(days));
+
+      const conditions = [gte(emailDeliveryLog.sentAt, sinceDate)];
+      if (status === 'bounced') {
+        conditions.push(eq(emailDeliveryLog.status, 'bounced'));
+      } else if (status === 'failed') {
+        conditions.push(eq(emailDeliveryLog.status, 'failed'));
+      } else {
+        conditions.push(or(eq(emailDeliveryLog.status, 'bounced'), eq(emailDeliveryLog.status, 'failed'))!);
+      }
+
+      const issues = await db
+        .select()
+        .from(emailDeliveryLog)
+        .where(and(...conditions))
+        .orderBy(desc(emailDeliveryLog.sentAt))
+        .limit(parseInt(limit))
+        .offset(parseInt(offset));
+
+      // Enrich with user and entity info
+      const enriched = await Promise.all(issues.map(async (issue) => {
+        let userName: string | null = null;
+        let entityName: string | null = null;
+
+        if (issue.recipientUserId) {
+          try {
+            const [user] = await db.select({ firstName: usersTable.firstName, lastName: usersTable.lastName })
+              .from(usersTable).where(eq(usersTable.id, issue.recipientUserId)).limit(1);
+            if (user) userName = `${user.firstName || ''} ${user.lastName || ''}`.trim() || null;
+          } catch { /* skip */ }
+        }
+
+        if (issue.relatedEntityType === 'regulation' && issue.relatedEntityId) {
+          try {
+            const result = await db.execute(sql`SELECT name FROM regulations WHERE id = ${issue.relatedEntityId} LIMIT 1`);
+            entityName = (result.rows[0] as any)?.name || null;
+          } catch { /* skip */ }
+        } else if (issue.relatedEntityType === 'compliance_task' && issue.relatedEntityId) {
+          try {
+            const result = await db.execute(sql`SELECT title FROM compliance_tasks WHERE id = ${issue.relatedEntityId} LIMIT 1`);
+            entityName = (result.rows[0] as any)?.title || null;
+          } catch { /* skip */ }
+        }
+
+        return { ...issue, userName, entityName };
+      }));
+
+      // Get summary counts
+      const [totalBounced] = await db.select({ count: sql<number>`count(*)` })
+        .from(emailDeliveryLog)
+        .where(and(eq(emailDeliveryLog.status, 'bounced'), gte(emailDeliveryLog.sentAt, sinceDate)));
+      const [totalFailed] = await db.select({ count: sql<number>`count(*)` })
+        .from(emailDeliveryLog)
+        .where(and(eq(emailDeliveryLog.status, 'failed'), gte(emailDeliveryLog.sentAt, sinceDate)));
+      const [totalDelivered] = await db.select({ count: sql<number>`count(*)` })
+        .from(emailDeliveryLog)
+        .where(and(eq(emailDeliveryLog.status, 'delivered'), gte(emailDeliveryLog.sentAt, sinceDate)));
+
+      res.json({
+        issues: enriched,
+        summary: {
+          bounced: Number(totalBounced?.count ?? 0),
+          failed: Number(totalFailed?.count ?? 0),
+          delivered: Number(totalDelivered?.count ?? 0),
+          periodDays: parseInt(days),
+        },
+        total: enriched.length,
+        offset: parseInt(offset),
+        limit: parseInt(limit),
+      });
+    } catch (error) {
+      console.error("Error fetching email delivery issues:", error);
+      res.status(500).json({
+        error: "Failed to fetch email delivery issues",
+        details: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+
+  // Mark delivery issue as resolved — resets user email_status to 'valid'
+  app.post('/api/admin/email-delivery-issues/:id/resolve', async (req, res) => {
+    try {
+      const { emailDeliveryLog, users: usersTable } = await import('@shared/schema');
+      const { eq } = await import('drizzle-orm');
+      const { db } = await import('../db');
+
+      const issueId = parseInt(req.params.id);
+      const [issue] = await db.select().from(emailDeliveryLog).where(eq(emailDeliveryLog.id, issueId)).limit(1);
+
+      if (!issue) {
+        return res.status(404).json({ error: 'Delivery log entry not found' });
+      }
+
+      // Update log status
+      await db.update(emailDeliveryLog)
+        .set({ status: 'sent', statusUpdatedAt: new Date(), errorMessage: 'Manually resolved by admin' })
+        .where(eq(emailDeliveryLog.id, issueId));
+
+      // Reset user email status if they were flagged
+      if (issue.recipientUserId) {
+        await db.update(usersTable)
+          .set({ emailStatus: 'valid', updatedAt: new Date() })
+          .where(eq(usersTable.id, issue.recipientUserId));
+      }
+
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error resolving delivery issue:", error);
+      res.status(500).json({ error: "Failed to resolve delivery issue" });
+    }
+  });
+
   // Admin logs endpoint - Available to all tenants for their own system logs
   app.get('/api/admin/logs', async (req, res) => {
     try {

@@ -316,16 +316,29 @@ router.post("/send", requireAuth, async (req, res) => {
         // Import email service dynamically
         try {
           const { emailService } = await import('../../services/email');
+          const tracking = {
+            emailType: 'manual_notification' as const,
+            relatedEntityType: regulationId ? 'regulation' as const : undefined,
+            relatedEntityId: regulationId || undefined,
+            recipientUserId: recipient.id,
+          };
           emailPromises.push(
-            emailService.sendEmail(recipient.email, emailSubject, emailContent)
-              .then(() => {
-                // Mark as sent
-                return tenantStorage.markNotificationAsSent(queueItem.id);
+            emailService.sendEmailTracked(recipient.email, emailSubject, emailContent, undefined, tracking)
+              .then((result) => {
+                if (result.success) {
+                  return tenantStorage.markNotificationAsSent(queueItem.id);
+                } else {
+                  syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, 
+                    `Email delivery failed for ${recipient.email}: ${result.errorMessage}`);
+                  return tenantStorage.updateNotificationQueueItem(queueItem.id, { 
+                    status: 'failed',
+                    retryCount: 1
+                  });
+                }
               })
               .catch(error => {
                 syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, 
                   `Failed to send email to ${recipient.email}: ${error}`);
-                // Update status to failed
                 return tenantStorage.updateNotificationQueueItem(queueItem.id, { 
                   status: 'failed',
                   retryCount: 1

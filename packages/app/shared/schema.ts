@@ -209,6 +209,8 @@ export const users = pgTable("users", {
   mfaEnabled: boolean("mfa_enabled").notNull().default(false),
   mfaBackupCodes: text("mfa_backup_codes"), // JSON array of backup codes (encrypted)
   mfaSetupAt: timestamp("mfa_setup_at"),
+  // Email deliverability status — set to 'bounced' when SMTP rejects delivery
+  emailStatus: text("email_status").notNull().default("valid"), // 'valid', 'bounced', 'unverified'
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
@@ -951,7 +953,8 @@ export const insertNotificationQueueSchema = createInsertSchema(notificationQueu
     'version_conflict', 
     'approval_needed',
     'sync_error',
-    'change_detected'
+    'change_detected',
+    'email_bounce'
   ]),
   status: z.enum(['pending', 'sent', 'failed']).default('pending'),
   priority: z.enum(['high', 'normal', 'low']).default('normal')
@@ -1750,6 +1753,59 @@ export const insertCircuitSplitSchema = createInsertSchema(circuitSplits).extend
 
 export type CircuitSplit = typeof circuitSplits.$inferSelect;
 export type InsertCircuitSplit = z.infer<typeof insertCircuitSplitSchema>;
+
+// ===== EMAIL DELIVERY LOG =====
+// Tracks every outbound email for bounce detection, escalation, and admin visibility.
+
+export const EMAIL_TYPES = [
+  'task_reminder', 'attestation_request', 'deadline_warning',
+  'escalation', 'final_attestation', 'manual_notification', 'other'
+] as const;
+export type EmailType = typeof EMAIL_TYPES[number];
+
+export const EMAIL_DELIVERY_STATUS = ['sent', 'delivered', 'bounced', 'failed'] as const;
+export type EmailDeliveryStatus = typeof EMAIL_DELIVERY_STATUS[number];
+
+export const BOUNCE_TYPES = ['permanent', 'transient'] as const;
+export type BounceType = typeof BOUNCE_TYPES[number];
+
+export const EMAIL_STATUS_VALUES = ['valid', 'bounced', 'unverified'] as const;
+export type UserEmailStatus = typeof EMAIL_STATUS_VALUES[number];
+
+export const emailDeliveryLog = pgTable("email_delivery_log", {
+  id: serial("id").primaryKey(),
+  recipientEmail: text("recipient_email").notNull(),
+  recipientUserId: integer("recipient_user_id").references(() => users.id),
+  emailType: text("email_type").notNull().default("other"),
+  relatedEntityType: text("related_entity_type"), // 'regulation' | 'compliance_task'
+  relatedEntityId: integer("related_entity_id"),
+  subject: text("subject"),
+  smtpMessageId: text("smtp_message_id"),
+  status: text("status").notNull().default("sent"),
+  smtpResponseCode: text("smtp_response_code"),
+  errorMessage: text("error_message"),
+  bounceType: text("bounce_type"), // 'permanent' | 'transient'
+  escalationTriggered: boolean("escalation_triggered").notNull().default(false),
+  escalationRecipient: text("escalation_recipient"),
+  sentAt: timestamp("sent_at").notNull().defaultNow(),
+  statusUpdatedAt: timestamp("status_updated_at").notNull().defaultNow(),
+}, (table) => {
+  return {
+    recipientEmailIdx: index("edl_recipient_email_idx").on(table.recipientEmail),
+    statusIdx: index("edl_status_idx").on(table.status),
+    sentAtIdx: index("edl_sent_at_idx").on(table.sentAt),
+    recipientUserIdx: index("edl_recipient_user_idx").on(table.recipientUserId),
+  };
+});
+
+export const insertEmailDeliveryLogSchema = createInsertSchema(emailDeliveryLog).extend({
+  emailType: z.enum(EMAIL_TYPES).default('other'),
+  status: z.enum(EMAIL_DELIVERY_STATUS).default('sent'),
+  bounceType: z.enum(BOUNCE_TYPES).optional().nullable(),
+});
+
+export type EmailDeliveryLog = typeof emailDeliveryLog.$inferSelect;
+export type InsertEmailDeliveryLog = typeof emailDeliveryLog.$inferInsert;
 
 // ===== SINGLE-TENANT ARCHITECTURE =====
 // Single-tenant configuration is handled via environment variables and config files

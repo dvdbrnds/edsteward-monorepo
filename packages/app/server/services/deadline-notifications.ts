@@ -1,5 +1,6 @@
 import { storage } from '../storage';
 import { emailService } from '../services/email';
+import type { EmailTrackingContext } from '../services/email';
 import { differenceInDays, differenceInHours as _differenceInHours, format } from 'date-fns';
 import type { Deadline, Regulation, User } from '@shared/schema';
 import { getDatabaseStorage } from './database';
@@ -170,15 +171,20 @@ async function sendDeadlineNotification(context: NotificationContext) {
     </p>
   `;
 
-  // Send emails to all recipients
-  const emailPromises = recipients.map(recipient => 
-    emailService.sendEmail(recipient.email, subject, emailContent)
-  );
+  // Send emails to all recipients with delivery tracking
+  const emailPromises = recipients.map(recipient => {
+    const tracking: EmailTrackingContext = {
+      emailType: 'deadline_warning',
+      relatedEntityType: 'regulation',
+      relatedEntityId: regulation.id,
+      recipientUserId: recipient.id,
+    };
+    return emailService.sendEmailTracked(
+      recipient.email, subject, emailContent, undefined, tracking
+    );
+  });
   
   await Promise.allSettled(emailPromises);
-
-  // Log notification sent
-  const recipientEmails = recipients.map(r => r.email).join(', ');
 }
 
 /**
@@ -380,10 +386,17 @@ export async function sendDeadlineCreationNotification(deadline: Deadline) {
       </p>
     `;
 
-    // Send to all recipients
-    const emailPromises = Array.from(recipients).map(email => 
-      emailService.sendEmail(email, subject, emailContent)
-    );
+    // Send to all recipients with delivery tracking
+    const emailPromises = Array.from(recipients).map(email => {
+      const user = allUsers.find(u => u.email === email);
+      const tracking: EmailTrackingContext = {
+        emailType: 'deadline_warning',
+        relatedEntityType: 'regulation',
+        relatedEntityId: regulation.id,
+        recipientUserId: user?.id,
+      };
+      return emailService.sendEmailTracked(email, subject, emailContent, undefined, tracking);
+    });
     
     await Promise.allSettled(emailPromises);
     

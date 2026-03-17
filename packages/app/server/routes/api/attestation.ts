@@ -12,6 +12,7 @@ import { attestationTokens, regulations, users } from '@shared/schema';
 import { eq, and, isNull, gt } from 'drizzle-orm';
 import crypto from 'crypto';
 import { emailService } from '../../services/email';
+import type { EmailTrackingContext } from '../../services/email';
 import { requireAuth, requireAdmin } from '../../middleware/role-based-auth';
 
 const router = Router();
@@ -128,7 +129,14 @@ router.post('/send', requireAuth, requireAdmin, async (req: Request, res: Respon
     const recipientName = targetUser?.firstName || targetEmail.split('@')[0];
     const emailBody = generateAttestationEmailForRecipient(reg, recipientName, attestationStatement, attestationPeriod, attestationUrl);
     
-    const emailSent = await emailService.sendEmail(targetEmail, emailSubject, emailBody);
+    const tracking: EmailTrackingContext = {
+      emailType: 'attestation_request',
+      relatedEntityType: 'regulation',
+      relatedEntityId: reg.id,
+      recipientUserId: targetUser?.id,
+    };
+    const emailResult = await emailService.sendEmailTracked(targetEmail, emailSubject, emailBody, undefined, tracking);
+    const emailSent = emailResult.success;
 
     // Email already stored in token record, no need to update
 

@@ -9,6 +9,7 @@
  */
 
 import { emailService } from './email';
+import type { EmailTrackingContext } from './email';
 import { differenceInDays, format, addDays } from 'date-fns';
 import { getDatabaseStorage } from './database';
 import type { User } from '@shared/schema';
@@ -334,12 +335,17 @@ async function sendTaskNotification(context: TaskNotificationContext, tenantId?:
     if (!recipient.email) continue;
     
     try {
-      await emailService.sendEmail({
-        to: recipient.email,
-        subject,
-        html,
-        text,
-      });
+      const tracking: EmailTrackingContext = {
+        emailType: 'task_reminder',
+        relatedEntityType: 'compliance_task',
+        relatedEntityId: context.task.id,
+        recipientUserId: recipient.id,
+      };
+      await emailService.sendEmailTracked(
+        { to: recipient.email, subject, html, text },
+        undefined, undefined, undefined,
+        tracking
+      );
       success = true;
     } catch (error) {
       console.error(`[TaskNotifications] Failed to send to ${recipient.email}:`, error);
@@ -603,12 +609,16 @@ This is an automated notification from EdSteward Compliance Management.
 
     for (const recipient of recipients) {
       try {
-        await emailService.sendEmail({
-          to: recipient.email,
-          subject,
-          html,
-          text,
-        });
+        const tracking: EmailTrackingContext = {
+          emailType: 'final_attestation',
+          relatedEntityType: 'regulation',
+          relatedEntityId: regulationId,
+        };
+        await emailService.sendEmailTracked(
+          { to: recipient.email, subject, html, text },
+          undefined, undefined, undefined,
+          tracking
+        );
         notifiedEmails.push(recipient.email);
         console.log(`[FinalAttestation] Notified ${recipient.role}: ${recipient.email}`);
       } catch (error) {

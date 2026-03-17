@@ -14,6 +14,7 @@ import { eq, desc, asc, and, gt, lt, gte, sql, isNull, isNotNull } from 'drizzle
 import { alias } from 'drizzle-orm/pg-core';
 import { requireAuth, requireAdmin } from '../../middleware/role-based-auth';
 import { emailService } from '../../services/email';
+import type { EmailTrackingContext } from '../../services/email';
 import { getCleryTasksWithDates, getCleryTaskCount } from '../../templates/clery-act-tasks';
 import { uploadLimiter } from '../../middleware/rate-limiter';
 import { checkAndNotifyRegulationReadyForAttestation } from '../../services/task-notifications';
@@ -52,6 +53,7 @@ router.get('/regulation/:regulationId', requireAuth, async (req: Request, res: R
         email: users.email,
         firstName: users.firstName,
         lastName: users.lastName,
+        emailStatus: users.emailStatus,
       },
       completedByUser: {
         id: completedByUsers.id,
@@ -190,6 +192,7 @@ router.get('/:taskId', requireAuth, async (req: Request, res: Response, next) =>
         email: users.email,
         firstName: users.firstName,
         lastName: users.lastName,
+        emailStatus: users.emailStatus,
       },
     })
     .from(complianceTasks)
@@ -506,7 +509,13 @@ router.post('/:taskId/nudge', requireAuth, requireAdmin, async (req: Request, re
       ? `${req.user.firstName} ${req.user.lastName}`
       : req.user?.username || 'Chief Compliance Officer';
 
-    await emailService.sendEmail({
+    const nudgeTracking: EmailTrackingContext = {
+      emailType: 'task_reminder',
+      relatedEntityType: 'compliance_task',
+      relatedEntityId: taskId,
+      recipientUserId: taskData.assignedUser.id,
+    };
+    await emailService.sendEmailTracked({
       to: taskData.assignedUser.email,
       subject: `Reminder: ${taskData.task.title} - Action Required`,
       html: `
@@ -521,7 +530,7 @@ router.post('/:taskId/nudge', requireAuth, requireAdmin, async (req: Request, re
         </div>
         <p>Please log in to EdSteward to complete this task.</p>
       `,
-    });
+    }, undefined, undefined, undefined, nudgeTracking);
 
     res.json({ success: true, message: 'Nudge sent successfully' });
   } catch (error) {
@@ -580,7 +589,12 @@ router.post('/:taskId/escalate', requireAuth, requireAdmin, async (req: Request,
           : taskData.assignedUser.username)
       : 'Unassigned';
 
-    await emailService.sendEmail({
+    const escalationTracking: EmailTrackingContext = {
+      emailType: 'escalation',
+      relatedEntityType: 'compliance_task',
+      relatedEntityId: taskId,
+    };
+    await emailService.sendEmailTracked({
       to: escalationEmail,
       cc: ccDri && taskData.assignedUser ? taskData.assignedUser.email : undefined,
       subject: `ESCALATION: ${taskData.task.title} - Compliance Task Requires Attention`,
@@ -597,7 +611,7 @@ router.post('/:taskId/escalate', requireAuth, requireAdmin, async (req: Request,
         ${message ? `<div style="margin: 20px 0;"><strong>Message from ${senderName}:</strong><p style="padding: 10px; background: #f5f5f5; border-radius: 4px;">${message}</p></div>` : ''}
         <p>Please ensure this compliance requirement is addressed promptly.</p>
       `,
-    });
+    }, undefined, undefined, undefined, escalationTracking);
 
     res.json({ success: true, message: 'Task escalated successfully' });
   } catch (error) {
@@ -1487,12 +1501,18 @@ router.post('/:taskId/send-task-email', requireAdmin, async (req: Request, res: 
       </html>
     `;
 
-    // Send email
-    await emailService.sendEmail({
+    // Send email with delivery tracking
+    const taskEmailTracking: EmailTrackingContext = {
+      emailType: 'task_reminder',
+      relatedEntityType: 'compliance_task',
+      relatedEntityId: taskId,
+      recipientUserId: recipient.id,
+    };
+    await emailService.sendEmailTracked({
       to: recipient.email,
       subject: emailSubject,
       html: htmlContent,
-    });
+    }, undefined, undefined, undefined, taskEmailTracking);
 
     // Log activity
     await db.insert(taskActivity).values({
@@ -2301,15 +2321,22 @@ router.post('/:taskId/request-attestation', requireAuth, async (req: Request, re
       </html>
     `;
 
-    const emailSent = await emailService.sendEmail(
+    const attestTrack: EmailTrackingContext = {
+      emailType: 'attestation_request',
+      relatedEntityType: 'compliance_task',
+      relatedEntityId: taskId,
+    };
+    const attestResult = await emailService.sendEmailTracked(
       email,
       `Attestation Required: ${task.title}`,
       htmlContent,
-      { html: true }
+      { html: true },
+      attestTrack
     );
+    const emailSent = attestResult.success;
 
     if (!emailSent) {
-      console.error(`[Attestation] Email delivery failed for ${email}, but token was created`);
+      console.error(`[Attestation] Email delivery failed for ${email} (code=${attestResult.smtpResponseCode}), but token was created`);
     }
 
     // Log activity
