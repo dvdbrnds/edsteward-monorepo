@@ -5,6 +5,17 @@ All notable changes to EdSteward are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.11] - 2026-03-17
+
+### Added
+- **RCPT TO pre-flight email verification** — before sending any outbound email,
+  the system resolves the recipient's MX records and probes with SMTP `RCPT TO`
+  to detect invalid addresses before the message is sent. Catches non-existent
+  domains (no MX records) and addresses rejected by providers that enforce
+  recipient validation (e.g., Gmail, Outlook.com). Results are cached for 10
+  minutes. Timeouts and probe errors are treated as inconclusive — the send
+  proceeds. Does not block sends for catch-all servers (e.g., Exchange).
+
 ## [1.5.10] - 2026-03-17
 
 ### Added
