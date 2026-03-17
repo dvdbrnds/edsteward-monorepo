@@ -2,8 +2,8 @@ import express from 'express';
 import fs from 'fs';
 import { storage } from '../../storage';
 import { getDatabaseStorage, getDbForRequest } from '../../services/database';
-import { evidenceFiles, disabledRegulations, regulationFeedback, regulations as regulationsTable } from '@shared/schema';
-import { eq, and, sql, desc, inArray } from 'drizzle-orm';
+import { evidenceFiles, disabledRegulations, regulationFeedback, regulations as regulationsTable, deadlines } from '@shared/schema';
+import { eq, and, sql, desc, inArray, gt, ne } from 'drizzle-orm';
 import { syslog, LogLevel, LogFacility } from '../../services/syslog';
 import type { Regulation } from '@shared/schema';
 import { 
@@ -84,13 +84,27 @@ router.get("/", async (req: any, res) => {
     }
     
     // Filter by ownership for compliance officers (admins see all)
-    // Compliance officers only see regulations specifically assigned to them
+    // CCOs see their assigned regulations PLUS any regulation with a deadline in the next 30 days
     if (user && isComplianceOfficer && !isAdmin) {
-      const _beforeCount = regulations.length;
-      // Check for both camelCase and snake_case field names (Drizzle vs raw SQL)
+      let urgentRegulationIds = new Set<number>();
+      try {
+        const db = getDbForRequest(req);
+        const thirtyDaysFromNow = new Date();
+        thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
+        const urgentDeadlines = await db.select({ regulationId: deadlines.regulationId })
+          .from(deadlines)
+          .where(and(
+            ne(deadlines.status, 'completed'),
+            sql`${deadlines.dueDate} <= ${thirtyDaysFromNow.toISOString().split('T')[0]}`
+          ));
+        urgentRegulationIds = new Set(urgentDeadlines.map(d => d.regulationId));
+      } catch (_e) {
+        // deadlines table may not exist — skip
+      }
+
       regulations = regulations.filter((reg: any) => {
         const ownerId = reg.ownerId ?? reg.owner_id;
-        return ownerId === user.id;
+        return ownerId === user.id || urgentRegulationIds.has(reg.id);
       });
     }
     

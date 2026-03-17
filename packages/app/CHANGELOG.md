@@ -5,6 +5,41 @@ All notable changes to EdSteward are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.9] - 2026-03-16
+
+### Added
+- **Deadline timeline indicator** — regulation list now shows a color-coded
+  horizontal progress bar for each regulation's next deadline (green 30+ days,
+  yellow 15-30, orange 7-14, red <7, pulsing red when overdue) with a day
+  count label underneath
+- CCOs now see all regulations with deadlines in the next 30 days, regardless
+  of ownership assignment
+
+## [1.5.8] - 2026-03-16
+
+### Added
+- **Confidential evidence handling** — engine auto-detects tasks involving
+  protected data (FERPA records, conduct reports, health info) and sets
+  evidence type to external reference; attestation UI shows "Where is this
+  evidence maintained?" input instead of file upload for confidential tasks
+- **Disable regulation per institution** — admins can disable regulations that
+  don't apply, with reason tracking; disabled regulations filtered from listing
+- **Regulation feedback button** — any user can submit corrections,
+  clarifications, or additional context about a regulation from its detail page
+- **DeSales University** tenant configuration in registry and engine customers
+- **GitHub Issues** templates for bug reports, feature requests, and regulation
+  data issues
+- **Interactive product tour** — spotlight-guided onboarding that highlights
+  navigation elements with positioned tooltips (triggers after first login)
+- Backfill script for retroactively flagging confidential compliance tasks
+
+### Changed
+- `compliance_tasks` schema: new `is_confidential`, `confidential_data_types`,
+  `external_system_reference` columns
+- New `disabled_regulations` and `regulation_feedback` tables
+- Evidence type enum extended with `external_reference` and `self_attestation`
+- MCP Engine LLM prompt now extracts confidential data types per compliance task
+
 ## [1.5.6] - 2026-03-14
 
 ### Added

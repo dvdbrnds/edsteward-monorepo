@@ -34,6 +34,7 @@ import {
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { DeadlineTimelineBar } from "./deadline-timeline-bar";
 
 // Column definitions for visibility control
 type ColumnKey = 'id' | 'name' | 'riskScore' | 'category' | 'dro' | 'status' | 'nextDeadline' | 'lastUpdated' | 'jurisdiction' | 'appliesTo';
@@ -862,26 +863,12 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter }: R
                     {isColumnVisible('nextDeadline') && (
                       <TableCell>
                         {nextDeadline ? (
-                          <div className="flex items-center gap-2">
-                            {nextDeadline.status === "completed" ? (
-                              <CheckCircle className="h-4 w-4 text-green-500" />
-                            ) : nextDeadline.status === "overdue" ? (
-                              <AlertCircle className="h-4 w-4 text-red-500" />
-                            ) : (
-                              <Clock className="h-4 w-4 text-yellow-500" />
-                            )}
-                            <span className={
-                              nextDeadline.status === "completed"
-                                ? "text-green-600"
-                                : nextDeadline.status === "overdue"
-                                ? "text-red-600"
-                                : "text-yellow-600"
-                            }>
-                              {format(new Date(nextDeadline.dueDate), "PP")}
-                            </span>
-                          </div>
+                          <DeadlineTimelineBar
+                            dueDate={nextDeadline.dueDate}
+                            status={nextDeadline.status}
+                          />
                         ) : (
-                          <span className="text-muted-foreground">No deadlines</span>
+                          <span className="text-xs text-muted-foreground">No deadlines</span>
                         )}
                       </TableCell>
                     )}
