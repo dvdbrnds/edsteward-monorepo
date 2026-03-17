@@ -116,13 +116,17 @@ echo ""
 success "All safety gates passed!"
 
 # ============================================================================
-# SCHEMA SYNC — ensure production DB has all columns/tables the new code expects
+# SCHEMA SYNC — ensure production DB has all columns/tables the new code expects.
+# drizzle-kit push can't run non-interactively (prompts on table rename ambiguity),
+# so we use sync-schema.js which only does ADD COLUMN / CREATE TABLE IF NOT EXISTS.
 # ============================================================================
 echo ""
-step "Schema Sync: Checking production database schema..."
-node "$SCRIPT_DIR/sync-schema.js" --production || {
-    warn "Schema sync encountered errors (non-fatal). Proceeding with deployment."
+step "Schema Sync: Ensuring production database matches code schema..."
+cd "$SCRIPT_DIR/.."
+node "$SCRIPT_DIR/sync-schema.cjs" --production || {
+    warn "Schema sync had errors (non-fatal). Review output above."
 }
+cd - > /dev/null
 
 # Show deployment summary and get confirmation
 show_production_deploy_summary "$VERSION" "$CURRENT_VERSION"

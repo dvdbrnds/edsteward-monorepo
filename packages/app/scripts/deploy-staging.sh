@@ -97,12 +97,16 @@ if [[ "$VERSION" == "$CURRENT_VERSION" ]]; then
 fi
 
 # ============================================================================
-# SCHEMA SYNC — ensure staging DB has all columns/tables the new code expects
+# SCHEMA SYNC — ensure staging DB has all columns/tables the new code expects.
+# drizzle-kit push can't run non-interactively (prompts on table rename ambiguity),
+# so we use sync-schema.js which only does ADD COLUMN / CREATE TABLE IF NOT EXISTS.
 # ============================================================================
-step "Schema Sync: Checking staging database schema..."
-node "$SCRIPT_DIR/sync-schema.js" --staging || {
-    warn "Schema sync encountered errors (non-fatal). Proceeding with deployment."
+step "Schema Sync: Ensuring staging database matches code schema..."
+cd "$SCRIPT_DIR/.."
+node "$SCRIPT_DIR/sync-schema.cjs" --staging || {
+    warn "Schema sync had errors (non-fatal). Review output above."
 }
+cd - > /dev/null
 
 echo ""
 step "1/6 - Building Frontend"
