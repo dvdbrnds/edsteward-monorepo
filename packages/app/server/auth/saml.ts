@@ -41,8 +41,6 @@ function extractUserAttributes(profile: SamlProfile, idpType: string): Record<st
     groups = Array.isArray(groupData) ? groupData : [groupData];
   }
   
-  // Log groups for debugging
-  
   const extractedData = {
     email: profile.email || profile[mapping.email] || profile.nameID,
     firstName: profile.firstName || profile[mapping.firstName] || '',
@@ -64,11 +62,6 @@ function extractUserAttributes(profile: SamlProfile, idpType: string): Record<st
     const mappedRoles = mapOktaGroupsToRoles(groups);
     extractedData.roles = mappedRoles;
     extractedData.role = getHighestPriorityRole(mappedRoles);
-    
-      groups: groups,
-      mappedRoles: mappedRoles,
-      primaryRole: extractedData.role
-    });
   } else if (idpType === 'shibboleth' || idpType === 'incommon') {
     // For educational institutions (Shibboleth/InCommon)
     const affiliation = profile[mapping.affiliation] || '';
@@ -89,12 +82,6 @@ function extractUserAttributes(profile: SamlProfile, idpType: string): Record<st
     extractedData.roles = [...new Set(roles)]; // Remove duplicates
     extractedData.role = getHighestPriorityRole(extractedData.roles);
     extractedData.organization = profile[mapping.organization] || '';
-    
-      affiliation: affiliation,
-      entitlement: entitlement,
-      mappedRoles: extractedData.roles,
-      primaryRole: extractedData.role
-    });
   }
 
   return extractedData;
