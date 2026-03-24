@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Seed FERPA and Title IX compliance tasks
- * 
+ *
  * This script populates the compliance_tasks table with predefined tasks
  * for FERPA (reg ID 223) and Title IX (reg ID 7).
  */
@@ -14,110 +14,116 @@ const pool = new Pool({
   ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
 });
 
+function reminderDaysForPriority(priority) {
+  if (priority === 'critical') return 30;
+  if (priority === 'high') return 14;
+  return 7;
+}
+
 // ===== FERPA TASKS =====
 const FERPA_TASKS = [
   // SECTION 1: ANNUAL NOTIFICATION
-  { tempId: 'ferpa-notification-main', parentTempId: null, title: 'Annual FERPA Rights Notification', description: 'Provide annual notification to students and parents of their FERPA rights.', assignedRole: 'Registrar', dueDate: 'Start of Fall Semester', priority: 'critical', evidenceRequired: true, evidenceType: 'document', sortOrder: 1 },
-  { tempId: 'ferpa-notification-content', parentTempId: 'ferpa-notification-main', title: 'Draft Notification Content', description: 'Prepare notification content including all required FERPA rights information.', assignedRole: 'Registrar', priority: 'high', evidenceRequired: true, evidenceType: 'document', sortOrder: 1 },
-  { tempId: 'ferpa-notification-legal', parentTempId: 'ferpa-notification-main', title: 'Legal Review of Notification', description: 'Have notification reviewed by legal counsel for compliance.', assignedRole: 'General Counsel', priority: 'high', evidenceRequired: true, evidenceType: 'attestation', sortOrder: 2 },
-  { tempId: 'ferpa-notification-distribute', parentTempId: 'ferpa-notification-main', title: 'Distribute Annual Notification', description: 'Send notification via email and post on institutional website.', assignedRole: 'Registrar', priority: 'high', evidenceRequired: true, evidenceType: 'screenshot', sortOrder: 3 },
-  
+  { tempId: 'ferpa-notification-main', parentTempId: null, taskId: 'FERPA-001', title: 'Annual FERPA Rights Notification', description: 'Provide annual notification to students and parents of their FERPA rights.', instructions: 'Publish the annual notice before the start of the fall term each year; keep proof of distribution.', category: 'Policy', statutoryRole: 'Registrar', statutoryCitation: '20 USC 1232g(a)(1)', requirementType: 'requirement', recurringSchedule: 'annual', reminderDays: 30, dueDate: null, assignedRole: 'Registrar', priority: 'critical', evidenceRequired: true, evidenceType: 'document', evidenceInstructions: 'Upload the final notice PDF, email template, or website URL plus evidence it was distributed.', estimatedEffort: '4-8 hours', deliverable: 'Annual FERPA rights notification issued to eligible students and parents.', sortOrder: 1 },
+  { tempId: 'ferpa-notification-content', parentTempId: 'ferpa-notification-main', taskId: 'FERPA-001-A', title: 'Draft Notification Content', description: 'Prepare notification content including all required FERPA rights information.', instructions: 'Draft text covering inspection, amendment, consent, and disclosure rights.', category: 'Policy', statutoryRole: 'Registrar', statutoryCitation: '20 USC 1232g(a)(1)', requirementType: 'requirement', recurringSchedule: 'annual', reminderDays: 14, assignedRole: 'Registrar', priority: 'high', evidenceRequired: true, evidenceType: 'document', evidenceInstructions: 'Upload draft or final copy of the notification content.', estimatedEffort: '2-4 hours', deliverable: 'Complete notification text ready for legal review.', sortOrder: 1 },
+  { tempId: 'ferpa-notification-legal', parentTempId: 'ferpa-notification-main', taskId: 'FERPA-001-B', title: 'Legal Review of Notification', description: 'Have notification reviewed by legal counsel for compliance.', instructions: 'Route the draft to counsel and incorporate feedback before publication.', category: 'Policy', statutoryRole: 'FERPA Compliance Officer', statutoryCitation: '20 USC 1232g(a)(1)', requirementType: 'requirement', recurringSchedule: 'annual', reminderDays: 14, assignedRole: 'General Counsel', priority: 'high', evidenceRequired: true, evidenceType: 'attestation', evidenceInstructions: 'Upload counsel sign-off memo or tracked approval email.', estimatedEffort: '1-2 weeks', deliverable: 'Legal review record for the annual notice.', sortOrder: 2 },
+  { tempId: 'ferpa-notification-distribute', parentTempId: 'ferpa-notification-main', taskId: 'FERPA-001-C', title: 'Distribute Annual Notification', description: 'Send notification via email and post on institutional website.', instructions: 'Distribute through official channels and archive the send log or posting confirmation.', category: 'Policy', statutoryRole: 'Registrar', statutoryCitation: '20 USC 1232g(a)(1)', requirementType: 'requirement', recurringSchedule: 'annual', reminderDays: 14, assignedRole: 'Registrar', priority: 'high', evidenceRequired: true, evidenceType: 'screenshot', evidenceInstructions: 'Upload screenshots or reports showing email delivery and website posting.', estimatedEffort: '2-4 hours', deliverable: 'Evidence that the annual notice was distributed and posted.', sortOrder: 3 },
+
   // SECTION 2: DIRECTORY INFORMATION
-  { tempId: 'ferpa-directory-main', parentTempId: null, title: 'Directory Information Policy', description: 'Maintain and communicate directory information policies.', assignedRole: 'Registrar', priority: 'high', evidenceRequired: true, evidenceType: 'document', sortOrder: 2 },
-  { tempId: 'ferpa-directory-define', parentTempId: 'ferpa-directory-main', title: 'Define Directory Information Categories', description: 'Document what information is designated as directory information.', assignedRole: 'Registrar', priority: 'medium', evidenceRequired: true, evidenceType: 'document', sortOrder: 1 },
-  { tempId: 'ferpa-directory-optout', parentTempId: 'ferpa-directory-main', title: 'Implement Opt-Out Process', description: 'Provide students a way to opt out of directory information disclosure.', assignedRole: 'Registrar', priority: 'high', evidenceRequired: true, evidenceType: 'link', sortOrder: 2 },
-  { tempId: 'ferpa-directory-track', parentTempId: 'ferpa-directory-main', title: 'Track Opt-Out Requests', description: 'Maintain system to track students who have opted out.', assignedRole: 'Registrar', priority: 'high', evidenceRequired: true, evidenceType: 'attestation', sortOrder: 3 },
-  
+  { tempId: 'ferpa-directory-main', parentTempId: null, taskId: 'FERPA-002', title: 'Directory Information Policy', description: 'Maintain and communicate directory information policies.', instructions: 'Review directory categories annually and publish how to opt out.', category: 'Policy', statutoryRole: 'Registrar', statutoryCitation: '20 USC 1232g(a)(5)', requirementType: 'requirement', recurringSchedule: 'annual', reminderDays: 14, dueDate: null, assignedRole: 'Registrar', priority: 'high', evidenceRequired: true, evidenceType: 'document', evidenceInstructions: 'Upload the directory information policy and opt-out instructions.', estimatedEffort: '4-8 hours', deliverable: 'Current directory information policy and opt-out process.', sortOrder: 2 },
+  { tempId: 'ferpa-directory-define', parentTempId: 'ferpa-directory-main', taskId: 'FERPA-002-A', title: 'Define Directory Information Categories', description: 'Document what information is designated as directory information.', instructions: 'List each data element designated as directory information in policy.', category: 'Policy', statutoryRole: 'Registrar', statutoryCitation: '20 USC 1232g(a)(5)(A)', requirementType: 'requirement', recurringSchedule: 'annual', reminderDays: 7, assignedRole: 'Registrar', priority: 'medium', evidenceRequired: true, evidenceType: 'document', evidenceInstructions: 'Upload policy excerpt listing directory categories.', estimatedEffort: '2-3 hours', deliverable: 'Written list of directory information elements.', sortOrder: 1 },
+  { tempId: 'ferpa-directory-optout', parentTempId: 'ferpa-directory-main', taskId: 'FERPA-002-B', title: 'Implement Opt-Out Process', description: 'Provide students a way to opt out of directory information disclosure.', instructions: 'Ensure forms or online workflow allow students to withhold directory information.', category: 'Access Control', statutoryRole: 'Registrar', statutoryCitation: '20 USC 1232g(a)(5)(B)', requirementType: 'requirement', recurringSchedule: 'annual', reminderDays: 14, assignedRole: 'Registrar', priority: 'high', evidenceRequired: true, evidenceType: 'link', evidenceInstructions: 'Upload link or screenshot of the opt-out mechanism.', estimatedEffort: '4-8 hours', deliverable: 'Functional student opt-out process for directory information.', sortOrder: 2 },
+  { tempId: 'ferpa-directory-track', parentTempId: 'ferpa-directory-main', taskId: 'FERPA-002-C', title: 'Track Opt-Out Requests', description: 'Maintain system to track students who have opted out.', instructions: 'Verify SIS or roster flags reflect opt-out status for disclosures.', category: 'Record Keeping', statutoryRole: 'Registrar', statutoryCitation: '20 USC 1232g(a)(5)', requirementType: 'requirement', recurringSchedule: 'annual', reminderDays: 14, assignedRole: 'Registrar', priority: 'high', evidenceRequired: true, evidenceType: 'attestation', evidenceInstructions: 'Upload attestation or report showing opt-outs are honored in systems.', estimatedEffort: '2-4 hours', deliverable: 'Tracking process or report for directory opt-outs.', sortOrder: 3 },
+
   // SECTION 3: RECORD ACCESS PROCEDURES
-  { tempId: 'ferpa-access-main', parentTempId: null, title: 'Record Access Procedures', description: 'Maintain procedures for students/parents to access education records.', assignedRole: 'Registrar', priority: 'high', evidenceRequired: true, evidenceType: 'document', sortOrder: 3 },
-  { tempId: 'ferpa-access-request', parentTempId: 'ferpa-access-main', title: 'Record Request Process', description: 'Document process for students to request access to their records.', assignedRole: 'Registrar', priority: 'high', evidenceRequired: true, evidenceType: 'document', sortOrder: 1 },
-  { tempId: 'ferpa-access-identity', parentTempId: 'ferpa-access-main', title: 'Identity Verification Procedures', description: 'Establish procedures to verify identity before releasing records.', assignedRole: 'Registrar', priority: 'high', evidenceRequired: true, evidenceType: 'document', sortOrder: 2 },
-  
+  { tempId: 'ferpa-access-main', parentTempId: null, taskId: 'FERPA-003', title: 'Record Access Procedures', description: 'Maintain procedures for students/parents to access education records.', instructions: 'Document timelines, fees if any, and who may inspect records.', category: 'Access Control', statutoryRole: 'Registrar', statutoryCitation: '20 USC 1232g(a)(4)', requirementType: 'requirement', recurringSchedule: 'annual', reminderDays: 14, dueDate: null, assignedRole: 'Registrar', priority: 'high', evidenceRequired: true, evidenceType: 'document', evidenceInstructions: 'Upload the access procedure policy or handbook section.', estimatedEffort: '4-8 hours', deliverable: 'Written procedures for requesting and inspecting education records.', sortOrder: 3 },
+  { tempId: 'ferpa-access-request', parentTempId: 'ferpa-access-main', taskId: 'FERPA-003-A', title: 'Record Request Process', description: 'Document process for students to request access to their records.', instructions: 'Describe intake, identity checks, response time, and copies.', category: 'Access Control', statutoryRole: 'Registrar', statutoryCitation: '20 USC 1232g(a)(4)', requirementType: 'requirement', recurringSchedule: 'annual', reminderDays: 14, assignedRole: 'Registrar', priority: 'high', evidenceRequired: true, evidenceType: 'document', evidenceInstructions: 'Upload procedure document or form used for access requests.', estimatedEffort: '2-4 hours', deliverable: 'Documented request and fulfillment process for record access.', sortOrder: 1 },
+  { tempId: 'ferpa-access-identity', parentTempId: 'ferpa-access-main', taskId: 'FERPA-003-B', title: 'Identity Verification Procedures', description: 'Establish procedures to verify identity before releasing records.', instructions: 'Align verification steps with institutional ID and remote request policies.', category: 'Access Control', statutoryRole: 'FERPA Compliance Officer', statutoryCitation: '20 USC 1232g(a)(4)', requirementType: 'requirement', recurringSchedule: 'annual', reminderDays: 14, assignedRole: 'Registrar', priority: 'high', evidenceRequired: true, evidenceType: 'document', evidenceInstructions: 'Upload written identity verification standard operating procedure.', estimatedEffort: '2-3 hours', deliverable: 'Identity verification policy for record disclosures.', sortOrder: 2 },
+
   // SECTION 4: AMENDMENT PROCEDURES
-  { tempId: 'ferpa-amend-main', parentTempId: null, title: 'Record Amendment Procedures', description: 'Maintain procedures for students to request amendments to records.', assignedRole: 'Registrar', priority: 'medium', evidenceRequired: true, evidenceType: 'document', sortOrder: 4 },
-  { tempId: 'ferpa-amend-request', parentTempId: 'ferpa-amend-main', title: 'Amendment Request Form', description: 'Provide form for students to request record amendments.', assignedRole: 'Registrar', priority: 'medium', evidenceRequired: true, evidenceType: 'document', sortOrder: 1 },
-  { tempId: 'ferpa-amend-hearing', parentTempId: 'ferpa-amend-main', title: 'Hearing Procedures', description: 'Document hearing procedures if amendment is denied.', assignedRole: 'General Counsel', priority: 'medium', evidenceRequired: true, evidenceType: 'document', sortOrder: 2 },
-  
+  { tempId: 'ferpa-amend-main', parentTempId: null, taskId: 'FERPA-004', title: 'Record Amendment Procedures', description: 'Maintain procedures for students to request amendments to records.', instructions: 'Include decision timelines and hearing rights if the request is denied.', category: 'Record Keeping', statutoryRole: 'Registrar', statutoryCitation: '20 USC 1232g(a)(2)', requirementType: 'requirement', recurringSchedule: 'annual', reminderDays: 7, dueDate: null, assignedRole: 'Registrar', priority: 'medium', evidenceRequired: true, evidenceType: 'document', evidenceInstructions: 'Upload amendment policy and any request forms.', estimatedEffort: '4-8 hours', deliverable: 'Published amendment request and hearing procedures.', sortOrder: 4 },
+  { tempId: 'ferpa-amend-request', parentTempId: 'ferpa-amend-main', taskId: 'FERPA-004-A', title: 'Amendment Request Form', description: 'Provide form for students to request record amendments.', instructions: 'Publish a clear form or online workflow for amendment requests.', category: 'Record Keeping', statutoryRole: 'Registrar', statutoryCitation: '20 USC 1232g(a)(2)(A)', requirementType: 'requirement', recurringSchedule: 'annual', reminderDays: 7, assignedRole: 'Registrar', priority: 'medium', evidenceRequired: true, evidenceType: 'document', evidenceInstructions: 'Upload blank form or portal instructions.', estimatedEffort: '2-4 hours', deliverable: 'Student-facing amendment request form or process.', sortOrder: 1 },
+  { tempId: 'ferpa-amend-hearing', parentTempId: 'ferpa-amend-main', taskId: 'FERPA-004-B', title: 'Hearing Procedures', description: 'Document hearing procedures if amendment is denied.', instructions: 'Describe how hearings are scheduled, who decides, and how outcomes are communicated.', category: 'Record Keeping', statutoryRole: 'FERPA Compliance Officer', statutoryCitation: '20 USC 1232g(a)(2)(B)', requirementType: 'requirement', recurringSchedule: 'annual', reminderDays: 7, assignedRole: 'General Counsel', priority: 'medium', evidenceRequired: true, evidenceType: 'document', evidenceInstructions: 'Upload hearing procedure documentation.', estimatedEffort: '4-8 hours', deliverable: 'Written hearing process for denied amendment requests.', sortOrder: 2 },
+
   // SECTION 5: CONSENT & DISCLOSURE
-  { tempId: 'ferpa-consent-main', parentTempId: null, title: 'Consent and Disclosure Procedures', description: 'Maintain procedures for obtaining consent and documenting disclosures.', assignedRole: 'Registrar', priority: 'critical', evidenceRequired: true, evidenceType: 'document', sortOrder: 5 },
-  { tempId: 'ferpa-consent-form', parentTempId: 'ferpa-consent-main', title: 'Written Consent Form', description: 'Provide form for students to authorize disclosure of records.', assignedRole: 'Registrar', priority: 'high', evidenceRequired: true, evidenceType: 'document', sortOrder: 1 },
-  { tempId: 'ferpa-consent-log', parentTempId: 'ferpa-consent-main', title: 'Disclosure Log Maintenance', description: 'Maintain log of all disclosures made from student records.', assignedRole: 'Registrar', priority: 'high', evidenceRequired: true, evidenceType: 'attestation', sortOrder: 2 },
-  { tempId: 'ferpa-consent-exceptions', parentTempId: 'ferpa-consent-main', title: 'Document Consent Exceptions', description: 'Document situations where disclosure is permitted without consent.', assignedRole: 'General Counsel', priority: 'high', evidenceRequired: true, evidenceType: 'document', sortOrder: 3 },
-  
+  { tempId: 'ferpa-consent-main', parentTempId: null, taskId: 'FERPA-005', title: 'Consent and Disclosure Procedures', description: 'Maintain procedures for obtaining consent and documenting disclosures.', instructions: 'Ensure consent captures purpose, parties, and information to be disclosed.', category: 'Reporting', statutoryRole: 'FERPA Compliance Officer', statutoryCitation: '20 USC 1232g(b)', requirementType: 'requirement', recurringSchedule: 'annual', reminderDays: 30, dueDate: null, assignedRole: 'Registrar', priority: 'critical', evidenceRequired: true, evidenceType: 'document', evidenceInstructions: 'Upload consent and disclosure policy documentation.', estimatedEffort: '4-8 hours', deliverable: 'Consent and disclosure policy aligned with FERPA exceptions.', sortOrder: 5 },
+  { tempId: 'ferpa-consent-form', parentTempId: 'ferpa-consent-main', taskId: 'FERPA-005-A', title: 'Written Consent Form', description: 'Provide form for students to authorize disclosure of records.', instructions: 'Use a consent form that specifies records, recipients, and purpose.', category: 'Reporting', statutoryRole: 'Registrar', statutoryCitation: '20 USC 1232g(b)(1)', requirementType: 'requirement', recurringSchedule: 'annual', reminderDays: 14, assignedRole: 'Registrar', priority: 'high', evidenceRequired: true, evidenceType: 'document', evidenceInstructions: 'Upload template consent form.', estimatedEffort: '2-4 hours', deliverable: 'FERPA-compliant written consent template.', sortOrder: 1 },
+  { tempId: 'ferpa-consent-log', parentTempId: 'ferpa-consent-main', taskId: 'FERPA-005-B', title: 'Disclosure Log Maintenance', description: 'Maintain log of all disclosures made from student records.', instructions: 'Record disclosures to third parties as required, including legitimate educational interest.', category: 'Record Keeping', statutoryRole: 'FERPA Compliance Officer', statutoryCitation: '20 USC 1232g(b)(4)', requirementType: 'requirement', recurringSchedule: 'annual', reminderDays: 14, assignedRole: 'Registrar', priority: 'high', evidenceRequired: true, evidenceType: 'attestation', evidenceInstructions: 'Upload sample disclosure log or attestation of logging practice.', estimatedEffort: '2-4 hours per year', deliverable: 'Disclosure log or equivalent audit trail.', sortOrder: 2 },
+  { tempId: 'ferpa-consent-exceptions', parentTempId: 'ferpa-consent-main', taskId: 'FERPA-005-C', title: 'Document Consent Exceptions', description: 'Document situations where disclosure is permitted without consent.', instructions: 'List statutory exceptions staff may rely on and training references.', category: 'Policy', statutoryRole: 'FERPA Compliance Officer', statutoryCitation: '20 USC 1232g(b)(1)(A)-(B)', requirementType: 'requirement', recurringSchedule: 'annual', reminderDays: 14, assignedRole: 'General Counsel', priority: 'high', evidenceRequired: true, evidenceType: 'document', evidenceInstructions: 'Upload exception matrix or policy section.', estimatedEffort: '4-8 hours', deliverable: 'Documented consent exceptions for staff use.', sortOrder: 3 },
+
   // SECTION 6: TRAINING
-  { tempId: 'ferpa-training-main', parentTempId: null, title: 'FERPA Staff Training', description: 'Provide annual FERPA training to all staff with access to student records.', assignedRole: 'HR / Compliance Officer', dueDate: 'Start of Academic Year', priority: 'high', evidenceRequired: true, evidenceType: 'document', sortOrder: 6 },
-  { tempId: 'ferpa-training-develop', parentTempId: 'ferpa-training-main', title: 'Develop Training Materials', description: 'Create or update FERPA training content.', assignedRole: 'Compliance Officer', priority: 'medium', evidenceRequired: true, evidenceType: 'document', sortOrder: 1 },
-  { tempId: 'ferpa-training-conduct', parentTempId: 'ferpa-training-main', title: 'Conduct Training Sessions', description: 'Deliver FERPA training to all relevant staff.', assignedRole: 'HR / Compliance Officer', priority: 'high', evidenceRequired: true, evidenceType: 'document', sortOrder: 2 },
-  { tempId: 'ferpa-training-track', parentTempId: 'ferpa-training-main', title: 'Track Training Completion', description: 'Maintain records of staff who have completed FERPA training.', assignedRole: 'HR', priority: 'medium', evidenceRequired: true, evidenceType: 'document', sortOrder: 3 },
-  
+  { tempId: 'ferpa-training-main', parentTempId: null, taskId: 'FERPA-006', title: 'FERPA Staff Training', description: 'Provide annual FERPA training to all staff with access to student records.', instructions: 'Schedule training at the start of each academic year and track completion.', category: 'Training', statutoryRole: 'FERPA Compliance Officer', statutoryCitation: '20 USC 1232g(a)(4)', requirementType: 'requirement', recurringSchedule: 'annual', reminderDays: 30, dueDate: null, assignedRole: 'HR / Compliance Officer', priority: 'high', evidenceRequired: true, evidenceType: 'document', evidenceInstructions: 'Upload roster, LMS report, or sign-in sheets for training.', estimatedEffort: '1-2 weeks', deliverable: 'Annual FERPA training completed for staff with record access.', sortOrder: 6 },
+  { tempId: 'ferpa-training-develop', parentTempId: 'ferpa-training-main', taskId: 'FERPA-006-A', title: 'Develop Training Materials', description: 'Create or update FERPA training content.', instructions: 'Align modules with current policy, directory info, and disclosure rules.', category: 'Training', statutoryRole: 'FERPA Compliance Officer', statutoryCitation: '20 USC 1232g(a)(4)', requirementType: 'requirement', recurringSchedule: 'annual', reminderDays: 7, assignedRole: 'Compliance Officer', priority: 'medium', evidenceRequired: true, evidenceType: 'document', evidenceInstructions: 'Upload slides, course outline, or LMS package.', estimatedEffort: '8-16 hours', deliverable: 'Updated FERPA training materials.', sortOrder: 1 },
+  { tempId: 'ferpa-training-conduct', parentTempId: 'ferpa-training-main', taskId: 'FERPA-006-B', title: 'Conduct Training Sessions', description: 'Deliver FERPA training to all relevant staff.', instructions: 'Offer live or online sessions and record attendance.', category: 'Training', statutoryRole: 'FERPA Compliance Officer', statutoryCitation: '20 USC 1232g(a)(4)', requirementType: 'requirement', recurringSchedule: 'annual', reminderDays: 14, assignedRole: 'HR / Compliance Officer', priority: 'high', evidenceRequired: true, evidenceType: 'document', evidenceInstructions: 'Upload attendance records or completion certificates.', estimatedEffort: '1-2 weeks', deliverable: 'Completed training sessions for targeted roles.', sortOrder: 2 },
+  { tempId: 'ferpa-training-track', parentTempId: 'ferpa-training-main', taskId: 'FERPA-006-C', title: 'Track Training Completion', description: 'Maintain records of staff who have completed FERPA training.', instructions: 'Retain completion data per HR policy and follow up with non-completers.', category: 'Training', statutoryRole: 'HR', statutoryCitation: '20 USC 1232g(a)(4)', requirementType: 'requirement', recurringSchedule: 'annual', reminderDays: 7, assignedRole: 'HR', priority: 'medium', evidenceRequired: true, evidenceType: 'document', evidenceInstructions: 'Upload training compliance report or dashboard export.', estimatedEffort: '2-4 hours', deliverable: 'Training completion tracking report.', sortOrder: 3 },
+
   // SECTION 7: SECURITY
-  { tempId: 'ferpa-security-main', parentTempId: null, title: 'Record Security Measures', description: 'Implement appropriate security measures for education records.', assignedRole: 'IT Security / Registrar', priority: 'high', evidenceRequired: true, evidenceType: 'document', sortOrder: 7 },
-  { tempId: 'ferpa-security-access', parentTempId: 'ferpa-security-main', title: 'Access Controls', description: 'Implement role-based access controls for student information systems.', assignedRole: 'IT Security', priority: 'high', evidenceRequired: true, evidenceType: 'attestation', sortOrder: 1 },
-  { tempId: 'ferpa-security-audit', parentTempId: 'ferpa-security-main', title: 'Access Audit', description: 'Conduct periodic audit of who has access to student records.', assignedRole: 'IT Security', priority: 'medium', evidenceRequired: true, evidenceType: 'document', sortOrder: 2 },
-  { tempId: 'ferpa-security-physical', parentTempId: 'ferpa-security-main', title: 'Physical Record Security', description: 'Ensure physical records are stored securely.', assignedRole: 'Registrar', priority: 'medium', evidenceRequired: true, evidenceType: 'attestation', sortOrder: 3 },
+  { tempId: 'ferpa-security-main', parentTempId: null, taskId: 'FERPA-007', title: 'Record Security Measures', description: 'Implement appropriate security measures for education records.', instructions: 'Review physical and electronic controls for education records annually.', category: 'Access Control', statutoryRole: 'FERPA Compliance Officer', statutoryCitation: '20 USC 1232g(a)(4)', requirementType: 'requirement', recurringSchedule: 'annual', reminderDays: 14, dueDate: null, assignedRole: 'IT Security / Registrar', priority: 'high', evidenceRequired: true, evidenceType: 'document', evidenceInstructions: 'Upload security plan excerpt or risk assessment summary.', estimatedEffort: '1-2 weeks', deliverable: 'Documented security measures for student education records.', sortOrder: 7 },
+  { tempId: 'ferpa-security-access', parentTempId: 'ferpa-security-main', taskId: 'FERPA-007-A', title: 'Access Controls', description: 'Implement role-based access controls for student information systems.', instructions: 'Validate least-privilege roles and periodic access reviews.', category: 'Access Control', statutoryRole: 'FERPA Compliance Officer', statutoryCitation: '20 USC 1232g(a)(4)', requirementType: 'requirement', recurringSchedule: 'annual', reminderDays: 14, assignedRole: 'IT Security', priority: 'high', evidenceRequired: true, evidenceType: 'attestation', evidenceInstructions: 'Upload RBAC matrix or access review attestation.', estimatedEffort: '4-8 hours', deliverable: 'Evidence of role-based access controls and review.', sortOrder: 1 },
+  { tempId: 'ferpa-security-audit', parentTempId: 'ferpa-security-main', taskId: 'FERPA-007-B', title: 'Access Audit', description: 'Conduct periodic audit of who has access to student records.', instructions: 'Run periodic reports and remediate inappropriate access.', category: 'Access Control', statutoryRole: 'IT Security', statutoryCitation: '20 USC 1232g(a)(4)', requirementType: 'requirement', recurringSchedule: 'annual', reminderDays: 7, assignedRole: 'IT Security', priority: 'medium', evidenceRequired: true, evidenceType: 'document', evidenceInstructions: 'Upload latest access audit report.', estimatedEffort: '4-8 hours', deliverable: 'Access audit findings and remediation notes.', sortOrder: 2 },
+  { tempId: 'ferpa-security-physical', parentTempId: 'ferpa-security-main', taskId: 'FERPA-007-C', title: 'Physical Record Security', description: 'Ensure physical records are stored securely.', instructions: 'Inspect filing areas, locked storage, and destruction procedures.', category: 'Access Control', statutoryRole: 'Registrar', statutoryCitation: '20 USC 1232g(a)(4)', requirementType: 'requirement', recurringSchedule: 'annual', reminderDays: 7, assignedRole: 'Registrar', priority: 'medium', evidenceRequired: true, evidenceType: 'attestation', evidenceInstructions: 'Upload checklist or photos attesting to secure storage.', estimatedEffort: '2-4 hours', deliverable: 'Physical security review for paper records.', sortOrder: 3 },
 ];
 
 // ===== TITLE IX TASKS =====
 const TITLE_IX_TASKS = [
   // SECTION 1: COORDINATOR
-  { tempId: 'tix-coordinator-main', parentTempId: null, title: 'Title IX Coordinator Designation', description: 'Designate and publicize a Title IX Coordinator.', assignedRole: 'President / Provost', priority: 'critical', evidenceRequired: true, evidenceType: 'document', sortOrder: 1 },
-  { tempId: 'tix-coordinator-appoint', parentTempId: 'tix-coordinator-main', title: 'Appoint Title IX Coordinator', description: 'Formally appoint a qualified Title IX Coordinator.', assignedRole: 'President / Provost', priority: 'critical', evidenceRequired: true, evidenceType: 'document', sortOrder: 1 },
-  { tempId: 'tix-coordinator-publish', parentTempId: 'tix-coordinator-main', title: 'Publish Coordinator Contact Information', description: 'Make coordinator name, title, office, phone, and email publicly available.', assignedRole: 'Title IX Coordinator', priority: 'high', evidenceRequired: true, evidenceType: 'screenshot', sortOrder: 2 },
-  { tempId: 'tix-coordinator-deputies', parentTempId: 'tix-coordinator-main', title: 'Designate Deputy Coordinators (if applicable)', description: 'Consider designating deputy coordinators for different areas.', assignedRole: 'Title IX Coordinator', priority: 'medium', evidenceRequired: false, evidenceType: 'none', sortOrder: 3 },
-  
+  { tempId: 'tix-coordinator-main', parentTempId: null, taskId: 'TIX-001', title: 'Title IX Coordinator Designation', description: 'Designate and publicize a Title IX Coordinator.', instructions: 'Ensure one qualified coordinator is identified and their contact information is public.', category: 'Coordinator Requirements', statutoryRole: 'Title IX Coordinator', statutoryCitation: '34 CFR 106.8(a)', requirementType: 'requirement', recurringSchedule: null, reminderDays: 30, dueDate: null, assignedRole: 'President / Provost', priority: 'critical', evidenceRequired: true, evidenceType: 'document', evidenceInstructions: 'Upload appointment letter or board resolution and public posting proof.', estimatedEffort: '4-8 hours', deliverable: 'Formal designation and public notice of Title IX Coordinator.', sortOrder: 1 },
+  { tempId: 'tix-coordinator-appoint', parentTempId: 'tix-coordinator-main', taskId: 'TIX-001-A', title: 'Appoint Title IX Coordinator', description: 'Formally appoint a qualified Title IX Coordinator.', instructions: 'Document authority, reporting line, and sufficient time and resources.', category: 'Coordinator Requirements', statutoryRole: 'Title IX Coordinator', statutoryCitation: '34 CFR 106.8(a)(1)', requirementType: 'requirement', recurringSchedule: null, reminderDays: 30, assignedRole: 'President / Provost', priority: 'critical', evidenceRequired: true, evidenceType: 'document', evidenceInstructions: 'Upload appointment letter or contract addendum.', estimatedEffort: '2-4 hours', deliverable: 'Signed appointment of Title IX Coordinator.', sortOrder: 1 },
+  { tempId: 'tix-coordinator-publish', parentTempId: 'tix-coordinator-main', taskId: 'TIX-001-B', title: 'Publish Coordinator Contact Information', description: 'Make coordinator name, title, office, phone, and email publicly available.', instructions: 'Post on website and in handbooks; update when contact data changes.', category: 'Coordinator Requirements', statutoryRole: 'Title IX Coordinator', statutoryCitation: '34 CFR 106.8(a)(2)', requirementType: 'requirement', recurringSchedule: 'annual', reminderDays: 14, assignedRole: 'Title IX Coordinator', priority: 'high', evidenceRequired: true, evidenceType: 'screenshot', evidenceInstructions: 'Upload screenshots of website and catalog pages showing contact info.', estimatedEffort: '1-2 hours', deliverable: 'Public posting of coordinator contact information.', sortOrder: 2 },
+  { tempId: 'tix-coordinator-deputies', parentTempId: 'tix-coordinator-main', taskId: 'TIX-001-C', title: 'Designate Deputy Coordinators (if applicable)', description: 'Consider designating deputy coordinators for different areas.', instructions: 'If used, document deputies’ roles and ensure training parity.', category: 'Coordinator Requirements', statutoryRole: 'Title IX Coordinator', statutoryCitation: '34 CFR 106.8(a)', requirementType: 'requirement', recurringSchedule: null, reminderDays: 7, assignedRole: 'Title IX Coordinator', priority: 'medium', evidenceRequired: false, evidenceType: 'none', evidenceInstructions: null, estimatedEffort: '2-4 hours', deliverable: 'Optional deputy coordinator designations on file.', sortOrder: 3 },
+
   // SECTION 2: POLICY
-  { tempId: 'tix-policy-main', parentTempId: null, title: 'Non-Discrimination Policy', description: 'Adopt and publish policy prohibiting sex discrimination.', assignedRole: 'Title IX Coordinator', priority: 'critical', evidenceRequired: true, evidenceType: 'document', sortOrder: 2 },
-  { tempId: 'tix-policy-draft', parentTempId: 'tix-policy-main', title: 'Draft/Update Policy', description: 'Create or update non-discrimination policy covering sex-based discrimination.', assignedRole: 'Title IX Coordinator', priority: 'high', evidenceRequired: true, evidenceType: 'document', sortOrder: 1 },
-  { tempId: 'tix-policy-legal', parentTempId: 'tix-policy-main', title: 'Legal Review of Policy', description: 'Have policy reviewed by legal counsel.', assignedRole: 'General Counsel', priority: 'high', evidenceRequired: true, evidenceType: 'attestation', sortOrder: 2 },
-  { tempId: 'tix-policy-publish', parentTempId: 'tix-policy-main', title: 'Publish Policy', description: 'Make policy publicly available in required locations.', assignedRole: 'Communications', priority: 'high', evidenceRequired: true, evidenceType: 'link', sortOrder: 3 },
-  
+  { tempId: 'tix-policy-main', parentTempId: null, taskId: 'TIX-002', title: 'Non-Discrimination Policy', description: 'Adopt and publish policy prohibiting sex discrimination.', instructions: 'Align policy with current Part 106 definitions and grievance procedures.', category: 'Policy', statutoryRole: 'Title IX Coordinator', statutoryCitation: '34 CFR 106.8(b)', requirementType: 'requirement', recurringSchedule: 'annual', reminderDays: 30, dueDate: null, assignedRole: 'Title IX Coordinator', priority: 'critical', evidenceRequired: true, evidenceType: 'document', evidenceInstructions: 'Upload the published non-discrimination policy.', estimatedEffort: '1-2 weeks', deliverable: 'Published sex non-discrimination policy.', sortOrder: 2 },
+  { tempId: 'tix-policy-draft', parentTempId: 'tix-policy-main', taskId: 'TIX-002-A', title: 'Draft/Update Policy', description: 'Create or update non-discrimination policy covering sex-based discrimination.', instructions: 'Incorporate admissions, employment, and education program protections.', category: 'Policy', statutoryRole: 'Title IX Coordinator', statutoryCitation: '34 CFR 106.8(b)', requirementType: 'requirement', recurringSchedule: 'annual', reminderDays: 14, assignedRole: 'Title IX Coordinator', priority: 'high', evidenceRequired: true, evidenceType: 'document', evidenceInstructions: 'Upload draft policy with revision highlights.', estimatedEffort: '1-2 weeks', deliverable: 'Draft or updated policy text.', sortOrder: 1 },
+  { tempId: 'tix-policy-legal', parentTempId: 'tix-policy-main', taskId: 'TIX-002-B', title: 'Legal Review of Policy', description: 'Have policy reviewed by legal counsel.', instructions: 'Resolve counsel comments before publication.', category: 'Policy', statutoryRole: 'General Counsel', statutoryCitation: '34 CFR 106.8(b)', requirementType: 'requirement', recurringSchedule: 'annual', reminderDays: 14, assignedRole: 'General Counsel', priority: 'high', evidenceRequired: true, evidenceType: 'attestation', evidenceInstructions: 'Upload legal review memo or approval email.', estimatedEffort: '1 week', deliverable: 'Legal review record for the policy.', sortOrder: 2 },
+  { tempId: 'tix-policy-publish', parentTempId: 'tix-policy-main', taskId: 'TIX-002-C', title: 'Publish Policy', description: 'Make policy publicly available in required locations.', instructions: 'Post to website, student handbook, and employee manual as applicable.', category: 'Policy', statutoryRole: 'Title IX Coordinator', statutoryCitation: '34 CFR 106.8(b)', requirementType: 'requirement', recurringSchedule: 'annual', reminderDays: 14, assignedRole: 'Communications', priority: 'high', evidenceRequired: true, evidenceType: 'link', evidenceInstructions: 'Upload URLs or screenshots of published policy.', estimatedEffort: '2-4 hours', deliverable: 'Publicly available policy links and proof of posting.', sortOrder: 3 },
+
   // SECTION 3: GRIEVANCE
-  { tempId: 'tix-grievance-main', parentTempId: null, title: 'Grievance Procedures', description: 'Establish and publish grievance procedures for sex discrimination complaints.', assignedRole: 'Title IX Coordinator', priority: 'critical', evidenceRequired: true, evidenceType: 'document', sortOrder: 3 },
-  { tempId: 'tix-grievance-draft', parentTempId: 'tix-grievance-main', title: 'Draft Grievance Procedures', description: 'Create comprehensive grievance procedures compliant with Title IX regulations.', assignedRole: 'Title IX Coordinator', priority: 'critical', evidenceRequired: true, evidenceType: 'document', sortOrder: 1 },
-  { tempId: 'tix-grievance-legal', parentTempId: 'tix-grievance-main', title: 'Legal Review of Procedures', description: 'Have grievance procedures reviewed for legal compliance.', assignedRole: 'General Counsel', priority: 'critical', evidenceRequired: true, evidenceType: 'attestation', sortOrder: 2 },
-  { tempId: 'tix-grievance-publish', parentTempId: 'tix-grievance-main', title: 'Publish Grievance Procedures', description: 'Make procedures publicly available.', assignedRole: 'Communications', priority: 'high', evidenceRequired: true, evidenceType: 'link', sortOrder: 3 },
-  { tempId: 'tix-grievance-forms', parentTempId: 'tix-grievance-main', title: 'Create Complaint Forms', description: 'Develop intake forms for filing complaints.', assignedRole: 'Title IX Coordinator', priority: 'high', evidenceRequired: true, evidenceType: 'document', sortOrder: 4 },
-  
+  { tempId: 'tix-grievance-main', parentTempId: null, taskId: 'TIX-003', title: 'Grievance Procedures', description: 'Establish and publish grievance procedures for sex discrimination complaints.', instructions: 'Ensure procedures meet 34 CFR Part 106 grievance process requirements.', category: 'Grievance Process', statutoryRole: 'Title IX Coordinator', statutoryCitation: '34 CFR 106.45', requirementType: 'requirement', recurringSchedule: 'annual', reminderDays: 30, dueDate: null, assignedRole: 'Title IX Coordinator', priority: 'critical', evidenceRequired: true, evidenceType: 'document', evidenceInstructions: 'Upload grievance procedures document.', estimatedEffort: '2-4 weeks', deliverable: 'Published Title IX grievance procedures.', sortOrder: 3 },
+  { tempId: 'tix-grievance-draft', parentTempId: 'tix-grievance-main', taskId: 'TIX-003-A', title: 'Draft Grievance Procedures', description: 'Create comprehensive grievance procedures compliant with Title IX regulations.', instructions: 'Address intake, notices, investigations, hearings, appeals, and supportive measures.', category: 'Grievance Process', statutoryRole: 'Title IX Coordinator', statutoryCitation: '34 CFR 106.45', requirementType: 'requirement', recurringSchedule: 'annual', reminderDays: 30, assignedRole: 'Title IX Coordinator', priority: 'critical', evidenceRequired: true, evidenceType: 'document', evidenceInstructions: 'Upload working draft of procedures.', estimatedEffort: '2-4 weeks', deliverable: 'Draft grievance procedures package.', sortOrder: 1 },
+  { tempId: 'tix-grievance-legal', parentTempId: 'tix-grievance-main', taskId: 'TIX-003-B', title: 'Legal Review of Procedures', description: 'Have grievance procedures reviewed for legal compliance.', instructions: 'Incorporate regulatory citations and institutional policy cross-references.', category: 'Grievance Process', statutoryRole: 'General Counsel', statutoryCitation: '34 CFR 106.45', requirementType: 'requirement', recurringSchedule: 'annual', reminderDays: 30, assignedRole: 'General Counsel', priority: 'critical', evidenceRequired: true, evidenceType: 'attestation', evidenceInstructions: 'Upload counsel approval or redline response.', estimatedEffort: '1-2 weeks', deliverable: 'Legal review of grievance procedures.', sortOrder: 2 },
+  { tempId: 'tix-grievance-publish', parentTempId: 'tix-grievance-main', taskId: 'TIX-003-C', title: 'Publish Grievance Procedures', description: 'Make procedures publicly available.', instructions: 'Post prominently and link from non-discrimination policy.', category: 'Grievance Process', statutoryRole: 'Title IX Coordinator', statutoryCitation: '34 CFR 106.45', requirementType: 'requirement', recurringSchedule: 'annual', reminderDays: 14, assignedRole: 'Communications', priority: 'high', evidenceRequired: true, evidenceType: 'link', evidenceInstructions: 'Upload public URLs for procedures.', estimatedEffort: '2-4 hours', deliverable: 'Published grievance procedures online.', sortOrder: 3 },
+  { tempId: 'tix-grievance-forms', parentTempId: 'tix-grievance-main', taskId: 'TIX-003-D', title: 'Create Complaint Forms', description: 'Develop intake forms for filing complaints.', instructions: 'Include required notices and confidentiality options per regulations.', category: 'Grievance Process', statutoryRole: 'Title IX Coordinator', statutoryCitation: '34 CFR 106.45(b)', requirementType: 'requirement', recurringSchedule: 'annual', reminderDays: 14, assignedRole: 'Title IX Coordinator', priority: 'high', evidenceRequired: true, evidenceType: 'document', evidenceInstructions: 'Upload complaint and reporting forms.', estimatedEffort: '4-8 hours', deliverable: 'Official complaint intake forms.', sortOrder: 4 },
+
   // SECTION 4: TRAINING
-  { tempId: 'tix-training-main', parentTempId: null, title: 'Title IX Training Program', description: 'Provide required training to Title IX personnel and campus community.', assignedRole: 'Title IX Coordinator', dueDate: 'Start of Academic Year', priority: 'critical', evidenceRequired: true, evidenceType: 'document', sortOrder: 4 },
-  { tempId: 'tix-training-coordinator', parentTempId: 'tix-training-main', title: 'Coordinator Training', description: 'Ensure Title IX Coordinator receives comprehensive training.', assignedRole: 'HR / Compliance', priority: 'critical', evidenceRequired: true, evidenceType: 'document', sortOrder: 1 },
-  { tempId: 'tix-training-investigators', parentTempId: 'tix-training-main', title: 'Investigator Training', description: 'Train all investigators on Title IX requirements.', assignedRole: 'Title IX Coordinator', priority: 'critical', evidenceRequired: true, evidenceType: 'document', sortOrder: 2 },
-  { tempId: 'tix-training-decision-makers', parentTempId: 'tix-training-main', title: 'Decision-Maker Training', description: 'Train hearing officers and decision-makers.', assignedRole: 'Title IX Coordinator', priority: 'critical', evidenceRequired: true, evidenceType: 'document', sortOrder: 3 },
-  { tempId: 'tix-training-employees', parentTempId: 'tix-training-main', title: 'Employee Awareness Training', description: 'Provide Title IX awareness training to all employees.', assignedRole: 'HR', priority: 'high', evidenceRequired: true, evidenceType: 'document', sortOrder: 4 },
-  { tempId: 'tix-training-students', parentTempId: 'tix-training-main', title: 'Student Awareness Education', description: 'Provide Title IX education to students.', assignedRole: 'Student Affairs', priority: 'high', evidenceRequired: true, evidenceType: 'document', sortOrder: 5 },
-  { tempId: 'tix-training-publish', parentTempId: 'tix-training-main', title: 'Publish Training Materials', description: 'Make training materials available on website as required.', assignedRole: 'Title IX Coordinator', priority: 'high', evidenceRequired: true, evidenceType: 'link', sortOrder: 6 },
-  
+  { tempId: 'tix-training-main', parentTempId: null, taskId: 'TIX-004', title: 'Title IX Training Program', description: 'Provide required training to Title IX personnel and campus community.', instructions: 'Schedule annual training cycles and publish materials as required.', category: 'Training', statutoryRole: 'Title IX Coordinator', statutoryCitation: '34 CFR 106.45(b)(1)(iii)', requirementType: 'requirement', recurringSchedule: 'annual', reminderDays: 30, dueDate: null, assignedRole: 'Title IX Coordinator', priority: 'critical', evidenceRequired: true, evidenceType: 'document', evidenceInstructions: 'Upload training plan summary and published materials links.', estimatedEffort: '2-4 weeks', deliverable: 'Annual Title IX training program for required audiences.', sortOrder: 4 },
+  { tempId: 'tix-training-coordinator', parentTempId: 'tix-training-main', taskId: 'TIX-004-A', title: 'Coordinator Training', description: 'Ensure Title IX Coordinator receives comprehensive training.', instructions: 'Complete regulatorily required topics and retain certificates.', category: 'Training', statutoryRole: 'Title IX Coordinator', statutoryCitation: '34 CFR 106.45(b)(1)(iii)', requirementType: 'requirement', recurringSchedule: 'annual', reminderDays: 30, assignedRole: 'HR / Compliance', priority: 'critical', evidenceRequired: true, evidenceType: 'document', evidenceInstructions: 'Upload certificates or LMS completion records.', estimatedEffort: '8-16 hours', deliverable: 'Coordinator training completion records.', sortOrder: 1 },
+  { tempId: 'tix-training-investigators', parentTempId: 'tix-training-main', taskId: 'TIX-004-B', title: 'Investigator Training', description: 'Train all investigators on Title IX requirements.', instructions: 'Cover trauma-informed practices and evidence evaluation.', category: 'Training', statutoryRole: 'Investigator', statutoryCitation: '34 CFR 106.45(b)(1)(iii)', requirementType: 'requirement', recurringSchedule: 'annual', reminderDays: 30, assignedRole: 'Title IX Coordinator', priority: 'critical', evidenceRequired: true, evidenceType: 'document', evidenceInstructions: 'Upload investigator training roster and materials version.', estimatedEffort: '8-16 hours', deliverable: 'Investigator training completion documentation.', sortOrder: 2 },
+  { tempId: 'tix-training-decision-makers', parentTempId: 'tix-training-main', taskId: 'TIX-004-C', title: 'Decision-Maker Training', description: 'Train hearing officers and decision-makers.', instructions: 'Include relevance, cross-examination rules, and impartiality.', category: 'Training', statutoryRole: 'Decision-Maker', statutoryCitation: '34 CFR 106.45(b)(1)(iii)', requirementType: 'requirement', recurringSchedule: 'annual', reminderDays: 30, assignedRole: 'Title IX Coordinator', priority: 'critical', evidenceRequired: true, evidenceType: 'document', evidenceInstructions: 'Upload decision-maker training certificates.', estimatedEffort: '8-16 hours', deliverable: 'Decision-maker training records.', sortOrder: 3 },
+  { tempId: 'tix-training-employees', parentTempId: 'tix-training-main', taskId: 'TIX-004-D', title: 'Employee Awareness Training', description: 'Provide Title IX awareness training to all employees.', instructions: 'Deploy mandatory module and track completion.', category: 'Training', statutoryRole: 'Title IX Coordinator', statutoryCitation: '34 CFR 106.8(b)', requirementType: 'requirement', recurringSchedule: 'annual', reminderDays: 14, assignedRole: 'HR', priority: 'high', evidenceRequired: true, evidenceType: 'document', evidenceInstructions: 'Upload LMS completion report for employees.', estimatedEffort: '1-2 weeks', deliverable: 'Employee Title IX awareness training completion data.', sortOrder: 4 },
+  { tempId: 'tix-training-students', parentTempId: 'tix-training-main', taskId: 'TIX-004-E', title: 'Student Awareness Education', description: 'Provide Title IX education to students.', instructions: 'Offer orientation or online module covering rights and reporting.', category: 'Training', statutoryRole: 'Title IX Coordinator', statutoryCitation: '34 CFR 106.8(b)', requirementType: 'requirement', recurringSchedule: 'annual', reminderDays: 14, assignedRole: 'Student Affairs', priority: 'high', evidenceRequired: true, evidenceType: 'document', evidenceInstructions: 'Upload syllabus links, orientation slides, or LMS proof.', estimatedEffort: '1-2 weeks', deliverable: 'Student education materials and participation evidence.', sortOrder: 5 },
+  { tempId: 'tix-training-publish', parentTempId: 'tix-training-main', taskId: 'TIX-004-F', title: 'Publish Training Materials', description: 'Make training materials available on website as required.', instructions: 'Post training materials used for each audience on the institution website.', category: 'Training', statutoryRole: 'Title IX Coordinator', statutoryCitation: '34 CFR 106.45(b)(10)(i)(D)', requirementType: 'requirement', recurringSchedule: 'annual', reminderDays: 14, assignedRole: 'Title IX Coordinator', priority: 'high', evidenceRequired: true, evidenceType: 'link', evidenceInstructions: 'Upload URLs where training materials are posted.', estimatedEffort: '2-4 hours', deliverable: 'Public webpage with required training materials.', sortOrder: 6 },
+
   // SECTION 5: RECORDKEEPING
-  { tempId: 'tix-records-main', parentTempId: null, title: 'Title IX Recordkeeping', description: 'Maintain required records of Title IX matters.', assignedRole: 'Title IX Coordinator', priority: 'high', evidenceRequired: true, evidenceType: 'attestation', sortOrder: 5 },
-  { tempId: 'tix-records-complaints', parentTempId: 'tix-records-main', title: 'Complaint Records', description: 'Maintain records of all complaints, investigations, and resolutions.', assignedRole: 'Title IX Coordinator', priority: 'high', evidenceRequired: true, evidenceType: 'attestation', sortOrder: 1 },
-  { tempId: 'tix-records-supportive', parentTempId: 'tix-records-main', title: 'Supportive Measures Records', description: 'Document supportive measures offered and implemented.', assignedRole: 'Title IX Coordinator', priority: 'medium', evidenceRequired: true, evidenceType: 'attestation', sortOrder: 2 },
-  { tempId: 'tix-records-training', parentTempId: 'tix-records-main', title: 'Training Records', description: 'Maintain records of all Title IX training.', assignedRole: 'Title IX Coordinator', priority: 'medium', evidenceRequired: true, evidenceType: 'document', sortOrder: 3 },
-  
+  { tempId: 'tix-records-main', parentTempId: null, taskId: 'TIX-005', title: 'Title IX Recordkeeping', description: 'Maintain required records of Title IX matters.', instructions: 'Retain records per regulatory retention and privacy requirements.', category: 'Grievance Process', statutoryRole: 'Title IX Coordinator', statutoryCitation: '34 CFR 106.45(b)(10)', requirementType: 'requirement', recurringSchedule: 'annual', reminderDays: 14, dueDate: null, assignedRole: 'Title IX Coordinator', priority: 'high', evidenceRequired: true, evidenceType: 'attestation', evidenceInstructions: 'Upload records retention policy attestation or audit sample.', estimatedEffort: 'Ongoing', deliverable: 'Title IX records management program.', sortOrder: 5 },
+  { tempId: 'tix-records-complaints', parentTempId: 'tix-records-main', taskId: 'TIX-005-A', title: 'Complaint Records', description: 'Maintain records of all complaints, investigations, and resolutions.', instructions: 'Use secure systems with access controls appropriate to sensitive data.', category: 'Grievance Process', statutoryRole: 'Title IX Coordinator', statutoryCitation: '34 CFR 106.45(b)(10)', requirementType: 'requirement', recurringSchedule: 'annual', reminderDays: 14, assignedRole: 'Title IX Coordinator', priority: 'high', evidenceRequired: true, evidenceType: 'attestation', evidenceInstructions: 'Upload redacted sample or process attestation—no unnecessary PII.', estimatedEffort: 'Ongoing', deliverable: 'Secure complaint and resolution file system.', sortOrder: 1 },
+  { tempId: 'tix-records-supportive', parentTempId: 'tix-records-main', taskId: 'TIX-005-B', title: 'Supportive Measures Records', description: 'Document supportive measures offered and implemented.', instructions: 'Log offers, responses, and coordination with academic and housing units.', category: 'Grievance Process', statutoryRole: 'Title IX Coordinator', statutoryCitation: '34 CFR 106.30', requirementType: 'requirement', recurringSchedule: 'annual', reminderDays: 7, assignedRole: 'Title IX Coordinator', priority: 'medium', evidenceRequired: true, evidenceType: 'attestation', evidenceInstructions: 'Upload process description or redacted log template.', estimatedEffort: 'Ongoing', deliverable: 'Supportive measures documentation process.', sortOrder: 2 },
+  { tempId: 'tix-records-training', parentTempId: 'tix-records-main', taskId: 'TIX-005-C', title: 'Training Records', description: 'Maintain records of all Title IX training.', instructions: 'Store attendance, materials version, and dates for each role group.', category: 'Training', statutoryRole: 'Title IX Coordinator', statutoryCitation: '34 CFR 106.45(b)(10)(i)(D)', requirementType: 'requirement', recurringSchedule: 'annual', reminderDays: 7, assignedRole: 'Title IX Coordinator', priority: 'medium', evidenceRequired: true, evidenceType: 'document', evidenceInstructions: 'Upload training records index or LMS export.', estimatedEffort: '2-4 hours per year', deliverable: 'Centralized Title IX training records.', sortOrder: 3 },
+
   // SECTION 6: ATHLETICS
-  { tempId: 'tix-athletics-main', parentTempId: null, title: 'Athletics Equity Review', description: 'Ensure equal opportunity in intercollegiate athletics.', assignedRole: 'Athletic Director', dueDate: 'Annual Review', priority: 'high', evidenceRequired: true, evidenceType: 'document', sortOrder: 6 },
-  { tempId: 'tix-athletics-participation', parentTempId: 'tix-athletics-main', title: 'Participation Opportunities', description: 'Assess and document athletic participation opportunities by sex.', assignedRole: 'Athletic Director', priority: 'high', evidenceRequired: true, evidenceType: 'document', sortOrder: 1 },
-  { tempId: 'tix-athletics-scholarships', parentTempId: 'tix-athletics-main', title: 'Scholarship Distribution', description: 'Ensure athletic scholarships are proportionally distributed.', assignedRole: 'Athletic Director', priority: 'high', evidenceRequired: true, evidenceType: 'document', sortOrder: 2 },
-  { tempId: 'tix-athletics-benefits', parentTempId: 'tix-athletics-main', title: 'Equal Treatment Assessment', description: 'Review equality of equipment, facilities, travel, coaching, etc.', assignedRole: 'Athletic Director', priority: 'medium', evidenceRequired: true, evidenceType: 'document', sortOrder: 3 },
-  
+  { tempId: 'tix-athletics-main', parentTempId: null, taskId: 'TIX-006', title: 'Athletics Equity Review', description: 'Ensure equal opportunity in intercollegiate athletics.', instructions: 'Conduct annual review of participation, aid, and treatment.', category: 'Prevention', statutoryRole: 'Title IX Coordinator', statutoryCitation: '34 CFR 106.41', requirementType: 'requirement', recurringSchedule: 'annual', reminderDays: 14, dueDate: null, assignedRole: 'Athletic Director', priority: 'high', evidenceRequired: true, evidenceType: 'document', evidenceInstructions: 'Upload equity review report or NCAA EADA alignment summary.', estimatedEffort: '2-4 weeks', deliverable: 'Annual athletics equity assessment.', sortOrder: 6 },
+  { tempId: 'tix-athletics-participation', parentTempId: 'tix-athletics-main', taskId: 'TIX-006-A', title: 'Participation Opportunities', description: 'Assess and document athletic participation opportunities by sex.', instructions: 'Compare participation rates to enrollment where applicable.', category: 'Prevention', statutoryRole: 'Title IX Coordinator', statutoryCitation: '34 CFR 106.41(c)', requirementType: 'requirement', recurringSchedule: 'annual', reminderDays: 14, assignedRole: 'Athletic Director', priority: 'high', evidenceRequired: true, evidenceType: 'document', evidenceInstructions: 'Upload participation counts and analysis.', estimatedEffort: '1-2 weeks', deliverable: 'Participation opportunity analysis.', sortOrder: 1 },
+  { tempId: 'tix-athletics-scholarships', parentTempId: 'tix-athletics-main', taskId: 'TIX-006-B', title: 'Scholarship Distribution', description: 'Ensure athletic scholarships are proportionally distributed.', instructions: 'Compare aid to participation for men’s and women’s programs.', category: 'Prevention', statutoryRole: 'Title IX Coordinator', statutoryCitation: '34 CFR 106.41(c)', requirementType: 'requirement', recurringSchedule: 'annual', reminderDays: 14, assignedRole: 'Athletic Director', priority: 'high', evidenceRequired: true, evidenceType: 'document', evidenceInstructions: 'Upload scholarship allocation spreadsheet or report.', estimatedEffort: '1 week', deliverable: 'Scholarship equity analysis.', sortOrder: 2 },
+  { tempId: 'tix-athletics-benefits', parentTempId: 'tix-athletics-main', taskId: 'TIX-006-C', title: 'Equal Treatment Assessment', description: 'Review equality of equipment, facilities, travel, coaching, etc.', instructions: 'Use a checklist comparing men’s and women’s programs.', category: 'Prevention', statutoryRole: 'Title IX Coordinator', statutoryCitation: '34 CFR 106.41(c)', requirementType: 'requirement', recurringSchedule: 'annual', reminderDays: 7, assignedRole: 'Athletic Director', priority: 'medium', evidenceRequired: true, evidenceType: 'document', evidenceInstructions: 'Upload facilities/equipment equity review.', estimatedEffort: '1-2 weeks', deliverable: 'Equal treatment assessment memo.', sortOrder: 3 },
+
   // SECTION 7: PREGNANCY
-  { tempId: 'tix-pregnancy-main', parentTempId: null, title: 'Pregnant and Parenting Student Support', description: 'Ensure non-discrimination for pregnant and parenting students.', assignedRole: 'Title IX Coordinator', priority: 'high', evidenceRequired: true, evidenceType: 'document', sortOrder: 7 },
-  { tempId: 'tix-pregnancy-policy', parentTempId: 'tix-pregnancy-main', title: 'Pregnancy Accommodation Policy', description: 'Establish policy for accommodating pregnant students.', assignedRole: 'Title IX Coordinator', priority: 'high', evidenceRequired: true, evidenceType: 'document', sortOrder: 1 },
-  { tempId: 'tix-pregnancy-communicate', parentTempId: 'tix-pregnancy-main', title: 'Communicate Support Services', description: 'Inform students of pregnancy-related support and accommodations.', assignedRole: 'Student Services', priority: 'medium', evidenceRequired: true, evidenceType: 'link', sortOrder: 2 },
+  { tempId: 'tix-pregnancy-main', parentTempId: null, taskId: 'TIX-007', title: 'Pregnant and Parenting Student Support', description: 'Ensure non-discrimination for pregnant and parenting students.', instructions: 'Publish accommodations process and train front-line staff.', category: 'Reporting', statutoryRole: 'Title IX Coordinator', statutoryCitation: '34 CFR 106.40', requirementType: 'requirement', recurringSchedule: 'annual', reminderDays: 14, dueDate: null, assignedRole: 'Title IX Coordinator', priority: 'high', evidenceRequired: true, evidenceType: 'document', evidenceInstructions: 'Upload pregnancy accommodations policy and training proof.', estimatedEffort: '1-2 weeks', deliverable: 'Pregnant and parenting student support program.', sortOrder: 7 },
+  { tempId: 'tix-pregnancy-policy', parentTempId: 'tix-pregnancy-main', taskId: 'TIX-007-A', title: 'Pregnancy Accommodation Policy', description: 'Establish policy for accommodating pregnant students.', instructions: 'Describe leaves, make-up work, and lactation support as applicable.', category: 'Policy', statutoryRole: 'Title IX Coordinator', statutoryCitation: '34 CFR 106.40(a)', requirementType: 'requirement', recurringSchedule: 'annual', reminderDays: 14, assignedRole: 'Title IX Coordinator', priority: 'high', evidenceRequired: true, evidenceType: 'document', evidenceInstructions: 'Upload approved accommodation policy.', estimatedEffort: '4-8 hours', deliverable: 'Published pregnancy accommodation policy.', sortOrder: 1 },
+  { tempId: 'tix-pregnancy-communicate', parentTempId: 'tix-pregnancy-main', taskId: 'TIX-007-B', title: 'Communicate Support Services', description: 'Inform students of pregnancy-related support and accommodations.', instructions: 'Add website content, orientation slides, and advising scripts.', category: 'Reporting', statutoryRole: 'Title IX Coordinator', statutoryCitation: '34 CFR 106.40(b)', requirementType: 'requirement', recurringSchedule: 'annual', reminderDays: 7, assignedRole: 'Student Services', priority: 'medium', evidenceRequired: true, evidenceType: 'link', evidenceInstructions: 'Upload links to student-facing resources.', estimatedEffort: '4-8 hours', deliverable: 'Student communications on pregnancy support.', sortOrder: 2 },
 ];
 
 async function seedTasks() {
   const client = await pool.connect();
-  
+
   try {
     console.log('🔌 Connected to database');
-    
+
     // Seed FERPA tasks (regulation ID 223)
     const ferpaRegId = 223;
     const existingFerpa = await client.query(
       'SELECT COUNT(*) as count FROM compliance_tasks WHERE regulation_id = $1',
       [ferpaRegId]
     );
-    
+
     if (parseInt(existingFerpa.rows[0].count) > 0) {
       console.log(`⚠️  FERPA tasks already exist (${existingFerpa.rows[0].count} tasks). Skipping.`);
     } else {
@@ -125,14 +131,14 @@ async function seedTasks() {
       await seedRegulationTasks(client, ferpaRegId, FERPA_TASKS);
       console.log(`✅ FERPA tasks seeded successfully!`);
     }
-    
+
     // Seed Title IX tasks (regulation ID 7)
     const titleIXRegId = 7;
     const existingTitleIX = await client.query(
       'SELECT COUNT(*) as count FROM compliance_tasks WHERE regulation_id = $1',
       [titleIXRegId]
     );
-    
+
     if (parseInt(existingTitleIX.rows[0].count) > 0) {
       console.log(`⚠️  Title IX tasks already exist (${existingTitleIX.rows[0].count} tasks). Skipping.`);
     } else {
@@ -140,9 +146,8 @@ async function seedTasks() {
       await seedRegulationTasks(client, titleIXRegId, TITLE_IX_TASKS);
       console.log(`✅ Title IX tasks seeded successfully!`);
     }
-    
+
     console.log('\n🎉 Task seeding complete!');
-    
   } catch (error) {
     console.error('❌ Error seeding tasks:', error);
     process.exit(1);
@@ -152,67 +157,80 @@ async function seedTasks() {
   }
 }
 
+function taskInsertValues(task) {
+  const reminderDays = task.reminderDays != null ? task.reminderDays : reminderDaysForPriority(task.priority);
+  return [
+    task.taskId,
+    task.title,
+    task.description,
+    task.instructions,
+    task.category,
+    task.statutoryRole,
+    task.statutoryCitation,
+    task.requirementType,
+    task.assignedRole,
+    task.dueDate || null,
+    task.recurringSchedule ?? null,
+    reminderDays,
+    task.priority,
+    task.evidenceRequired,
+    task.evidenceType,
+    task.evidenceInstructions != null ? task.evidenceInstructions : null,
+    task.estimatedEffort,
+    task.deliverable,
+    'pending',
+    task.sortOrder,
+  ];
+}
+
 async function seedRegulationTasks(client, regulationId, tasks) {
   const tempIdToDbId = new Map();
-  
+
   // First pass: insert all parent tasks
   const parentTasks = tasks.filter(t => !t.parentTempId);
   for (const task of parentTasks) {
+    const v = taskInsertValues(task);
     const result = await client.query(`
       INSERT INTO compliance_tasks (
-        regulation_id, parent_task_id, title, description, assigned_role,
-        due_date, priority, evidence_required, evidence_type, status, sort_order, created_at, updated_at
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, NOW(), NOW())
+        regulation_id, parent_task_id, task_id, title, description, instructions, category, statutory_role, statutory_citation, requirement_type,
+        assigned_role, due_date, recurring_schedule, reminder_days, priority, evidence_required, evidence_type, evidence_instructions, estimated_effort, deliverable,
+        status, sort_order, created_at, updated_at
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, NOW(), NOW())
       RETURNING id
     `, [
       regulationId,
       null,
-      task.title,
-      task.description,
-      task.assignedRole,
-      null, // due_date - would need conversion
-      task.priority,
-      task.evidenceRequired,
-      task.evidenceType,
-      'pending',
-      task.sortOrder
+      ...v,
     ]);
-    
+
     tempIdToDbId.set(task.tempId, result.rows[0].id);
     console.log(`   ✓ Created parent: ${task.title}`);
   }
-  
+
   // Second pass: insert all child tasks
   const childTasks = tasks.filter(t => t.parentTempId);
   for (const task of childTasks) {
     const parentDbId = tempIdToDbId.get(task.parentTempId);
-    
+
+    const v = taskInsertValues(task);
     const result = await client.query(`
       INSERT INTO compliance_tasks (
-        regulation_id, parent_task_id, title, description, assigned_role,
-        due_date, priority, evidence_required, evidence_type, status, sort_order, created_at, updated_at
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, NOW(), NOW())
+        regulation_id, parent_task_id, task_id, title, description, instructions, category, statutory_role, statutory_citation, requirement_type,
+        assigned_role, due_date, recurring_schedule, reminder_days, priority, evidence_required, evidence_type, evidence_instructions, estimated_effort, deliverable,
+        status, sort_order, created_at, updated_at
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, NOW(), NOW())
       RETURNING id
     `, [
       regulationId,
       parentDbId,
-      task.title,
-      task.description,
-      task.assignedRole,
-      null,
-      task.priority,
-      task.evidenceRequired,
-      task.evidenceType,
-      'pending',
-      task.sortOrder
+      ...v,
     ]);
-    
+
     tempIdToDbId.set(task.tempId, result.rows[0].id);
     console.log(`      └─ Created sub-task: ${task.title}`);
   }
-  
+
   console.log(`   Total tasks created: ${tasks.length}`);
 }
 
 seedTasks();
-
