@@ -5,6 +5,22 @@ All notable changes to EdSteward are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.12] - 2026-03-24
+
+### Fixed
+- **SAML auth syntax error** — removed orphaned object-literal fragments in
+  `server/auth/saml.ts` that caused 10 TypeScript compilation errors (debug
+  logging calls were partially deleted, leaving dangling arguments behind)
+
+### Changed
+- **Seed scripts modernized to full 21-field task standard** — all four
+  compliance task seed scripts (Clery Act, FERPA, Title IX, combined
+  FERPA+Title IX) now populate the complete field set: `taskId`, `instructions`,
+  `category`, `statutoryRole`, `statutoryCitation`, `requirementType`,
+  `recurringSchedule`, `reminderDays`, `evidenceInstructions`,
+  `estimatedEffort`, and `deliverable`. SQL INSERT statements updated to
+  write all new columns. Statutory citations reference actual USC/CFR sections.
+
 ## [1.5.11] - 2026-03-17
 
 ### Added
