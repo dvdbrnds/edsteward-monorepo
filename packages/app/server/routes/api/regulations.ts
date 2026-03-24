@@ -120,16 +120,32 @@ router.get("/", async (req: any, res) => {
     }
     
     // Multi-type institution filter (comma-separated)
+    // Maps new two-tier taxonomy slugs to legacy regulation data slugs
+    const INSTITUTION_TYPE_ALIASES: Record<string, string[]> = {
+      'private-nonprofit-4year': ['private-universities'],
+      'private-nonprofit-2year': ['private-universities'],
+      'public-4year': ['public-universities'],
+      'public-2year': ['community-colleges'],
+      'private-for-profit': ['for-profit-institutions'],
+      'graduate-professional': ['professional-schools'],
+      'religious-affiliation': ['religious-institutions'],
+      'research-intensive': ['research-institutions', 'research-institutes'],
+    };
     if (institutionTypes && typeof institutionTypes === 'string') {
-      const types = institutionTypes.split(',').map(t => t.trim()).filter(Boolean);
-      if (types.length > 0) {
+      const rawTypes = institutionTypes.split(',').map(t => t.trim()).filter(Boolean);
+      const types = new Set(rawTypes);
+      for (const t of rawTypes) {
+        const aliases = INSTITUTION_TYPE_ALIASES[t];
+        if (aliases) aliases.forEach(a => types.add(a));
+      }
+      if (types.size > 0) {
         regulations = regulations.filter((reg: Regulation) => {
           const institutions = Array.isArray(reg.applicableInstitutions)
             ? reg.applicableInstitutions
             : [];
           if (institutions.length === 0) return true;
           if (institutions.includes('all-institutions')) return true;
-          return types.some(t => institutions.includes(t));
+          return [...types].some(t => institutions.includes(t));
         });
       }
     }
