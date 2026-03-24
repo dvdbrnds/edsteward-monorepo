@@ -5,6 +5,15 @@ All notable changes to EdSteward are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.13] - 2026-03-24
+
+### Fixed
+- **Institution type filter hiding 100 regulations** — the "Showing
+  applicable only" filter used new taxonomy slugs (e.g. `private-nonprofit-4year`)
+  that didn't match the legacy slugs in regulation data (e.g. `private-universities`).
+  Added a mapping layer so both taxonomies are recognized. Clery Act and 99
+  other regulations are now visible again when the filter is active.
+
 ## [1.5.12] - 2026-03-24
 
 ### Fixed
