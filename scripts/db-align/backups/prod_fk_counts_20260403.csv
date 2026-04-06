@@ -1,0 +1,258 @@
+1|REG-237|Age Discrimination Act of 1975|5|1|0|0|3
+2|REG-020|Americans with Disabilities Act of 1990|50|0|0|0|4
+3|REG-214|Higher Education Act: Institutional and Financial Assistance Information for Students|7|0|2|0|0
+4|REG-251|Higher Education Act: Textbook Information|4|0|2|0|0
+5|REG-138|Higher Education Opportunity Act Sections 152 and 153|6|0|2|0|0
+6|REG-018|Section 504 of The Rehabilitation Act of 1973|35|0|0|0|0
+7|REG-002|Title IX of the Education Amendments of 1972|81|0|5|4|0
+8|REG-009|Title VI of the Civil Rights Act of 1964|31|0|1|0|0
+9|REG-001|Jeanne Clery Disclosure of Campus Security Policy and Campus Crime Statistics Act|50|0|0|1|5
+10|REG-149|Bankruptcy Abuse Prevention & Consumer Protection Act of 2005|9|0|0|0|0
+11|REG-150|Clayton Antitrust Act of 1914|9|0|3|0|0
+12|REG-210|Fair Credit Reporting Act (FCRA)|8|0|0|0|0
+13|REG-175|Federal Insurance Contributions Act (FICA)|7|0|0|0|0
+14|REG-151|Federal Unemployment Tax Act (FUTA)|9|0|0|0|0
+15|REG-152|Higher Education Act – Disclosure of Foreign Gifts|8|1|3|0|1
+16|REG-192|Qualified Tuition and Student Loan Interest Reporting|8|0|1|0|0
+17|REG-155|Regulation E: Electronic Fund Transfers|9|0|0|0|0
+18|REG-156|Sarbanes Oxley Act of 2002 (SOX)|9|0|0|0|0
+19|REG-157|Sherman Antitrust Act|9|0|3|0|0
+20|REG-158|Social Security Act|9|0|0|0|0
+21|REG-160|Tax Cuts and Jobs Act of 2017 (endowment excise tax)|9|0|0|0|0
+22|REG-161|Truth in Lending Act|9|0|0|0|0
+23|REG-162|Uniform Administrative Requirements, Cost Principles, and Audit Requirements for Federal Awards (Uniform Guidance, Super Circular, or Omni Circular)|8|0|0|0|0
+24|REG-163|Unrelated Business Income Tax (UBIT)|8|0|0|0|0
+26|REG-012|Higher Education Act: Recognition of Accrediting Agency or Association|3|0|2|0|0
+29|REG-153|Higher Education Act: Readmission Requirements for Servicemembers|7|0|2|0|0
+33|REG-017|Equity in Athletics Disclosure Act (EADA)|30|2|0|0|0
+36|REG-250|Higher Education Act: Textbook Informatoin|0|0|0|0|0
+37|REG-199|Anti-Kickback Act of 1986|7|0|0|0|0
+38|REG-200|Anti-discrimination laws for federal contractors|7|0|0|0|0
+39|REG-166|Byrd Amendment|8|0|1|0|0
+40|REG-202|Copeland Anti-Kickback Act|6|0|0|0|0
+41|REG-205|Davis-Bacon Act|7|0|0|0|0
+42|REG-208|E-Verify Executive Order 13465-Amending Executive Order 12989|7|0|2|0|0
+43||Health Insurance Portability and Accountability Act of 1996 (HIPAA)|0|0|0|0|0
+44|REG-246|Higher Education Act: Foreign Gift and Contract Reports|5|0|3|0|0
+45|REG-222|Small Business Act and Small Business Investment Act of 1958|7|0|0|0|0
+46|REG-225|Trade Sanctions Reform and Export Enhancement|7|0|6|0|0
+47|REG-218|Non-Retaliation for Disclosure of Compensation Information|7|0|0|0|0
+48|REG-203|Copyright Act|7|0|0|0|0
+49|REG-204|Copyright Term Extension Act|7|0|0|0|0
+50|REG-206|Digital Millennium Copyright Act (DMCA)|7|0|0|0|0
+52|REG-056|Higher Education Act: Program Participation Agreements|39|0|2|0|0
+53|REG-216|Lanham Act|7|0|0|0|0
+54|REG-223|Small Webcasters Settlement Act of 2002|6|0|0|0|0
+55|REG-224|Technology Education and Copyright Harmonization Act (TEACH ACT) of 2002|7|0|2|0|11
+57|REG-071|Fair Housing Act, Section 6|7|0|0|0|0
+58|REG-072|Patient Protection and Affordable Care Act (Section 1557)|6|0|0|0|0
+60|REG-077|The Family and Medical Leave Act of 1993|9|0|0|0|0
+61|REG-239|Age Discrimination in Employment Act of 1967|0|0|0|0|0
+63|REG-073|Equal Employment Opportunity|8|0|1|0|0
+64|REG-106|Equal Employment of Veterans|7|0|0|0|0
+65|REG-114|Genetic Information Non-Discrimination Act of 2008|7|0|0|0|0
+66|REG-118|Lilly Ledbetter Fair Pay Act of 2009|5|0|0|0|0
+67|REG-023|Drug-Free Schools and Communities Act|27|0|2|0|0
+70|REG-010|Title VII of the Civil Rights Act of 1964|43|0|1|0|0
+71|REG-236|Uniformed Services Employment and Reemployment Rights Act (USERRA)|7|0|0|0|0
+72|REG-075|Pregnant Workers Fairness Act (PWFA)|6|0|0|0|0
+73|REG-100|Affirmative Action/Equal Employment Opportunity|8|0|1|0|0
+75||Age Discrimination Employment Act of 1967|0|0|0|0|0
+78||Higher Education Act - Title IV (Student Financial Aid)|0|0|0|0|0
+80|REG-215|Immigration and Nationality Act|0|0|0|0|0
+86|REG-123|Veterans’ employment emphasis under Federal contracts|6|0|0|0|0
+87|REG-230|Cafeteria Plan Regulations|7|0|0|0|0
+88|REG-231|Consolidated Omnibus Budget Reconciliation Act (COBRA)|7|0|0|0|0
+89|REG-232|Employee Retirement Income Security Act of 1974 (ERISA)|6|0|0|0|0
+90|REG-233|Medicare, Medicaid, and SCHIP Extension Act of 2007|6|0|0|0|0
+91|REG-234|Patient Protection and Affordable Care Act|6|0|0|0|0
+92|REG-235|The Veterans’ Readjustment Benefits Act|6|0|0|0|0
+95|REG-124|Atomic Energy Act of 1954|7|0|0|0|0
+96|REG-125|Chemical Facility Anti-Terrorism Standards|7|0|0|0|0
+97|REG-126|Clean Air Act|7|0|0|0|0
+98|REG-127|Clean Water Act|6|0|0|0|0
+99|REG-128|Comprehensive Environmental Response, Compensation, and Liability Act (CERCLA)|6|0|0|0|0
+100|REG-131|Emergency Planning and Community Right Act (EPCRA)|0|0|0|0|0
+101|REG-132|Energy Policy Act|4|0|0|0|0
+102|REG-133|Energy Reorganization Act of 1974, as amended|4|0|0|0|0
+103|REG-134|Federal Insecticide, Fungicide and Rodenticide Act|7|0|0|0|0
+104|REG-135|Guarding and Use of Hand & Portable Powered Tools|6|0|0|0|0
+105|REG-115|Hazardous Materials Transportation Act|7|0|0|0|0
+106|REG-136|Hazardous and Solid Waste Amendments of 1984|4|0|0|0|0
+107|REG-139|Housing & Urban Development Lead Based Paint Poisoning in Certain Residential Structures|5|0|0|0|0
+108|REG-140|Mandatory Reporting of Greenhouse Gases|6|0|0|0|0
+109|REG-141|Motor Carrier Act of 1980|6|0|0|0|0
+110|REG-142|National Emission Standards for Hazardous Air Pollutants (NESHAP)|6|0|0|0|0
+111|REG-098|OSHA|14|0|0|0|0
+112|REG-088|OSHA Asbestos in Construction Standard|10|0|0|0|0
+113|REG-089|OSHA Asbestos in General Industry Standard|10|0|0|0|0
+114|REG-090|OSHA Enforcement Guidance for Personal Protective Equipment (PPE) in General Industry|7|0|0|0|0
+115|REG-091|OSHA Lead in Construction Standard|9|0|0|0|0
+116|REG-092|OSHA Lead in General Industry Standard|9|0|0|0|0
+117|REG-093|OSHA Welding, Cutting, and Brazing|7|0|0|0|0
+118|REG-094|OSHA – Bloodborne Pathogens Standard|10|0|0|0|0
+119|REG-095|OSHA’s  Emergency Action Plan Standard|7|0|0|0|0
+120|REG-096|OSHA’s  Occupational Noise Exposure Standard|7|0|0|0|0
+121|REG-097|OSHA’s Occupational Exposure to Hazardous Chemicals in Laboratories Standard|7|0|0|0|0
+122|REG-143|Oil Pollution Act|7|0|0|0|0
+123|REG-144|Residential Lead-Based Paint Hazard Reduction Act of 1992|6|0|0|0|0
+124|REG-145|Resource Conservation and Recovery Act|8|0|0|0|0
+125|REG-146|Standards For the Management of Used Oil|6|0|0|0|0
+126|REG-147|The Public Health Security and Bioterrorism Preparedness and Response Act|6|0|0|0|0
+127|REG-148|Toxic Substances Control Act|6|0|0|0|0
+128|REG-164|Acts Affecting a Personal Financial Interest|7|0|0|0|0
+129|REG-165|Bribery of Public Officials and Witnesses|7|0|0|0|0
+130|REG-169|Compensation to Members of Congress, Officers, Others in Matters Affecting the Government|7|0|0|0|0
+131|REG-173|Ethics in Government Act (Amended by Ethics Reform Act and Honest Leadership and Open Government Act of 2007)|7|0|0|0|0
+132|REG-181|House and Senate Gift Ban and Ethics Rules|7|0|0|0|0
+133|REG-064|Outside Earned Income and Activities|6|0|0|0|0
+134|REG-194|Restrictions on Former Officers, Employees, and Elected Officials of the Executive and Legislative|7|0|0|0|0
+135|REG-195|Salary of Government Officials and Employees Payable Only by United States|7|0|6|0|0
+136|REG-034|Arms Export Control Act of 1976|2|0|6|0|0
+137|REG-037|Export Administration Act of 1979|7|0|6|0|0
+138|REG-039|Foreign Assets Control Regulations|26|0|7|0|0
+139|REG-059|International Emergency Economic Powers Act|7|0|8|0|0
+140|REG-060|International Traffic in Arms Regulations (ITAR)|35|0|8|0|0
+141|REG-070|Trading with the Enemy Act of 1917|4|0|6|0|0
+142|REG-035|Contracts with Third Party Servicers|28|0|0|0|0
+143|REG-040|Higher Education Act: Aid Application Verification|31|0|2|0|0
+144|REG-041|Higher Education Act: Audits|27|0|2|0|0
+145|REG-042|Higher Education Act: Borrower Defense to Repayment|27|0|2|0|0
+146|REG-043|Higher Education Act: Cash Management|8|0|2|0|0
+147|REG-245|Higher Education Act: Code of Conduct|7|0|2|0|0
+148|REG-044|Higher Education Act: Cohort Default Rate|29|0|2|0|0
+149|REG-045|Higher Education Act: Eligibility and Certification|31|0|2|0|0
+150|REG-046|Higher Education Act: Entrance and Exit Counseling|26|0|2|0|0
+151|REG-047|Higher Education Act: Federal Supplemental Educational Opportunity Grant Program|28|0|2|0|0
+152|REG-048|Higher Education Act: Federal Work Study|29|0|2|0|0
+153|REG-049|Higher Education Act: Financial Responsibility Requirements|28|0|2|0|0
+154|REG-050|Higher Education Act: Information Distributed to Students|39|0|2|0|0
+155|REG-051|Higher Education Act: Net Price Calculator|25|0|2|0|0
+156|REG-052|Higher Education Act: PLUS Loans|8|0|2|0|0
+157|REG-053|Higher Education Act: Penalties for Drug Violations|27|0|2|0|0
+158|REG-054|Higher Education Act: Perkins Loans|33|0|2|0|0
+159|REG-055|Higher Education Act: Preferred Lenders|7|0|2|0|0
+161|REG-057|Higher Education Act: Record Retention|35|0|2|0|0
+162|REG-058|Higher Education Act: Standard of Conduct|5|0|2|0|0
+164|REG-067|Student Loan Default Prevention Initiative Act of 1990|1|0|0|0|0
+165|REG-068|Student Right to Know Act|1|0|0|0|0
+166|REG-069|Teacher Preparation Programs|31|0|0|0|0
+168|REG-103|Controlling the Assault of Non-Solicited Pornography And Marketing Act of 2003 (CAN-SPAM Act)|8|0|0|0|0
+171|REG-247|Internal Revenue Code: Substantiation and Disclosure Provisions|6|0|0|0|0
+172|REG-248|Pension Protection Act|6|0|0|0|0
+173|REG-249|Philanthropy Protection Act of 1995|5|0|0|0|0
+174|REG-176|Federal Sentencing Guidelines|8|0|0|0|0
+175|REG-184|Internal Revenue Service: Governance Information Required on Form 990|7|0|0|0|0
+176||REG1891|0|0|0|0|0
+178|REG-104|Department of Education General Administrative Regulations and Other Applicable Grant Regulations|8|0|2|0|0
+179|REG-011|False Claims Act|6|0|0|0|0
+180|REG-111|Federal Awardee Performance and Integrity Information System (FAPIIS)|4|0|0|0|0
+181|REG-112|Federal Funding Accountability and Transparency Act of 2006 (FFATA)|5|0|0|0|0
+182|REG-113|Fraud Enforcement and Recovery Act of 2009 (FERA)|5|0|0|0|0
+183|REG-102|Controlled Substances Act|8|0|0|0|0
+184||HIPAA|0|0|0|0|0
+185|REG-137|Higher Education Opportunity Act|7|0|2|0|0
+189|REG-022|Health Insurance Portability and Accountability Act|0|0|0|0|0
+190|REG-217|NSF grant term and condition, September 21, 2018|6|0|0|0|0
+191|REG-159|Student Exchange and Visitor Information System (SEVIS)|9|0|1|0|0
+192|REG-154|Immigration and Nationality Act (INA)|7|0|0|0|0
+193|REG-101|Communications Assistance for Law Enforcement Act (CALEA)|6|0|0|0|0
+196|REG-105|Electronic Communications Privacy Act of 1986|6|0|0|0|0
+197|REG-108|FCC – Cable Certification|5|0|0|0|0
+198|REG-109|FCC – Fixed Microwave Services, Licensing|5|0|0|0|0
+199|REG-110|FCC – Wireless Communications, Licensing|6|0|0|0|0
+202|REG-116|Homeland Security Act of 2002|26|0|0|0|0
+203|REG-117|Junk Fax Prevention Act of 2005|5|0|0|0|0
+204|REG-119|No Electronic Theft Act|5|0|0|0|0
+205|REG-121|Telemarketing|6|0|0|0|0
+206|REG-198|American Jobs Creation Act of 2004|4|0|0|0|0
+207|REG-201|Bayh-Dole Act of 1980|8|0|0|0|0
+208|REG-036|Cooperative Research and Technology Enhancement Act (CREATE Act)|28|0|0|0|0
+209|REG-226|Trademark Revision Act|5|0|0|0|0
+210|REG-227|U.S. Patent Act|5|0|0|0|0
+211|REG-228|Visual Artists Rights Act|5|0|0|0|0
+212|REG-212|Foreign Agents Registration Act of 1938|4|0|1|0|0
+213|REG-213|Foreign Corrupt Practices Act (FCPA)|7|0|1|0|0
+214|REG-180|Honest Leadership and Open Government Act of 2007|7|0|0|0|0
+216|REG-185|Lobbying Disclosure Act|6|0|0|0|0
+217|REG-188|Political Activities|7|0|0|0|0
+219|REG-027|Children’s Online Privacy Protection Act of 1998 (COPPA)|28|0|0|0|0
+220|REG-028|Electronic Communications Privacy Act|34|0|0|0|0
+222|REG-029|Fair and Accurate Credit Transaction Act (FACTA)|10|0|0|0|0
+223|REG-004|Family Educational Rights and Privacy Act (FERPA)|46|0|2|1|0
+224|REG-030|Federal Information Security Management Act (FISMA)|29|0|0|0|0
+225|REG-031|Freedom of Information Act|18|0|0|0|0
+226|REG-032|Gramm Leach Bliley Act (GLBA)|27|0|0|1|0
+228|REG-033|Health Information Technology for Economic and Clinical Health (HITECH) Act of 2009|35|0|0|0|0
+229|REG-074|Higher Education Act Financial Value Transparency & Gainful Employment|7|0|2|0|0
+230|REG-082|Higher Education Act: Credit Hour Definition|6|0|2|0|0
+231|REG-083|Higher Education Act: Incentive Compensation Prohibition|6|0|2|0|0
+232|REG-084|Higher Education Act: Misrepresentation|7|0|2|0|0
+233|REG-085|Higher Education Act: State Authorization|7|0|2|0|0
+234|REG-207|Drug & Alcohol Testing of Transportation Employees|8|0|0|0|0
+235|REG-130|Drug Free Workplace Act|9|0|0|0|0
+236|REG-209|Employee Polygraph Protection Act|5|0|0|0|0
+238|REG-211|Federal Volunteer Protection Act|5|0|0|0|0
+240|REG-229|Worker Adjustment and Retraining Notification Act (WARN)|6|0|0|0|0
+241|REG-078|America COMPETES Act|5|0|2|0|0
+242|REG-079|Animal Welfare Act|8|0|2|0|0
+243|REG-080|Clinical Trials § Financial Disclosures by Investigator|6|0|2|0|0
+244|REG-038|Export Administration Regulations|35|0|6|0|0
+245|REG-081|Food and Drug Administration (FDA) Amendments Act of 2007|6|0|2|0|0
+246|REG-061|National Science Foundation Research Misconduct Policies|4|0|2|0|0
+247|REG-086|Native American Graves Protection and Repatriation Act (NAGPRA)|8|0|2|0|0
+248|REG-120|Protection of Human Subjects Regulations (Common Rule)|9|0|2|0|0
+249|REG-065|Public Health Service Policies on Research Misconduct|29|0|2|0|0
+250|REG-066|Responsibility of Applicants for Promoting Objectivity in Research for which PHS Funding is Sought|5|0|2|0|0
+251|REG-099|Small Unmanned Aircraft Systems|7|0|2|0|0
+252|REG-171|Deferred Compensation|8|0|1|0|0
+253|REG-172|Employee Annuities|8|0|1|0|0
+255|REG-186|Nonqualified Deferred Inclusion|8|0|1|0|0
+256|REG-190|Qualified Pensions|8|0|1|0|0
+257|REG-007|Campus Sex Crimes Prevention Act (§ 1601 of the Victims of Trafficking and Violence Protection Act of 2000)|29|0|0|0|0
+261|REG-167|Cafeteria Plans 26 U.S.C. § 125|9|0|1|0|0
+262|REG-168|Charitable Gift Annuity Antitrust Relief Act|9|0|4|0|0
+265|REG-177|Federal Unemployment Tax Act|7|0|0|0|0
+266|REG-178|Foreign Bank Accounts and Tax Filings|8|0|2|0|0
+267|REG-179|Fringe Benefits|8|0|1|0|0
+268|REG-182|Independent Contractors|8|0|1|0|0
+269|REG-183|Industrial Alcohol User Permits and Special Tax|8|0|1|0|0
+271|REG-189|Public Disclosure of Material|9|0|1|0|0
+274|REG-193|Reporting of Payments of Royalties|9|0|1|0|0
+275|REG-196|Small Business Job Protection Act|8|0|1|0|0
+276|REG-197|Unrelated Business Income (UBIT)|9|0|1|0|0
+277|REG-241|Civil Service Reform Act of 1978|4|0|0|0|0
+278|REG-243|National Labor Relations Act|6|0|0|0|0
+279|REG-170|Consumer Credit Protection Act, Title III (CCPA) – Garnishments|7|0|0|0|0
+280|REG-174|Fair Labor Standards Act (FLSA)|7|0|0|0|0
+283|REG-191|Qualified Tuition Reductions|6|0|0|0|0
+284||Regulation ID OSHA-2024-001|0|1|0|0|0
+285||EDU-2024-001 Regulation|0|0|0|0|0
+286||FERPA-2024|26|0|0|0|0
+287||Occupational Safety and Health Administration Regulation 2024-001|0|0|0|0|0
+288||Regulation ID EDU-2024-001|0|0|0|0|0
+289||Family Educational Rights and Privacy Act of 2024|0|0|0|0|0
+291||Americans with Disabilities Act (ADA) Amendments Act of 2024, Section 001|0|0|0|0|0
+292||Family Educational Rights and Privacy Act 2024 Update|0|0|0|0|0
+294||Americans with Disabilities Act (ADA) Amendments Act of 2008|0|0|0|0|0
+295||Family Education Rights and Privacy Act (FERPA) 2024 Update|26|0|0|0|0
+356|REG-242|General Data Protection Regulation (GDPR)|33|1|0|0|0
+359|REG-TEST-001|Test Regulation|0|0|0|0|0
+386||Title IX|0|0|0|0|0
+389|REG-252|PA Act 55 of 2022 - Sexual Violence in Higher Ed|35|0|0|0|0
+416||New Jersey Campus Sex Assault Victim Bill Of Rights|58|0|0|0|0
+417||Pennsylvania Sexual Violence Education Act|56|0|0|0|0
+418||Pennsylvania Graduation Rates Reporting Act|5|0|0|0|0
+420||New Jersey Uniform Crime Reporting|39|0|0|0|0
+421||Pennsylvania Uniform Crime Reporting Act|39|0|0|0|0
+429||PA Act 36 of 1990 - English Fluency in Higher Ed|3|0|0|0|0
+432||Higher Education Act: Drug and Alcohol Abuse Prevention|27|0|0|0|0
+442||New Jersey Licensure Accreditation Standards|36|0|0|0|0
+443||New Jersey Hazing Prevention|38|0|0|0|0
+444||New Jersey Tuition Aid Grant Program|35|0|0|0|0
+445||Pennsylvania Institutional Accreditation|10|0|0|0|0
+446||Pennsylvania Higher Education Gift Disclosure Act|3|0|0|0|0
+447||Pennsylvania English Fluency In Higher Education A|5|0|0|0|0
+448||Pennsylvania Higher Education Standards|5|0|0|0|0
+449||New Jersey Veterans Benefits Compliance|9|0|0|0|0
+450||Pennsylvania Student Consumer Protection|7|0|0|0|0

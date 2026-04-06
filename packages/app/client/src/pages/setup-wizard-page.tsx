@@ -1,222 +1,157 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { queryClient, apiRequest } from "@/lib/queryClient";
+import { useBranding } from "@/hooks/use-branding";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { insertUserSchema } from "@shared/schema";
 import { Progress } from "@/components/ui/progress";
-import { Loader2, User, UserPlus, Key } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import { Redirect } from "wouter";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import type { z } from "zod";
+import { Settings, Users, Shield, BookOpen, CheckCircle2 } from "lucide-react";
+import { Redirect, useLocation } from "wouter";
 
-type FormValues = z.infer<typeof insertUserSchema>;
-
-const REGULATION_CATEGORIES = [
-  "Academic Programs",
-  "Financial Aid",
-  "Student Services",
-  "Athletics",
-  "Campus Safety",
-  "Research",
-] as const;
-
-type RegulationCategory = typeof REGULATION_CATEGORIES[number];
-
-const SUGGESTED_DISTRIBUTION_LISTS: Record<RegulationCategory, string> = {
-  "Academic Programs": "academicaffairs@moravian.edu",
-  "Financial Aid": "finaid@moravian.edu",
-  "Student Services": "studentlife@moravian.edu",
-  "Athletics": "athletics@moravian.edu",
-  "Campus Safety": "police@moravian.edu",
-  "Research": "research@moravian.edu",
-} as const;
+const SETUP_STEPS = [
+  {
+    id: "welcome",
+    title: "Welcome",
+    description: "Get oriented with your compliance portal",
+    icon: BookOpen,
+  },
+  {
+    id: "settings",
+    title: "System Settings",
+    description: "Configure your institution profile, branding, and notification preferences",
+    icon: Settings,
+  },
+  {
+    id: "users",
+    title: "Add Users",
+    description: "Create accounts for your compliance team and assign roles",
+    icon: Users,
+  },
+  {
+    id: "sso",
+    title: "Single Sign-On",
+    description: "Connect your institution's identity provider for seamless login",
+    icon: Shield,
+  },
+];
 
 export default function SetupWizardPage() {
   const { user } = useAuth();
-  const { toast } = useToast();
+  const branding = useBranding();
+  const [, navigate] = useLocation();
   const [currentStep, setCurrentStep] = useState(0);
-  const [officeStep, setOfficeStep] = useState(0);
-  const [isComplete, setIsComplete] = useState(false);
-  const [officeAssignments, setOfficeAssignments] = useState<Record<string, { email: string; name: string }>>({});
-  const [redirectUri, setRedirectUri] = useState("");
 
-  // Query for redirect URI
-  const { data: redirectUriData } = useQuery({
-    queryKey: ["/api/auth/redirect-uri"],
-    queryFn: async () => {
-      const response = await apiRequest("GET", "/api/auth/redirect-uri");
-      return response.json();
-    },
-  });
+  const institutionName = branding?.institutionName || "Your Institution";
+  const progress = ((currentStep + 1) / SETUP_STEPS.length) * 100;
 
-  useEffect(() => {
-    if (redirectUriData?.redirectUri) {
-      setRedirectUri(redirectUriData.redirectUri);
-    }
-  }, [redirectUriData]);
-
-  const { data: hasAdmin, isLoading: checkingAdmin } = useQuery({
-    queryKey: ["/api/setup/has-admin"],
-    queryFn: async () => {
-      const response = await apiRequest("GET", "/api/setup/has-admin");
-      return response.json();
-    },
-  });
-
-  const form = useForm<FormValues>({
-    resolver: zodResolver(insertUserSchema),
-    defaultValues: {
-      username: "",
-      password: "",
-      role: "admin",
-      department: "Administration",
-    },
-  });
-
-  const officeForm = useForm({
-    defaultValues: {
-      name: "",
-      email: "",
-    },
-  });
-
-  const createAdminMutation = useMutation({
-    mutationFn: async (data: FormValues) => {
-      const response = await apiRequest("POST", "/api/setup/admin", data);
-      if (!response.ok) {
-        throw new Error("Failed to create admin account");
-      }
-      return response.json();
-    },
-    onSuccess: () => {
-      toast({
-        title: "Admin Account Created",
-        description: "You can now proceed with configuring compliance offices.",
-      });
-      setCurrentStep((prev) => prev + 1);
-    },
-    onError: (error) => {
-      toast({
-        title: "Setup Error",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
-
-  useEffect(() => {
-    if (hasAdmin && currentStep === 0) {
-      setCurrentStep(1);
-    }
-  }, [hasAdmin]);
-
-  if (isComplete) {
-    return <Redirect to="/admin/settings" />;
+  if (!user) {
+    return <Redirect to="/auth" />;
   }
 
-  const handleOfficeSubmit = (data: { name: string; email: string }) => {
-    const currentCategory = REGULATION_CATEGORIES[officeStep];
-    setOfficeAssignments((prev) => ({
-      ...prev,
-      [currentCategory]: data,
-    }));
-
-    if (officeStep < REGULATION_CATEGORIES.length - 1) {
-      setOfficeStep((prev) => prev + 1);
-      officeForm.reset();
-    } else {
-      setIsComplete(true);
-    }
-  };
-
-  if (checkingAdmin) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="h-8 w-8 animate-spin text-border" />
+  const renderWelcome = () => (
+    <div className="space-y-4">
+      <p className="text-gray-600">
+        Welcome to the {institutionName} Compliance Portal. This quick guide will help you
+        get your institution set up. You can complete these steps now or come back to them later
+        from <strong>System Settings</strong>.
+      </p>
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <h4 className="font-medium text-blue-900 mb-2">What's already set up:</h4>
+        <ul className="text-sm text-blue-800 space-y-1">
+          <li className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-green-600" /> Your database and regulations are loaded</li>
+          <li className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-green-600" /> Your admin account is active</li>
+          <li className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-green-600" /> Institution branding is configured</li>
+        </ul>
       </div>
-    );
-  }
+      <Button onClick={() => setCurrentStep(1)} className="w-full">
+        Let's Get Started
+      </Button>
+    </div>
+  );
 
-  const setupSteps = hasAdmin
-    ? [
-        {
-          id: "oauth2",
-          title: "Configure OAuth2",
-          description:
-            "Set up OAuth2 credentials for Google Sheets integration across different environments. This can be configured later in admin settings.",
-          icon: Key,
-          required: false,
-        },
-        {
-          id: "offices",
-          title: "Assign Compliance Offices",
-          description:
-            "Designate offices responsible for each regulation category.",
-          icon: UserPlus,
-          required: false,
-        },
-      ]
-    : [
-        {
-          id: "admin",
-          title: "Create Admin Account",
-          description: "Set up the initial administrator account for managing compliance",
-          icon: User,
-          required: true,
-        },
-        {
-          id: "oauth2",
-          title: "Configure OAuth2",
-          description:
-            "Set up OAuth2 credentials for Google Sheets integration across different environments. This can be configured later in admin settings.",
-          icon: Key,
-          required: false,
-        },
-        {
-          id: "offices",
-          title: "Assign Compliance Offices",
-          description:
-            "Designate offices responsible for each regulation category.",
-          icon: UserPlus,
-          required: false,
-        },
-      ];
+  const renderSettings = () => (
+    <div className="space-y-4">
+      <p className="text-gray-600">
+        Review your institution profile, branding colors, and notification preferences.
+        These were set during provisioning but can be fine-tuned here.
+      </p>
+      <div className="bg-gray-50 rounded-lg p-4 space-y-3 text-sm">
+        <div><strong>Institution Type:</strong> Configured during setup (editable in Settings &gt; Institution)</div>
+        <div><strong>Branding:</strong> Colors and logo (editable in Settings &gt; Branding)</div>
+        <div><strong>Notifications:</strong> Email delivery settings (Settings &gt; Notifications)</div>
+      </div>
+      <div className="flex gap-3">
+        <Button variant="outline" onClick={() => navigate("/admin/settings")} className="flex-1">
+          Open System Settings
+        </Button>
+        <Button onClick={() => setCurrentStep(2)} className="flex-1">
+          Next: Add Users
+        </Button>
+      </div>
+    </div>
+  );
 
-  const progress = ((currentStep + 1) / setupSteps.length) * 100;
-  const officeProgress = ((officeStep + 1) / REGULATION_CATEGORIES.length) * 100;
+  const renderUsers = () => (
+    <div className="space-y-4">
+      <p className="text-gray-600">
+        Add your compliance team members. You can create local accounts now, or set up
+        SSO in the next step so users authenticate through your institution's identity provider.
+      </p>
+      <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+        <h4 className="font-medium text-amber-900 mb-2">Recommended roles:</h4>
+        <ul className="text-sm text-amber-800 space-y-1">
+          <li><strong>Admin</strong> — Full access to settings, users, and all features</li>
+          <li><strong>Compliance Officer</strong> — Manage regulations, tasks, and attestations</li>
+          <li><strong>User</strong> — View regulations and complete assigned tasks</li>
+        </ul>
+      </div>
+      <div className="flex gap-3">
+        <Button variant="outline" onClick={() => navigate("/admin/settings")} className="flex-1">
+          Manage Users in Settings
+        </Button>
+        <Button onClick={() => setCurrentStep(3)} className="flex-1">
+          Next: SSO Setup
+        </Button>
+      </div>
+    </div>
+  );
+
+  const renderSSO = () => (
+    <div className="space-y-4">
+      <p className="text-gray-600">
+        Single Sign-On allows your users to log in with their institutional credentials
+        (Okta, Azure AD, Shibboleth, etc.). Your EdSteward administrator will configure
+        this with your IT department.
+      </p>
+      <div className="bg-gray-50 rounded-lg p-4 space-y-2 text-sm">
+        <div><strong>SP Entity ID:</strong> <code className="bg-white px-1 rounded">urn:edsteward:sp:{user?.username?.split('@')[1]?.split('.')[0] || 'your-institution'}</code></div>
+        <div><strong>Callback URL:</strong> <code className="bg-white px-1 rounded">https://{window.location.hostname}/auth/saml/callback</code></div>
+        <p className="text-gray-500 mt-2">
+          Share these details with your IT department when setting up the SAML integration.
+          SSO can be configured at any time — it doesn't need to happen now.
+        </p>
+      </div>
+      <Button onClick={() => navigate("/admin/settings")} className="w-full">
+        Complete Setup — Go to Settings
+      </Button>
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center">
       <div className="max-w-2xl w-full px-4">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-[#002147] mb-2">
-            Moravian Compliance Portal Setup
+          <h1 className="text-3xl font-bold mb-2">
+            {institutionName} Compliance Portal Setup
           </h1>
           <p className="text-muted-foreground">
-            Complete the following steps to set up your compliance portal.
+            Complete the following steps to get your compliance portal ready.
           </p>
         </div>
 
         <Progress value={progress} className="mb-8" />
 
-        <div className="space-y-6">
-          {setupSteps.map((step, index) => {
+        <div className="space-y-4">
+          {SETUP_STEPS.map((step, index) => {
             const Icon = step.icon;
             const isCurrent = index === currentStep;
             const isCompleted = index < currentStep;
@@ -224,236 +159,33 @@ export default function SetupWizardPage() {
             return (
               <Card
                 key={step.id}
-                className={`${isCurrent ? "ring-2 ring-[#00267A]" : ""} ${
-                  isCompleted ? "bg-background" : ""
+                className={`transition-all ${isCurrent ? "ring-2 ring-primary" : ""} ${
+                  isCompleted ? "opacity-60" : ""
                 }`}
               >
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-3">
-                    <Icon
-                      className={`h-6 w-6 ${
-                        isCompleted ? "text-green-500" : "text-[#00267A]"
-                      }`}
-                    />
-                    {step.title}
-                    {step.required && (
-                      <span className="text-sm text-red-500 ml-2">Required</span>
+                <CardHeader className="cursor-pointer" onClick={() => index <= currentStep && setCurrentStep(index)}>
+                  <CardTitle className="flex items-center gap-3 text-base">
+                    {isCompleted ? (
+                      <CheckCircle2 className="h-5 w-5 text-green-500" />
+                    ) : (
+                      <Icon className="h-5 w-5 text-primary" />
                     )}
+                    {step.title}
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
-                  {isCurrent && step.id === "admin" && !hasAdmin && (
-                    <Form {...form}>
-                      <form
-                        onSubmit={form.handleSubmit((data) =>
-                          createAdminMutation.mutate(data)
-                        )}
-                        className="space-y-6"
-                      >
-                        <FormField
-                          control={form.control}
-                          name="username"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Username</FormLabel>
-                              <FormControl>
-                                <Input {...field} />
-                              </FormControl>
-                              <FormDescription>
-                                Choose a username for the administrator account
-                              </FormDescription>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={form.control}
-                          name="password"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Password</FormLabel>
-                              <FormControl>
-                                <Input type="password" {...field} />
-                              </FormControl>
-                              <FormDescription>
-                                Create a secure password for the administrator account
-                              </FormDescription>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        <Button
-                          type="submit"
-                          className="w-full"
-                          disabled={createAdminMutation.isPending}
-                        >
-                          {createAdminMutation.isPending ? (
-                            <>
-                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                              Creating Account...
-                            </>
-                          ) : (
-                            "Create Admin Account"
-                          )}
-                        </Button>
-                      </form>
-                    </Form>
-                  )}
-
-                  {isCurrent && step.id === "oauth2" && (
-                    <div className="space-y-6">
-                      <Tabs defaultValue="development" className="w-full">
-                        <TabsList className="grid w-full grid-cols-2">
-                          <TabsTrigger value="development">Development</TabsTrigger>
-                          <TabsTrigger value="production">Production</TabsTrigger>
-                        </TabsList>
-                        <TabsContent value="development" className="space-y-4">
-                          <div className="rounded-lg bg-slate-50 p-4 border border-slate-200">
-                            <h3 className="font-medium mb-2">Development Setup</h3>
-                            <ol className="list-decimal list-inside space-y-2 text-sm">
-                              <li>Go to Google Cloud Console</li>
-                              <li>Create a new project or select existing one</li>
-                              <li>Enable Google Sheets API</li>
-                              <li>Create OAuth2 credentials:
-                                <ul className="list-disc list-inside ml-4 mt-1">
-                                  <li>Application type: Web application</li>
-                                  <li>Redirect URI (Development):</li>
-                                  <code className="block bg-slate-100 p-2 my-1 rounded text-xs break-all">
-                                    {redirectUri}
-                                  </code>
-                                </ul>
-                              </li>
-                            </ol>
-                          </div>
-                        </TabsContent>
-                        <TabsContent value="production" className="space-y-4">
-                          <div className="rounded-lg bg-slate-50 p-4 border border-slate-200">
-                            <h3 className="font-medium mb-2">Production Setup</h3>
-                            <ol className="list-decimal list-inside space-y-2 text-sm">
-                              <li>Create new OAuth2 credentials for production</li>
-                              <li>Use your production domain for redirect URI:
-                                <code className="block bg-slate-100 p-2 my-1 rounded text-xs">
-                                  https://compliance.moravian.edu/api/auth/google/callback
-                                </code>
-                              </li>
-                              <li>Update environment variables in production:
-                                <pre className="bg-slate-100 p-2 my-1 rounded text-xs">
-                                  GOOGLE_CLIENT_ID=prod_client_id{"\n"}
-                                  GOOGLE_CLIENT_SECRET=prod_client_secret{"\n"}
-                                  GOOGLE_SHEETS_SHEET_ID=your_sheet_id
-                                </pre>
-                              </li>
-                            </ol>
-                          </div>
-                        </TabsContent>
-                      </Tabs>
-                      <div className="flex justify-between pt-4">
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          onClick={() => setCurrentStep((prev) => prev + 1)}
-                        >
-                          Skip OAuth2 Setup
-                        </Button>
-                        <Button onClick={() => setCurrentStep((prev) => prev + 1)}>
-                          Continue
-                        </Button>
-                      </div>
-                    </div>
-                  )}
-
-                  {isCurrent && step.id === "offices" && (
-                    <div className="space-y-6">
-                      <div className="mb-6">
-                        <Progress value={officeProgress} className="mb-2" />
-                        <p className="text-sm text-muted-foreground text-center">
-                          Step {officeStep + 1} of {REGULATION_CATEGORIES.length}
-                        </p>
-                      </div>
-
-                      <div className="space-y-4">
-                        <h3 className="text-lg font-medium">
-                          Assign Office for {REGULATION_CATEGORIES[officeStep]}
-                        </h3>
-                        <p className="text-muted-foreground">
-                          Assign a compliance office responsible for{" "}
-                          {REGULATION_CATEGORIES[officeStep]} regulations.
-                          We recommend using department distribution lists (e.g.,{" "}
-                          {SUGGESTED_DISTRIBUTION_LISTS[REGULATION_CATEGORIES[officeStep]]}){" "}
-                          to ensure notifications reach the entire team.
-                        </p>
-
-                        <Form {...officeForm}>
-                          <form
-                            onSubmit={officeForm.handleSubmit(handleOfficeSubmit)}
-                            className="space-y-4"
-                          >
-                            <FormField
-                              control={officeForm.control}
-                              name="name"
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormLabel>Office Name</FormLabel>
-                                  <FormControl>
-                                    <Input
-                                      placeholder="Enter office or department name"
-                                      {...field}
-                                    />
-                                  </FormControl>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-
-                            <FormField
-                              control={officeForm.control}
-                              name="email"
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormLabel>Office Email</FormLabel>
-                                  <FormControl>
-                                    <Input
-                                      type="email"
-                                      placeholder={`e.g., ${SUGGESTED_DISTRIBUTION_LISTS[REGULATION_CATEGORIES[officeStep]]}`}
-                                      {...field}
-                                    />
-                                  </FormControl>
-                                  <FormDescription>
-                                    Use department distribution lists to ensure the entire team receives notifications
-                                  </FormDescription>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-
-                            <div className="flex justify-between pt-4">
-                              {/* Temporarily removed Skip Setup button
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                onClick={() => setIsComplete(true)}
-                              >
-                                Skip Setup
-                              </Button>
-                              */}
-                              <Button type="submit">
-                                {officeStep === REGULATION_CATEGORIES.length - 1
-                                  ? "Complete Setup"
-                                  : "Next Category"}
-                              </Button>
-                            </div>
-                          </form>
-                        </Form>
-                      </div>
-                    </div>
-                  )}
-
-                  {!isCurrent && (
-                    <p className="text-muted-foreground">{step.description}</p>
-                  )}
-                </CardContent>
+                {isCurrent && (
+                  <CardContent>
+                    {step.id === "welcome" && renderWelcome()}
+                    {step.id === "settings" && renderSettings()}
+                    {step.id === "users" && renderUsers()}
+                    {step.id === "sso" && renderSSO()}
+                  </CardContent>
+                )}
+                {!isCurrent && !isCompleted && (
+                  <CardContent>
+                    <p className="text-muted-foreground text-sm">{step.description}</p>
+                  </CardContent>
+                )}
               </Card>
             );
           })}

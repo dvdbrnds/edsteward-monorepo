@@ -19,7 +19,6 @@ import {
   Settings,
   Shield,
   Bell,
-  BarChart3,
   Menu,
   X,
   Sun,
@@ -95,7 +94,6 @@ export default function Navigation() {
 
   const links = [
     { href: "/", label: "Dashboard", icon: LayoutDashboard, badge: badges.totalUrgent, tourId: "nav-dashboard" },
-    { href: "/analytics", label: "Analytics", icon: BarChart3, badge: 0, tourId: "nav-analytics" },
     { href: "/notifications", label: "Notifications", icon: Bell, badge: badges.overdueAlerts, tourId: "nav-notifications" },
     ...(user?.role?.toLowerCase() === "admin" || user?.role?.toLowerCase() === "compliance_officer"
       ? [

@@ -1,5 +1,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useCallback, useMemo, useState, useEffect } from "react";
+import { useCallback, useMemo, useState, useEffect, createContext, useContext } from "react";
+import type { ReactNode } from "react";
 
 interface InstitutionConfig {
   primaryType: string | null;
@@ -10,7 +11,20 @@ interface InstitutionConfig {
 
 const CONFIG_QUERY_KEY = ["/api/institution-config/types"] as const;
 
-export function useInstitutionFilter() {
+interface InstitutionFilterContextType {
+  config: InstitutionConfig | undefined;
+  isLoading: boolean;
+  institutionTypes: string[];
+  isConfigured: boolean;
+  isFiltering: boolean;
+  toggleFilter: () => void;
+  regulationsQueryKey: readonly [string];
+  invalidateRegulations: () => void;
+}
+
+const InstitutionFilterContext = createContext<InstitutionFilterContextType | null>(null);
+
+export function InstitutionFilterProvider({ children }: { children: ReactNode }) {
   const queryClient = useQueryClient();
 
   const { data: config, isLoading } = useQuery<InstitutionConfig>({
@@ -55,7 +69,7 @@ export function useInstitutionFilter() {
     queryClient.invalidateQueries({ queryKey: ["/api/regulations"] });
   }, [queryClient]);
 
-  return {
+  const value = useMemo<InstitutionFilterContextType>(() => ({
     config,
     isLoading,
     institutionTypes,
@@ -64,5 +78,19 @@ export function useInstitutionFilter() {
     toggleFilter,
     regulationsQueryKey,
     invalidateRegulations,
-  };
+  }), [config, isLoading, institutionTypes, isConfigured, effectiveFiltering, toggleFilter, regulationsQueryKey, invalidateRegulations]);
+
+  return (
+    <InstitutionFilterContext.Provider value={value}>
+      {children}
+    </InstitutionFilterContext.Provider>
+  );
+}
+
+export function useInstitutionFilter() {
+  const context = useContext(InstitutionFilterContext);
+  if (!context) {
+    throw new Error("useInstitutionFilter must be used within an InstitutionFilterProvider");
+  }
+  return context;
 }

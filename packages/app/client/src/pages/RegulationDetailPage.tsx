@@ -123,6 +123,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
+import {
+  Command,
+  CommandInput,
+  CommandList,
+  CommandEmpty,
+  CommandGroup,
+  CommandItem,
+} from "@/components/ui/command";
 import {
   ExternalLink,
   FileText,
@@ -144,6 +153,7 @@ import {
   Calendar,
   ChevronDown,
   ChevronRight,
+  ChevronsUpDown,
   Scale,
   FolderOpen,
   MessageSquare,
@@ -212,10 +222,12 @@ function RegulationDetailPage() {
   
   // DRI reassignment confirmation state
   const [pendingDriChange, setPendingDriChange] = useState<{
-    newOwnerId: string;
+    newOwnerId?: string;
+    newOwnerRole?: string;
     newOwnerName: string;
     currentOwnerName: string;
   } | null>(null);
+  const [driPopoverOpen, setDriPopoverOpen] = useState(false);
   
   // Accordion section states - Summary expanded by default, others collapsed
   const [summaryOpen, setSummaryOpen] = useState(true);
@@ -428,6 +440,19 @@ function RegulationDetailPage() {
     enabled: isAdmin,
   });
 
+  // Fetch canonical role assignments for DRI selection
+  const { data: roleAssignments = [] } = useQuery<Array<{
+    id: number;
+    roleName: string;
+    displayName: string | null;
+    defaultUserId: number | null;
+    defaultUser: { id: number; firstName: string | null; lastName: string | null; email: string | null } | null;
+    category: string | null;
+  }>>({
+    queryKey: ["/api/role-assignments"],
+    enabled: isAdmin,
+  });
+
   const categoryMutation = useMutation({
     mutationFn: async (category: string) => {
       
@@ -470,19 +495,24 @@ function RegulationDetailPage() {
   });
 
   const ownerMutation = useMutation({
-    mutationFn: async (ownerId: string | null) => {
+    mutationFn: async (payload: { ownerId?: string | null; ownerRole?: string }) => {
       if (!regulation?.id) {
         throw new Error('No regulation ID available');
+      }
+
+      const body: Record<string, unknown> = {};
+      if (payload.ownerRole) {
+        body.ownerRole = payload.ownerRole;
+      } else {
+        body.ownerId = payload.ownerId === "unassigned" ? null : payload.ownerId;
       }
       
       const response = await fetch(
         `/api/regulations/${regulation.id}/owner`,
         {
           method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ ownerId: ownerId === "unassigned" ? null : ownerId }),
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
         }
       );
       
@@ -870,94 +900,151 @@ function RegulationDetailPage() {
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-xs text-muted-foreground">Primary DRI:</span>
-                      <Select
-                        key={`owner-${regulation.ownerId || 'none'}`}
-                        value={regulation.ownerId?.toString() || "unassigned"}
-                        onValueChange={(value) => {
-                          // Get current owner name
-                          const currentOwner = regulation.ownerId 
-                            ? users.find(u => u.id === regulation.ownerId)
-                            : null;
-                          const currentOwnerName = currentOwner
-                            ? (currentOwner.firstName && currentOwner.lastName)
-                              ? `${currentOwner.firstName} ${currentOwner.lastName}`
-                              : currentOwner.username || currentOwner.email || 'Unknown'
-                            : 'No one';
-                          
-                          // Get new owner name
-                          const newOwner = value === 'unassigned' 
-                            ? null 
-                            : users.find(u => u.id.toString() === value);
-                          const newOwnerName = newOwner
-                            ? (newOwner.firstName && newOwner.lastName)
-                              ? `${newOwner.firstName} ${newOwner.lastName}`
-                              : newOwner.username || newOwner.email || 'Unknown'
-                            : 'No one (unassigned)';
-                          
-                          // Show confirmation dialog
-                          setPendingDriChange({
-                            newOwnerId: value,
-                            newOwnerName,
-                            currentOwnerName,
-                          });
-                        }}
-                      >
-                        <SelectTrigger className="w-[220px] bg-indigo-50 border border-indigo-200 rounded-md hover:bg-indigo-100 transition-colors">
-                          <SelectValue placeholder="Assign Primary DRI...">
-                            {regulation.ownerId 
-                              ? (() => {
-                                  const owner = users.find(u => u.id === regulation.ownerId);
-                                  if (owner) {
-                                    return (owner.firstName && owner.lastName)
-                                      ? `${owner.firstName} ${owner.lastName}`
-                                      : owner.username || owner.email || `User ${regulation.ownerId}`;
-                                  }
-                                  return `User ${regulation.ownerId}`;
-                                })()
-                              : "— No Primary DRI —"}
-                          </SelectValue>
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="unassigned">
-                            <span className="text-muted-foreground">— No Primary DRI —</span>
-                          </SelectItem>
-                          {users
-                            .filter(u => {
-                              // Allow admins, compliance officers, department heads, and any user with a name
-                              const eligibleRoles = ['admin', 'compliance_officer', 'department_head', 'user'];
-                              return eligibleRoles.includes(u.role) && (u.firstName || u.lastName || u.username);
-                            })
-                            .sort((a, b) => {
-                              // Sort by role priority, then by name
-                              const rolePriority: Record<string, number> = { admin: 0, compliance_officer: 1, department_head: 2, user: 3 };
-                              const aPriority = rolePriority[a.role] ?? 4;
-                              const bPriority = rolePriority[b.role] ?? 4;
-                              if (aPriority !== bPriority) return aPriority - bPriority;
-                              const aName = `${a.firstName || ''} ${a.lastName || ''}`.trim() || a.username || '';
-                              const bName = `${b.firstName || ''} ${b.lastName || ''}`.trim() || b.username || '';
-                              return aName.localeCompare(bName);
-                            })
-                            .map((u) => {
-                              const displayName = (u.firstName && u.lastName) 
-                                ? `${u.firstName} ${u.lastName}` 
-                                : u.username || u.email || `User ${u.id}`;
-                              const roleLabels: Record<string, string> = {
-                                admin: 'Admin',
-                                compliance_officer: 'Compliance',
-                                department_head: 'Dept Head',
-                                user: 'Staff'
-                              };
-                              return (
-                                <SelectItem key={u.id} value={u.id.toString()}>
-                                  {displayName}
-                                  <span className="text-xs text-muted-foreground ml-2">
-                                    ({roleLabels[u.role] || u.role})
-                                  </span>
-                                </SelectItem>
-                              );
-                            })}
-                        </SelectContent>
-                      </Select>
+                      {(() => {
+                        const canonicalRole = (regulation as any).suggestedDriRole as string | null;
+                        const hasManualOverride = !!regulation.ownerId;
+                        const manualOwnerName = hasManualOverride
+                          ? (() => {
+                              const owner = users.find(u => u.id === regulation.ownerId);
+                              if (owner) {
+                                return (owner.firstName && owner.lastName)
+                                  ? `${owner.firstName} ${owner.lastName}`
+                                  : owner.username || owner.email || `User ${regulation.ownerId}`;
+                              }
+                              return `User ${regulation.ownerId}`;
+                            })()
+                          : null;
+
+                        const displayValue = hasManualOverride ? manualOwnerName! : (canonicalRole || '— No Primary DRI —');
+                        const currentDriLabel = hasManualOverride
+                          ? `${manualOwnerName} (manual override)`
+                          : canonicalRole || 'No one';
+
+                        return (
+                          <>
+                            <Popover open={driPopoverOpen} onOpenChange={setDriPopoverOpen}>
+                              <PopoverTrigger asChild>
+                                <Button
+                                  variant="outline"
+                                  role="combobox"
+                                  aria-expanded={driPopoverOpen}
+                                  className="w-[280px] justify-between bg-indigo-50 border border-indigo-200 hover:bg-indigo-100 transition-colors font-normal"
+                                >
+                                  <div className="flex items-center gap-1.5 truncate">
+                                    {!hasManualOverride && canonicalRole && (
+                                      <Shield className="h-3.5 w-3.5 text-indigo-600 shrink-0" />
+                                    )}
+                                    <span className="truncate">{displayValue}</span>
+                                  </div>
+                                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                </Button>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-[320px] p-0" align="start">
+                                <Command>
+                                  <CommandInput placeholder="Search roles or people..." />
+                                  <CommandList>
+                                    <CommandEmpty>No matches found.</CommandEmpty>
+                                    <CommandGroup heading="Canonical Roles">
+                                      {roleAssignments
+                                        .sort((a, b) => {
+                                          if (a.roleName === canonicalRole) return -1;
+                                          if (b.roleName === canonicalRole) return 1;
+                                          return a.roleName.localeCompare(b.roleName);
+                                        })
+                                        .map((ra) => {
+                                          const mappedUser = ra.defaultUser
+                                            ? (ra.defaultUser.firstName && ra.defaultUser.lastName)
+                                              ? `${ra.defaultUser.firstName} ${ra.defaultUser.lastName}`
+                                              : ra.defaultUser.email || null
+                                            : null;
+                                          const isDefault = ra.roleName === canonicalRole;
+                                          const isActive = isDefault && !hasManualOverride;
+                                          return (
+                                            <CommandItem
+                                              key={`role-${ra.id}`}
+                                              value={`${ra.roleName} ${ra.displayName || ''} ${ra.category || ''}`}
+                                              onSelect={() => {
+                                                setDriPopoverOpen(false);
+                                                setPendingDriChange({
+                                                  newOwnerRole: ra.roleName,
+                                                  newOwnerName: mappedUser ? `${ra.roleName} → ${mappedUser}` : `${ra.roleName} (no user mapped)`,
+                                                  currentOwnerName: currentDriLabel,
+                                                });
+                                              }}
+                                              className={isDefault ? 'bg-indigo-50' : ''}
+                                            >
+                                              <Check className={`mr-2 h-4 w-4 ${isActive ? 'opacity-100 text-indigo-600' : 'opacity-0'}`} />
+                                              <div className="flex flex-col min-w-0">
+                                                <span className={isDefault ? 'font-medium text-indigo-700' : ''}>
+                                                  {ra.roleName}
+                                                  {isDefault && <span className="text-xs text-indigo-500 ml-1">(default)</span>}
+                                                </span>
+                                                {mappedUser && (
+                                                  <span className="text-xs text-muted-foreground truncate">→ {mappedUser}</span>
+                                                )}
+                                                {!mappedUser && (
+                                                  <span className="text-xs text-amber-500 truncate">No user mapped</span>
+                                                )}
+                                              </div>
+                                            </CommandItem>
+                                          );
+                                        })}
+                                    </CommandGroup>
+                                    <CommandGroup heading="Override with Specific Person">
+                                      {users
+                                        .filter(u => {
+                                          const eligibleRoles = ['admin', 'compliance_officer', 'department_head', 'user'];
+                                          return eligibleRoles.includes(u.role) && (u.firstName || u.lastName || u.username);
+                                        })
+                                        .sort((a, b) => {
+                                          const aName = `${a.firstName || ''} ${a.lastName || ''}`.trim() || a.username || '';
+                                          const bName = `${b.firstName || ''} ${b.lastName || ''}`.trim() || b.username || '';
+                                          return aName.localeCompare(bName);
+                                        })
+                                        .map((u) => {
+                                          const displayName = (u.firstName && u.lastName)
+                                            ? `${u.firstName} ${u.lastName}`
+                                            : u.username || u.email || `User ${u.id}`;
+                                          const roleLabels: Record<string, string> = {
+                                            admin: 'Admin',
+                                            compliance_officer: 'Compliance',
+                                            department_head: 'Dept Head',
+                                            user: 'Staff'
+                                          };
+                                          return (
+                                            <CommandItem
+                                              key={u.id}
+                                              value={`${displayName} ${u.email || ''}`}
+                                              onSelect={() => {
+                                                setDriPopoverOpen(false);
+                                                setPendingDriChange({
+                                                  newOwnerId: u.id.toString(),
+                                                  newOwnerName: displayName,
+                                                  currentOwnerName: currentDriLabel,
+                                                });
+                                              }}
+                                            >
+                                              <Check className={`mr-2 h-4 w-4 ${regulation.ownerId === u.id ? "opacity-100" : "opacity-0"}`} />
+                                              <span>{displayName}</span>
+                                              <span className="ml-auto text-xs text-muted-foreground">
+                                                {roleLabels[u.role] || u.role}
+                                              </span>
+                                            </CommandItem>
+                                          );
+                                        })}
+                                    </CommandGroup>
+                                  </CommandList>
+                                </Command>
+                              </PopoverContent>
+                            </Popover>
+                            {hasManualOverride && canonicalRole && (
+                              <span className="text-xs text-muted-foreground whitespace-nowrap" title={`Default canonical role: ${canonicalRole}`}>
+                                Default: {canonicalRole}
+                              </span>
+                            )}
+                          </>
+                        );
+                      })()}
                     </div>
                   </div>
                 ) : (
@@ -987,13 +1074,22 @@ function RegulationDetailPage() {
                     </div>
                   );
                 })()}
-                {/* Statute */}
+                {/* Statute — clicks through to Full Regulation Text section */}
                 {regulation?.statute && (
-                  <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    className="flex items-center gap-2 hover:underline cursor-pointer"
+                    onClick={() => {
+                      setFullTextOpen(true);
+                      setTimeout(() => {
+                        document.getElementById('full-regulation-text')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      }, 100);
+                    }}
+                  >
                     <Scale className="h-4 w-4 text-muted-foreground" />
                     <span className="text-muted-foreground">Statute:</span>
-                    <span className="font-medium text-foreground">{regulation.statute}</span>
-                  </div>
+                    <span className="font-medium text-primary underline-offset-2">{regulation.statute}</span>
+                  </button>
                 )}
                 {/* Agency */}
                 {regulation?.agency_name && (
@@ -1908,7 +2004,11 @@ function RegulationDetailPage() {
                 <AlertDialogAction
                   onClick={() => {
                     if (pendingDriChange) {
-                      ownerMutation.mutate(pendingDriChange.newOwnerId);
+                      ownerMutation.mutate(
+                        pendingDriChange.newOwnerRole
+                          ? { ownerRole: pendingDriChange.newOwnerRole }
+                          : { ownerId: pendingDriChange.newOwnerId }
+                      );
                       setPendingDriChange(null);
                     }
                   }}

@@ -23,8 +23,8 @@ RUN cd server && npm run build
 # Production stage with nginx for frontend
 FROM node:20-alpine AS runner
 
-# Install nginx
-RUN apk add --no-cache nginx
+# Install nginx and PostgreSQL client (pg_dump/psql needed for schema cloning)
+RUN apk add --no-cache nginx postgresql-client
 
 WORKDIR /app
 

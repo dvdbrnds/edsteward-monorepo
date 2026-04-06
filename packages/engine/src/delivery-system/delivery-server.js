@@ -1835,6 +1835,159 @@ class DeliveryServer {
         });
       }
     });
+
+    // ══════════════════════════════════════════════════════════════════════
+    // SENTINEL API — Automated regulation change detection
+    // ══════════════════════════════════════════════════════════════════════
+
+    this.app.get('/api/sentinel/stats', async (req, res) => {
+      try {
+        const sentinelDb = await import('../sentinel/sentinel-db.js');
+        await sentinelDb.ensureSchema();
+        const stats = await sentinelDb.getDashboardStats();
+        res.json(stats);
+      } catch (error) {
+        console.error('[Sentinel] Stats error:', error.message);
+        res.status(500).json({ error: error.message });
+      }
+    });
+
+    this.app.get('/api/sentinel/signals', async (req, res) => {
+      try {
+        const sentinelDb = await import('../sentinel/sentinel-db.js');
+        const limit = parseInt(req.query.limit) || 50;
+        const signals = await sentinelDb.getRecentSignals(limit);
+        res.json(signals);
+      } catch (error) {
+        res.status(500).json({ error: error.message });
+      }
+    });
+
+    this.app.get('/api/sentinel/signals/regulation/:regId', async (req, res) => {
+      try {
+        const sentinelDb = await import('../sentinel/sentinel-db.js');
+        const signals = await sentinelDb.getSignalsForRegulation(
+          parseInt(req.params.regId),
+          parseInt(req.query.limit) || 20
+        );
+        res.json(signals);
+      } catch (error) {
+        res.status(500).json({ error: error.message });
+      }
+    });
+
+    this.app.get('/api/sentinel/runs', async (req, res) => {
+      try {
+        const sentinelDb = await import('../sentinel/sentinel-db.js');
+        const limit = parseInt(req.query.limit) || 20;
+        const runs = await sentinelDb.getRecentRuns(limit);
+        res.json(runs);
+      } catch (error) {
+        res.status(500).json({ error: error.message });
+      }
+    });
+
+    this.app.post('/api/sentinel/scan', async (req, res) => {
+      try {
+        const sentinelDb = await import('../sentinel/sentinel-db.js');
+        const scanner = await import('../sentinel/source-scanner.js');
+        const classifier = await import('../sentinel/change-classifier.js');
+
+        await sentinelDb.ensureSchema();
+
+        const sinceDate = req.body.sinceDate || (() => {
+          const d = new Date();
+          d.setDate(d.getDate() - 7);
+          return d.toISOString().split('T')[0];
+        })();
+
+        const run = await sentinelDb.createRun(sinceDate, req.body.scanType || 'full');
+
+        const summary = await scanner.runFullScan({
+          sinceDate,
+          concurrency: parseInt(req.body.concurrency) || 5,
+        });
+
+        const classified = classifier.classifyAll(summary.signals);
+
+        for (const item of classified.all) {
+          if (item.classification !== 'none') {
+            await sentinelDb.insertSignal(run.id, item);
+          }
+        }
+
+        await sentinelDb.completeRun(run.id, summary);
+
+        res.json({
+          runId: run.id,
+          regulationsScanned: summary.regulationsScanned,
+          frSignals: summary.frSignals,
+          ecfrChanges: summary.ecfrChanges,
+          stateActivity: summary.stateActivity,
+          errors: summary.errors,
+          actionable: classified.actionable.length,
+          informational: classified.informational.length,
+          watching: classified.watching.length,
+        });
+      } catch (error) {
+        console.error('[Sentinel] Scan error:', error.message);
+        res.status(500).json({ error: error.message });
+      }
+    });
+
+    this.app.post('/api/sentinel/process-workflows', async (req, res) => {
+      try {
+        const executor = await import('../sentinel/workflow-executor.js');
+        const result = await executor.processPendingWorkflows({
+          concurrency: parseInt(req.body.concurrency) || 3,
+          limit: parseInt(req.body.limit) || 50,
+          quickMode: req.body.quickMode || false,
+        });
+        res.json(result);
+      } catch (error) {
+        console.error('[Sentinel] Workflow error:', error.message);
+        res.status(500).json({ error: error.message });
+      }
+    });
+
+    this.app.post('/api/sentinel/process-deliveries', async (req, res) => {
+      try {
+        const delivery = await import('../sentinel/auto-delivery.js');
+        const result = await delivery.processPendingDeliveries({
+          limit: parseInt(req.body.limit) || 50,
+        });
+        res.json(result);
+      } catch (error) {
+        console.error('[Sentinel] Delivery error:', error.message);
+        res.status(500).json({ error: error.message });
+      }
+    });
+
+    this.app.post('/api/sentinel/signal/:signalId/workflow', async (req, res) => {
+      try {
+        const executor = await import('../sentinel/workflow-executor.js');
+        const result = await executor.executeSignalWorkflow(
+          parseInt(req.params.signalId),
+          { quick: req.body.quick || false }
+        );
+        res.json({ success: true, result });
+      } catch (error) {
+        res.status(500).json({ error: error.message });
+      }
+    });
+
+    this.app.post('/api/sentinel/signal/:signalId/deliver', async (req, res) => {
+      try {
+        const delivery = await import('../sentinel/auto-delivery.js');
+        const result = await delivery.deliverSignal(
+          parseInt(req.params.signalId),
+          req.body.mode
+        );
+        res.json(result);
+      } catch (error) {
+        res.status(500).json({ error: error.message });
+      }
+    });
   }
 
   async start() {

@@ -327,7 +327,7 @@ export const ExecutiveDashboard: React.FC = () => {
                 </p>
               </div>
               <Button variant="destructive" size="sm" asChild>
-                <Link href="/regulations">
+                <Link href="/">
                   View Issues <ArrowRight className="h-4 w-4 ml-2" />
                 </Link>
               </Button>
@@ -549,7 +549,7 @@ export const ExecutiveDashboard: React.FC = () => {
                 <CardDescription>Upcoming compliance deadlines</CardDescription>
               </div>
               <Button variant="ghost" size="sm" asChild>
-                <Link href="/regulations">
+                <Link href="/">
                   View All <ArrowRight className="h-4 w-4 ml-1" />
                 </Link>
               </Button>

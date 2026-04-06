@@ -24,7 +24,7 @@ const TOUR_STEPS: TourStep[] = [
   },
   {
     title: 'Dashboard',
-    description: 'Your home base. See overdue tasks, upcoming deadlines, compliance scores, and recent activity at a glance. Widgets are draggable — arrange them however you like.',
+    description: 'Your home base. The Regulations tab shows your full regulation list with key metrics. Switch to Analytics for compliance scores, charts, tasks, and deadlines.',
     target: '[data-tour="nav-dashboard"]',
     placement: 'bottom',
   },
@@ -42,7 +42,7 @@ const TOUR_STEPS: TourStep[] = [
   },
   {
     title: 'Your Regulations',
-    description: 'Below the dashboard, you\'ll find your full regulation list. Each regulation has compliance tasks, deadlines, evidence requirements, and an attestation workflow. Click any regulation to see its detail page.',
+    description: 'The regulation list is front and center on your dashboard. Each regulation has compliance tasks, deadlines, evidence requirements, and an attestation workflow. Click any regulation to see its detail page.',
     target: '[data-tour="nav-dashboard"]',
     placement: 'bottom',
   },

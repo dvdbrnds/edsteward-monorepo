@@ -55,8 +55,8 @@ function xmlToCleanText(xml) {
  * @returns {Promise<object>} - Full authoritative CFR text
  */
 export async function fetchCFRFullText(title, part, options = {}) {
-  const { section, name } = options;
-  const ecfrDate = '2025-01-01';
+  const { section, name, date } = options;
+  const ecfrDate = date || new Date().toISOString().split('T')[0];
 
   let apiUrl = `${ECFR_API_BASE}/full/${ecfrDate}/title-${title}.xml?part=${part}`;
   if (section) {
@@ -397,11 +397,32 @@ export async function fetchMultipleCitations(citations) {
   }
 }
 
+/**
+ * Lightweight check: fetch eCFR full text and return a SHA-256 content hash.
+ * Used by the Regulation Sentinel to detect upstream changes without running
+ * the full enrichment workflow.
+ *
+ * @param {string} title - CFR title number
+ * @param {string} part  - CFR part number
+ * @param {object} options - { section, name }
+ * @returns {Promise<{changed: boolean, hash: string|null, length: number, error?: string}>}
+ */
+export async function checkCFRHash(title, part, options = {}) {
+  const { createHash } = await import('crypto');
+  const result = await fetchCFRFullText(title, part, options);
+  if (!result.success) {
+    return { changed: false, hash: null, length: 0, error: result.error };
+  }
+  const hash = createHash('sha256').update(result.fullText).digest('hex');
+  return { changed: false, hash, length: result.length, date: result.date };
+}
+
 export default {
   fetchCFRFullText,
   fetchCFRPart,
   fetchCFRSection,
   fetchByCitation,
-  fetchMultipleCitations
+  fetchMultipleCitations,
+  checkCFRHash
 };
 

@@ -1674,6 +1674,46 @@
         /**
          * Load version control status on page load
          */
+        /**
+         * Load Sentinel status for this regulation from the delivery server.
+         */
+        async function loadSentinelStatus() {
+            const sourceEl = document.getElementById('sentinelSourceStatus');
+            const scanEl = document.getElementById('sentinelLastScan');
+            const countEl = document.getElementById('sentinelPendingCount');
+            if (!sourceEl) return;
+
+            try {
+                const [statsRes, sigRes] = await Promise.all([
+                    fetch('http://localhost:3003/api/sentinel/stats').then(r => r.ok ? r.json() : null).catch(() => null),
+                    fetch(`http://localhost:3003/api/sentinel/signals/regulation/${encodeURIComponent(REGULATION_SLUG)}`)
+                        .then(r => r.ok ? r.json() : []).catch(() => []),
+                ]);
+
+                if (statsRes && statsRes.last_scan) {
+                    scanEl.textContent = new Date(statsRes.last_scan).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+                }
+
+                if (sigRes && sigRes.length > 0) {
+                    const latest = sigRes[0];
+                    const classMap = { major: 'CHANGE DETECTED', routine: 'MINOR UPDATE', informational: 'INFO', watch: 'WATCHING' };
+                    const colorMap = { major: '#d32f2f', routine: '#f57c00', informational: '#1976d2', watch: '#f9a825' };
+                    sourceEl.textContent = classMap[latest.classification] || 'UP TO DATE';
+                    sourceEl.style.color = colorMap[latest.classification] || '#2e7d32';
+                    const pending = sigRes.filter(s => s.workflow_status === 'pending' || s.delivery_status === 'pending').length;
+                    countEl.textContent = pending > 0 ? `${pending} pending` : 'None';
+                } else {
+                    sourceEl.textContent = 'UP TO DATE';
+                    sourceEl.style.color = '#2e7d32';
+                    countEl.textContent = 'None';
+                }
+            } catch (err) {
+                sourceEl.textContent = 'OFFLINE';
+                sourceEl.style.color = '#9e9e9e';
+                console.warn('Sentinel status unavailable:', err.message);
+            }
+        }
+
         async function loadVersionStatus() {
             try {
                 const response = await fetch(`http://localhost:3004/api/llm/console-versions/${REG_KEY}`);
@@ -2064,6 +2104,88 @@
             }
         }
         
+        // Load Circuit Court Interpretations for this regulation
+        async function loadCircuitInterpretations() {
+            const slug = REGULATION_SLUG;
+            if (!slug) return;
+
+            try {
+                const response = await fetch(`http://localhost:3003/api/circuit-interpretations/${slug}`);
+                if (!response.ok) return;
+
+                const data = await response.json();
+                const interpretations = data.interpretations || [];
+                const splits = data.circuitSplits || [];
+                const total = interpretations.length + splits.length;
+
+                if (total === 0) return;
+
+                document.getElementById('circuit-section').style.display = 'block';
+                document.getElementById('data-circuit-count').textContent = total;
+
+                // Render circuit splits
+                if (splits.length > 0) {
+                    const splitsEl = document.getElementById('data-circuit-splits');
+                    splitsEl.innerHTML = '<div style="font-weight:600;color:#3730a3;margin-bottom:8px;font-size:13px;">Active Circuit Splits</div>' +
+                        splits.map(s => `
+                            <div style="background:white;border-radius:8px;padding:14px;margin-bottom:10px;border-left:4px solid #ef4444;box-shadow:0 1px 3px rgba(0,0,0,0.1);">
+                                <div style="font-weight:600;color:#1e293b;font-size:13px;margin-bottom:4px;">${s.title}</div>
+                                <div style="font-size:12px;color:#475569;line-height:1.6;margin-bottom:8px;">${s.description}</div>
+                                <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                                    ${(s.affectedCircuits || []).map(c => `<span style="background:#fee2e2;color:#991b1b;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;">${c}${c === 1 ? 'st' : c === 2 ? 'nd' : c === 3 ? 'rd' : 'th'} Cir.</span>`).join('')}
+                                    ${s.scotusPetitionPending ? '<span style="background:#fef3c7;color:#92400e;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;">SCOTUS Petition Pending</span>' : ''}
+                                    ${s.scotusCertGranted ? '<span style="background:#dc2626;color:white;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;">SCOTUS Cert Granted</span>' : ''}
+                                </div>
+                            </div>
+                        `).join('');
+                }
+
+                // Render interpretations
+                if (interpretations.length > 0) {
+                    const typeColors = { stricter: '#dc2626', broader: '#2563eb', narrower: '#d97706', divergent: '#7c3aed', vacated: '#991b1b' };
+                    const severityColors = { critical: '#dc2626', high: '#ea580c', medium: '#ca8a04', low: '#22c55e' };
+                    const listEl = document.getElementById('data-circuit-list');
+                    listEl.innerHTML = '<div style="font-weight:600;color:#3730a3;margin-bottom:8px;font-size:13px;">Circuit Interpretations</div>' +
+                        interpretations.map(ci => {
+                            const typeColor = typeColors[ci.interpretationType] || '#6b7280';
+                            const sevColor = severityColors[ci.impactSeverity] || '#6b7280';
+                            return `
+                                <div style="background:white;border-radius:8px;padding:14px;margin-bottom:10px;border-left:4px solid ${typeColor};box-shadow:0 1px 3px rgba(0,0,0,0.1);">
+                                    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+                                        <div>
+                                            <div style="font-weight:600;color:#1e293b;font-size:13px;">${ci.circuitNumber}${ci.circuitNumber === 1 ? 'st' : ci.circuitNumber === 2 ? 'nd' : ci.circuitNumber === 3 ? 'rd' : 'th'} Circuit</div>
+                                            <div style="color:#475569;font-size:12px;margin-top:2px;font-style:italic;">${ci.caseName} (${ci.caseYear})</div>
+                                        </div>
+                                        <div style="display:flex;gap:6px;">
+                                            <span style="background:${typeColor};color:white;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;text-transform:uppercase;">${ci.interpretationType}</span>
+                                            <span style="background:${sevColor};color:white;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;text-transform:uppercase;">${ci.impactSeverity}</span>
+                                        </div>
+                                    </div>
+                                    <div style="font-size:12px;color:#334155;line-height:1.6;margin-bottom:8px;">${ci.summary}</div>
+                                    ${ci.complianceImplication ? `<div style="font-size:11px;color:#1e40af;background:#eff6ff;padding:8px;border-radius:4px;line-height:1.5;"><strong>Compliance Impact:</strong> ${ci.complianceImplication}</div>` : ''}
+                                    ${ci.sourceUrl ? `<a href="${ci.sourceUrl}" target="_blank" style="display:inline-block;margin-top:6px;font-size:11px;color:#4f46e5;text-decoration:none;">📄 View Case →</a>` : ''}
+                                </div>`;
+                        }).join('');
+                }
+
+                addConsoleLog(`⚖️ Found ${interpretations.length} circuit interpretation(s) and ${splits.length} circuit split(s)`, 'info');
+            } catch (error) {
+                console.error('Error loading circuit interpretations:', error);
+            }
+        }
+
+        function toggleCircuitSection() {
+            const el = document.getElementById('data-circuit-expanded');
+            const toggle = document.getElementById('circuit-toggle');
+            if (el.style.display === 'none') {
+                el.style.display = 'block';
+                if (toggle) toggle.textContent = '▲ Collapse';
+            } else {
+                el.style.display = 'none';
+                if (toggle) toggle.textContent = '▼ Expand';
+            }
+        }
+
         // TAB 1: Load Complete Data (All Rich Data)
         async function loadCompleteData() {
             console.log('🔄 loadCompleteData() called');
@@ -4111,8 +4233,15 @@
             loadVersionStatus();
             addConsoleLog(`🔐 Loading version control for ${REG_KEY}...`, 'info');
             
+            // Load Sentinel change-detection status
+            loadSentinelStatus();
+            
             // Load the first tab (Regulation Text)
             loadRegulationText();
+            
+            // Load supplementary data (EOs, circuit courts)
+            loadExecutiveOrders();
+            loadCircuitInterpretations();
             
             // Initialize WebSocket for real-time updates
             initializeWebSocketConnection();

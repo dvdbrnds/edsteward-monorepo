@@ -27,6 +27,7 @@ import SystemSettings from './components/SystemSettings';
 import CustomerDeliveryDashboard from './components/CustomerDeliveryDashboard';
 import RegulationSearch from './components/RegulationSearch';
 import ErrorBoundary from './components/ErrorBoundary';
+import SentinelDashboard from './components/SentinelDashboard';
 
 // Theme configuration with Material Design color palette
 const theme = {
@@ -191,6 +192,7 @@ const DevClientApp = () => {
               <NavLink to="/editor">MCP Editor</NavLink>
               <NavLink to="/health">Health</NavLink>
               <NavLink to="/batch">Batch Testing</NavLink>
+              <NavLink to="/sentinel">Sentinel</NavLink>
               <NavLink to="/debug">Debug</NavLink>
               <NavLink to="/admin">Admin</NavLink>
             </Nav>
@@ -209,6 +211,11 @@ const DevClientApp = () => {
               <Route path="/customer-delivery" element={
                 <ErrorBoundary>
                   <CustomerDeliveryDashboard />
+                </ErrorBoundary>
+              } />
+              <Route path="/sentinel" element={
+                <ErrorBoundary>
+                  <SentinelDashboard />
                 </ErrorBoundary>
               } />
               <Route path="/batch" element={<BatchTestingPanel />} />

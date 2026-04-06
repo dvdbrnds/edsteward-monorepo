@@ -207,6 +207,18 @@
                                     </div>
                                 </div>
                     
+<!-- SECTION 6.7: Circuit Court Interpretations -->
+                                <div id="circuit-section" style="margin-bottom: 24px; background: #eef2ff; border-radius: 12px; border: 1px solid #818cf8; overflow: hidden; display: none;">
+                                    <div onclick="toggleCircuitSection()" style="padding: 16px 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, #3730a3 0%, #4f46e5 100%); color: white;">
+                                        <h4 style="margin: 0; font-size: 14px; color: white;">⚖️ Circuit Court Interpretations (<span id="data-circuit-count">0</span>)</h4>
+                                        <span id="circuit-toggle" style="font-size: 12px; color: white;">▼ Expand</span>
+                                    </div>
+                                    <div id="data-circuit-expanded" style="display: none; padding: 16px; max-height: 500px; overflow-y: auto; background: #f5f3ff;">
+                                        <div id="data-circuit-splits" style="margin-bottom: 16px;"></div>
+                                        <div id="data-circuit-list" style="font-size: 13px; color: #1e293b;"></div>
+                                    </div>
+                                </div>
+
 <!-- SECTION 7: Full Regulation Text (Collapsible) -->
                                 <div style="margin-bottom: 24px; background: #fafbfc; border-radius: 12px; border: 1px solid #e1e5e9;">
                                     <div onclick="toggleRegText()" style="padding: 16px 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e1e5e9;">
@@ -492,6 +504,28 @@
                 <div id="versionMessage" class="version-message" style="display: none;"></div>
             </div>
             
+            <h3>Sentinel Status</h3>
+            <div class="diagnostics-panel" id="sentinelPanel">
+                <div class="diagnostic-item">
+                    <span>Source Status</span>
+                    <span id="sentinelSourceStatus" class="diagnostic-status ok" style="font-size:11px">CHECKING</span>
+                </div>
+                <div class="diagnostic-item">
+                    <span>Last Scanned</span>
+                    <span id="sentinelLastScan" style="font-size:11px;color:#6e7681">—</span>
+                </div>
+                <div class="diagnostic-item">
+                    <span>Pending Signals</span>
+                    <span id="sentinelPendingCount" style="font-size:11px;color:#6e7681">—</span>
+                </div>
+                <div style="margin-top:8px">
+                    <a id="sentinelDashboardLink" href="/sentinel" target="_blank"
+                       style="font-size:11px;color:#58a6ff;text-decoration:none">
+                       Open Sentinel Dashboard &rarr;
+                    </a>
+                </div>
+            </div>
+
             <h3>System Diagnostics</h3>
             <div class="diagnostics-panel" id="diagnosticsPanel">
                 <div class="diagnostic-item">

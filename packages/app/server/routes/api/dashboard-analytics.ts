@@ -85,6 +85,9 @@ router.get('/', async (req, res) => {
       return new Date(t.dueDate) < now;
     }).length;
 
+    const rootTaskCount = allTasks.filter(t => !t.parentTaskId).length;
+    const subtaskCount = allTasks.filter(t => !!t.parentTaskId).length;
+
     // === REQUIREMENT TYPE BREAKDOWN (MCP Engine sync Jan 2026) ===
     // Separate legally mandated requirements from best practices
     const requirementTasks = allTasks.filter(t => !t.requirementType || t.requirementType === 'requirement');
@@ -225,6 +228,8 @@ router.get('/', async (req, res) => {
         inProgress: inProgressTasks,
         pending: pendingTasks,
         overdue: overdueTasks,
+        rootCount: rootTaskCount,
+        subtaskCount,
         completionRate: parseFloat(requirementCompletionRate.toFixed(1)),
         // Requirement type breakdown (MCP Engine sync Jan 2026)
         requirements: {
@@ -271,6 +276,40 @@ router.get('/', async (req, res) => {
       error: 'Failed to fetch analytics',
       details: error instanceof Error ? error.message : String(error)
     });
+  }
+});
+
+router.get('/task-counts', async (req, res) => {
+  try {
+    const db = getDbForRequest(req);
+    const { regulationIds } = req.query;
+
+    let tasks = await db.select({
+      id: complianceTasks.id,
+      parentTaskId: complianceTasks.parentTaskId,
+      regulationId: complianceTasks.regulationId,
+      status: complianceTasks.status,
+    }).from(complianceTasks);
+
+    if (regulationIds && typeof regulationIds === 'string') {
+      const ids = new Set(regulationIds.split(',').map(Number).filter(n => !isNaN(n)));
+      if (ids.size > 0) {
+        tasks = tasks.filter(t => t.regulationId !== null && ids.has(t.regulationId));
+      }
+    }
+
+    const rootTasks = tasks.filter(t => !t.parentTaskId);
+    const completedRoot = rootTasks.filter(t => t.status === 'completed').length;
+
+    res.json({
+      rootCount: rootTasks.length,
+      rootCompleted: completedRoot,
+      subtaskCount: tasks.filter(t => !!t.parentTaskId).length,
+      total: tasks.length,
+    });
+  } catch (error) {
+    console.error('Error fetching task counts:', error);
+    res.status(500).json({ error: 'Failed to fetch task counts' });
   }
 });
 

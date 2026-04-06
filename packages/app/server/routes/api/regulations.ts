@@ -2,7 +2,7 @@ import express from 'express';
 import fs from 'fs';
 import { storage } from '../../storage';
 import { getDatabaseStorage, getDbForRequest } from '../../services/database';
-import { evidenceFiles, disabledRegulations, regulationFeedback, regulations as regulationsTable, deadlines } from '@shared/schema';
+import { evidenceFiles, disabledRegulations, regulationFeedback, regulations as regulationsTable, deadlines, complianceTasks, roleAssignments } from '@shared/schema';
 import { eq, and, sql, desc, inArray, gt, ne } from 'drizzle-orm';
 import { syslog, LogLevel, LogFacility } from '../../services/syslog';
 import type { Regulation } from '@shared/schema';
@@ -270,12 +270,70 @@ router.get("/:regulationId", async (req: any, res) => {
     const user = req.user;
     const ownerId = (regulation as any).ownerId ?? (regulation as any).owner_id;
     const isOwner = user ? user.id === ownerId : false;
-    
-    // Return regulation with ownership info
+
+    // Derive the canonical DRI role: first from task assigned_roles, then from role_assignments by category
+    let suggestedDriRole: string | null = null;
+    try {
+      const db = getDbForRequest(req);
+
+      // Primary: most common assigned_role on top-level tasks
+      const roleRows = await db.select({
+        role: complianceTasks.assignedRole,
+        count: sql<number>`count(*)`.as('count'),
+      })
+        .from(complianceTasks)
+        .where(and(
+          eq(complianceTasks.regulationId, regulationId),
+          sql`${complianceTasks.parentTaskId} IS NULL`,
+          sql`${complianceTasks.assignedRole} IS NOT NULL AND ${complianceTasks.assignedRole} != ''`,
+        ))
+        .groupBy(complianceTasks.assignedRole)
+        .orderBy(desc(sql`count(*)`))
+        .limit(1);
+
+      if (roleRows.length > 0 && roleRows[0].role) {
+        suggestedDriRole = roleRows[0].role;
+      }
+
+      // Fallback: map regulation category → role_assignments category
+      if (!suggestedDriRole && (regulation as any).category) {
+        const categoryMap: Record<string, string[]> = {
+          'Academic Programs': ['Academic'],
+          'Athletics': ['Athletics'],
+          'Campus Safety': ['Safety'],
+          'Civil Rights': ['Civil Rights'],
+          'Environmental Health & Safety': ['Compliance', 'Safety'],
+          'Ethics & Governance': ['Compliance', 'Governance'],
+          'Finance': ['Finance'],
+          'Financial Aid': ['Financial', 'Financial Aid'],
+          'Fundraising & Development': ['External Affairs'],
+          'Human Resources': ['HR'],
+          'Information Technology': ['Technology'],
+          'Intellectual Property': ['Legal', 'Research'],
+          'Research': ['Research'],
+          'Student Services': ['Student Affairs'],
+        };
+        const mappedCategories = categoryMap[(regulation as any).category] || [];
+        if (mappedCategories.length > 0) {
+          const [fallbackRole] = await db.select({ roleName: roleAssignments.roleName })
+            .from(roleAssignments)
+            .where(inArray(roleAssignments.category, mappedCategories))
+            .orderBy(roleAssignments.roleName)
+            .limit(1);
+          if (fallbackRole) {
+            suggestedDriRole = fallbackRole.roleName;
+          }
+        }
+      }
+    } catch (e) {
+      // Non-critical — don't block the response
+    }
+
     const regulationWithOwnership = {
       ...regulation,
-      isOwner, // true if current user is the Primary DRI for this regulation
+      isOwner,
       ownerId: ownerId || null,
+      suggestedDriRole,
     };
 
     const totalTime = Date.now() - startTime;
@@ -549,27 +607,45 @@ router.patch("/:regulationId/category", requireAuth, async (req: any, res) => {
   }
 });
 
-// Update regulation owner (assign to user) - requires admin
+// Update regulation owner (assign to user or canonical role) - requires admin
 router.patch("/:regulationId/owner", requireAuth, async (req: any, res) => {
   try {
     const regulationId = parseInt(req.params.regulationId);
-    const { ownerId } = req.body;
+    const { ownerId, ownerRole } = req.body;
     
     if (isNaN(regulationId)) {
       return res.status(400).json({ error: "Invalid regulation ID" });
     }
     
-    // Check if user is admin
     if (req.user?.role !== 'admin') {
       return res.status(403).json({ error: "Admin access required" });
     }
     
     const tenantStorage = getDatabaseStorage(req.tenantId);
+    const db = getDbForRequest(req);
     
-    // Allow null to unassign
-    const ownerValue = ownerId === null || ownerId === '' ? null : parseInt(ownerId);
+    let ownerValue: number | null = null;
+    let resolvedViaRole: string | null = null;
+
+    if (ownerRole) {
+      // Role-based assignment: look up default_user_id from role_assignments
+      const [assignment] = await db.select({
+        defaultUserId: roleAssignments.defaultUserId,
+        roleName: roleAssignments.roleName,
+      })
+        .from(roleAssignments)
+        .where(eq(roleAssignments.roleName, ownerRole))
+        .limit(1);
+
+      if (assignment?.defaultUserId) {
+        ownerValue = assignment.defaultUserId;
+        resolvedViaRole = assignment.roleName;
+      }
+      // If no default user is mapped, ownerValue stays null — the role is still shown client-side via suggestedDriRole
+    } else {
+      ownerValue = ownerId === null || ownerId === '' ? null : parseInt(ownerId);
+    }
     
-    // Get current regulation to check if owner changed
     const currentRegulation = await tenantStorage.getRegulation(regulationId);
     const previousOwnerId = currentRegulation?.ownerId;
     
@@ -577,7 +653,6 @@ router.patch("/:regulationId/owner", requireAuth, async (req: any, res) => {
       ownerId: ownerValue 
     });
     
-    // Create notification for the new owner if assigned (and it's a different user)
     if (ownerValue && ownerValue !== previousOwnerId) {
       try {
         const regulationName = updatedRegulation?.name || updatedRegulation?.topic || `Regulation #${regulationId}`;
@@ -585,13 +660,14 @@ router.patch("/:regulationId/owner", requireAuth, async (req: any, res) => {
           ? `${req.user.firstName} ${req.user.lastName}` 
           : req.user?.username || 'An administrator';
         
+        const roleNote = resolvedViaRole ? ` (via role: ${resolvedViaRole})` : '';
         await tenantStorage.createNotificationQueueItem({
           regulationId: regulationId,
           userId: ownerValue,
           type: 'regulation_assigned',
           content: {
             title: 'You have been assigned a regulation',
-            message: `${assignedByName} has assigned you as the Primary DRI for "${regulationName}". Please review the regulation and its compliance requirements.`,
+            message: `${assignedByName} has assigned you as the Primary DRI for "${regulationName}"${roleNote}. Please review the regulation and its compliance requirements.`,
             regulationId: regulationId,
             regulationName: regulationName,
             assignedBy: req.user?.id,
@@ -604,14 +680,13 @@ router.patch("/:regulationId/owner", requireAuth, async (req: any, res) => {
         syslog.log(LogFacility.LOCAL0, LogLevel.INFO, 
           `Created assignment notification for user ${ownerValue} for regulation ${regulationId}`);
       } catch (notificationError) {
-        // Don't fail the main operation if notification fails
         syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, 
           `Failed to create assignment notification: ${notificationError instanceof Error ? notificationError.message : String(notificationError)}`);
       }
     }
     
     syslog.log(LogFacility.LOCAL0, LogLevel.INFO, 
-      `Updated owner for regulation ${regulationId} to user ${ownerValue || 'unassigned'}`);
+      `Updated owner for regulation ${regulationId} to ${resolvedViaRole ? `role ${resolvedViaRole} (user ${ownerValue})` : `user ${ownerValue || 'unassigned'}`}`);
     
     res.json(updatedRegulation);
   } catch (error) {

@@ -7,13 +7,39 @@ import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import { 
   AlertCircle, CheckCircle, Database, ArrowLeft, ArrowRight,
-  Loader2, Building2, User, Palette, Server, Rocket, Check
+  Loader2, Building2, User, Palette, Server, Rocket, Check, Landmark
 } from 'lucide-react';
 
 // API base URL
 const API_BASE = import.meta.env.DEV ? 'http://localhost:4000' : '';
 
 // ===== TYPES =====
+
+const INSTITUTION_PRIMARY_TYPES = [
+  { value: 'public-4year', label: 'Public 4-Year University' },
+  { value: 'private-nonprofit-4year', label: 'Private Nonprofit 4-Year University' },
+  { value: 'public-2year', label: 'Public 2-Year College' },
+  { value: 'private-nonprofit-2year', label: 'Private Nonprofit 2-Year College' },
+  { value: 'private-for-profit', label: 'Private For-Profit Institution' },
+];
+
+const INSTITUTION_CHARACTERISTICS = [
+  { value: 'religious-affiliation', label: 'Religious Affiliation' },
+  { value: 'research-intensive', label: 'Research Intensive' },
+  { value: 'graduate-professional', label: 'Graduate/Professional Programs' },
+  { value: 'intercollegiate-athletics', label: 'Intercollegiate Athletics' },
+  { value: 'online-distance-ed', label: 'Online/Distance Education' },
+  { value: 'medical-health-programs', label: 'Medical/Health Programs' },
+  { value: 'residential-campus', label: 'Residential Campus' },
+  { value: 'title-iv-participant', label: 'Title IV Participant' },
+];
+
+const US_STATES = [
+  'AL','AK','AZ','AR','CA','CO','CT','DC','DE','FL','GA','HI','ID','IL','IN',
+  'IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH',
+  'NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT',
+  'VT','VA','WA','WV','WI','WY',
+];
 
 interface TenantFormData {
   // Step 1: Organization Info
@@ -33,6 +59,11 @@ interface TenantFormData {
   // Step 3: Branding
   primaryColor: string;
   logoUrl: string;
+
+  // Step 4: Institution
+  institutionType: string;
+  institutionCharacteristics: string[];
+  stateCode: string;
 }
 
 interface ProvisioningStep {
@@ -43,12 +74,13 @@ interface ProvisioningStep {
   data?: any;
 }
 
-type WizardStep = 'organization' | 'admin-user' | 'branding' | 'review' | 'provisioning' | 'complete';
+type WizardStep = 'organization' | 'admin-user' | 'branding' | 'institution' | 'review' | 'provisioning' | 'complete';
 
 const WIZARD_STEPS: { id: WizardStep; label: string; icon: React.ReactNode }[] = [
   { id: 'organization', label: 'Organization', icon: <Building2 className="h-4 w-4" /> },
   { id: 'admin-user', label: 'Admin User', icon: <User className="h-4 w-4" /> },
   { id: 'branding', label: 'Branding', icon: <Palette className="h-4 w-4" /> },
+  { id: 'institution', label: 'Institution', icon: <Landmark className="h-4 w-4" /> },
   { id: 'review', label: 'Review', icon: <Check className="h-4 w-4" /> },
   { id: 'provisioning', label: 'Setup', icon: <Server className="h-4 w-4" /> },
   { id: 'complete', label: 'Complete', icon: <Rocket className="h-4 w-4" /> },
@@ -77,6 +109,9 @@ const TenantCreationWizard: React.FC = () => {
     adminLastName: '',
     primaryColor: '#1e40af',
     logoUrl: '',
+    institutionType: 'private-nonprofit-4year',
+    institutionCharacteristics: ['title-iv-participant'],
+    stateCode: 'PA',
   });
 
   // Auto-generate subdomain from name
@@ -139,6 +174,8 @@ const TenantCreationWizard: React.FC = () => {
       if (err) { setError(err); return; }
       setCurrentStep('branding');
     } else if (currentStep === 'branding') {
+      setCurrentStep('institution');
+    } else if (currentStep === 'institution') {
       setCurrentStep('review');
     } else if (currentStep === 'review') {
       startProvisioning();
@@ -149,7 +186,8 @@ const TenantCreationWizard: React.FC = () => {
     setError(null);
     if (currentStep === 'admin-user') setCurrentStep('organization');
     else if (currentStep === 'branding') setCurrentStep('admin-user');
-    else if (currentStep === 'review') setCurrentStep('branding');
+    else if (currentStep === 'institution') setCurrentStep('branding');
+    else if (currentStep === 'review') setCurrentStep('institution');
   };
 
   // ===== PROVISIONING =====
@@ -195,6 +233,11 @@ const TenantCreationWizard: React.FC = () => {
           branding: {
             primaryColor: formData.primaryColor,
             logoUrl: formData.logoUrl || undefined,
+          },
+          institution: {
+            primaryType: formData.institutionType || undefined,
+            characteristics: formData.institutionCharacteristics,
+            stateCode: formData.stateCode || undefined,
           },
         }),
       });
@@ -442,6 +485,77 @@ const TenantCreationWizard: React.FC = () => {
     </div>
   );
 
+  const toggleCharacteristic = (value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      institutionCharacteristics: prev.institutionCharacteristics.includes(value)
+        ? prev.institutionCharacteristics.filter(c => c !== value)
+        : [...prev.institutionCharacteristics, value],
+    }));
+  };
+
+  const renderInstitutionStep = () => (
+    <div className="space-y-6">
+      <div className="bg-blue-50 p-4 rounded-lg">
+        <p className="text-sm text-blue-800">
+          <strong>Institution Profile:</strong> This determines which regulations are shown as applicable.
+          The state code determines the federal circuit court jurisdiction. These can be adjusted later in System Settings.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="institutionType">Institution Type</Label>
+          <select
+            id="institutionType"
+            value={formData.institutionType}
+            onChange={(e) => handleChange('institutionType', e.target.value)}
+            className="w-full h-10 px-3 rounded-md border border-gray-300 bg-white"
+          >
+            <option value="">Select type...</option>
+            {INSTITUTION_PRIMARY_TYPES.map(t => (
+              <option key={t.value} value={t.value}>{t.label}</option>
+            ))}
+          </select>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="stateCode">State</Label>
+          <select
+            id="stateCode"
+            value={formData.stateCode}
+            onChange={(e) => handleChange('stateCode', e.target.value)}
+            className="w-full h-10 px-3 rounded-md border border-gray-300 bg-white"
+          >
+            <option value="">Select state...</option>
+            {US_STATES.map(s => (
+              <option key={s} value={s}>{s}</option>
+            ))}
+          </select>
+          <p className="text-xs text-gray-500">Determines federal circuit court jurisdiction</p>
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <Label>Institutional Characteristics</Label>
+        <p className="text-xs text-gray-500 mb-2">Select all that apply — these activate additional regulatory requirements</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+          {INSTITUTION_CHARACTERISTICS.map(c => (
+            <label key={c.value} className="flex items-center gap-2 p-2 rounded hover:bg-gray-50 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={formData.institutionCharacteristics.includes(c.value)}
+                onChange={() => toggleCharacteristic(c.value)}
+                className="rounded border-gray-300"
+              />
+              <span className="text-sm">{c.label}</span>
+            </label>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+
   const renderReviewStep = () => (
     <div className="space-y-6">
       <div className="bg-gray-50 rounded-lg p-6 space-y-4">
@@ -483,6 +597,20 @@ const TenantCreationWizard: React.FC = () => {
             style={{ backgroundColor: formData.primaryColor }}
           />
           <strong>{formData.primaryColor}</strong>
+        </div>
+      </div>
+
+      <div className="bg-gray-50 rounded-lg p-6 space-y-4">
+        <h3 className="font-semibold text-lg flex items-center gap-2">
+          <Landmark className="h-5 w-5 text-amber-600" />
+          Institution Profile
+        </h3>
+        <div className="grid grid-cols-2 gap-4 text-sm">
+          <div><span className="text-gray-500">Type:</span> <strong>{INSTITUTION_PRIMARY_TYPES.find(t => t.value === formData.institutionType)?.label || 'Not set'}</strong></div>
+          <div><span className="text-gray-500">State:</span> <strong>{formData.stateCode || 'Not set'}</strong></div>
+          {formData.institutionCharacteristics.length > 0 && (
+            <div className="col-span-2"><span className="text-gray-500">Characteristics:</span> <strong>{formData.institutionCharacteristics.map(c => INSTITUTION_CHARACTERISTICS.find(ic => ic.value === c)?.label).join(', ')}</strong></div>
+          )}
         </div>
       </div>
 
@@ -572,8 +700,8 @@ const TenantCreationWizard: React.FC = () => {
         Open https://{formData.subdomain}.edsteward.ai
       </a>
 
-      <div className="bg-gray-50 rounded-lg p-6 text-left max-w-md mx-auto">
-        <h4 className="font-semibold mb-3">Login Credentials:</h4>
+      <div className="bg-gray-50 rounded-lg p-6 text-left max-w-lg mx-auto">
+        <h4 className="font-semibold mb-3">Login Credentials (break-glass account):</h4>
         <div className="space-y-2 text-sm">
           <div className="flex justify-between">
             <span className="text-gray-500">Username:</span>
@@ -586,13 +714,52 @@ const TenantCreationWizard: React.FC = () => {
         </div>
       </div>
 
-      <div className="mt-8 p-4 bg-yellow-50 rounded-lg text-left max-w-md mx-auto">
-        <h4 className="font-semibold text-yellow-800 mb-2">⚠️ Important Note</h4>
-        <p className="text-sm text-yellow-700">
-          DNS propagation may take a few minutes. If the site doesn't load immediately, 
-          wait 5-10 minutes and try again. The wildcard DNS (*edsteward.ai) will route 
-          to the correct tenant.
+      <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-6 text-left max-w-lg mx-auto">
+        <h4 className="font-semibold text-blue-900 mb-3">SSO Setup Info (share with IT):</h4>
+        <div className="space-y-2 text-sm font-mono">
+          <div>
+            <span className="text-blue-600 font-sans text-xs block">SP Entity ID:</span>
+            <code className="bg-white px-2 py-1 rounded block mt-0.5">urn:edsteward:sp:{formData.subdomain}</code>
+          </div>
+          <div>
+            <span className="text-blue-600 font-sans text-xs block">ACS / Callback URL:</span>
+            <code className="bg-white px-2 py-1 rounded block mt-0.5">https://{formData.subdomain}.edsteward.ai/auth/saml/callback</code>
+          </div>
+          <div>
+            <span className="text-blue-600 font-sans text-xs block">Name ID Format:</span>
+            <code className="bg-white px-2 py-1 rounded block mt-0.5 text-xs">urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</code>
+          </div>
+        </div>
+        <p className="text-xs text-blue-700 mt-3">
+          Send this info to the institution's IT department to configure their IdP. 
+          Once they provide the IdP metadata, configure SSO from the Customers page.
         </p>
+      </div>
+
+      <div className="mt-6 bg-amber-50 border border-amber-200 rounded-lg p-6 text-left max-w-lg mx-auto">
+        <h4 className="font-semibold text-amber-900 mb-3">Post-Provisioning Checklist:</h4>
+        <ul className="space-y-2 text-sm text-amber-800">
+          <li className="flex items-start gap-2">
+            <input type="checkbox" className="mt-1 rounded" />
+            <span><strong>DNS CNAME:</strong> Create <code>{formData.subdomain}.edsteward.ai</code> CNAME pointing to the ALB (run <code>scripts/add-new-tenant.sh {formData.subdomain}</code>)</span>
+          </li>
+          <li className="flex items-start gap-2">
+            <input type="checkbox" className="mt-1 rounded" />
+            <span><strong>Verify site:</strong> Open <code>https://{formData.subdomain}.edsteward.ai</code> and log in</span>
+          </li>
+          <li className="flex items-start gap-2">
+            <input type="checkbox" className="mt-1 rounded" />
+            <span><strong>Engine config:</strong> Enable tenant in <code>engine/config/customers.json</code> and push regulation updates</span>
+          </li>
+          <li className="flex items-start gap-2">
+            <input type="checkbox" className="mt-1 rounded" />
+            <span><strong>SSO:</strong> When IT responds with IdP metadata, configure via Customers → SSO</span>
+          </li>
+          <li className="flex items-start gap-2">
+            <input type="checkbox" className="mt-1 rounded" />
+            <span><strong>Password change:</strong> Ensure the admin changes their initial password</span>
+          </li>
+        </ul>
       </div>
 
       <div className="mt-8 flex justify-center gap-4">
@@ -605,6 +772,7 @@ const TenantCreationWizard: React.FC = () => {
             name: '', subdomain: '', contactEmail: '', contactName: '', plan: 'professional',
             adminUsername: '', adminEmail: '', adminPassword: '', adminFirstName: '', adminLastName: '',
             primaryColor: '#1e40af', logoUrl: '',
+            institutionType: 'private-nonprofit-4year', institutionCharacteristics: ['title-iv-participant'], stateCode: 'PA',
           });
           setCreatedTenant(null);
           setProvisioningSteps([]);
@@ -647,6 +815,7 @@ const TenantCreationWizard: React.FC = () => {
           {currentStep === 'organization' && renderOrganizationStep()}
           {currentStep === 'admin-user' && renderAdminUserStep()}
           {currentStep === 'branding' && renderBrandingStep()}
+          {currentStep === 'institution' && renderInstitutionStep()}
           {currentStep === 'review' && renderReviewStep()}
           {currentStep === 'provisioning' && renderProvisioningStep()}
           {currentStep === 'complete' && renderCompleteStep()}

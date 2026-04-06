@@ -552,6 +552,17 @@ async function main() {
     // Start Frontend (user interface)
     await startFrontend();
 
+    // Start Regulation Sentinel scheduler (automated change detection)
+    try {
+      const sentinelDb = await import('./src/sentinel/sentinel-db.js');
+      const sentinel = await import('./src/sentinel/sentinel-service.js');
+      await sentinelDb.ensureSchema();
+      sentinel.startScheduler();
+      log.success('Regulation Sentinel scheduler started', 'SENTINEL');
+    } catch (sentinelError) {
+      log.warn(`Sentinel scheduler failed to start: ${sentinelError.message}`, 'SENTINEL');
+    }
+
     // Success summary
     console.log('\n🎉 MCP Engine Successfully Started!\n');
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
@@ -560,6 +571,7 @@ async function main() {
     console.log('🚀 Delivery System:  http://localhost:' + CONFIG.ports.delivery);
     console.log('👥 Customer API:     http://localhost:' + CONFIG.ports.customerManagement);
     console.log('🌐 Frontend:         http://localhost:' + CONFIG.ports.frontend);
+    console.log('🛰️  Sentinel:         Cron scheduler active (via Delivery Server API)');
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     console.log('\n✨ All services are ready for compliance management!');
     console.log('📝 Press Ctrl+C to gracefully stop all services\n');

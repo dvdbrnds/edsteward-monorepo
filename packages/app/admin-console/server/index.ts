@@ -21,6 +21,8 @@ import compression from 'compression';
 import { createServer } from 'http';
 import { Pool } from 'pg';
 
+const APP_BASE_URL = process.env.APP_BASE_URL || 'https://moravian.edsteward.ai';
+
 import {
   initializeAdminDatabase,
   getAllTenants,
@@ -550,7 +552,7 @@ app.put('/api/customers/:id/sso', requireAuth, async (req, res) => {
 
     // Trigger tenant registry refresh in main app
     try {
-      await fetch('https://moravian.edsteward.ai/api/admin/tenant-registry/refresh', {
+      await fetch(`${APP_BASE_URL}/api/admin/tenant-registry/refresh`, {
         method: 'POST',
       });
       console.log('✅ Main app tenant registry refreshed');
@@ -730,7 +732,7 @@ app.delete('/api/customers/:id/sso', requireAuth, async (req, res) => {
 
     // Refresh main app
     try {
-      await fetch('https://moravian.edsteward.ai/api/admin/tenant-registry/refresh', {
+      await fetch(`${APP_BASE_URL}/api/admin/tenant-registry/refresh`, {
         method: 'POST',
       });
     } catch (e) {

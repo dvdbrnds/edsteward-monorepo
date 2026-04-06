@@ -12,6 +12,7 @@
 
 import { Pool } from 'pg';
 import crypto from 'crypto';
+import { execSync } from 'child_process';
 
 // Configuration
 const NEON_API_KEY = process.env.NEON_API_KEY;
@@ -22,13 +23,14 @@ const AWS_ACCESS_KEY_ID = process.env.AWS_ACCESS_KEY_ID;
 const AWS_SECRET_ACCESS_KEY = process.env.AWS_SECRET_ACCESS_KEY;
 const ECS_CLUSTER = process.env.ECS_CLUSTER || 'edsteward-cluster';
 const ECS_SERVICE = process.env.ECS_SERVICE || 'edsteward-service';
-const ECS_TASK_FAMILY = process.env.ECS_TASK_FAMILY || 'edsteward-saml-step3';
+const ECS_TASK_FAMILY = process.env.ECS_TASK_FAMILY || 'edsteward-saml-production';
+const APP_BASE_URL = process.env.APP_BASE_URL || 'https://moravian.edsteward.ai';
 
 // Interfaces
 export interface TenantProvisioningRequest {
   name: string;
   subdomain: string;
-  contactEmail?: string;  // Optional - for hands-on tenant handover
+  contactEmail?: string;
   contactName?: string;
   plan: 'starter' | 'professional' | 'enterprise';
   adminUser: {
@@ -41,6 +43,11 @@ export interface TenantProvisioningRequest {
   branding?: {
     primaryColor?: string;
     logoUrl?: string;
+  };
+  institution?: {
+    primaryType?: string;
+    characteristics?: string[];
+    stateCode?: string;
   };
 }
 
@@ -112,10 +119,27 @@ export async function cloneSchemaFromTemplate(targetDatabaseUrl: string): Promis
     throw new Error('TEMPLATE_DATABASE_URL not configured');
   }
 
-  console.log('📋 Cloning schema from template...');
+  console.log('📋 Cloning schema from template via pg_dump...');
 
+  try {
+    // pg_dump --schema-only captures everything: tables, indexes, constraints,
+    // sequences, foreign keys, and defaults — unlike the old manual approach
+    // which missed most of those.
+    const output = execSync(
+      `pg_dump "${TEMPLATE_DATABASE_URL}" --schema-only --no-owner --no-privileges --no-comments | psql "${targetDatabaseUrl}"`,
+      { encoding: 'utf-8', timeout: 120_000, stdio: ['pipe', 'pipe', 'pipe'] }
+    );
+    console.log('✅ Schema cloned successfully via pg_dump');
+  } catch (error: any) {
+    // pg_dump/psql not available — fall back to a simpler SQL-level clone
+    console.warn('⚠️ pg_dump not available, falling back to SQL-level schema clone:', error.message);
+    await cloneSchemaViaSQL(targetDatabaseUrl);
+  }
+}
+
+async function cloneSchemaViaSQL(targetDatabaseUrl: string): Promise<void> {
   const templatePool = new Pool({
-    connectionString: TEMPLATE_DATABASE_URL,
+    connectionString: TEMPLATE_DATABASE_URL!,
     ssl: { rejectUnauthorized: false },
   });
 
@@ -125,133 +149,59 @@ export async function cloneSchemaFromTemplate(targetDatabaseUrl: string): Promis
   });
 
   try {
-    // Get table creation order (respecting foreign keys)
-    const tableOrder = [
-      'users',
-      'tenants',
-      'regulations',
-      'compliance_tasks',
-      'guides',
-      'branding_configurations',
-      'email_configs',
-      'twilio_configs',
-      'csv_schemas',
-      'field_mappings',
-      'validation_rules',
-      'attestation_tokens',
-      'audit_logs',
-      'deadlines',
-      'evidence_files',
-      'notes',
-      'note_history',
-      'notifications',
-      'notification_queue',
-      'regulation_updates',
-      'regulation_versions',
-      'sync_control',
-      'system_logs',
-      'task_activity',
-      'task_evidence',
-      'transformation_logs',
-      'validation_status',
-      'version_conflicts',
-      'error_records',
-    ];
-
-    // Get all tables from template database
-    const tablesResult = await templatePool.query(`
-      SELECT tablename FROM pg_tables WHERE schemaname = 'public'
-    `);
-    
+    // Get the full DDL from pg_dump format via SQL (pg_get_tabledef equivalent)
+    const tablesResult = await templatePool.query(
+      `SELECT tablename FROM pg_tables WHERE schemaname = 'public' ORDER BY tablename`
+    );
     const tables = tablesResult.rows.map(r => r.tablename);
-    console.log(`Found ${tables.length} tables to clone`);
+    console.log(`Found ${tables.length} tables to clone via SQL fallback`);
 
-    // We'll use a transaction to create tables
     const client = await targetPool.connect();
-    
     try {
       await client.query('BEGIN');
 
-      // Create each table by copying structure
-      for (const table of tableOrder) {
-        if (!tables.includes(table)) continue;
-
-        // Get table structure
-        const structureResult = await templatePool.query(`
-          SELECT column_name, data_type, character_maximum_length, 
-                 is_nullable, column_default, ordinal_position
-          FROM information_schema.columns 
+      for (const table of tables) {
+        // Use CREATE TABLE ... (LIKE template INCLUDING ALL) pattern via raw DDL
+        const ddlResult = await templatePool.query(`
+          SELECT 'CREATE TABLE IF NOT EXISTS "' || $1 || '" (' ||
+            string_agg(
+              '"' || column_name || '" ' ||
+              CASE
+                WHEN data_type = 'character varying' THEN 'VARCHAR(' || COALESCE(character_maximum_length::text, '255') || ')'
+                WHEN data_type = 'ARRAY' THEN 'TEXT[]'
+                WHEN column_default LIKE 'nextval%' THEN 'SERIAL'
+                ELSE UPPER(data_type)
+              END ||
+              CASE WHEN is_nullable = 'NO' AND column_default NOT LIKE 'nextval%' THEN ' NOT NULL' ELSE '' END ||
+              CASE WHEN column_default IS NOT NULL AND column_default NOT LIKE 'nextval%' THEN ' DEFAULT ' || column_default ELSE '' END,
+              ', ' ORDER BY ordinal_position
+            ) || ')' as ddl
+          FROM information_schema.columns
           WHERE table_name = $1 AND table_schema = 'public'
-          ORDER BY ordinal_position
         `, [table]);
 
-        if (structureResult.rows.length === 0) continue;
-
-        // Build CREATE TABLE statement
-        const columns = structureResult.rows.map(col => {
-          let def = `"${col.column_name}" `;
-          
-          if (col.data_type === 'character varying') {
-            def += `VARCHAR(${col.character_maximum_length || 255})`;
-          } else if (col.data_type === 'ARRAY') {
-            def += 'TEXT[]';
-          } else {
-            def += col.data_type.toUpperCase();
-          }
-
-          if (col.is_nullable === 'NO') {
-            def += ' NOT NULL';
-          }
-
-          if (col.column_default && !col.column_default.includes('nextval')) {
-            def += ` DEFAULT ${col.column_default}`;
-          }
-
-          return def;
-        });
-
-        // Check for primary key
-        const pkResult = await templatePool.query(`
-          SELECT a.attname
-          FROM pg_index i
-          JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey)
-          WHERE i.indrelid = $1::regclass AND i.indisprimary
-        `, [table]);
-
-        let createSQL = `CREATE TABLE IF NOT EXISTS "${table}" (${columns.join(', ')}`;
-        
-        if (pkResult.rows.length > 0) {
-          const pkCols = pkResult.rows.map(r => `"${r.attname}"`).join(', ');
-          createSQL += `, PRIMARY KEY (${pkCols})`;
+        if (ddlResult.rows[0]?.ddl) {
+          await client.query(ddlResult.rows[0].ddl);
+          console.log(`  ✓ Created table: ${table}`);
         }
-        
-        createSQL += ')';
-
-        await client.query(createSQL);
-        console.log(`  ✓ Created table: ${table}`);
       }
 
-      // Create sequences for serial columns
-      for (const table of tableOrder) {
-        if (!tables.includes(table)) continue;
-
-        const seqResult = await templatePool.query(`
-          SELECT column_name, column_default
-          FROM information_schema.columns
-          WHERE table_name = $1 
-            AND table_schema = 'public'
-            AND column_default LIKE 'nextval%'
-        `, [table]);
-
-        for (const seq of seqResult.rows) {
-          const seqName = `${table}_${seq.column_name}_seq`;
-          await client.query(`CREATE SEQUENCE IF NOT EXISTS "${seqName}"`);
-          await client.query(`ALTER TABLE "${table}" ALTER COLUMN "${seq.column_name}" SET DEFAULT nextval('${seqName}')`);
-        }
+      // Add primary keys
+      const pkResult = await templatePool.query(`
+        SELECT tc.table_name, string_agg(kcu.column_name, ', ' ORDER BY kcu.ordinal_position) as pk_cols
+        FROM information_schema.table_constraints tc
+        JOIN information_schema.key_column_usage kcu ON tc.constraint_name = kcu.constraint_name
+        WHERE tc.constraint_type = 'PRIMARY KEY' AND tc.table_schema = 'public'
+        GROUP BY tc.table_name, tc.constraint_name
+      `);
+      for (const pk of pkResult.rows) {
+        try {
+          await client.query(`ALTER TABLE "${pk.table_name}" ADD PRIMARY KEY (${pk.pk_cols.split(', ').map((c: string) => `"${c}"`).join(', ')})`);
+        } catch { /* PK may already exist from SERIAL */ }
       }
 
       await client.query('COMMIT');
-      console.log('✅ Schema cloned successfully');
+      console.log('✅ Schema cloned via SQL fallback');
     } catch (error) {
       await client.query('ROLLBACK');
       throw error;
@@ -498,6 +448,60 @@ export async function configureBranding(
   }
 }
 
+// ===== STEP 5b: CONFIGURE INSTITUTION =====
+
+export async function configureInstitution(
+  databaseUrl: string,
+  tenantId: string,
+  institution?: TenantProvisioningRequest['institution']
+): Promise<void> {
+  if (!institution?.primaryType && !institution?.stateCode) {
+    console.log('⏭️  No institution config provided, skipping');
+    return;
+  }
+
+  console.log('🏛️  Configuring institution settings...');
+
+  const pool = new Pool({
+    connectionString: databaseUrl,
+    ssl: { rejectUnauthorized: false },
+  });
+
+  try {
+    const existing = await pool.query(
+      'SELECT id FROM institution_configurations WHERE tenant_id = $1',
+      [tenantId]
+    );
+
+    if (existing.rows.length > 0) {
+      await pool.query(`
+        UPDATE institution_configurations
+        SET primary_type = $1, characteristics = $2, state_code = $3, updated_at = NOW()
+        WHERE tenant_id = $4
+      `, [
+        institution.primaryType || null,
+        JSON.stringify(institution.characteristics || []),
+        institution.stateCode || null,
+        tenantId,
+      ]);
+    } else {
+      await pool.query(`
+        INSERT INTO institution_configurations (tenant_id, primary_type, characteristics, state_code, hide_non_applicable, allow_users_to_toggle, created_at, updated_at)
+        VALUES ($1, $2, $3, $4, true, true, NOW(), NOW())
+      `, [
+        tenantId,
+        institution.primaryType || null,
+        JSON.stringify(institution.characteristics || []),
+        institution.stateCode || null,
+      ]);
+    }
+
+    console.log('✅ Institution configured:', { primaryType: institution.primaryType, stateCode: institution.stateCode });
+  } finally {
+    await pool.end();
+  }
+}
+
 // ===== STEP 6: ADD TENANT RECORD =====
 
 export async function addTenantToOwnDatabase(
@@ -547,7 +551,7 @@ export async function provisionTenant(
     { step: 2, name: 'Clone Schema', status: 'pending' },
     { step: 3, name: 'Copy Regulations & Tasks', status: 'pending' },
     { step: 4, name: 'Create Admin User', status: 'pending' },
-    { step: 5, name: 'Configure Branding', status: 'pending' },
+    { step: 5, name: 'Configure Branding & Institution', status: 'pending' },
     { step: 6, name: 'Register Tenant', status: 'pending' },
     { step: 7, name: 'Finalize', status: 'pending' },
   ];
@@ -588,10 +592,11 @@ export async function provisionTenant(
     const userResult = await createAdminUser(databaseUrl, request.adminUser);
     updateStep(4, 'completed', `Admin user created (ID: ${userResult.userId})`, userResult);
 
-    // Step 5: Configure Branding
-    updateStep(5, 'in_progress', 'Configuring branding...');
+    // Step 5: Configure Branding & Institution
+    updateStep(5, 'in_progress', 'Configuring branding and institution...');
     await configureBranding(databaseUrl, tenantId, request.branding, request.name);
-    updateStep(5, 'completed', 'Branding configured');
+    await configureInstitution(databaseUrl, tenantId, request.institution);
+    updateStep(5, 'completed', 'Branding and institution configured');
 
     // Step 6: Register Tenant in Admin Database
     updateStep(6, 'in_progress', 'Registering tenant...');
@@ -651,7 +656,7 @@ export async function provisionTenant(
 
     // Refresh the main application's tenant registry
     try {
-      const refreshResponse = await fetch('https://moravian.edsteward.ai/api/admin/tenant-registry/refresh', {
+      const refreshResponse = await fetch(`${APP_BASE_URL}/api/admin/tenant-registry/refresh`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
       });
@@ -1300,7 +1305,7 @@ export async function softDeleteTenant(
     
     // Step 3: Refresh main app's tenant registry
     try {
-      await fetch('https://moravian.edsteward.ai/api/admin/tenant-registry/refresh', {
+      await fetch(`${APP_BASE_URL}/api/admin/tenant-registry/refresh`, {
         method: 'POST',
       });
       steps.push({ step: 'Refresh tenant registry', status: 'completed' });
@@ -1421,7 +1426,7 @@ export async function hardDeleteTenant(
     
     // Step 5: Refresh tenant registry
     try {
-      await fetch('https://moravian.edsteward.ai/api/admin/tenant-registry/refresh', {
+      await fetch(`${APP_BASE_URL}/api/admin/tenant-registry/refresh`, {
         method: 'POST',
       });
       steps.push({ step: 'Refresh tenant registry', status: 'completed' });
@@ -1515,7 +1520,7 @@ export async function restoreTenant(
     
     // Refresh tenant registry
     try {
-      await fetch('https://moravian.edsteward.ai/api/admin/tenant-registry/refresh', {
+      await fetch(`${APP_BASE_URL}/api/admin/tenant-registry/refresh`, {
         method: 'POST',
       });
     } catch (error) {

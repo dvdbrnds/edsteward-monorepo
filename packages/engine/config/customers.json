@@ -44,6 +44,36 @@
       },
       "enabled": false,
       "subscriptions": ["all"]
+    },
+    {
+      "id": "muhlenberg-prod",
+      "name": "Muhlenberg College (Production)",
+      "shortName": "Muhlenberg Prod",
+      "url": "https://muhlenberg.edsteward.ai",
+      "apiEndpoint": "/api/regulation-updates",
+      "type": "production",
+      "auth": {
+        "method": "basic",
+        "username": "mcp-engine",
+        "password": "SET_VIA_EDSTEWARD_PASSWORD_ENV"
+      },
+      "enabled": false,
+      "subscriptions": ["all"]
+    },
+    {
+      "id": "lafayette-prod",
+      "name": "Lafayette College (Production)",
+      "shortName": "Lafayette Prod",
+      "url": "https://lafayette.edsteward.ai",
+      "apiEndpoint": "/api/regulation-updates",
+      "type": "production",
+      "auth": {
+        "method": "basic",
+        "username": "mcp-engine",
+        "password": "SET_VIA_EDSTEWARD_PASSWORD_ENV"
+      },
+      "enabled": false,
+      "subscriptions": ["all"]
     }
   ],
   "defaults": {

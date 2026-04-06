@@ -34,11 +34,11 @@ import AttestationPage from "@/pages/attestation-page";
 import TaskPage from "@/pages/task-page";
 import TaskAnalyticsPage from "@/pages/task-analytics-page";
 import ChangelogPage from "@/pages/changelog-page";
-import ExecutiveDashboardPage from "@/pages/executive-dashboard-page";
 import ExecutiveOrdersPage from "@/pages/executive-orders-page";
 import { ProtectedRoute } from "./lib/protected-route";
 import { ProtectedRegulationRoute } from "./lib/protected-regulation-route";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
+import { InstitutionFilterProvider } from "@/hooks/use-institution-filter";
 
 // Tenant detection utility removed - using single-tenant mode
 
@@ -68,9 +68,6 @@ function AppContent() {
               <Route path="/task/:token" component={TaskPage} />
 
               {/* Protected Routes - Authentication Required */}
-              <Route path="/analytics">
-                <ExecutiveDashboardPage />
-              </Route>
               <ProtectedRoute path="/" component={HomePage} />
               {/* Admin Dashboard - DISABLED */}
               {/* {currentTenant === 'admin' && (
@@ -139,11 +136,13 @@ export default function App() {
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <PageLayout>
-            <AppContent />
-          </PageLayout>
-          <Toaster />
-          <ProductTour />
+          <InstitutionFilterProvider>
+            <PageLayout>
+              <AppContent />
+            </PageLayout>
+            <Toaster />
+            <ProductTour />
+          </InstitutionFilterProvider>
         </AuthProvider>
       </QueryClientProvider>
     </ErrorBoundary>

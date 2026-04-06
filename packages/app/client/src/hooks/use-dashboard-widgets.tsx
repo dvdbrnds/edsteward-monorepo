@@ -1,15 +1,12 @@
 import { useState, useEffect, useCallback, createContext, useContext, ReactNode } from 'react';
 
 export type WidgetId = 
-  | 'stats'
   | 'myTasks'
   | 'pendingAttestations'
-  | 'complianceOverview'
   | 'upcomingDeadlines'
   | 'notifications'
   | 'deadlineCalendar'
-  | 'trusteesCard'
-  | 'regulationList';
+  | 'trusteesCard';
 
 export interface Widget {
   id: WidgetId;
@@ -21,13 +18,6 @@ export interface Widget {
 
 export const DASHBOARD_WIDGETS: Widget[] = [
   {
-    id: 'stats',
-    name: 'Dashboard Statistics',
-    description: 'Overview of compliance metrics',
-    defaultVisible: true,
-    canHide: true,
-  },
-  {
     id: 'myTasks',
     name: 'My Tasks',
     description: 'Tasks assigned to you',
@@ -38,13 +28,6 @@ export const DASHBOARD_WIDGETS: Widget[] = [
     id: 'pendingAttestations',
     name: 'Pending Attestations',
     description: 'Attestations requiring your action',
-    defaultVisible: true,
-    canHide: true,
-  },
-  {
-    id: 'complianceOverview',
-    name: 'Compliance Overview',
-    description: 'Compliance status by category',
     defaultVisible: true,
     canHide: true,
   },
@@ -75,13 +58,6 @@ export const DASHBOARD_WIDGETS: Widget[] = [
     description: 'Quick access to trustees dashboard',
     defaultVisible: true,
     canHide: true,
-  },
-  {
-    id: 'regulationList',
-    name: 'Regulations List',
-    description: 'Full list of regulations',
-    defaultVisible: true,
-    canHide: false, // Core functionality - always visible
   },
 ];
 

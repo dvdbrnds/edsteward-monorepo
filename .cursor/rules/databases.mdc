@@ -48,24 +48,37 @@ The MCP Engine uses a **local PostgreSQL** database, not Neon:
 3. **After backfilling dev**: remember to also sync to production (`ep-weathered-term`) and staging (`ep-fancy-scene`)
 4. **To verify production data**: query `ep-weathered-term` directly, not `ep-summer-pine`
 
-## CRITICAL: Regulation ID Alignment
+## CRITICAL: Regulation Key Alignment
 
-**Production and local dev MUST have identical numeric `id` values for the same regulations.** Features like circuit interpretations, executive order impacts, and compliance tasks all use `regulation_id` foreign keys. If IDs diverge, data seeded locally becomes meaningless in production.
+**`reg_key` is the canonical regulation identifier across all databases.** The MCP Engine is the authority — all regulations must exist in the engine first, then flow downstream to app databases.
+
+### Key Format
+- **Federal:** `REG-###` (e.g., `REG-001`, `REG-076`)
+- **State (PA):** `PA-###` (e.g., `PA-001`, `PA-055`)
+- **State (NJ):** `NJ-###` (e.g., `NJ-001`, `NJ-006`)
+- **State (CA):** `CA-###` (e.g., `CA-001`)
+- **International:** `REG-###` (e.g., `REG-242` for GDPR)
+
+### `item_id` vs `reg_key`
+- `reg_key`: Canonical identifier, unique constraint in both engine and app DBs. Used for sync matching.
+- `item_id`: Legacy slug in the engine (used for console URLs, file paths). Auto-generated `REG####` in the app. **Do not use for cross-DB matching.**
+- The MCP sync API tries `reg_key` first, then DB primary key, then `item_id` as last resort.
 
 ### Rules
-1. **Never truncate/re-seed the `regulations` table** without exporting production first
-2. **New regulations** added locally get IDs > production max — that's safe
-3. **New regulations** in production must be synced to local before further dev
-4. **Before deploying**: run `./scripts/check-regulation-id-alignment.sh` (automated in deploy-staging.sh)
-5. **If drift is detected**: follow the procedure in `scripts/db-align/README.md`
+1. **Engine is the authority** — never add a regulation to the app DB without it existing in the engine first
+2. **Never reuse a `reg_key`** — both DBs have UNIQUE constraints on `reg_key`
+3. **Before deploying**: run `./scripts/check-regulation-alignment.zsh` (compares engine ↔ production)
+4. **New regulations** must be assigned a `reg_key` following the format above
+5. **State regulations** must use state-prefixed keys, never `REG-###`
 
-### Alignment was last verified: 2026-03-14
-- 242 production regulations, all IDs match local
-- 39 local-only regulations (test/extra) at IDs 390+
+### Alignment was last verified: 2026-04-03
+- 244 regulations fully aligned (225 federal, 18 state, 1 international)
+- 0 collisions, 0 null reg_keys in production
+- Dev/staging DB has ~55 unkeyed records (test artifacts, lower priority)
 
 ## Schema Differences
 
 Production and local dev share the latest schema. Staging and other tenants may be behind:
-- `regulations.reg_key`: exists in production + dev, missing in staging (uses `item_id`)
+- `regulations.reg_key`: exists in production + dev + engine, all with UNIQUE constraint
 - `compliance_tasks.statutory_citation`: exists in production + dev, may be missing elsewhere
 - When syncing to older-schema DBs, match on `name` instead of `reg_key`
