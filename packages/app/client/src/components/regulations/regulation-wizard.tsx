@@ -20,16 +20,7 @@ import { Loader2, ArrowRight, ArrowLeft } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-
-const CATEGORIES = [
-  "Academic Programs",
-  "Accounting",
-  "Admissions",
-  "Athletics",
-  "Campus Safety",
-  "Financial Aid",
-  "Other"
-];
+import { useCanonicalCategories } from "@/hooks/use-canonical-categories";
 
 interface RegulationWizardProps {
   onSuccess: () => void;
@@ -37,6 +28,7 @@ interface RegulationWizardProps {
 
 export default function RegulationWizard({ onSuccess }: RegulationWizardProps) {
   const [step, setStep] = useState(0);
+  const { categoryNames: CATEGORIES } = useCanonicalCategories();
 
   const form = useForm<InsertRegulation>({
     resolver: zodResolver(insertRegulationSchema),

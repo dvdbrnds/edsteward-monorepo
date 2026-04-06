@@ -17,8 +17,10 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
+import { useCanonicalCategories } from "@/hooks/use-canonical-categories";
 
 export default function RegulationForm({ onSuccess }: { onSuccess: () => void }) {
+  const { categoryNames: CATEGORIES } = useCanonicalCategories();
   const form = useForm<InsertRegulation>({
     resolver: zodResolver(insertRegulationSchema),
     defaultValues: {
@@ -149,11 +151,9 @@ export default function RegulationForm({ onSuccess }: { onSuccess: () => void })
                   className="w-full p-2 border rounded-md"
                 >
                   <option value="">Select a category</option>
-                  <option value="Academic Programs">Academic Programs</option>
-                  <option value="Accounting">Accounting</option>
-                  <option value="Admissions">Admissions</option>
-                  <option value="Athletics">Athletics</option>
-                  <option value="Campus Safety">Campus Safety</option>
+                  {CATEGORIES.map((cat) => (
+                    <option key={cat} value={cat}>{cat}</option>
+                  ))}
                 </select>
               </FormControl>
               <FormMessage />

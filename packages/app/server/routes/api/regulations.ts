@@ -13,6 +13,7 @@ import {
   attachUserPermissions
 } from '../../middleware/role-based-auth';
 import { auditRegulationAction, auditEvidence as _auditEvidence } from '../../middleware/audit-middleware';
+import { getCanonicalCategories, normalizeCategory } from '../../services/category-normalizer';
 import multer from 'multer';
 import { uploadLimiter } from '../../middleware/rate-limiter';
 
@@ -28,6 +29,19 @@ const router = express.Router();
 
 // Apply user permissions to all routes
 router.use(attachUserPermissions);
+
+// Get canonical categories (public — used by category dropdowns across the UI)
+router.get("/categories", async (_req: any, res) => {
+  try {
+    const categories = await getCanonicalCategories();
+    res.json(categories);
+  } catch (error) {
+    syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Failed to fetch canonical categories", {
+      error: error instanceof Error ? error.message : String(error)
+    });
+    res.status(500).json({ error: "Failed to fetch categories" });
+  }
+});
 
 // Get all regulations
 router.get("/", async (req: any, res) => {
@@ -587,16 +601,25 @@ router.patch("/:regulationId/category", requireAuth, async (req: any, res) => {
       return res.status(400).json({ error: "Category is required" });
     }
     
-    // Check if user is admin
     if (req.user?.role !== 'admin') {
       return res.status(403).json({ error: "Admin access required" });
     }
     
+    // Normalize to canonical category so canonical_category_id stays in sync
+    const normalized = await normalizeCategory(category, { source: 'admin-ui', autoCreate: true });
+    
     const tenantStorage = getDatabaseStorage(req.tenantId);
-    const updatedRegulation = await tenantStorage.updateRegulation(regulationId, { category });
+    const updatePayload: Record<string, any> = {
+      category: normalized.canonicalName || category,
+    };
+    if (normalized.canonicalId) {
+      updatePayload.canonicalCategoryId = normalized.canonicalId;
+      updatePayload.originalCategory = category;
+    }
+    const updatedRegulation = await tenantStorage.updateRegulation(regulationId, updatePayload);
     
     syslog.log(LogFacility.LOCAL0, LogLevel.INFO, 
-      `Updated category for regulation ${regulationId} to ${category}`);
+      `Updated category for regulation ${regulationId} to ${normalized.canonicalName || category}`);
     
     res.json(updatedRegulation);
   } catch (error) {

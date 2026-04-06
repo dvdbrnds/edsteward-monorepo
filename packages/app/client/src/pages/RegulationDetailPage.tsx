@@ -187,30 +187,14 @@ import { CircuitInterpretationsPanel } from "@/components/regulations/circuit-in
 import { AuditTrailPanel } from "@/components/regulations/audit-trail-panel";
 import { StatutoryFramework } from "@/components/regulations/statutory-framework";
 import { useAuth } from "@/hooks/use-auth";
-
-const CATEGORIES = [
-  "Academic Programs",
-  "Athletics",
-  "Campus Safety",
-  "Civil Rights",
-  "Environmental Health & Safety",
-  "Ethics & Governance",
-  "Finance",
-  "Financial Aid",
-  "Fundraising & Development",
-  "Human Resources",
-  "Information Technology",
-  "Intellectual Property",
-  "Research",
-  "Student Services",
-  "Other",
-];
+import { useCanonicalCategories } from "@/hooks/use-canonical-categories";
 
 
 
 function RegulationDetailPage() {
   const [location, navigate] = useLocation();
   const { user } = useAuth();
+  const { categoryNames: CATEGORIES } = useCanonicalCategories();
   const queryClient = useQueryClient();
   const [showWebPublishDialog, setShowWebPublishDialog] = useState(false);
   const [showCommunicationDialog, setShowCommunicationDialog] = useState(false);
