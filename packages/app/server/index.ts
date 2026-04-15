@@ -3,6 +3,17 @@
  * Simplified server without multi-tenant complexity
  */
 
+import * as Sentry from '@sentry/node';
+
+if (process.env.SENTRY_DSN) {
+  Sentry.init({
+    dsn: process.env.SENTRY_DSN,
+    environment: process.env.NODE_ENV || 'development',
+    release: `edsteward@${process.env.VERSION || '1.5.15'}`,
+    tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0,
+  });
+}
+
 import express from 'express';
 import session from 'express-session';
 import passport from 'passport';
@@ -119,8 +130,13 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Session configuration
 // NOTE: sameSite must be 'none' for SAML callbacks (cross-origin POST from IdP)
 // This requires secure: true (HTTPS) which is enforced in production
+const sessionSecret = process.env.SESSION_SECRET;
+if (!sessionSecret && process.env.NODE_ENV === 'production') {
+  console.error('FATAL: SESSION_SECRET must be set in production');
+  process.exit(1);
+}
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'your-secret-key',
+  secret: sessionSecret || 'dev-only-insecure-secret',
   resave: false,
   saveUninitialized: false,
   cookie: {
@@ -189,75 +205,6 @@ app.use('/auth/saml', authLimiter);
 
 // API routes
 registerRoutes(app);
-
-// CRITICAL: Direct login endpoint since routes aren't working
-app.post('/api/authenticate', async (req, res) => {
-  try {
-    const { email, username, password } = req.body;
-    const loginEmail = email || username; // Accept both email and username fields
-    
-    if (!loginEmail || !password) {
-      return res.status(400).json({ error: 'Email and password required' });
-    }
-
-    // Import database storage (tenant-aware)
-    const { getDatabaseStorage } = await import('./services/database');
-    const tenantStorage = getDatabaseStorage((req as any).tenantId);
-    
-    // Try to get user by email first, then by username
-    let user = await tenantStorage.getUserByEmail(loginEmail);
-    if (!user) {
-      user = await tenantStorage.getUserByUsername(loginEmail);
-    }
-    
-    if (!user) {
-      return res.status(401).json({ error: 'No account found with that username or email. Please check your credentials and try again.' });
-    }
-
-    // Verify scrypt password
-    const crypto = await import('crypto');
-    const { promisify } = await import('util');
-    const scryptAsync = promisify(crypto.scrypt);
-    
-    const [salt, hash] = user.password.split(':');
-    if (!salt || !hash) {
-      return res.status(401).json({ error: 'Account configuration error. Please contact your administrator.' });
-    }
-    
-    const derivedKey = await scryptAsync(password, Buffer.from(salt, 'hex'), 32) as Buffer;
-    const storedKey = Buffer.from(hash, 'hex');
-    const isValidPassword = crypto.timingSafeEqual(derivedKey, storedKey);
-
-    if (!isValidPassword) {
-      return res.status(401).json({ error: 'Incorrect password. Please check your password and try again.' });
-    }
-
-    // CRITICAL: Attach tenantId to user for session serialization
-    const tenantId = (req as any).tenantId || 'default';
-    (user as any)._tenantId = tenantId;
-    console.log(`[AUTH] /api/authenticate successful for '${user.username}' in tenant '${tenantId}'`);
-
-    req.login(user, (err) => {
-      if (err) {
-        return res.status(500).json({ error: 'Login failed' });
-      }
-
-      res.json({
-        success: true,
-        user: {
-          id: user.id,
-          email: user.email,
-          username: user.username,
-          role: user.role
-        }
-      });
-    });
-
-  } catch (error) {
-    console.error('Login error:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
 
 // Static files - only used in production mode
 // In dev mode, Vite middleware handles this
@@ -537,11 +484,20 @@ if (!isDev) {
   });
 }
 
-// Error handling
- 
+// Error handling — ordered: JSON parse errors, deserialization, then general API errors
+import { jsonErrorHandler, deserializationErrorHandler, apiErrorHandler } from './middleware/error';
+app.use(jsonErrorHandler);
+app.use(deserializationErrorHandler);
+app.use(apiErrorHandler);
+if (process.env.SENTRY_DSN) {
+  Sentry.setupExpressErrorHandler(app);
+}
+
 app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
-  console.error('Server error:', err);
-  res.status(500).json({ error: 'Internal server error' });
+  console.error('Unhandled server error:', err);
+  if (!res.headersSent) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
 });
 
 // Create HTTP server with WebSocket support

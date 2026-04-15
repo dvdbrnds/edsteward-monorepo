@@ -25,6 +25,15 @@ const ECS_CLUSTER = process.env.ECS_CLUSTER || 'edsteward-cluster';
 const ECS_SERVICE = process.env.ECS_SERVICE || 'edsteward-service';
 const ECS_TASK_FAMILY = process.env.ECS_TASK_FAMILY || 'edsteward-saml-production';
 const APP_BASE_URL = process.env.APP_BASE_URL || 'https://moravian.edsteward.ai';
+const REGISTRY_API_SECRET = process.env.REGISTRY_API_SECRET;
+
+function registryHeaders(): Record<string, string> {
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (REGISTRY_API_SECRET) {
+    headers['x-registry-secret'] = REGISTRY_API_SECRET;
+  }
+  return headers;
+}
 
 // Interfaces
 export interface TenantProvisioningRequest {
@@ -658,7 +667,7 @@ export async function provisionTenant(
     try {
       const refreshResponse = await fetch(`${APP_BASE_URL}/api/admin/tenant-registry/refresh`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: registryHeaders(),
       });
       
       if (refreshResponse.ok) {
@@ -1307,6 +1316,7 @@ export async function softDeleteTenant(
     try {
       await fetch(`${APP_BASE_URL}/api/admin/tenant-registry/refresh`, {
         method: 'POST',
+        headers: registryHeaders(),
       });
       steps.push({ step: 'Refresh tenant registry', status: 'completed' });
     } catch (error) {
@@ -1428,6 +1438,7 @@ export async function hardDeleteTenant(
     try {
       await fetch(`${APP_BASE_URL}/api/admin/tenant-registry/refresh`, {
         method: 'POST',
+        headers: registryHeaders(),
       });
       steps.push({ step: 'Refresh tenant registry', status: 'completed' });
     } catch (error) {
@@ -1522,6 +1533,7 @@ export async function restoreTenant(
     try {
       await fetch(`${APP_BASE_URL}/api/admin/tenant-registry/refresh`, {
         method: 'POST',
+        headers: registryHeaders(),
       });
     } catch (error) {
       // Non-critical

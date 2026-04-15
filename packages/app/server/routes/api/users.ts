@@ -19,8 +19,7 @@ const checkIsAdmin = (req: express.Request): boolean => {
   return userRole === 'admin' || 
          userRole === 'administrator' ||
          userRoles.includes('admin') ||
-         userRoles.includes('administrator') ||
-         req.user?.username === 'dvdbrnds';
+         userRoles.includes('administrator');
 };
 
 const router = express.Router();
@@ -62,8 +61,7 @@ router.get("/", requireAuth, async (req, res) => {
     const isAdmin = userRole === 'admin' || 
                    userRole === 'administrator' ||
                    userRoles.includes('admin') ||
-                   userRoles.includes('administrator') ||
-                   req.user?.username === 'dvdbrnds'; // Special case for dvdbrnds
+                   userRoles.includes('administrator');
     
     if (!isAdmin) {
       syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, 

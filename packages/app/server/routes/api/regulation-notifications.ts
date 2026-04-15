@@ -23,7 +23,6 @@ const requireComplianceRole = (req: express.Request, res: express.Response, next
     user.role === 'compliance_officer' ||
     user.role === 'cco' ||
     user.role === 'legal' ||
-    user.username === 'dvdbrnds' ||
     (user.roles && (
       user.roles.includes('admin') ||
       user.roles.includes('compliance_officer') ||

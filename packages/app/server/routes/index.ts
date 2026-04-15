@@ -245,18 +245,16 @@ export function registerRoutes(app: express.Application): Server {
       return res.status(401).json({ error: "No user found" });
     }
 
-    // Ensure dvdbrnds is always admin (legacy compatibility)
-    const userWithRole = user.username === 'dvdbrnds' ? { ...user, role: 'admin' } : user;
-
     res.json({
-      id: userWithRole.id,
-      username: userWithRole.username,
-      email: userWithRole.email,
-      role: userWithRole.role,
-      createdAt: userWithRole.createdAt,
-      lastLogin: userWithRole.lastLogin
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      role: user.role,
+      createdAt: user.createdAt,
+      lastLogin: user.lastLogin
     });
   });
+
 
   // Setup status for frontend navigation (requires auth)
   app.get('/api/setup/status', async (req, res) => {
@@ -304,29 +302,15 @@ export function registerRoutes(app: express.Application): Server {
       return res.status(401).json({ error: 'Authentication required' });
     }
 
-    let user = req.user;
-
-    // Ensure dvdbrnds is always admin
-    if (user && user.username === 'dvdbrnds' && user.role !== 'admin') {
-      user = { ...user, role: 'admin' };
-    }
-
-    res.json(user);
+    res.json(req.user);
   });
 
   app.get('/api/auth/status', (req, res) => {
     const isAuthenticated = req.isAuthenticated();
 
-    let user = isAuthenticated ? req.user : null;
-
-    // Ensure dvdbrnds is always admin
-    if (user && user.username === 'dvdbrnds' && user.role !== 'admin') {
-      user = { ...user, role: 'admin' };
-    }
-
     res.json({
       authenticated: isAuthenticated,
-      user: user,
+      user: isAuthenticated ? req.user : null,
       timestamp: new Date().toISOString()
     });
   });
@@ -1099,9 +1083,20 @@ export function registerRoutes(app: express.Application): Server {
 
   // ===== TENANT REGISTRY ENDPOINTS =====
   // These endpoints allow the admin console to manage the dynamic tenant registry
+  // Protected by either: (a) authenticated admin user, or (b) shared secret for service-to-service calls
+  const requireRegistryAuth = (req: Request, res: Response, next: Function) => {
+    const secret = req.headers['x-registry-secret'] as string;
+    if (secret && secret === process.env.REGISTRY_API_SECRET) {
+      return next();
+    }
+    if (req.isAuthenticated?.() && req.user?.role === 'admin') {
+      return next();
+    }
+    return res.status(401).json({ error: 'Unauthorized: admin auth or registry secret required' });
+  };
   
   // Get tenant registry status
-  app.get('/api/admin/tenant-registry/status', async (req, res) => {
+  app.get('/api/admin/tenant-registry/status', requireRegistryAuth, async (req, res) => {
     try {
       const { getRegistryStats, getAllCachedTenants } = await import('../services/tenant-registry');
       const stats = getRegistryStats();
@@ -1128,7 +1123,7 @@ export function registerRoutes(app: express.Application): Server {
   });
 
   // Refresh tenant registry (called after new tenant is created)
-  app.post('/api/admin/tenant-registry/refresh', async (req, res) => {
+  app.post('/api/admin/tenant-registry/refresh', requireRegistryAuth, async (req, res) => {
     try {
       const { refreshAllTenants, getRegistryStats } = await import('../services/tenant-registry');
       
@@ -1152,7 +1147,7 @@ export function registerRoutes(app: express.Application): Server {
   });
 
   // Invalidate specific tenant cache (for updates)
-  app.post('/api/admin/tenant-registry/invalidate/:tenantId', async (req, res) => {
+  app.post('/api/admin/tenant-registry/invalidate/:tenantId', requireRegistryAuth, async (req, res) => {
     try {
       const { invalidateTenantCache } = await import('../services/tenant-registry');
       const { tenantId } = req.params;
@@ -1776,15 +1771,13 @@ export function registerRoutes(app: express.Application): Server {
       return res.status(401).json({ error: "No user found" });
     }
 
-    const userWithRole = user.username === 'dvdbrnds' ? { ...user, role: 'admin' } : user;
-
     res.json({
-      id: userWithRole.id,
-      username: userWithRole.username,
-      email: userWithRole.email,
-      role: userWithRole.role,
-      createdAt: userWithRole.createdAt,
-      lastLogin: userWithRole.lastLogin
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      role: user.role,
+      createdAt: user.createdAt,
+      lastLogin: user.lastLogin
     });
   });
 
