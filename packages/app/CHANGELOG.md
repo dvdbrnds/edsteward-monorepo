@@ -5,6 +5,36 @@ All notable changes to EdSteward are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.15] - 2026-04-06
+
+### Added
+- **Canonical categories end-to-end** — added `GET /api/regulations/categories`
+  endpoint serving 15 canonical categories from the database, replacing 4
+  hardcoded `CATEGORIES` arrays with a new `useCanonicalCategories()` hook.
+  Category assignment on `PATCH /category` now normalizes via the
+  category-normalizer service. Populated `category_mappings` table with 48
+  verified mappings and backfilled `canonical_category_id` across all
+  regulations. Eliminated 60 "Uncategorized" regulations via name-based
+  classification rules.
+
+## [1.5.14] - 2026-04-06
+
+### Added
+- **DRI autocomplete combobox** — replaced the DRI dropdown with a searchable
+  autocomplete (Popover + Command). Canonical roles from `role_assignments` are
+  shown as default DRI suggestions for all regulations. Roles are selectable as
+  DRI; the backend resolves to the mapped user via `role_assignments`.
+- **Suggested DRI role API** — the compliance tasks API now returns
+  `suggestedDriRole` derived from task `assigned_role` data with a category
+  fallback.
+- **Clickable statute citations** — statutory citation text on the regulation
+  detail page is now clickable and scrolls to the Full Regulation Text section.
+
+### Fixed
+- Deleted duplicate REG-250 (typo of REG-251)
+- Backfilled `assigned_role` on 165 engine task rows missing role data
+- Synced 30 regulations with proper tasks and roles to app DB
+
 ## [1.5.13] - 2026-03-24
 
 ### Fixed

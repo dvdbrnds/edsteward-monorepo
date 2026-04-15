@@ -1,7 +1,7 @@
 # EdSteward AI Assistant Guidelines
 
-> **Last Updated:** February 12, 2026
-> **Current Version:** v1.4.10
+> **Last Updated:** April 15, 2026
+> **Current Version:** v1.5.15
 > **Production:** https://moravian.edsteward.ai
 > **Staging:** https://staging.edsteward.ai
 
