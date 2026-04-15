@@ -45,11 +45,11 @@ export function WebSocketStatus() {
     if (useMCPEngine) {
       switch (connectionState) {
         case 'connected':
-          return `MCP Engine (${subscribedRegulations.length} regs)`;
+          return `EdSteward (${subscribedRegulations.length} regs)`;
         case 'connecting':
           return 'Connecting to MCP...';
         case 'error':
-          return 'MCP Engine Error';
+          return 'EdSteward Connection Error';
         default:
           return 'MCP Disconnected';
       }

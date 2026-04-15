@@ -224,6 +224,22 @@ export function registerRoutes(app: express.Application): Server {
     }
   });
 
+  // Serve branding assets from the database (public, no auth — needed for login page)
+  app.get('/api/branding/:assetType(logo|favicon)', async (req, res) => {
+    try {
+      const tenantStorage = getDatabaseStorage(req.tenantId);
+      const asset = await tenantStorage.getBrandingAsset(req.params.assetType);
+      if (!asset) {
+        return res.status(404).send();
+      }
+      res.set('Content-Type', asset.mimeType);
+      res.set('Cache-Control', 'public, max-age=86400');
+      res.send(asset.data);
+    } catch {
+      res.status(404).send();
+    }
+  });
+
   // Setup authentication
   setupAuth(app as any);
 

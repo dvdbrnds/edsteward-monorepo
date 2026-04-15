@@ -116,7 +116,7 @@ const DebugTools: React.FC<DebugToolsProps> = ({ className }) => {
           </div>
 
           <div>
-            <h3 className="text-sm font-medium mb-2">WebSocket Status (MCP Engine Integration)</h3>
+            <h3 className="text-sm font-medium mb-2">WebSocket Status (EdSteward Integration)</h3>
             <div className="space-y-2">
               <div className="grid grid-cols-2 gap-2 text-xs">
                 <div className="flex justify-between p-2 bg-muted rounded">
@@ -126,7 +126,7 @@ const DebugTools: React.FC<DebugToolsProps> = ({ className }) => {
                   </Badge>
                 </div>
                 <div className="flex justify-between p-2 bg-muted rounded">
-                  <span className="font-medium">MCP Engine:</span>
+                  <span className="font-medium">EdSteward:</span>
                   <Badge variant={useMCPEngine ? 'default' : 'secondary'}>
                     {useMCPEngine ? 'Enabled' : 'Disabled'}
                   </Badge>

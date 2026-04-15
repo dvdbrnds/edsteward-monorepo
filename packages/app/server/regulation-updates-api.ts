@@ -60,7 +60,7 @@ async function autoCreateRegulationIfNotExists(
     category: options.category || 'Uncategorized',
     topic: options.topic || 'General Compliance',
     jurisdictionSource: (options.jurisdictionSource as any) || 'federal',
-    summary: options.summary || `Auto-created from MCP Engine update. Pending CCO review.`,
+    summary: options.summary || `Auto-created from regulation update. Pending CCO review.`,
     isApplicable: true,
     isCurrent: true,
     versionNumber: 1,

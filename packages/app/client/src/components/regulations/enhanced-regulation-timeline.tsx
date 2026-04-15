@@ -193,7 +193,7 @@ export const EnhancedRegulationTimeline: React.FC<EnhancedRegulationTimelineProp
         id: `version-${version.id}`,
         date: new Date(version.createdAt),
         title: `Version ${version.versionNumber}`,
-        description: `${version.source === 'mcp' ? 'MCP Engine Update' : 
+        description: `${version.source === 'mcp' ? 'EdSteward Update' : 
                      version.source === 'import' ? 'Imported Update' :
                      version.source === 'rollback' ? 'Rolled Back' : 'Manual Update'}`,
         type: 'version',

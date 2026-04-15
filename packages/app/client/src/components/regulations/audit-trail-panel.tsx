@@ -362,7 +362,7 @@ export function AuditTrailPanel({ regulationId }: AuditTrailPanelProps) {
                       {isSystemAction(log) ? (
                         <span className="flex items-center gap-1">
                           <Bot className="h-3 w-3" />
-                          System / MCP Engine
+                          System / EdSteward
                         </span>
                       ) : (
                         <span className="flex items-center gap-1">

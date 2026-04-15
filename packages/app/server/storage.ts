@@ -185,6 +185,10 @@ export interface IStorage {
   // Branding configuration methods
   getBrandingConfig(): Promise<{ [key: string]: unknown }>;
   saveBrandingConfig(_config: { [key: string]: unknown }): Promise<{ [key: string]: unknown }>;
+
+  // Branding asset methods (DB-backed, survives deploys)
+  saveBrandingAsset(_type: string, _data: Buffer, _mimeType: string, _filename: string): Promise<{ url: string }>;
+  getBrandingAsset(_type: string): Promise<{ data: Buffer; mimeType: string; filename: string } | null>;
 }
  
 
@@ -1017,7 +1021,7 @@ export class DatabaseStorage implements IStorage {
                 eo.impactType,
                 eo.impactSeverity,
                 eo.impactSummary || null,
-                'MCP Engine AI',
+                'EdSteward AI',
                 eo.confidenceScore?.toString() || null,
                 eo.affectedSections ? JSON.stringify(eo.affectedSections) : null,
                 eo.assessmentDate || null,
@@ -1037,7 +1041,7 @@ export class DatabaseStorage implements IStorage {
                 eo.impactType,
                 eo.impactSeverity,
                 eo.impactSummary || null,
-                'MCP Engine AI',
+                'EdSteward AI',
                 eo.assessmentDate || new Date().toISOString().split('T')[0],
                 eo.confidenceScore?.toString() || null,
                 eo.affectedSections ? JSON.stringify(eo.affectedSections) : null,
@@ -1898,7 +1902,7 @@ export class DatabaseStorage implements IStorage {
           date: version.createdAt,
           type: 'version',
           title: `Version ${version.versionNumber}`,
-          description: `${version.source === 'mcp' ? 'MCP Engine Update' : 
+          description: `${version.source === 'mcp' ? 'EdSteward Update' : 
                        version.source === 'import' ? 'Imported Update' :
                        version.source === 'rollback' ? 'Rolled Back' : 'Manual Update'}`,
           data: version,
@@ -2636,6 +2640,44 @@ export class DatabaseStorage implements IStorage {
     } catch (error) {
       console.error("Error saving branding config:", error);
       throw error;
+    }
+  }
+
+  async saveBrandingAsset(type: string, data: Buffer, mimeType: string, filename: string): Promise<{ url: string }> {
+    await this.pool.query(`
+      CREATE TABLE IF NOT EXISTS branding_assets (
+        id SERIAL PRIMARY KEY,
+        asset_type VARCHAR(50) NOT NULL UNIQUE,
+        data BYTEA NOT NULL,
+        mime_type VARCHAR(100) NOT NULL,
+        filename VARCHAR(255),
+        updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+      )
+    `);
+
+    await this.pool.query(`
+      INSERT INTO branding_assets (asset_type, data, mime_type, filename, updated_at)
+      VALUES ($1, $2, $3, $4, NOW())
+      ON CONFLICT (asset_type)
+      DO UPDATE SET data = EXCLUDED.data, mime_type = EXCLUDED.mime_type,
+                    filename = EXCLUDED.filename, updated_at = NOW()
+    `, [type, data, mimeType, filename]);
+
+    const timestamp = Date.now();
+    return { url: `/api/branding/${type}?v=${timestamp}` };
+  }
+
+  async getBrandingAsset(type: string): Promise<{ data: Buffer; mimeType: string; filename: string } | null> {
+    try {
+      const result = await this.pool.query(
+        `SELECT data, mime_type, filename FROM branding_assets WHERE asset_type = $1`,
+        [type]
+      );
+      if (result.rows.length === 0) return null;
+      const row = result.rows[0];
+      return { data: row.data, mimeType: row.mime_type, filename: row.filename };
+    } catch {
+      return null;
     }
   }
 

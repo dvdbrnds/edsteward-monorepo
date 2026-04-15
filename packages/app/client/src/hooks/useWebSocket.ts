@@ -237,7 +237,7 @@ export function useWebSocket(options: WebSocketHookOptions = {}) {
           // Only show toast for MCP Engine connection failures, not internal WebSocket
           if (useMCPEngine) {
             toast({
-              title: "MCP Engine Disconnected",
+              title: "EdSteward Disconnected",
               description: "Real-time regulation updates are unavailable.",
               variant: "destructive",
             });

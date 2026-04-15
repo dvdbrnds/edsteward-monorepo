@@ -124,24 +124,22 @@ export function useLegacyBranding(): LegacyBranding {
 // Update favicon with cache busting
 function updateFavicon(faviconUrl: string) {
   try {
-    // Target by ID first, then by selector
+    const baseUrl = faviconUrl.split('?')[0];
+    const cacheBustedUrl = `${baseUrl}?v=${Date.now()}`;
+
     let favicon = document.getElementById('favicon-link') as HTMLLinkElement;
     if (!favicon) {
       favicon = document.querySelector('link[rel="icon"]') as HTMLLinkElement;
     }
 
     if (favicon) {
-      // Add timestamp to force browser to reload favicon
-      const timestamp = new Date().getTime();
-      favicon.href = `${faviconUrl}?v=${timestamp}`;
+      favicon.href = cacheBustedUrl;
     } else {
-      // Create favicon link if it doesn't exist
       const newFavicon = document.createElement('link');
       newFavicon.rel = 'icon';
       newFavicon.type = 'image/x-icon';
       newFavicon.id = 'favicon-link';
-      const timestamp = new Date().getTime();
-      newFavicon.href = `${faviconUrl}?v=${timestamp}`;
+      newFavicon.href = cacheBustedUrl;
       document.head.appendChild(newFavicon);
     }
   } catch (error) {

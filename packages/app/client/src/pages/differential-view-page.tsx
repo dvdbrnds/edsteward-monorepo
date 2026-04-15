@@ -613,7 +613,7 @@ const DifferentialViewPage: React.FC<DifferentialViewPageProps> = ({ isDemo = fa
                           <div>
                             <p className="font-semibold text-amber-800">Tasks Pending Approval</p>
                             <p className="text-sm text-amber-700 mt-1">
-                              These {tasks.length} tasks from MCP Engine will replace the current {currentTasks.length} tasks 
+                              These {tasks.length} tasks from EdSteward will replace the current {currentTasks.length} tasks 
                               when you approve this update. This includes both requirements and best practices.
                             </p>
                           </div>
@@ -957,7 +957,7 @@ const DifferentialViewPage: React.FC<DifferentialViewPageProps> = ({ isDemo = fa
                   <div className="space-y-3">
                     <div className="flex items-center gap-2">
                       <Badge className="bg-indigo-100 text-indigo-700 hover:bg-indigo-100">
-                        MCP Engine
+                        EdSteward
                       </Badge>
                       {update.metadata?.federal_register_enhancement?.successful && (
                         <Badge className="bg-green-100 text-green-700 hover:bg-green-100">

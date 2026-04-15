@@ -1164,7 +1164,7 @@ export function setupMCPIntegrationApi(app: express.Application) {
                   ${eo.impactSummary || null},
                   ${eo.affectedSections ? JSON.stringify(eo.affectedSections) : null},
                   ${eo.confidenceScore ? String(eo.confidenceScore) : null},
-                  ${'MCP Engine AI'}, ${eo.assessmentDate || new Date().toISOString().split('T')[0]}
+                  ${'EdSteward AI'}, ${eo.assessmentDate || new Date().toISOString().split('T')[0]}
                 )
                 ON CONFLICT (eo_id, regulation_id) DO UPDATE SET
                   impact_type = EXCLUDED.impact_type,

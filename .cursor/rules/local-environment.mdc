@@ -1,0 +1,17 @@
+---
+description: Local development environment preferences and tools
+alwaysApply: true
+---
+
+# Local Environment
+
+## Docker
+
+**Use Colima, NOT Docker Desktop.** The user has Colima installed via Homebrew (`/opt/homebrew/bin/colima`).
+
+- Start the Docker daemon: `colima start`
+- Stop: `colima stop`
+- Check status: `colima status`
+- NEVER run `open -a Docker` or reference Docker Desktop
+
+The deploy scripts (`deploy-staging.sh`, `deploy-production.sh`) just need a Docker daemon — Colima provides this.

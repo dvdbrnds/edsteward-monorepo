@@ -308,7 +308,7 @@ export function RoleAssignmentsSettings() {
               Role Assignments
             </CardTitle>
             <CardDescription>
-              Map suggested roles (from MCP Engine) to default assignees. Tasks with these roles will auto-assign to the configured person.
+              Map suggested roles to default assignees. Tasks with these roles will auto-assign to the configured person.
             </CardDescription>
           </div>
           <Button onClick={() => setShowAddDialog(true)}>
@@ -617,7 +617,7 @@ export function RoleAssignmentsSettings() {
                 placeholder="e.g., Registrar, Title IX Coordinator"
               />
               <p className="text-xs text-muted-foreground mt-1">
-                Must match the assignedRole value from MCP Engine
+                Must match the suggested role name from EdSteward
               </p>
             </div>
 

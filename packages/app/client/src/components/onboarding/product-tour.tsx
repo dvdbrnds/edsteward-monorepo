@@ -36,7 +36,7 @@ const TOUR_STEPS: TourStep[] = [
   },
   {
     title: 'Regulation Updates',
-    description: 'When the MCP Engine detects regulation changes, they appear here for your review. You can approve, reject, or defer each update before it affects your compliance tasks.',
+    description: 'When EdSteward detects regulation changes, they appear here for your review. You can approve, reject, or defer each update before it affects your compliance tasks.',
     target: '[data-tour="nav-reg-updates"]',
     placement: 'bottom',
   },

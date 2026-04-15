@@ -770,7 +770,7 @@ function RegulationDetailPage() {
                     <p className="text-sm text-yellow-700 mt-1">
                       This regulation has updates waiting for review and approval. 
                       {pendingUpdates.some((update) => update.name?.includes('MCP Engine')) && 
-                        ' Some updates are from the MCP Engine with enhanced Federal Register data.'
+                        ' Some updates include enhanced Federal Register data.'
                       }
                     </p>
                   </div>

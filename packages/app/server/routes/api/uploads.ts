@@ -20,18 +20,9 @@ const uploadDir = isActualProduction
   ? path.join('/app', 'uploads')
   : path.join(process.cwd(), 'uploads');
 
-// Branding assets directory
-const brandingAssetsDir = isActualProduction
-  ? path.join('/app', 'client/public/assets')
-  : path.join(process.cwd(), 'client/public/assets');
-
 // Ensure upload directories exist
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
-}
-
-if (!fs.existsSync(brandingAssetsDir)) {
-  fs.mkdirSync(brandingAssetsDir, { recursive: true });
 }
 
 const multerStorage = multer.diskStorage({
@@ -44,24 +35,8 @@ const multerStorage = multer.diskStorage({
   }
 });
 
-// Special storage for branding assets
-const brandingStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, brandingAssetsDir);
-  },
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    const fieldName = file.fieldname;
-    
-    if (fieldName === 'logo') {
-      cb(null, `institution-logo${ext}`);
-    } else if (fieldName === 'favicon') {
-      cb(null, `institution-favicon${ext}`);
-    } else {
-      cb(null, `${fieldName}-${Date.now()}${ext}`);
-    }
-  }
-});
+// Branding assets use memory storage — files are saved to the database, not disk
+const brandingMemoryStorage = multer.memoryStorage();
 
 const upload = multer({
   storage: multerStorage,
@@ -87,7 +62,7 @@ const upload = multer({
 
 // Branding assets upload with specific validation
 const brandingUpload = multer({
-  storage: brandingStorage,
+  storage: brandingMemoryStorage,
   limits: {
     fileSize: 5 * 1024 * 1024, // 5MB limit for branding assets
   },
@@ -136,34 +111,36 @@ const requireAdmin = (req: any, res: express.Response, next: express.NextFunctio
   next();
 };
 
-// Upload branding assets (logo/favicon)
+// Upload branding assets (logo/favicon) — stored in the database
 router.post('/branding', requireAdmin, brandingUpload.fields([
   { name: 'logo', maxCount: 1 },
   { name: 'favicon', maxCount: 1 }
-]), (req, res) => {
+]), async (req, res) => {
   try {
+    const { getDatabaseStorage } = await import('../../services/database');
+    const tenantStorage = getDatabaseStorage((req as any).tenantId);
+
     const files = req.files as { [fieldname: string]: Express.Multer.File[] };
     const results: { [key: string]: string } = {};
-    const timestamp = Date.now(); // Cache-busting timestamp
-    
+
     if (files.logo && files.logo[0]) {
-      const logoFile = files.logo[0];
-      // Add cache-busting timestamp to URL to force browser refresh
-      results.logoUrl = `/assets/${logoFile.filename}?v=${timestamp}`;
-      syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Logo uploaded: ${logoFile.filename}`);
+      const f = files.logo[0];
+      const { url } = await tenantStorage.saveBrandingAsset('logo', f.buffer, f.mimetype, f.originalname);
+      results.logoUrl = url;
+      syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Logo saved to DB: ${f.originalname} (${f.size} bytes)`);
     }
-    
+
     if (files.favicon && files.favicon[0]) {
-      const faviconFile = files.favicon[0];
-      // Add cache-busting timestamp to URL to force browser refresh
-      results.faviconUrl = `/assets/${faviconFile.filename}?v=${timestamp}`;
-      syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Favicon uploaded: ${faviconFile.filename}`);
+      const f = files.favicon[0];
+      const { url } = await tenantStorage.saveBrandingAsset('favicon', f.buffer, f.mimetype, f.originalname);
+      results.faviconUrl = url;
+      syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Favicon saved to DB: ${f.originalname} (${f.size} bytes)`);
     }
-    
+
     if (Object.keys(results).length === 0) {
       return res.status(400).json({ error: 'No valid files uploaded' });
     }
-    
+
     res.json({
       success: true,
       message: 'Assets uploaded successfully',
@@ -171,9 +148,9 @@ router.post('/branding', requireAdmin, brandingUpload.fields([
     });
   } catch (error) {
     syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, `Branding upload error: ${error instanceof Error ? error.message : String(error)}`);
-    res.status(500).json({ 
-      error: 'Upload failed', 
-      details: error instanceof Error ? error.message : String(error) 
+    res.status(500).json({
+      error: 'Upload failed',
+      details: error instanceof Error ? error.message : String(error)
     });
   }
 });
