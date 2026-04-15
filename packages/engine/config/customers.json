@@ -42,7 +42,7 @@
         "username": "mcp-engine",
         "password": "SET_VIA_EDSTEWARD_PASSWORD_ENV"
       },
-      "enabled": false,
+      "enabled": true,
       "subscriptions": ["all"]
     },
     {
