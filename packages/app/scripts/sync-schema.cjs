@@ -124,8 +124,9 @@ async function main() {
     process.exit(1);
   }
 
-  const sourcePool = new Pool({ connectionString: sourceUrl });
-  const targetPool = new Pool({ connectionString: targetUrl });
+  const sslConfig = { rejectUnauthorized: false };
+  const sourcePool = new Pool({ connectionString: sourceUrl, ssl: sslConfig });
+  const targetPool = new Pool({ connectionString: targetUrl, ssl: sslConfig });
   const sc = await sourcePool.connect();
   const tc = await targetPool.connect();
 

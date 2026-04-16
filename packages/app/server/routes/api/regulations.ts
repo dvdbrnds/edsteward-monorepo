@@ -17,9 +17,9 @@ import { getCanonicalCategories, normalizeCategory } from '../../services/catego
 import multer from 'multer';
 import { uploadLimiter } from '../../middleware/rate-limiter';
 
-// Simple multer configuration for evidence uploads
+// Evidence uploads use memory storage — files are saved to the database
 const upload = multer({
-  dest: 'uploads/',
+  storage: multer.memoryStorage(),
   limits: {
     fileSize: 10 * 1024 * 1024, // 10MB limit
   },
@@ -441,6 +441,10 @@ router.post("/:regulationId/evidence", uploadLimiter, requireAuth, upload.single
 
     try {
       const tenantStorage = getDatabaseStorage(req.tenantId);
+
+      const fileKey = `evidence-reg-${regulationId}-${Date.now()}-${Math.random().toString(36).substring(7)}`;
+      const { url } = await tenantStorage.saveFile(fileKey, file.buffer, file.mimetype, file.originalname);
+
       const evidenceFile = await tenantStorage.createEvidenceFile({
         regulationId: regulationId,
         fileName: file.originalname,
@@ -449,7 +453,7 @@ router.post("/:regulationId/evidence", uploadLimiter, requireAuth, upload.single
         description,
         uploadedBy: req.user.id,
         status: "pending",
-        storagePath: file.path,
+        storagePath: url,
         isOfficial
       });
 

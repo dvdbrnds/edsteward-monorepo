@@ -1,5 +1,5 @@
 import express from 'express';
-import bcrypt from 'bcryptjs';
+import { hashPassword } from '../../auth';
 import { getDatabaseStorage } from '../../services/database';
 import { syslog, LogLevel, LogFacility } from '../../services/syslog';
 
@@ -159,7 +159,7 @@ router.post("/", requireAuth, async (req, res) => {
     }
 
     // Hash password if provided (optional for SSO users)
-    const hashedPassword = password ? await bcrypt.hash(password, 10) : await bcrypt.hash(Math.random().toString(36), 10);
+    const hashedPassword = password ? await hashPassword(password) : await hashPassword(Math.random().toString(36));
 
     // Create user
     const newUser = await tenantStorage.createUser({
@@ -218,7 +218,7 @@ router.patch("/:id", requireAuth, async (req, res) => {
     if (role !== undefined) updates.role = role;
     if (department !== undefined) updates.department = department;
     if (isActive !== undefined) updates.isActive = isActive;
-    if (password) updates.password = await bcrypt.hash(password, 10);
+    if (password) updates.password = await hashPassword(password);
 
     const updatedUser = await tenantStorage.updateUser(userId, updates);
 

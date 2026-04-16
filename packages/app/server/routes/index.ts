@@ -240,6 +240,23 @@ export function registerRoutes(app: express.Application): Server {
     }
   });
 
+  // Serve uploaded files from the database (authenticated)
+  app.get('/api/files/:fileKey', async (req: any, res) => {
+    try {
+      const tenantStorage = getDatabaseStorage(req.tenantId);
+      const file = await tenantStorage.getFile(req.params.fileKey);
+      if (!file) {
+        return res.status(404).json({ error: 'File not found' });
+      }
+      res.set('Content-Type', file.mimeType);
+      res.set('Content-Disposition', `inline; filename="${file.filename}"`);
+      res.set('Cache-Control', 'private, max-age=3600');
+      res.send(file.data);
+    } catch {
+      res.status(404).json({ error: 'File not found' });
+    }
+  });
+
   // Setup authentication
   setupAuth(app as any);
 
@@ -1815,8 +1832,7 @@ export function registerRoutes(app: express.Application): Server {
   // Serve static files
   app.use('/downloads', express.static(path.join(APP_ROOT, 'public/downloads')));
   
-  // Serve uploaded evidence files
-  app.use('/uploads', express.static(path.join(APP_ROOT, 'uploads')));
+  // Evidence files are now served from the database via /api/files/:fileKey
 
   // Serve branding assets
   const assetsPath = path.join(APP_ROOT, 'client/public/assets');

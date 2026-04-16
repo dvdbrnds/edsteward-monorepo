@@ -1,45 +1,16 @@
 import express from 'express';
 import multer from 'multer';
 import path from 'path';
-import fs from 'fs';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
 import { syslog, LogLevel, LogFacility } from '../../services/syslog';
 import { uploadLimiter } from '../../middleware/rate-limiter';
 
-// ES Module compatibility: Get current file path
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
 const router = express.Router();
 
-// Configure multer storage - use environment-appropriate path
-// Check if we're in a real production container or just local production mode
-const isActualProduction = process.env.NODE_ENV === 'production' && process.env.DOCKER_CONTAINER === 'true';
-const uploadDir = isActualProduction
-  ? path.join('/app', 'uploads')
-  : path.join(process.cwd(), 'uploads');
-
-// Ensure upload directories exist
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
-
-const multerStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, uploadDir);
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1E9)}`;
-    cb(null, `${file.fieldname}-${uniqueSuffix}${path.extname(file.originalname)}`);
-  }
-});
-
-// Branding assets use memory storage — files are saved to the database, not disk
-const brandingMemoryStorage = multer.memoryStorage();
+// All uploads use memory storage — files are saved to the database
+const memoryStorage = multer.memoryStorage();
 
 const upload = multer({
-  storage: multerStorage,
+  storage: memoryStorage,
   limits: {
     fileSize: 10 * 1024 * 1024, // 10MB limit
   },
@@ -62,7 +33,7 @@ const upload = multer({
 
 // Branding assets upload with specific validation
 const brandingUpload = multer({
-  storage: brandingMemoryStorage,
+  storage: memoryStorage,
   limits: {
     fileSize: 5 * 1024 * 1024, // 5MB limit for branding assets
   },
@@ -155,74 +126,31 @@ router.post('/branding', requireAdmin, brandingUpload.fields([
   }
 });
 
-// Custom file download route with proper content-type handling
-router.get('/:filename', (req, res) => {
-  const filename = req.params.filename;
-  const filePath = path.join(uploadDir, filename);
-  
-  // Check if file exists
-  if (!fs.existsSync(filePath)) {
-    return res.status(404).json({ error: 'File not found' });
-  }
-  
-  // Get file extension to determine content-type
-  const ext = path.extname(filename).toLowerCase();
-  
-  // Set appropriate content-type based on file extension
-  if (ext === '.pdf') {
-    res.setHeader('Content-Type', 'application/pdf');
-  } else if (ext === '.doc') {
-    res.setHeader('Content-Type', 'application/msword');
-  } else if (ext === '.docx') {
-    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
-  } else if (ext === '.jpg' || ext === '.jpeg') {
-    res.setHeader('Content-Type', 'image/jpeg');
-  } else if (ext === '.png') {
-    res.setHeader('Content-Type', 'image/png');
-  }
-  
-  // Set content disposition header for download
-  res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
-  
-  // Stream file to response
-  const fileStream = fs.createReadStream(filePath);
-  fileStream.pipe(res);
-});
-
-// Regulation file downloads with proper content type handling
+// Regulation file downloads (static assets bundled in the build)
 router.get('/regulations/:filename', (req, res) => {
+  const fs = require('fs');
   const filename = req.params.filename;
+  const isActualProduction = process.env.NODE_ENV === 'production' && process.env.DOCKER_CONTAINER === 'true';
   const basePath = isActualProduction ? '/app' : process.cwd();
   const filePath = path.join(basePath, 'public/downloads/regulations', filename);
   
-  // Check if file exists
   if (!fs.existsSync(filePath)) {
     syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, `Regulation file not found: ${filename}`);
     return res.status(404).json({ error: 'Regulation file not found' });
   }
   
-  // Get file extension to determine content-type
   const ext = path.extname(filename).toLowerCase();
-  
-  // Set appropriate content-type based on file extension
-  if (ext === '.pdf') {
-    res.setHeader('Content-Type', 'application/pdf');
-  } else if (ext === '.doc') {
-    res.setHeader('Content-Type', 'application/msword');
-  } else if (ext === '.docx') {
-    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
-  } else if (ext === '.jpg' || ext === '.jpeg') {
-    res.setHeader('Content-Type', 'image/jpeg');
-  } else if (ext === '.png') {
-    res.setHeader('Content-Type', 'image/png');
-  } else if (ext === '.txt') {
-    res.setHeader('Content-Type', 'text/plain');
-  }
-  
-  // Set content disposition header for download
+  const mimeMap: Record<string, string> = {
+    '.pdf': 'application/pdf',
+    '.doc': 'application/msword',
+    '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg',
+    '.png': 'image/png',
+    '.txt': 'text/plain',
+  };
+  if (mimeMap[ext]) res.setHeader('Content-Type', mimeMap[ext]);
   res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
   
-  // Stream file to response
   const fileStream = fs.createReadStream(filePath);
   fileStream.pipe(res);
 });

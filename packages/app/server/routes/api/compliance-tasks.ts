@@ -1040,7 +1040,7 @@ router.post('/:taskId/evidence', uploadLimiter, requireAuth, async (req: Request
           if (name === 'linkTitle') uploadedLinkTitle = val;
         });
 
-        let fileWritePromise: Promise<void> | null = null;
+        let fileSavePromise: Promise<void> | null = null;
 
         bb.on('file', (_name: string, file: import('stream').Readable, info: { filename: string; encoding: string; mimeType: string }) => {
           uploadedFileName = info.filename;
@@ -1052,28 +1052,19 @@ router.post('/:taskId/evidence', uploadLimiter, requireAuth, async (req: Request
           });
 
           file.on('end', () => {
-            // Create a promise for the file write operation
-            fileWritePromise = (async () => {
-              const fs = await import('fs/promises');
-              const path = await import('path');
-              
-              const uploadsDir = path.join(process.cwd(), 'uploads', 'evidence');
-              await fs.mkdir(uploadsDir, { recursive: true });
-
-              // Generate unique filename
-              const uniqueName = `${Date.now()}-${Math.random().toString(36).substring(7)}-${uploadedFileName}`;
-              const filePath = path.join(uploadsDir, uniqueName);
-              
-              await fs.writeFile(filePath, Buffer.concat(chunks));
-              uploadedFileUrl = `/uploads/evidence/${uniqueName}`;
+            fileSavePromise = (async () => {
+              const { getDatabaseStorage } = await import('../../services/database');
+              const tenantStorage = getDatabaseStorage((req as any).tenantId);
+              const fileKey = `evidence-task-${taskId}-${Date.now()}-${Math.random().toString(36).substring(7)}`;
+              const { url } = await tenantStorage.saveFile(fileKey, Buffer.concat(chunks), uploadedFileType, uploadedFileName);
+              uploadedFileUrl = url;
             })();
           });
         });
 
         bb.on('close', async () => {
-          // Wait for file write to complete before resolving
-          if (fileWritePromise) {
-            await fileWritePromise;
+          if (fileSavePromise) {
+            await fileSavePromise;
           }
           resolve({
             fileName: uploadedFileName || uploadedLinkTitle || 'Link',
@@ -1166,15 +1157,15 @@ router.delete('/:taskId/evidence/:evidenceId', requireAdmin, async (req: Request
       return res.status(404).json({ error: 'Evidence not found' });
     }
 
-    // Delete file if exists
-    if (existingEvidence[0].fileUrl) {
+    // Delete file from DB if it has a DB-backed URL
+    if (existingEvidence[0].fileUrl?.startsWith('/api/files/')) {
       try {
-        const fs = await import('fs/promises');
-        const path = await import('path');
-        const filePath = path.join(process.cwd(), existingEvidence[0].fileUrl);
-        await fs.unlink(filePath);
+        const { getDatabaseStorage } = await import('../../services/database');
+        const tenantStorage = getDatabaseStorage((req as any).tenantId);
+        const fileKey = existingEvidence[0].fileUrl.replace('/api/files/', '');
+        await tenantStorage.deleteFile(fileKey);
       } catch (e) {
-        console.warn('Could not delete file:', e);
+        console.warn('Could not delete file from DB:', e);
       }
     }
 
@@ -2675,7 +2666,7 @@ router.post('/attestation/:token/evidence', uploadLimiter, async (req: Request, 
           if (name === 'linkTitle') uploadedLinkTitle = val;
         });
 
-        let fileWritePromise: Promise<void> | null = null;
+        let fileSavePromise: Promise<void> | null = null;
 
         bb.on('file', (_name: string, file: import('stream').Readable, info: { filename: string; encoding: string; mimeType: string }) => {
           uploadedFileName = info.filename;
@@ -2687,25 +2678,19 @@ router.post('/attestation/:token/evidence', uploadLimiter, async (req: Request, 
           });
 
           file.on('end', () => {
-            fileWritePromise = (async () => {
-              const fs = await import('fs/promises');
-              const path = await import('path');
-              
-              const uploadsDir = path.join(process.cwd(), 'uploads', 'evidence');
-              await fs.mkdir(uploadsDir, { recursive: true });
-
-              const uniqueName = `${Date.now()}-${Math.random().toString(36).substring(7)}-${uploadedFileName}`;
-              const filePath = path.join(uploadsDir, uniqueName);
-              
-              await fs.writeFile(filePath, Buffer.concat(chunks));
-              uploadedFileUrl = `/uploads/evidence/${uniqueName}`;
+            fileSavePromise = (async () => {
+              const { getDatabaseStorage } = await import('../../services/database');
+              const tenantStorage = getDatabaseStorage((req as any).tenantId);
+              const fileKey = `evidence-attest-${attestationToken.taskId}-${Date.now()}-${Math.random().toString(36).substring(7)}`;
+              const { url } = await tenantStorage.saveFile(fileKey, Buffer.concat(chunks), uploadedFileType, uploadedFileName);
+              uploadedFileUrl = url;
             })();
           });
         });
 
         bb.on('close', async () => {
-          if (fileWritePromise) {
-            await fileWritePromise;
+          if (fileSavePromise) {
+            await fileSavePromise;
           }
           resolve({
             fileName: uploadedFileName || uploadedLinkTitle || 'Link',
@@ -2822,15 +2807,15 @@ router.delete('/attestation/:token/evidence/:evidenceId', async (req: Request, r
       return res.status(404).json({ error: 'Evidence not found for this task' });
     }
 
-    // Delete the physical file if it exists
-    if (existingEvidence[0].fileUrl) {
+    // Delete file from DB if it has a DB-backed URL
+    if (existingEvidence[0].fileUrl?.startsWith('/api/files/')) {
       try {
-        const fs = await import('fs/promises');
-        const path = await import('path');
-        const filePath = path.join(process.cwd(), existingEvidence[0].fileUrl);
-        await fs.unlink(filePath);
+        const { getDatabaseStorage } = await import('../../services/database');
+        const tenantStorage = getDatabaseStorage((req as any).tenantId);
+        const fileKey = existingEvidence[0].fileUrl.replace('/api/files/', '');
+        await tenantStorage.deleteFile(fileKey);
       } catch (e) {
-        console.warn('Could not delete evidence file:', e);
+        console.warn('Could not delete evidence file from DB:', e);
       }
     }
 

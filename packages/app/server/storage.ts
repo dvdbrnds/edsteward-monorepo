@@ -189,6 +189,11 @@ export interface IStorage {
   // Branding asset methods (DB-backed, survives deploys)
   saveBrandingAsset(_type: string, _data: Buffer, _mimeType: string, _filename: string): Promise<{ url: string }>;
   getBrandingAsset(_type: string): Promise<{ data: Buffer; mimeType: string; filename: string } | null>;
+
+  // File storage methods (DB-backed, replaces ephemeral disk uploads)
+  saveFile(_fileKey: string, _data: Buffer, _mimeType: string, _filename: string): Promise<{ url: string }>;
+  getFile(_fileKey: string): Promise<{ data: Buffer; mimeType: string; filename: string } | null>;
+  deleteFile(_fileKey: string): Promise<void>;
 }
  
 
@@ -2678,6 +2683,56 @@ export class DatabaseStorage implements IStorage {
       return { data: row.data, mimeType: row.mime_type, filename: row.filename };
     } catch {
       return null;
+    }
+  }
+
+  private async ensureFileStorageTable(): Promise<void> {
+    await this.pool.query(`
+      CREATE TABLE IF NOT EXISTS file_storage (
+        id SERIAL PRIMARY KEY,
+        file_key VARCHAR(255) NOT NULL UNIQUE,
+        data BYTEA NOT NULL,
+        mime_type VARCHAR(100) NOT NULL,
+        filename VARCHAR(255) NOT NULL,
+        size INTEGER,
+        created_at TIMESTAMP NOT NULL DEFAULT NOW()
+      )
+    `);
+  }
+
+  async saveFile(fileKey: string, data: Buffer, mimeType: string, filename: string): Promise<{ url: string }> {
+    await this.ensureFileStorageTable();
+    await this.pool.query(`
+      INSERT INTO file_storage (file_key, data, mime_type, filename, size, created_at)
+      VALUES ($1, $2, $3, $4, $5, NOW())
+      ON CONFLICT (file_key) DO UPDATE SET
+        data = EXCLUDED.data, mime_type = EXCLUDED.mime_type,
+        filename = EXCLUDED.filename, size = EXCLUDED.size
+    `, [fileKey, data, mimeType, filename, data.length]);
+    return { url: `/api/files/${fileKey}` };
+  }
+
+  async getFile(fileKey: string): Promise<{ data: Buffer; mimeType: string; filename: string } | null> {
+    try {
+      await this.ensureFileStorageTable();
+      const result = await this.pool.query(
+        `SELECT data, mime_type, filename FROM file_storage WHERE file_key = $1`,
+        [fileKey]
+      );
+      if (result.rows.length === 0) return null;
+      const row = result.rows[0];
+      return { data: row.data, mimeType: row.mime_type, filename: row.filename };
+    } catch {
+      return null;
+    }
+  }
+
+  async deleteFile(fileKey: string): Promise<void> {
+    try {
+      await this.ensureFileStorageTable();
+      await this.pool.query(`DELETE FROM file_storage WHERE file_key = $1`, [fileKey]);
+    } catch {
+      // non-critical
     }
   }
 
