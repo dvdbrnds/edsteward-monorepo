@@ -1723,13 +1723,12 @@ app.post('/api/sync/dev-to-template', requireAuth, async (req, res) => {
       return res.status(400).json({ error: 'You must confirm the sync operation' });
     }
 
-    // Re-authenticate admin
-    const adminUsers = [
-      { id: 1, email: 'admin@edsteward.ai', password: 'admin123', name: 'EdSteward Admin', role: 'super_admin' },
-      { id: 2, email: 'dvdbrnds@gmail.com', password: 'gabadhgabadh', name: 'David Brands', role: 'super_admin' }
-    ];
-    const matchingAdmin = adminUsers.find(u => u.email === adminEmail);
-    if (!matchingAdmin || matchingAdmin.password !== adminPassword) {
+    // Re-authenticate admin using the same env-based user list
+    const syncSecret = process.env.ADMIN_SYNC_SECRET || process.env.ADMIN_CONSOLE_PASSWORD;
+    if (!syncSecret) {
+      return res.status(500).json({ error: 'ADMIN_SYNC_SECRET or ADMIN_CONSOLE_PASSWORD must be set for sync operations' });
+    }
+    if (adminPassword !== syncSecret) {
       return res.status(401).json({ error: 'Invalid admin password' });
     }
 

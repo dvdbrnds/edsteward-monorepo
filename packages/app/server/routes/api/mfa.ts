@@ -31,7 +31,7 @@ const disableMFASchema = z.object({
 router.get('/status', requireAuth, async (req: Request, res: Response) => {
   try {
     const userId = req.user!.id;
-    const status = await MFAService.getMFAStatus(userId);
+    const status = await MFAService.getMFAStatus(userId, (req as any).tenantId);
     
     
     const response = {
@@ -59,7 +59,7 @@ router.post('/setup/generate', requireAuth, async (req: Request, res: Response) 
     const user = req.user!;
     
     // Check if MFA is already enabled
-    const currentStatus = await MFAService.getMFAStatus(user.id);
+    const currentStatus = await MFAService.getMFAStatus(user.id, (req as any).tenantId);
     if (currentStatus.enabled) {
       return res.status(400).json({
         success: false,
@@ -67,7 +67,7 @@ router.post('/setup/generate', requireAuth, async (req: Request, res: Response) 
       });
     }
 
-    const setupData = await MFAService.generateSetup(user.id, user.email);
+    const setupData = await MFAService.generateSetup(user.id, user.email, (req as any).tenantId);
     
     // Store setup data in session temporarily (don't save to DB yet)
     req.session.mfaSetup = {
@@ -127,7 +127,8 @@ router.post('/setup/verify', requireAuth, async (req: Request, res: Response) =>
       user.id,
       mfaSetup.secret,
       verificationCode,
-      mfaSetup.backupCodes
+      mfaSetup.backupCodes,
+      (req as any).tenantId
     );
 
     if (success) {
@@ -169,7 +170,7 @@ router.post('/verify', requireAuth, async (req: Request, res: Response) => {
     const { code } = verifyMFASchema.parse(req.body);
     const userId = req.user!.id;
     
-    const result = await MFAService.verifyMFA(userId, code);
+    const result = await MFAService.verifyMFA(userId, code, (req as any).tenantId);
     
     if (result.success) {
       res.json({
@@ -214,7 +215,7 @@ router.post('/disable', requireAuth, async (req: Request, res: Response) => {
     }
 
     // Disable MFA for the user
-    await MFAService.disableMFA(userId);
+    await MFAService.disableMFA(userId, (req as any).tenantId);
 
     res.json({
       success: true,
@@ -237,7 +238,7 @@ router.post('/backup-codes/regenerate', requireAuth, async (req: Request, res: R
   try {
     const userId = req.user!.id;
     
-    const newBackupCodes = await MFAService.regenerateBackupCodes(userId);
+    const newBackupCodes = await MFAService.regenerateBackupCodes(userId, (req as any).tenantId);
     
     if (newBackupCodes) {
       res.json({
@@ -280,7 +281,7 @@ router.post('/disable', requireAuth, async (req: Request, res: Response) => {
       });
     }
 
-    const success = await MFAService.disableMFA(user.id);
+    const success = await MFAService.disableMFA(user.id, (req as any).tenantId);
     
     if (success) {
       res.json({

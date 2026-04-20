@@ -9,11 +9,6 @@ interface SamlCache {
   removeAsync(key: string): Promise<string | null>;
 }
 
-// Declare global type for SAML cache
-declare global {
-  var samlCache: Map<string, string> | undefined;
-}
-
 export interface IdentityProviderConfig {
   id: string;
   name: string;
@@ -49,31 +44,84 @@ const getServiceProviderKey = (): string => {
   }
 };
 
-// Create SAML cache implementation
+// PostgreSQL-backed SAML cache — survives restarts and multi-instance ECS
+let samlCacheTableReady = false;
+
+async function ensureSamlCacheTable(): Promise<void> {
+  if (samlCacheTableReady) return;
+  try {
+    const { pool } = await import('../services/database');
+    await (pool as any).query(`
+      CREATE TABLE IF NOT EXISTS saml_request_cache (
+        key TEXT PRIMARY KEY,
+        value TEXT NOT NULL,
+        created_at TIMESTAMP NOT NULL DEFAULT NOW()
+      )
+    `);
+    samlCacheTableReady = true;
+  } catch (err) {
+    console.warn('[SAML-CACHE] Failed to create cache table, falling back to in-memory:', err);
+  }
+}
+
+// Lazy-delete expired entries (older than 8 hours, matching requestIdExpirationPeriodMs)
+async function pruneExpiredEntries(): Promise<void> {
+  try {
+    const { pool } = await import('../services/database');
+    await (pool as any).query(
+      `DELETE FROM saml_request_cache WHERE created_at < NOW() - INTERVAL '8 hours'`
+    );
+  } catch { /* non-critical */ }
+}
+
 const createSamlCache = (): SamlCache => {
+  const fallbackMap = new Map<string, string>();
+
   return {
     saveAsync: async function(key: string, value: string): Promise<string> {
-      // In production, use Redis or database
-      // For now, use in-memory storage (not recommended for production)
-      if (!globalThis.samlCache) {
-        globalThis.samlCache = new Map();
-      }
-      globalThis.samlCache.set(key, value);
-      return Promise.resolve(value);
+      try {
+        await ensureSamlCacheTable();
+        if (samlCacheTableReady) {
+          const { pool } = await import('../services/database');
+          await (pool as any).query(
+            `INSERT INTO saml_request_cache (key, value) VALUES ($1, $2)
+             ON CONFLICT (key) DO UPDATE SET value = $2, created_at = NOW()`,
+            [key, value]
+          );
+          pruneExpiredEntries().catch(() => {});
+          return value;
+        }
+      } catch { /* fall through */ }
+      fallbackMap.set(key, value);
+      return value;
     },
     getAsync: async function(key: string): Promise<string | null> {
-      if (!globalThis.samlCache) {
-        globalThis.samlCache = new Map();
-      }
-      return Promise.resolve(globalThis.samlCache.get(key) || null);
+      try {
+        await ensureSamlCacheTable();
+        if (samlCacheTableReady) {
+          const { pool } = await import('../services/database');
+          const result = await (pool as any).query(
+            `SELECT value FROM saml_request_cache WHERE key = $1`, [key]
+          );
+          return result.rows[0]?.value ?? null;
+        }
+      } catch { /* fall through */ }
+      return fallbackMap.get(key) ?? null;
     },
     removeAsync: async function(key: string): Promise<string | null> {
-      if (!globalThis.samlCache) {
-        globalThis.samlCache = new Map();
-      }
-      const value = globalThis.samlCache.get(key);
-      globalThis.samlCache.delete(key);
-      return Promise.resolve(value || null);
+      try {
+        await ensureSamlCacheTable();
+        if (samlCacheTableReady) {
+          const { pool } = await import('../services/database');
+          const result = await (pool as any).query(
+            `DELETE FROM saml_request_cache WHERE key = $1 RETURNING value`, [key]
+          );
+          return result.rows[0]?.value ?? null;
+        }
+      } catch { /* fall through */ }
+      const val = fallbackMap.get(key) ?? null;
+      fallbackMap.delete(key);
+      return val;
     }
   };
 };

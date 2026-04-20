@@ -240,7 +240,7 @@ export function registerRoutes(app: express.Application): Server {
   });
 
   // Serve uploaded files from the database (authenticated)
-  app.get('/api/files/:fileKey', async (req: any, res) => {
+  app.get('/api/files/:fileKey', requireAuth, async (req: any, res) => {
     try {
       const tenantStorage = getDatabaseStorage(req.tenantId);
       const file = await tenantStorage.getFile(req.params.fileKey);
@@ -1475,7 +1475,7 @@ export function registerRoutes(app: express.Application): Server {
 
       // Verify MFA code
       const { MFAService } = await import('../services/mfa');
-      const isValidCode = await MFAService.verifyCode(user.id, code);
+      const isValidCode = await MFAService.verifyCode(user.id, code, (req as any).tenantId);
 
       if (!isValidCode) {
         await syslog.log(
@@ -1642,7 +1642,7 @@ export function registerRoutes(app: express.Application): Server {
         } else {
           // Second step: verify MFA code
           const { MFAService } = await import('../services/mfa');
-          const isValidCode = await MFAService.verifyCode(user.id, mfaCode);
+          const isValidCode = await MFAService.verifyCode(user.id, mfaCode, (req as any).tenantId);
 
           if (!isValidCode) {
             await syslog.log(

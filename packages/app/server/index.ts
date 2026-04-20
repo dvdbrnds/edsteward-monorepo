@@ -16,6 +16,7 @@ if (process.env.SENTRY_DSN) {
 
 import express from 'express';
 import session from 'express-session';
+import connectPgSimple from 'connect-pg-simple';
 import passport from 'passport';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -28,7 +29,7 @@ import { createServer } from 'http';
 import { setupWebSocketServer } from './websocket-server';
 import { institutionConfig, validateConfig } from './config/institution';
 import { configureAuth } from './auth/single-tenant-auth';
-import { testConnection, getDbForRequest } from './services/database';
+import { testConnection, getDbForRequest, pool as sharedPool } from './services/database';
 import { registerRoutes } from './routes';
 import { users } from '../shared/schema';
 import { eq } from 'drizzle-orm';
@@ -135,7 +136,20 @@ if (!sessionSecret && process.env.NODE_ENV === 'production') {
   console.error('FATAL: SESSION_SECRET must be set in production');
   process.exit(1);
 }
+
+const PgSession = connectPgSimple(session);
+const sessionStore = new PgSession({
+  pool: sharedPool as any,
+  tableName: 'session',
+  createTableIfMissing: true,
+  pruneSessionInterval: 60 * 15, // prune expired sessions every 15 min
+  errorLog: (err: Error) => {
+    console.error('[SESSION-STORE] PostgreSQL session error:', err.message);
+  },
+});
+
 app.use(session({
+  store: sessionStore,
   secret: sessionSecret || 'dev-only-insecure-secret',
   resave: false,
   saveUninitialized: false,
@@ -143,7 +157,6 @@ app.use(session({
     secure: process.env.NODE_ENV === 'production',
     httpOnly: true,
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
-    // 'none' required for SAML (cross-origin POST), 'lax' for dev without SAML
     sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
   },
 }));

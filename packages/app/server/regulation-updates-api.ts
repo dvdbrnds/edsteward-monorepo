@@ -684,7 +684,7 @@ export function setupRegulationUpdatesApi(app: Express) {
                 });
               }
               
-              console.log(`⚠️ Regulation not found: ${regKey || identifier}. Auto-creating...`);
+              console.log(`⚠️ Regulation not found: ${regKey || mcpData.itemId || mcpData.name}. Auto-creating...`);
               validRegulationId = await autoCreateRegulationIfNotExists(regKey, mcpData.name, {
                 statute: (mcpData as any).statute,
                 category: (mcpData as any).category,

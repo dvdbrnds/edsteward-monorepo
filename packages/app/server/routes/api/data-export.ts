@@ -53,7 +53,7 @@ router.get('/', requireAuth, async (req: Request, res: Response) => {
 
     // 3. Task activity by user
     const activityResult = await pool.query(`
-      SELECT ta.id, ta.task_id, ta.action, ta.details, ta.created_at,
+      SELECT ta.id, ta.task_id, ta.activity_type, ta.content, ta.created_at,
              ct.title as task_title
       FROM task_activity ta
       LEFT JOIN compliance_tasks ct ON ta.task_id = ct.id
@@ -83,7 +83,7 @@ router.get('/', requireAuth, async (req: Request, res: Response) => {
 
     // 6. Attestation records involving user
     const attestationsResult = await pool.query(`
-      SELECT tat.id, tat.task_id, tat.status, tat.created_at, tat.expires_at,
+      SELECT tat.id, tat.task_id, tat.created_at, tat.expires_at, tat.used_at,
              ct.title as task_title
       FROM task_attestation_tokens tat
       LEFT JOIN compliance_tasks ct ON tat.task_id = ct.id

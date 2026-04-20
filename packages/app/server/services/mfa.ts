@@ -92,7 +92,7 @@ export class MFAService {
   /**
    * Generate MFA setup data for a user (Context7 security best practices)
    */
-  static async generateSetup(userId: number, email: string): Promise<MFASetupResult> {
+  static async generateSetup(userId: number, email: string, tenantId?: string): Promise<MFASetupResult> {
     // Generate cryptographically secure secret (20 bytes = 160 bits, exceeds RFC 6238 minimum)
     const secret = new OTPAuth.Secret({ size: MFA_CONFIG.secretSize });
     
@@ -124,7 +124,7 @@ export class MFAService {
   /**
    * Enable MFA for a user
    */
-  static async enableMFA(userId: number, secret: string, verificationCode: string, backupCodes: string[]): Promise<boolean> {
+  static async enableMFA(userId: number, secret: string, verificationCode: string, backupCodes: string[], tenantId?: string): Promise<boolean> {
     // Verify the code before enabling using OTPAuth
     const totp = new OTPAuth.TOTP({
       secret: OTPAuth.Secret.fromBase32(secret),
@@ -143,7 +143,7 @@ export class MFAService {
       return false;
     }
 
-    const storage = getDatabaseStorage();
+    const storage = getDatabaseStorage(tenantId);
     
     // Encrypt sensitive data
     const encryptedSecret = encrypt(secret);
@@ -163,8 +163,8 @@ export class MFAService {
   /**
    * Verify MFA code (TOTP or backup code)
    */
-  static async verifyMFA(userId: number, code: string): Promise<MFAVerificationResult> {
-    const storage = getDatabaseStorage();
+  static async verifyMFA(userId: number, code: string, tenantId?: string): Promise<MFAVerificationResult> {
+    const storage = getDatabaseStorage(tenantId);
     const user = await storage.getUser(userId);
 
     if (!user || !user.mfaEnabled || !user.mfaSecret) {
@@ -240,9 +240,9 @@ export class MFAService {
   /**
    * Verify MFA code for login (simplified version)
    */
-  static async verifyCode(userId: number, code: string): Promise<boolean> {
+  static async verifyCode(userId: number, code: string, tenantId?: string): Promise<boolean> {
     try {
-      const result = await this.verifyMFA(userId, code);
+      const result = await this.verifyMFA(userId, code, tenantId);
       return result.success;
     } catch (error) {
       console.error('❌ MFA code verification error:', error);
@@ -254,12 +254,12 @@ export class MFAService {
   /**
    * Get MFA status for a user
    */
-  static async getMFAStatus(userId: number): Promise<{
+  static async getMFAStatus(userId: number, tenantId?: string): Promise<{
     enabled: boolean;
     setupAt?: Date;
     backupCodesRemaining?: number;
   }> {
-    const storage = getDatabaseStorage();
+    const storage = getDatabaseStorage(tenantId);
     const user = await storage.getUser(userId);
 
     if (!user) {
@@ -286,8 +286,8 @@ export class MFAService {
   /**
    * Regenerate backup codes
    */
-  static async regenerateBackupCodes(userId: number): Promise<string[] | null> {
-    const storage = getDatabaseStorage();
+  static async regenerateBackupCodes(userId: number, tenantId?: string): Promise<string[] | null> {
+    const storage = getDatabaseStorage(tenantId);
     const user = await storage.getUser(userId);
 
     if (!user || !user.mfaEnabled) {
@@ -307,9 +307,9 @@ export class MFAService {
   /**
    * Disable MFA for a user
    */
-  static async disableMFA(userId: number): Promise<void> {
+  static async disableMFA(userId: number, tenantId?: string): Promise<void> {
     try {
-      const storage = getDatabaseStorage();
+      const storage = getDatabaseStorage(tenantId);
       await storage.updateUser(userId, {
         mfaEnabled: false,
         mfaSecret: null,
