@@ -514,18 +514,18 @@ export function ComplianceDocuments() {
             Supporting Policy Documents
           </CardTitle>
           <CardDescription>
-            Detailed policy documents that support the HECVAT compliance report. Available upon request for institutional review.
+            Detailed policy documents that support the HECVAT compliance report. Download to share with auditors or institutional reviewers.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
             {[
-              { name: 'Information Security Policy', section: 'Security Controls', review: 'Annual', lastReviewed: 'Feb 2026' },
-              { name: 'Incident Response Plan', section: 'Incident Response', review: 'Semi-annual', lastReviewed: 'Feb 2026' },
-              { name: 'Data Retention Policy', section: 'Data Protection', review: 'Annual', lastReviewed: 'Feb 2026' },
-              { name: 'Privacy Policy', section: 'Privacy', review: 'Annual', lastReviewed: 'Feb 2026' },
-              { name: 'AI Governance Policy', section: 'AI Governance', review: 'Semi-annual', lastReviewed: 'Feb 2026' },
-              { name: 'Emergency Access Procedure', section: 'Business Continuity', review: 'Annual', lastReviewed: 'Feb 2026' },
+              { name: 'Information Security Policy', slug: 'information-security-policy', section: 'Security Controls', review: 'Annual', lastReviewed: 'Feb 2026' },
+              { name: 'Incident Response Plan', slug: 'incident-response-plan', section: 'Incident Response', review: 'Semi-annual', lastReviewed: 'Feb 2026' },
+              { name: 'Data Retention Policy', slug: 'data-retention-policy', section: 'Data Protection', review: 'Annual', lastReviewed: 'Feb 2026' },
+              { name: 'Privacy Policy', slug: 'privacy-policy', section: 'Privacy', review: 'Annual', lastReviewed: 'Feb 2026' },
+              { name: 'AI Governance Policy', slug: 'ai-governance-policy', section: 'AI Governance', review: 'Semi-annual', lastReviewed: 'Feb 2026' },
+              { name: 'Emergency Access Procedure', slug: 'emergency-access-procedure', section: 'Business Continuity', review: 'Annual', lastReviewed: 'Feb 2026' },
             ].map((doc, idx) => (
               <div key={idx} className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/30 transition-colors">
                 <div className="flex items-center gap-3">
@@ -537,14 +537,25 @@ export function ComplianceDocuments() {
                     </div>
                   </div>
                 </div>
-                <Badge variant="outline" className="text-xs flex-shrink-0">
-                  Available on Request
-                </Badge>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex-shrink-0"
+                  onClick={() => {
+                    const a = document.createElement('a');
+                    a.href = `/api/compliance/policies/${doc.slug}/download`;
+                    a.download = '';
+                    a.click();
+                  }}
+                >
+                  <Download className="h-3.5 w-3.5 mr-1.5" />
+                  Download
+                </Button>
               </div>
             ))}
           </div>
           <div className="mt-4 p-3 bg-muted/30 rounded-lg text-sm text-muted-foreground">
-            To request copies of supporting policy documents, contact{' '}
+            All policy documents are also available upon request at{' '}
             <a href="mailto:support@edsteward.ai" className="text-primary hover:underline">
               support@edsteward.ai
             </a>

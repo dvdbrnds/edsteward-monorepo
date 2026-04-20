@@ -106,7 +106,8 @@ logs/
 uploads/
 attached_assets/
 references/
-docs/
+docs/templates/
+docs/architecture/
 scripts/
 deployments/
 infrastructure/
