@@ -168,7 +168,7 @@ export function configureAuth(app: Express): void {
     // CRITICAL: Store both userId and tenantId to prevent cross-tenant session hijacking
     const sessionData = {
       userId: userObj.id,
-      tenantId: userObj._tenantId || 'default',
+      tenantId: userObj._tenantId || process.env.DEFAULT_TENANT || 'default',
     };
     console.log(`[AUTH] Serializing user ${userObj.id} for tenant ${sessionData.tenantId}`);
     done(null, sessionData);
@@ -188,13 +188,23 @@ export function configureAuth(app: Express): void {
       } else {
         // Legacy format - just user ID (string or number)
         userId = typeof sessionData === 'string' ? parseInt(sessionData, 10) : sessionData as number;
-        tenantId = 'default'; // Legacy sessions don't have tenant info
+        tenantId = 'default';
+      }
+
+      // Remap legacy 'default' tenant to the actual configured default
+      if (tenantId === 'default' && process.env.DEFAULT_TENANT && process.env.DEFAULT_TENANT !== 'default') {
+        tenantId = process.env.DEFAULT_TENANT;
       }
       
       console.log(`[AUTH] Deserializing user ${userId} from tenant ${tenantId}`);
       
-      // CRITICAL: Use tenant-specific storage for user lookup
-      const storage = getDatabaseStorage(tenantId);
+      let storage;
+      try {
+        storage = getDatabaseStorage(tenantId);
+      } catch {
+        console.warn(`[AUTH] Tenant '${tenantId}' not found during deserialization, invalidating session`);
+        return done(null, false);
+      }
       let user = await storage.getUser(userId, undefined);
 
       if (!user) {
