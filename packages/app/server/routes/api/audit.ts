@@ -231,10 +231,10 @@ router.get('/regulation/:regulationId', requireAuth, requirePermission('canViewS
       LIMIT 500
     `;
     
-    const { Pool } = await import('pg');
-    const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+    const { getDatabaseStorage } = await import('../../services/database');
+    const tenantStorage = getDatabaseStorage((req as any).tenantId);
+    const pool = (tenantStorage as any).pool;
     const taskActivityResult = await pool.query(taskActivityQuery, [regulationId]);
-    await pool.end();
 
     // Convert task_activity records to audit log format
     const taskActivityLogs = taskActivityResult.rows.map((row: any) => ({

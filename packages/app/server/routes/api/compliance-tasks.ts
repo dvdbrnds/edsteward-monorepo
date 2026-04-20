@@ -20,8 +20,13 @@ import { uploadLimiter } from '../../middleware/rate-limiter';
 import { checkAndNotifyRegulationReadyForAttestation } from '../../services/task-notifications';
 
 // JWT secret for task tokens (use same as attestation or a dedicated one)
-const TASK_TOKEN_SECRET = process.env.ATTESTATION_JWT_SECRET || process.env.JWT_SECRET || 'edsteward-task-secret-key';
-const TASK_TOKEN_EXPIRY = '14d'; // 14 days
+const _JWT_FROM_ENV = process.env.ATTESTATION_JWT_SECRET || process.env.JWT_SECRET;
+if (!_JWT_FROM_ENV && process.env.NODE_ENV === 'production') {
+  console.error('FATAL: ATTESTATION_JWT_SECRET or JWT_SECRET must be set in production');
+  process.exit(1);
+}
+const TASK_TOKEN_SECRET = _JWT_FROM_ENV || 'dev-only-insecure-key';
+const TASK_TOKEN_EXPIRY = '14d';
 
 // Alias for the users table to join twice (assignedTo and completedBy)
 const completedByUsers = alias(users, 'completedByUsers');

@@ -97,11 +97,30 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // AUTHENTICATION (Simple token-based for now)
 // =============================================================================
 
-// Admin users (TODO: Move to database with proper password hashing)
-const adminUsers = [
-  { id: 1, email: 'admin@edsteward.ai', password: 'admin123', name: 'EdSteward Admin', role: 'super_admin' },
-  { id: 2, email: 'dvdbrnds@gmail.com', password: 'gabadhgabadh', name: 'David Brands', role: 'super_admin' }
-];
+// Admin users from environment variables (never hardcode credentials)
+const ADMIN_CONSOLE_USERS = process.env.ADMIN_CONSOLE_USERS;
+const adminUsers: Array<{ id: number; email: string; password: string; name: string; role: string }> = [];
+
+if (ADMIN_CONSOLE_USERS) {
+  try {
+    const parsed = JSON.parse(ADMIN_CONSOLE_USERS);
+    parsed.forEach((u: any, i: number) => {
+      adminUsers.push({ id: i + 1, email: u.email, password: u.password, name: u.name || u.email, role: 'super_admin' });
+    });
+  } catch { /* fall through to default */ }
+}
+
+if (adminUsers.length === 0) {
+  const email = process.env.ADMIN_CONSOLE_EMAIL || 'admin@edsteward.ai';
+  const password = process.env.ADMIN_CONSOLE_PASSWORD;
+  if (!password) {
+    console.error('FATAL: ADMIN_CONSOLE_PASSWORD env var is required. Set it to secure the admin console.');
+    if (process.env.NODE_ENV === 'production') process.exit(1);
+    adminUsers.push({ id: 1, email, password: 'admin-dev-only', name: 'Dev Admin', role: 'super_admin' });
+  } else {
+    adminUsers.push({ id: 1, email, password, name: 'EdSteward Admin', role: 'super_admin' });
+  }
+}
 
 // Token storage (in-memory for simplicity)
 const activeTokens = new Map<string, { userId: number; expiresAt: Date }>();

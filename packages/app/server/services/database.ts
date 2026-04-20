@@ -106,7 +106,11 @@ export function getDatabaseStorage(tenantId?: string): DatabaseStorage {
   }
   
   if (!databaseUrl) {
-    console.warn(`[MULTI-TENANT] No database URL for tenant '${tenantId}', using default`);
+    if (process.env.MULTI_TENANT === 'true') {
+      console.error(`[MULTI-TENANT] REJECTED: No database URL for tenant '${tenantId}' — refusing to fall back to default DB`);
+      throw new Error(`Tenant '${tenantId}' is not configured. Contact your administrator.`);
+    }
+    console.warn(`[SINGLE-TENANT] No database URL for tenant '${tenantId}', using default`);
     if (!storage) {
       storage = new DatabaseStorage();
     }
@@ -190,6 +194,10 @@ export function getTenantDb(tenantId?: string): ReturnType<typeof drizzle> {
   }
   
   if (!databaseUrl) {
+    if (process.env.MULTI_TENANT === 'true') {
+      console.error(`[TENANT-DB] REJECTED: No database URL for tenant '${tenantId}' — refusing to fall back to shared DB`);
+      throw new Error(`Tenant '${tenantId}' is not configured. Contact your administrator.`);
+    }
     console.warn(`[TENANT-DB] No database URL for tenant '${tenantId}', using shared db`);
     return sharedDb;
   }

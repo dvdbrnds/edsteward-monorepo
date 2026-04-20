@@ -42,7 +42,7 @@ import dataRetentionRouter from './api/data-retention';
 
 // Note: aws-tenant-management was removed - belongs in separate admin-console app
 import { debugRouter } from './api/debug';
-import { emergencyMoravianRouter } from './api/emergency-moravian-fix';
+// emergency-moravian-fix endpoint removed — no longer needed
 import attestationRouter from './api/attestation';
 import complianceTasksRouter from './api/compliance-tasks';
 import roleAssignmentsRouter from './api/role-assignments';
@@ -54,8 +54,7 @@ import complianceRouter from './api/compliance';
 import featureFlagsRouter from './api/feature-flags';
 import dataExportRouter from './api/data-export';
 import demoRequestsRouter from './api/demo-requests';
-// @ts-ignore
-import migrationRoutes from './database-migration.js';
+// database-migration endpoint removed — destructive, hardcoded auth key
 
 // Extend session interface for testing
 declare module 'express-session' {
@@ -476,20 +475,12 @@ export function registerRoutes(app: express.Application): Server {
 
   // Note: AWS Tenant Management was removed - belongs in separate admin-console app at admin.edsteward.ai
   
-  app.use('/api/database-migration', migrationRoutes);
+  // database-migration endpoint removed for security
 
   // Register debug routes (no auth required for debugging)
   app.use('/api/debug', debugRouter);
 
-  // Emergency bypass for Moravian tenant - only use when hostname is moravian.edsteward.ai
-  app.use('/api/emergency', (req, res, next) => {
-    const hostname = req.get('host') || '';
-    if (hostname.startsWith('moravian.')) {
-      emergencyMoravianRouter(req, res, next);
-    } else {
-      res.status(404).json({ error: 'Emergency endpoint only available for Moravian tenant' });
-    }
-  });
+  // Emergency endpoint removed — multi-tenant routing is stable now
 
   // Institution configuration endpoint for client-side branding
   app.get('/api/institution-config', (req, res) => {

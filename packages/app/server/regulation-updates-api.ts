@@ -84,10 +84,12 @@ const MCP_ENGINE_PASSWORD = process.env.MCP_ENGINE_PASSWORD;
  * ALLOWS BYPASS for localhost requests (for local MCP Engine testing)
  */
 function basicAuthMiddleware(req: Request, res: Response, next: Function) {
-  // Allow localhost requests to bypass authentication
-  const host = req.headers.host || '';
-  if (host.includes('localhost') || host.includes('127.0.0.1')) {
-    return next();
+  // Localhost bypass only in development
+  if (process.env.NODE_ENV !== 'production') {
+    const host = req.headers.host || '';
+    if (host.includes('localhost') || host.includes('127.0.0.1')) {
+      return next();
+    }
   }
 
   // Method 1: X-MCP-API-Key header (preferred)

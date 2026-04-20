@@ -14,9 +14,9 @@
  */
 
 import express, { Request, Response } from 'express';
-import { Pool } from 'pg';
 import { requireAuth, requirePermission } from '../../middleware/role-based-auth';
 import { syslog, LogLevel, LogFacility } from '../../services/syslog';
+import { getDatabaseStorage } from '../../services/database';
 import { AuditService } from '../../services/audit';
 import archiver from 'archiver';
 import path from 'path';
@@ -63,7 +63,8 @@ router.get('/regulation/:regulationId', requireAuth, requirePermission('canManag
     return res.status(400).json({ error: 'Invalid regulation ID' });
   }
 
-  const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+  const tenantStorage = getDatabaseStorage((req as any).tenantId);
+  const pool = (tenantStorage as any).pool;
 
   try {
     // Generate export ID for tracking
@@ -84,7 +85,7 @@ router.get('/regulation/:regulationId', requireAuth, requirePermission('canManag
     `, [regulationId]);
 
     if (regulationResult.rows.length === 0) {
-      await pool.end();
+      // pool is shared tenant pool — do not close
       return res.status(404).json({ error: 'Regulation not found' });
     }
 
@@ -190,7 +191,7 @@ router.get('/regulation/:regulationId', requireAuth, requirePermission('canManag
       ORDER BY ru.update_date ASC
     `, [regulationId]);
 
-    await pool.end();
+    // pool is shared tenant pool — do not close
 
     // Compile the export data
     const exportData: LegalExportData = {
@@ -284,7 +285,7 @@ router.get('/regulation/:regulationId', requireAuth, requirePermission('canManag
     }
 
   } catch (error) {
-    await pool.end();
+    // pool is shared tenant pool — do not close
     syslog.log(LogFacility.LOCAL0, LogLevel.ERROR,
       `⚖️ LEGAL EXPORT FAILED: Regulation ${regulationId} - ${error instanceof Error ? error.message : String(error)}`
     );
@@ -308,7 +309,8 @@ router.get('/regulation/:regulationId/download', requireAuth, requirePermission(
     return res.status(400).json({ error: 'Invalid regulation ID' });
   }
 
-  const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+  const tenantStorage = getDatabaseStorage((req as any).tenantId);
+  const pool = (tenantStorage as any).pool;
   const exportId = `LEGAL-${Date.now()}-${regulationId}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
 
   try {
@@ -319,7 +321,7 @@ router.get('/regulation/:regulationId/download', requireAuth, requirePermission(
     // Get all the data (same queries as above)
     const regulationResult = await pool.query(`SELECT * FROM regulations WHERE id = $1`, [regulationId]);
     if (regulationResult.rows.length === 0) {
-      await pool.end();
+      // pool is shared tenant pool — do not close
       return res.status(404).json({ error: 'Regulation not found' });
     }
 
@@ -370,7 +372,7 @@ router.get('/regulation/:regulationId/download', requireAuth, requirePermission(
     // Get deadlines
     const deadlinesResult = await pool.query(`SELECT * FROM deadlines WHERE regulation_id = $1`, [regulationId]);
 
-    await pool.end();
+    // pool is shared tenant pool — do not close
 
     // Create ZIP archive
     const archive = archiver('zip', { zlib: { level: 9 } });
@@ -456,7 +458,7 @@ EdSteward Compliance Management Platform
     );
 
   } catch (error) {
-    await pool.end();
+    // pool is shared tenant pool — do not close
     syslog.log(LogFacility.LOCAL0, LogLevel.ERROR,
       `⚖️ LEGAL EXPORT ZIP FAILED: ${error instanceof Error ? error.message : String(error)}`
     );

@@ -5,8 +5,8 @@
  */
 
 import express, { Request, Response } from 'express';
-import { Pool } from 'pg';
 import { syslog, LogLevel, LogFacility } from '../../services/syslog';
+import { getDatabaseStorage } from '../../services/database';
 
 const router = express.Router();
 
@@ -29,7 +29,8 @@ router.get('/', requireAuth, async (req: Request, res: Response) => {
     return res.status(401).json({ error: 'User not found in session' });
   }
 
-  const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+  const tenantStorage = getDatabaseStorage((req as any).tenantId);
+  const pool = (tenantStorage as any).pool;
   const exportId = `USER-EXPORT-${Date.now()}-${user.id}`;
 
   try {
@@ -108,7 +109,6 @@ router.get('/', requireAuth, async (req: Request, res: Response) => {
       LIMIT 100
     `, [`%${user.email}%`, `%${user.username}%`]);
 
-    await pool.end();
 
     const exportData = {
       exportMetadata: {
@@ -168,7 +168,7 @@ router.get('/', requireAuth, async (req: Request, res: Response) => {
     res.json(exportData);
 
   } catch (error) {
-    try { await pool.end(); } catch (e) { /* ignore */ }
+    // pool is shared tenant pool — do not close
     
     syslog.log(LogFacility.LOCAL0, LogLevel.ERROR,
       `Data subject export failed for user ${user.id}: ${error instanceof Error ? error.message : String(error)}`);
@@ -190,7 +190,8 @@ router.get('/summary', requireAuth, async (req: Request, res: Response) => {
     return res.status(401).json({ error: 'User not found in session' });
   }
 
-  const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+  const tenantStorage2 = getDatabaseStorage((req as any).tenantId);
+  const pool = (tenantStorage2 as any).pool;
 
   try {
     const [tasks, activities, evidence, notes, attestations, audits] = await Promise.all([
@@ -202,7 +203,6 @@ router.get('/summary', requireAuth, async (req: Request, res: Response) => {
       pool.query('SELECT count(*) FROM audit_logs WHERE user_id = $1', [user.id]),
     ]);
 
-    await pool.end();
 
     res.json({
       userId: user.id,
@@ -223,7 +223,7 @@ router.get('/summary', requireAuth, async (req: Request, res: Response) => {
       }
     });
   } catch (error) {
-    try { await pool.end(); } catch (e) { /* ignore */ }
+    // pool is shared tenant pool — do not close
     res.status(500).json({ error: 'Failed to retrieve data summary' });
   }
 });

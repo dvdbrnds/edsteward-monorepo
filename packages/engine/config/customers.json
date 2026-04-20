@@ -77,7 +77,7 @@
     }
   ],
   "defaults": {
-    "pushToAll": false,
+    "pushToAll": true,
     "defaultCustomer": "moravian-prod",
     "retryAttempts": 3,
     "retryDelay": 1000

@@ -72,7 +72,6 @@ export interface ProvisioningResult {
   success: boolean;
   tenantId: string;
   subdomain: string;
-  databaseUrl?: string;
   steps: ProvisioningStep[];
   error?: string;
 }
@@ -689,7 +688,6 @@ export async function provisionTenant(
       success: true,
       tenantId,
       subdomain: request.subdomain,
-      databaseUrl,
       steps,
     };
 
@@ -707,7 +705,6 @@ export async function provisionTenant(
       success: false,
       tenantId,
       subdomain: request.subdomain,
-      databaseUrl,
       steps,
       error: error.message,
     };

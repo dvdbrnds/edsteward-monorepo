@@ -94,7 +94,7 @@ router.get("/", requireAuth, async (req, res) => {
       `Admin ${req.user.email} retrieved ${userList.length} users for notifications`);
     
     res.json(userList);
-  } catch (_error) {
+  } catch (error) {
     syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, 
       `Failed to get users: ${error instanceof Error ? error.message : String(error)}`);
     

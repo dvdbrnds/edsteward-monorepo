@@ -21,30 +21,39 @@ const MFA_CONFIG = {
   backupCodeLength: 8,
 };
 
-// Encryption configuration (currently using base64 for development)
-// const _ENCRYPTION_KEY = process.env.MFA_ENCRYPTION_KEY || crypto.randomBytes(32).toString('hex');
-// const _ALGORITHM = 'aes-256-gcm';
+const ALGORITHM = 'aes-256-gcm';
+const IV_LENGTH = 16;
+const AUTH_TAG_LENGTH = 16;
 
-if (!process.env.MFA_ENCRYPTION_KEY) {
-  console.warn('⚠️ MFA_ENCRYPTION_KEY not set. Using random key (data will not persist across restarts)');
+let ENCRYPTION_KEY: Buffer;
+if (process.env.MFA_ENCRYPTION_KEY) {
+  ENCRYPTION_KEY = Buffer.from(process.env.MFA_ENCRYPTION_KEY, 'hex');
+  if (ENCRYPTION_KEY.length !== 32) {
+    console.error('FATAL: MFA_ENCRYPTION_KEY must be 64 hex chars (32 bytes). Generate with: openssl rand -hex 32');
+    process.exit(1);
+  }
+} else {
+  console.warn('⚠️ MFA_ENCRYPTION_KEY not set — generating ephemeral key (MFA data will NOT survive restarts)');
+  ENCRYPTION_KEY = crypto.randomBytes(32);
 }
 
-/**
- * Encrypt sensitive MFA data (simplified for development)
- */
 function encrypt(text: string): string {
-  // For development, use simple base64 encoding
-  // In production, use proper AES-256-GCM encryption
-  return Buffer.from(text).toString('base64');
+  const iv = crypto.randomBytes(IV_LENGTH);
+  const cipher = crypto.createCipheriv(ALGORITHM, ENCRYPTION_KEY, iv);
+  const encrypted = Buffer.concat([cipher.update(text, 'utf8'), cipher.final()]);
+  const authTag = cipher.getAuthTag();
+  return [iv.toString('hex'), authTag.toString('hex'), encrypted.toString('hex')].join(':');
 }
 
-/**
- * Decrypt sensitive MFA data (simplified for development)
- */
 function decrypt(encryptedData: string): string {
-  // For development, use simple base64 decoding
-  // In production, use proper AES-256-GCM decryption
-  return Buffer.from(encryptedData, 'base64').toString('utf8');
+  // Backward compatibility: if it doesn't contain ':', it's legacy base64
+  if (!encryptedData.includes(':')) {
+    return Buffer.from(encryptedData, 'base64').toString('utf8');
+  }
+  const [ivHex, authTagHex, dataHex] = encryptedData.split(':');
+  const decipher = crypto.createDecipheriv(ALGORITHM, ENCRYPTION_KEY, Buffer.from(ivHex, 'hex'));
+  decipher.setAuthTag(Buffer.from(authTagHex, 'hex'));
+  return decipher.update(Buffer.from(dataHex, 'hex')) + decipher.final('utf8');
 }
 
 /**

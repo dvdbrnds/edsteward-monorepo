@@ -457,7 +457,7 @@ router.post('/attestation/:token/evidence', uploadLimiter, async (req: Request, 
           if (name === 'linkTitle') uploadedLinkTitle = val;
         });
 
-        let fileWritePromise: Promise<void> | null = null;
+        let fileSavePromise: Promise<void> | null = null;
 
         bb.on('file', (_name: string, file: import('stream').Readable, info: { filename: string; encoding: string; mimeType: string }) => {
           uploadedFileName = info.filename;
@@ -469,25 +469,19 @@ router.post('/attestation/:token/evidence', uploadLimiter, async (req: Request, 
           });
 
           file.on('end', () => {
-            fileWritePromise = (async () => {
-              const fs = await import('fs/promises');
-              const path = await import('path');
-              
-              const uploadsDir = path.join(process.cwd(), 'uploads', 'evidence');
-              await fs.mkdir(uploadsDir, { recursive: true });
-
-              const uniqueName = `${Date.now()}-${Math.random().toString(36).substring(7)}-${uploadedFileName}`;
-              const filePath = path.join(uploadsDir, uniqueName);
-              
-              await fs.writeFile(filePath, Buffer.concat(chunks));
-              uploadedFileUrl = `/uploads/evidence/${uniqueName}`;
+            fileSavePromise = (async () => {
+              const { getDatabaseStorage } = await import('../../server/services/database');
+              const tenantStorage = getDatabaseStorage((req as any).tenantId);
+              const fileKey = `evidence-attest-standalone-${Date.now()}-${Math.random().toString(36).substring(7)}`;
+              const { url } = await tenantStorage.saveFile(fileKey, Buffer.concat(chunks), uploadedFileType, uploadedFileName);
+              uploadedFileUrl = url;
             })();
           });
         });
 
         bb.on('close', async () => {
-          if (fileWritePromise) {
-            await fileWritePromise;
+          if (fileSavePromise) {
+            await fileSavePromise;
           }
           resolve({
             fileName: uploadedFileName || uploadedLinkTitle || 'Link',
