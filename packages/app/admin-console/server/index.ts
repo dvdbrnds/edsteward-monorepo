@@ -1075,6 +1075,17 @@ app.post('/api/provisioning/full', requireAuth, async (req, res) => {
       });
     }
 
+    const RESERVED_SUBDOMAINS = [
+      'www', 'api', 'admin', 'staging', 'template', 'test', 'dev',
+      'mail', 'smtp', 'ftp', 'ssh', 'ns1', 'ns2', 'cdn', 'assets',
+      'static', 'docs', 'help', 'support', 'status', 'blog',
+    ];
+    if (RESERVED_SUBDOMAINS.includes(request.subdomain)) {
+      return res.status(400).json({
+        error: `"${request.subdomain}" is a reserved subdomain and cannot be used.`
+      });
+    }
+
     // Check if subdomain already exists
     const existing = await getTenantById(request.subdomain);
     if (existing) {

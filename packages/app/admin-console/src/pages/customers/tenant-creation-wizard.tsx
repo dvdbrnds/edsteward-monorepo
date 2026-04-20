@@ -34,6 +34,12 @@ const INSTITUTION_CHARACTERISTICS = [
   { value: 'title-iv-participant', label: 'Title IV Participant' },
 ];
 
+const RESERVED_SUBDOMAINS = [
+  'www', 'api', 'admin', 'staging', 'template', 'test', 'dev',
+  'mail', 'smtp', 'ftp', 'ssh', 'ns1', 'ns2', 'cdn', 'assets',
+  'static', 'docs', 'help', 'support', 'status', 'blog',
+];
+
 const US_STATES = [
   'AL','AK','AZ','AR','CA','CO','CT','DC','DE','FL','GA','HI','ID','IL','IN',
   'IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH',
@@ -109,9 +115,9 @@ const TenantCreationWizard: React.FC = () => {
     adminLastName: '',
     primaryColor: '#1e40af',
     logoUrl: '',
-    institutionType: 'private-nonprofit-4year',
+    institutionType: '',
     institutionCharacteristics: ['title-iv-participant'],
-    stateCode: 'PA',
+    stateCode: '',
   });
 
   // Auto-generate subdomain from name
@@ -143,6 +149,7 @@ const TenantCreationWizard: React.FC = () => {
     if (!formData.subdomain.trim()) return 'Subdomain is required';
     if (!/^[a-z0-9-]+$/.test(formData.subdomain)) return 'Subdomain must be lowercase letters, numbers, and hyphens only';
     if (formData.subdomain.length < 3) return 'Subdomain must be at least 3 characters';
+    if (RESERVED_SUBDOMAINS.includes(formData.subdomain)) return `"${formData.subdomain}" is a reserved subdomain and cannot be used`;
     // Contact email is optional - only validate format if provided
     if (formData.contactEmail.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.contactEmail)) return 'Invalid email format';
     return null;
@@ -154,7 +161,7 @@ const TenantCreationWizard: React.FC = () => {
     if (!formData.adminEmail.trim()) return 'Admin email is required';
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.adminEmail)) return 'Invalid email format';
     if (!formData.adminPassword) return 'Password is required';
-    if (formData.adminPassword.length < 6) return 'Password must be at least 6 characters';
+    if (formData.adminPassword.length < 12) return 'Password must be at least 12 characters';
     if (!formData.adminFirstName.trim()) return 'First name is required';
     if (!formData.adminLastName.trim()) return 'Last name is required';
     return null;
@@ -422,7 +429,7 @@ const TenantCreationWizard: React.FC = () => {
           type="password"
           value={formData.adminPassword}
           onChange={(e) => handleChange('adminPassword', e.target.value)}
-          placeholder="Minimum 6 characters"
+          placeholder="Minimum 12 characters"
           className="bg-white"
         />
         <p className="text-xs text-gray-500">The admin should change this password after first login</p>
@@ -772,7 +779,7 @@ const TenantCreationWizard: React.FC = () => {
             name: '', subdomain: '', contactEmail: '', contactName: '', plan: 'professional',
             adminUsername: '', adminEmail: '', adminPassword: '', adminFirstName: '', adminLastName: '',
             primaryColor: '#1e40af', logoUrl: '',
-            institutionType: 'private-nonprofit-4year', institutionCharacteristics: ['title-iv-participant'], stateCode: 'PA',
+            institutionType: '', institutionCharacteristics: ['title-iv-participant'], stateCode: '',
           });
           setCreatedTenant(null);
           setProvisioningSteps([]);
