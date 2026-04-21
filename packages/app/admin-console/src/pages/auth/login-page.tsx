@@ -21,7 +21,7 @@ export function LoginPage() {
     try {
       await login({ email, password });
       // Navigation will happen automatically via App.tsx route logic
-    } catch (err) {
+    } catch {
       // Error is already handled in the auth hook
     } finally {
       setIsSubmitting(false);

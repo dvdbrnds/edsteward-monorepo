@@ -102,18 +102,19 @@ export async function initializeDatabase() {
           .filter(line => line.trim().startsWith('INSERT INTO'))
           .slice(0, 50); // Limit to first 50 to avoid timeout
 
-        let successCount = 0;
+        let _successCount = 0;
         for (const statement of insertStatements) {
           try {
             await db.execute(sql.raw(statement));
-            successCount++;
-          } catch (_err) {
+            _successCount++;
+          } catch {
             // Continue on errors - some inserts might conflict
           }
         }
 
       }
-    } catch (_err) {
+    } catch {
+      // intentionally empty
     }
 
     // Final verification

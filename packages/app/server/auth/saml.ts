@@ -284,7 +284,7 @@ export function setupSamlAuth(app: Express) {
   
   // Initiate SAML authentication for specific provider
   app.get('/auth/saml/:provider', (req: Request, res: Response, next: NextFunction) => {
-    const provider = req.params.provider;
+    const _provider = req.params.provider;
     
     passport.authenticate('saml-multi', {
       failureRedirect: '/login?error=saml_error'
@@ -330,7 +330,7 @@ export function setupSamlAuth(app: Express) {
       
       res.type('application/xml');
       res.status(200).send(metadata);
-    } catch (_error) {
+    } catch {
       res.status(500).send('Error generating metadata');
     }
   });

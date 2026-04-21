@@ -37,7 +37,7 @@ interface NoteSectionProps {
   initialData?: Partial<FormValues> & { id?: string };
 }
 
-interface User {
+interface _User {
   id: number;
   role: string;
   roles?: string;
@@ -99,7 +99,7 @@ export function NoteSection({ regulationId, initialData }: NoteSectionProps) {
       } else {
         throw new Error('Failed to delete note');
       }
-    } catch (error) {
+    } catch {
       toast({
         title: "Error",
         description: "Failed to delete note",
@@ -143,7 +143,7 @@ export function NoteSection({ regulationId, initialData }: NoteSectionProps) {
           variant: "destructive",
         });
       }
-    } catch (error) {
+    } catch {
       toast({
         title: "Error",
         description: "Failed to load note history",
@@ -500,7 +500,7 @@ export function NoteSection({ regulationId, initialData }: NoteSectionProps) {
                 <p className="text-muted-foreground">No modification history found for this note.</p>
               ) : (
                 <div className="space-y-4">
-                  {noteHistory.map((historyItem, index) => (
+                  {noteHistory.map((historyItem, _index) => (
                     <Card key={historyItem.id} className="border-l-4 border-l-blue-500">
                       <CardHeader className="pb-2">
                         <div className="flex justify-between items-start">

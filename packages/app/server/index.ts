@@ -39,7 +39,7 @@ import { tenantMiddleware } from './middleware/tenant';
 import { tenantSessionVerificationMiddleware } from './middleware/session';
 import { tenantRequestLogger, getAllTenantMetrics, getTopEndpoints } from './middleware/tenant-logger';
 import { setupVite, serveStatic, log } from './vite';
-import { initializeTenantRegistry, refreshAllTenants, getRegistryStats, closeTenantRegistry } from './services/tenant-registry';
+import { initializeTenantRegistry, refreshAllTenants, getRegistryStats } from './services/tenant-registry';
 
 // Check if we're in development mode
 const isDev = process.env.NODE_ENV !== 'production';

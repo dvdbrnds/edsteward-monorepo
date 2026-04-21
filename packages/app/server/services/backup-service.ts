@@ -14,7 +14,7 @@
  * used to automatically recover.  Data is never left in a broken state.
  */
 
-import { exec, spawn } from 'child_process';
+import { exec } from 'child_process';
 import { promisify } from 'util';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -59,7 +59,7 @@ const getBackupDir = (): string => {
 
 const parseDatabaseUrl = (): { host: string; port: string; database: string; user: string; password: string } => {
   const url = process.env.DATABASE_URL || '';
-  const match = url.match(/postgres(?:ql)?:\/\/([^:]+):([^@]+)@([^:\/]+):?(\d+)?\/(.+?)(?:\?.*)?$/);
+  const match = url.match(/postgres(?:ql)?:\/\/([^:]+):([^@]+)@([^:/]+):?(\d+)?\/(.+?)(?:\?.*)?$/);
   if (!match) {
     throw new Error('Invalid DATABASE_URL format');
   }

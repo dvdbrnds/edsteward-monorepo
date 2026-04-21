@@ -5,7 +5,7 @@
 
 import { Request } from 'express';
 import { db } from '../db';
-import { auditLogs, type InsertAuditLog, type AuditLog } from '@shared/schema';
+import { auditLogs, type AuditLog } from '@shared/schema';
 import { eq, and, desc, gte, lte, ilike, or, sql, count } from 'drizzle-orm';
 import { syslog, LogLevel, LogFacility } from './syslog';
 

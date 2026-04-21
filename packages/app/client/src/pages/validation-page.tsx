@@ -1,8 +1,7 @@
-import { useLocation } from "wouter";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import Navigation from "@/components/layout/navigation";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -11,7 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Download, AlertTriangle, CheckCircle, XCircle, Loader2, FileText, Shield } from "lucide-react";
+import { Download, AlertTriangle, CheckCircle, XCircle, FileText, Shield } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { ConsoleView } from "@/components/common/console-view";

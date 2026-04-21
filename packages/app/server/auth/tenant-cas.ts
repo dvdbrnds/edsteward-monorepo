@@ -29,7 +29,7 @@ interface CASProfile {
 }
 
 // CAS configuration for a tenant
-interface TenantCASConfig {
+interface _TenantCASConfig {
   serverUrl: string;
   serviceValidateUrl?: string;
   version: '2.0' | '3.0';
@@ -39,7 +39,7 @@ interface TenantCASConfig {
 /**
  * Get CAS configuration for a tenant
  */
-async function getTenantCASConfig(tenantId: string, serviceUrl: string): Promise<{
+async function getTenantCASConfig(tenantId: string, _serviceUrl: string): Promise<{
   casURL: string;
   propertyMap: Record<string, string>;
   version: '2.0' | '3.0';
@@ -296,7 +296,7 @@ export function setupTenantCASAuth(app: Express) {
    * CAS Callback handler
    * CAS redirects back here with a ticket
    */
-  app.get('/auth/cas/callback', async (req: Request, res: Response, next: NextFunction) => {
+  app.get('/auth/cas/callback', async (req: Request, res: Response, _next: NextFunction) => {
     try {
       // Get tenant from session
       const tenantId = req.session?.casTenantId;
@@ -330,7 +330,7 @@ export function setupTenantCASAuth(app: Express) {
         // Unregister temporary strategy
         try {
           passport.unuse(strategyName);
-        } catch (e) {
+        } catch {
           // Strategy may already be unregistered
         }
         

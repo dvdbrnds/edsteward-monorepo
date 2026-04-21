@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RegulationViewer } from "../RegulationViewer";
 import { Card } from "@/components/ui/card";

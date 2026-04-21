@@ -318,7 +318,7 @@ describe('EdSteward API Integration Tests', () => {
 
     // Context7 Best Practice: Test malformed JSON handling
     it('should handle malformed JSON in POST requests', async () => {
-      const response = await request(app)
+      const _response = await request(app)
         .post('/api/regulations')
         .set('Content-Type', 'application/json')
         .send('{ invalid json }')
@@ -328,12 +328,12 @@ describe('EdSteward API Integration Tests', () => {
     // Context7 Best Practice: Test large payload handling
     it('should handle oversized payloads appropriately', async () => {
       const largePayload = {
-        title: 'A'.repeat(10000), // Very long title
+        title: 'A'.repeat(10000),
         agency_name: 'Test Agency',
-        description: 'B'.repeat(50000) // Very long description
+        description: 'B'.repeat(50000)
       }
 
-      const response = await request(app)
+      const _response = await request(app)
         .post('/api/regulations')
         .send(largePayload)
         .expect((res: any) => {

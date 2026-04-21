@@ -45,7 +45,7 @@ const FALLBACK_TENANT_DATABASE_URLS: Record<string, string> = {
 /**
  * Get database URL for a tenant - tries dynamic registry first, then fallback
  */
-async function resolveTenantDatabaseUrl(tenantId: string): Promise<string | null> {
+async function _resolveTenantDatabaseUrl(tenantId: string): Promise<string | null> {
   // Try dynamic registry first
   if (isRegistryInitialized()) {
     const dynamicUrl = await getTenantDatabaseUrl(tenantId);

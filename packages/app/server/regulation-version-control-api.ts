@@ -215,7 +215,7 @@ export function setupRegulationVersionControlApi(app: Express) {
         return res.status(403).json({ error: 'Unauthorized to create snapshots' });
       }
 
-      const { reason } = req.body;
+      const { reason: _reason } = req.body;
 
 
       // Get current regulation content

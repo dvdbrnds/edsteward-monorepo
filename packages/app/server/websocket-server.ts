@@ -11,7 +11,7 @@ export function setupWebSocketServer(httpServer: Server) {
   // Track connected clients for broadcasting
   const connectedClients = new Set<any>();
   
-  wss.on('connection', (ws, req) => {
+  wss.on('connection', (ws) => {
     connectedClients.add(ws);
     
     // Send connection confirmation
@@ -50,12 +50,12 @@ export function setupWebSocketServer(httpServer: Server) {
   
   // Helper function to broadcast messages to all clients
   function broadcastToClients(message: any, clients: Set<any>) {
-    let broadcastCount = 0;
+    let _broadcastCount = 0;
     clients.forEach(client => {
       if (client.readyState === 1) { // WebSocket.OPEN
         try {
           client.send(JSON.stringify(message));
-          broadcastCount++;
+          _broadcastCount++;
         } catch (error) {
           console.error('❌ Error broadcasting to client:', error);
           clients.delete(client);

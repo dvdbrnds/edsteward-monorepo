@@ -100,7 +100,7 @@ const TenantCreationWizard: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [provisioningSteps, setProvisioningSteps] = useState<ProvisioningStep[]>([]);
-  const [createdTenant, setCreatedTenant] = useState<any>(null);
+  const [_createdTenant, setCreatedTenant] = useState<any>(null);
 
   const [formData, setFormData] = useState<TenantFormData>({
     name: '',
@@ -275,8 +275,6 @@ const TenantCreationWizard: React.FC = () => {
         {WIZARD_STEPS.map((step, index) => {
           const isActive = step.id === currentStep;
           const isPast = getStepIndex(currentStep) > index;
-          const isFuture = getStepIndex(currentStep) < index;
-
           return (
             <div
               key={step.id}

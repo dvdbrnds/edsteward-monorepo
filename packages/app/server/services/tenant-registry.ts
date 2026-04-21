@@ -390,7 +390,7 @@ export function getAllCachedTenants(): Tenant[] {
   const seen = new Set<string>();
   const tenants: Tenant[] = [];
   
-  for (const [key, record] of Array.from(tenantCache)) {
+  for (const [_key, record] of Array.from(tenantCache)) {
     if (!seen.has(record.tenant.id)) {
       seen.add(record.tenant.id);
       tenants.push(record.tenant);
@@ -406,7 +406,7 @@ export function getAllCachedTenants(): Tenant[] {
 export function getAllTenantDatabaseUrls(): Record<string, string> {
   const urls: Record<string, string> = {};
   
-  for (const [key, record] of Array.from(tenantCache)) {
+  for (const [_key, record] of Array.from(tenantCache)) {
     if (record.databaseUrl && !urls[record.tenant.subdomain]) {
       urls[record.tenant.subdomain] = record.databaseUrl;
     }

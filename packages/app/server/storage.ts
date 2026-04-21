@@ -12,7 +12,6 @@ import {
   syncControl,
   notificationQueue,
   versionConflicts,
-  institutionConfigurations,
   type EvidenceFile,
   type InsertEvidenceFile,
   type NoteHistory,
@@ -52,7 +51,6 @@ import type {
 import { regulationUpdates, type RegulationUpdate, type InsertRegulationUpdate } from "@shared/schema";
 import { getDatabase, getDatabasePool } from "./services/database";
 import { eq, desc, or, like, sql } from "drizzle-orm";
-import { getDatabaseStorage } from "./services/database";
 import session from "express-session";
 import connectPg from "connect-pg-simple";
 // NOTE: Do NOT import { pool } from "./db" here — use this.pool for tenant isolation
@@ -2810,7 +2808,7 @@ export class DatabaseStorage implements IStorage {
 
   async getRegulationsForInstitutionTypes(types: string[]): Promise<Regulation[]> {
     if (types.length === 0) return this.getRegulations();
-    const placeholders = types.map((_, i) => `$${i + 1}`).join(', ');
+    const _placeholders = types.map((_, i) => `$${i + 1}`).join(', ');
     const query = `
       SELECT * FROM regulations
       WHERE applicable_institutions @> '"all-institutions"'::jsonb

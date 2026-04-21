@@ -1,9 +1,7 @@
 import * as fs from 'fs';
-import * as path from 'path';
 import * as os from 'os';
 import { db } from '../db';
 import { systemLogs } from '@shared/schema';
-import { eq } from 'drizzle-orm';
 
 // Log levels based on syslog protocol (RFC 5424)
 export enum LogLevel {
@@ -219,6 +217,7 @@ export class SysLogger {
         } else if (level === LogLevel.WARNING) {
           console.warn(consoleMessage);
         } else {
+          // intentionally empty
         }
       }
     } catch (error) {

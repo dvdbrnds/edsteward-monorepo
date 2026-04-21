@@ -2,8 +2,8 @@ import express from 'express';
 import fs from 'fs';
 import { storage } from '../../storage';
 import { getDatabaseStorage, getDbForRequest } from '../../services/database';
-import { evidenceFiles, disabledRegulations, regulationFeedback, regulations as regulationsTable, deadlines, complianceTasks, roleAssignments } from '@shared/schema';
-import { eq, and, sql, desc, inArray, gt, ne } from 'drizzle-orm';
+import { evidenceFiles, disabledRegulations, regulationFeedback, deadlines, complianceTasks, roleAssignments } from '@shared/schema';
+import { eq, and, sql, desc, inArray, ne } from 'drizzle-orm';
 import { syslog, LogLevel, LogFacility } from '../../services/syslog';
 import type { Regulation } from '@shared/schema';
 import { 
@@ -90,7 +90,7 @@ router.get("/", async (req: any, res) => {
         if (disabledIds.size > 0) {
           regulations = regulations.filter((reg: Regulation) => !disabledIds.has(reg.id));
         }
-      } catch (_e) {
+      } catch {
         // Table may not exist yet — skip filtering
       }
     }
@@ -110,7 +110,7 @@ router.get("/", async (req: any, res) => {
             sql`${deadlines.dueDate} <= ${thirtyDaysFromNow.toISOString().split('T')[0]}`
           ));
         urgentRegulationIds = new Set(urgentDeadlines.map(d => d.regulationId));
-      } catch (_e) {
+      } catch {
         // deadlines table may not exist — skip
       }
 
@@ -337,7 +337,7 @@ router.get("/:regulationId", async (req: any, res) => {
           }
         }
       }
-    } catch (e) {
+    } catch {
       // Non-critical — don't block the response
     }
 

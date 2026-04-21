@@ -1,5 +1,5 @@
 import { db } from '../db';
-import { eq, sql } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import { pgTable, text, jsonb, timestamp } from 'drizzle-orm/pg-core';
 import { FEATURE_FLAGS, FeatureFlag } from '@shared/feature-flags';
 
@@ -92,7 +92,7 @@ export class FeatureFlagService {
   static async updateTenantFeatures(
     tenantId: string, 
     features: Record<string, boolean>,
-    updatedBy: string
+    _updatedBy: string
   ): Promise<boolean> {
     try {
       // Validate feature keys

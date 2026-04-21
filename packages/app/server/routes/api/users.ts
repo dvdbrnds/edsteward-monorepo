@@ -37,7 +37,7 @@ router.get("/me", requireAuth, async (req, res) => {
       lastName: req.user?.lastName,
       department: req.user?.department
     });
-  } catch (_error) {
+  } catch {
     res.status(500).json({ error: "Failed to get user info" });
   }
 });
@@ -191,7 +191,7 @@ router.patch("/:id", requireAuth, async (req, res) => {
     }
 
     const userId = parseInt(req.params.id);
-    const { firstName, lastName, email, role, department, isActive, password } = req.body;
+    const { firstName, lastName, email, role, department, isActive: _isActive, password } = req.body;
 
     const tenantStorage = getDatabaseStorage(req.tenantId);
     

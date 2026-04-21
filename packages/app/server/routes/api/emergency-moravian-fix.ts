@@ -15,9 +15,9 @@ router.get('/regulations', async (req, res) => {
     const {
       jurisdiction,
       jurisdictionSource,
-      institutionType, 
+      institutionType: _institutionType, 
       category,
-      search,
+      search: _search,
       applicable,
       sortBy = 'lastUpdated',
       sortOrder = 'desc',

@@ -23,7 +23,7 @@
     }
 
     // Show toast notification
-    function showToast(title, message, type = 'info') {
+    function _showToast(title, message, type = 'info') {
         // Create toast element
         const toast = document.createElement('div');
         toast.style.cssText = `
@@ -99,7 +99,7 @@
 
         ws.onopen = function() {
             connectionStatus = 'connected';
-            const wasReconnecting = reconnectAttempts > 0;
+            const _wasReconnecting = reconnectAttempts > 0;
             reconnectAttempts = 0;
             const indicator = document.getElementById('mcp-status-indicator');
             if (indicator) updateStatusIndicator(indicator, 'connected');

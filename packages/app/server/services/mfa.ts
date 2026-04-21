@@ -23,7 +23,7 @@ const MFA_CONFIG = {
 
 const ALGORITHM = 'aes-256-gcm';
 const IV_LENGTH = 16;
-const AUTH_TAG_LENGTH = 16;
+const _AUTH_TAG_LENGTH = 16;
 
 let ENCRYPTION_KEY: Buffer;
 if (process.env.MFA_ENCRYPTION_KEY) {
@@ -92,7 +92,7 @@ export class MFAService {
   /**
    * Generate MFA setup data for a user (Context7 security best practices)
    */
-  static async generateSetup(userId: number, email: string, tenantId?: string): Promise<MFASetupResult> {
+  static async generateSetup(userId: number, email: string, _tenantId?: string): Promise<MFASetupResult> {
     // Generate cryptographically secure secret (20 bytes = 160 bits, exceeds RFC 6238 minimum)
     const secret = new OTPAuth.Secret({ size: MFA_CONFIG.secretSize });
     

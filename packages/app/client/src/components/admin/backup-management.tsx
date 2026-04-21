@@ -126,7 +126,7 @@ export function BackupManagement() {
   };
 
   // Fetch backup status
-  const { data: statusData, isLoading: statusLoading } = useQuery<{ success: boolean; status: BackupStatus }>({
+  const { data: statusData } = useQuery<{ success: boolean; status: BackupStatus }>({
     queryKey: ['backup-status'],
     queryFn: () => apiRequest('GET', '/api/backups/status'),
     refetchInterval: 60000,

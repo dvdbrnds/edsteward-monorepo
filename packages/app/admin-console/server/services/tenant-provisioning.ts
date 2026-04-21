@@ -133,7 +133,7 @@ export async function cloneSchemaFromTemplate(targetDatabaseUrl: string): Promis
     // pg_dump --schema-only captures everything: tables, indexes, constraints,
     // sequences, foreign keys, and defaults — unlike the old manual approach
     // which missed most of those.
-    const output = execSync(
+    const _output = execSync(
       `pg_dump "${TEMPLATE_DATABASE_URL}" --schema-only --no-owner --no-privileges --no-comments | psql "${targetDatabaseUrl}"`,
       { encoding: 'utf-8', timeout: 120_000, stdio: ['pipe', 'pipe', 'pipe'] }
     );
@@ -1316,7 +1316,7 @@ export async function softDeleteTenant(
         headers: registryHeaders(),
       });
       steps.push({ step: 'Refresh tenant registry', status: 'completed' });
-    } catch (error) {
+    } catch {
       steps.push({ step: 'Refresh tenant registry', status: 'failed', message: 'Non-critical failure' });
     }
     
@@ -1438,7 +1438,7 @@ export async function hardDeleteTenant(
         headers: registryHeaders(),
       });
       steps.push({ step: 'Refresh tenant registry', status: 'completed' });
-    } catch (error) {
+    } catch {
       steps.push({ step: 'Refresh tenant registry', status: 'failed', message: 'Non-critical failure' });
     }
     
@@ -1532,7 +1532,7 @@ export async function restoreTenant(
         method: 'POST',
         headers: registryHeaders(),
       });
-    } catch (error) {
+    } catch {
       // Non-critical
     }
     

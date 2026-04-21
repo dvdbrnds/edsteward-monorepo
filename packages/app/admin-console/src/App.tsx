@@ -28,9 +28,6 @@ import { NotFoundPage } from '@/pages/error/not-found-page';
 // Hooks
 import { useAuth } from '@/hooks/use-auth';
 
-// Types
-import { AdminUser } from '@/types/auth';
-
 function App() {
     const { user, isLoading } = useAuth();
 

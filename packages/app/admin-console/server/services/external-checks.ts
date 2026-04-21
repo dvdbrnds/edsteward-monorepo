@@ -242,7 +242,7 @@ interface AccessibilityIssue {
   description: string;
 }
 
-function analyzePageAccessibility(html: string, url: string): AccessibilityIssue[] {
+function analyzePageAccessibility(html: string, _url: string): AccessibilityIssue[] {
   const $ = cheerio.load(html);
   const issues: AccessibilityIssue[] = [];
 
@@ -364,27 +364,20 @@ function analyzePageAccessibility(html: string, url: string): AccessibilityIssue
   return issues;
 }
 
-function buildAccessibilityIndicators(pages: CrawledPage[]): { indicators: ExternalIndicator[]; score: number } {
-  let totalIssues = 0;
-  let criticalCount = 0;
-  let seriousCount = 0;
-  let pagesAnalyzed = 0;
+function _buildAccessibilityIndicators(pages: CrawledPage[]): { indicators: ExternalIndicator[]; score: number } {
+  let _totalIssues = 0;
+  let _criticalCount = 0;
+  let _seriousCount = 0;
+  let _pagesAnalyzed = 0;
 
   for (const page of pages.slice(0, 10)) {
     if (!page.textContent) continue;
-    pagesAnalyzed++;
-    // Re-fetch won't work here, but we can reconstruct basic analysis from textContent
-    // For a production version, we'd store raw HTML. For now, count what we can from the page metadata.
+    _pagesAnalyzed++;
   }
 
-  // Since we don't have raw HTML in CrawledPage, we'll analyze based on the homepage
-  // and any pages we can re-fetch. For now, create summary indicators.
-  // The real analysis happens during the crawl phase (see below).
-
   const indicators: ExternalIndicator[] = [];
-  const adaUrl = 'https://www.w3.org/WAI/standards-guidelines/wcag/';
+  const _adaUrl = 'https://www.w3.org/WAI/standards-guidelines/wcag/';
 
-  // These get populated by analyzeAccessibilityFromCrawl()
   return { indicators, score: 0 };
 }
 

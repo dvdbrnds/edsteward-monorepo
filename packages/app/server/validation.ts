@@ -35,7 +35,7 @@
 
 import { z } from "zod";
 import type { Regulation } from "@shared/schema";
-import { parse, isValid, isFuture, isPast } from "date-fns";
+import { isFuture, isPast } from "date-fns";
 
 // Enhanced URL validation
 const urlSchema = z.string().url().optional().or(z.literal(""));

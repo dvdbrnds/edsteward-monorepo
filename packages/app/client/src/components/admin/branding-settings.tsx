@@ -178,7 +178,7 @@ const FileUploadField: React.FC<{
           await result;
           
         } else {
-          
+          // intentionally empty
         }
         
         
@@ -193,7 +193,7 @@ const FileUploadField: React.FC<{
         setIsProcessing(false);
       }
     } else {
-      
+      // intentionally empty
     }
   };
 
@@ -281,8 +281,7 @@ const FileUploadField: React.FC<{
                     console.error('❌ PREVIEW: Favicon src:', img.src);
                     img.style.display = 'none';
                   }}
-                  onLoad={(e) => {
-                    const img = e.target as HTMLImageElement;
+                  onLoad={() => {
                     
                     
                   }}
@@ -304,8 +303,7 @@ const FileUploadField: React.FC<{
                     console.error('❌ PREVIEW: Image naturalHeight:', img.naturalHeight);
                     img.style.display = 'none';
                   }}
-                  onLoad={(e) => {
-                    const img = e.target as HTMLImageElement;
+                  onLoad={() => {
                     
                     
                   }}
@@ -460,7 +458,7 @@ const BrandingPreview: React.FC<{ config: BrandingFormData }> = ({ config }) => 
   );
 };
 
-export function BrandingSettingsV2({ onConfigUpdate }: BrandingSettingsProps) {
+export function BrandingSettingsV2({ onConfigUpdate: _onConfigUpdate }: BrandingSettingsProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [hasChanges, setHasChanges] = useState(false);
@@ -794,10 +792,10 @@ export function BrandingSettingsV2({ onConfigUpdate }: BrandingSettingsProps) {
           // Don't show error toast, as this is a nice-to-have feature
         }
               } else {
-        
+        // intentionally empty
       }
     } else {
-      
+      // intentionally empty
     }
     
     

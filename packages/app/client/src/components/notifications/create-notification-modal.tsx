@@ -33,7 +33,7 @@ interface CreateNotificationModalProps {
 }
 
 export default function CreateNotificationModal({ isOpen, onClose }: CreateNotificationModalProps) {
-  const { user } = useAuth();
+  const { user: _user } = useAuth();
   const queryClient = useQueryClient();
   
   const [formData, setFormData] = useState({

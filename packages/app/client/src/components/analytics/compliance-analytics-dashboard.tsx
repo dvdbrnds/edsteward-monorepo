@@ -32,8 +32,6 @@ import {
   TrendingUp,
   TrendingDown,
   AlertTriangle,
-  CheckCircle,
-  Clock,
   Target,
   Users,
   FileText,
@@ -91,15 +89,14 @@ const COLORS = {
   gray: '#6b7280'
 };
 
-const PIE_COLORS = [COLORS.success, COLORS.warning, COLORS.danger, COLORS.info];
+const _PIE_COLORS = [COLORS.success, COLORS.warning, COLORS.danger, COLORS.info];
 
 export const ComplianceAnalyticsDashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d' | '1y'>('30d');
+  const [_timeRange, _setTimeRange] = useState<'7d' | '30d' | '90d' | '1y'>('30d');
   
-  // Mock data - in real implementation, this would come from API
-  const [metrics, setMetrics] = useState<ComplianceMetrics>({
+  const [metrics, _setMetrics] = useState<ComplianceMetrics>({
     totalRegulations: 127,
     activeRegulations: 98,
     totalDeadlines: 45,

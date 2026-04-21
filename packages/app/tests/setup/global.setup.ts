@@ -1,6 +1,8 @@
 import { beforeAll, afterAll, beforeEach, afterEach } from 'vitest'
 import '@testing-library/jest-dom'
 
+const originalConsoleError = console.error
+
 // Context7 Best Practice: Global test environment setup
 beforeAll(() => {
   // Set test environment variables
@@ -9,7 +11,6 @@ beforeAll(() => {
   process.env.VITE_TENANT_ID = 'test-tenant'
   
   // Context7 Best Practice: Mock console methods in tests
-  const originalConsoleError = console.error
   console.error = (...args: any[]) => {
     // Filter out known React/development warnings in tests
     const message = args[0]
@@ -28,7 +29,7 @@ beforeAll(() => {
 // Context7 Best Practice: Global test cleanup
 afterAll(() => {
   // Restore console methods
-  console.error = console.error
+  console.error = originalConsoleError
 })
 
 // Context7 Best Practice: Clear all mocks between tests

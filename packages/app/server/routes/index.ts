@@ -882,7 +882,7 @@ export function registerRoutes(app: express.Application): Server {
   // Email delivery issues — bounced/failed emails from email_delivery_log
   app.get('/api/admin/email-delivery-issues', async (req, res) => {
     try {
-      const { emailDeliveryLog, users: usersTable, regulations, complianceTasks } = await import('@shared/schema');
+      const { emailDeliveryLog, users: usersTable } = await import('@shared/schema');
       const { desc, eq, or, sql, and, gte } = await import('drizzle-orm');
       const { db } = await import('../db');
 

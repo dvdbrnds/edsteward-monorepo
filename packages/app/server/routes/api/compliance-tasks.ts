@@ -11,7 +11,7 @@ import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import { getDbForRequest } from '../../services/database';
 import { complianceTasks, taskEvidence, taskActivity, users, regulations, taskAttestationTokens } from '@shared/schema';
-import { eq, desc, asc, and, gt, lt, gte, sql, isNull, isNotNull } from 'drizzle-orm';
+import { eq, desc, asc, and, gt, sql } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
 import { requireAuth, requireAdmin } from '../../middleware/role-based-auth';
 import { emailService } from '../../services/email';

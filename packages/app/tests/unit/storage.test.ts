@@ -3,7 +3,7 @@
  * Tests the DatabaseStorage and MockStorage implementations
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 
 describe('Storage Interface', () => {
   describe('IStorage Interface', () => {

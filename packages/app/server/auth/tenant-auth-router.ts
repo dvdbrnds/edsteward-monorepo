@@ -74,7 +74,7 @@ export function setupUnifiedSSOAuth(app: Express) {
    * Unified SSO Login
    * Automatically routes to the correct provider based on tenant configuration
    */
-  app.get('/auth/sso/login', async (req: Request, res: Response, next: NextFunction) => {
+  app.get('/auth/sso/login', async (req: Request, res: Response, _next: NextFunction) => {
     try {
       // Ensure we have tenant context
       const tenantId = req.tenantId || req.tenant?.id;
@@ -87,7 +87,7 @@ export function setupUnifiedSSOAuth(app: Express) {
       }
 
       // Get tenant's SSO provider
-      const { provider, enabled, config } = await getTenantSSOProvider(tenantId);
+      const { provider, enabled, config: _config } = await getTenantSSOProvider(tenantId);
 
       if (!enabled) {
         return res.status(400).json({
@@ -127,7 +127,7 @@ export function setupUnifiedSSOAuth(app: Express) {
    * Unified SSO Logout
    * Logs out from the appropriate provider
    */
-  app.get('/auth/sso/logout', async (req: Request, res: Response, next: NextFunction) => {
+  app.get('/auth/sso/logout', async (req: Request, res: Response, _next: NextFunction) => {
     try {
       const tenantId = req.tenantId || req.tenant?.id;
       
@@ -253,7 +253,7 @@ export function setupUnifiedSSOAuth(app: Express) {
         provider: enabled ? provider : null,
       });
 
-    } catch (error) {
+    } catch {
       res.json({ ssoEnabled: false });
     }
   });

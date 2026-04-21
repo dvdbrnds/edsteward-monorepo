@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import {
   Table,
@@ -18,29 +18,16 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import {
   Download,
   History,
-  ExternalLink,
-  FileText,
-  Mail,
-  Printer,
-  Globe,
-  Clock,
-  CheckCircle,
-  AlertCircle,
-  ArrowLeft,
-  Loader2,
-  Bell,
-  Shield,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
 import { Redirect } from "wouter";
 import { RegulationDiffViewer } from "@/components/regulations/regulation-diff-viewer";
 import type { Regulation } from "@shared/schema";
-import { format } from "date-fns";
 
 type RegulationData = Regulation;
 
@@ -50,17 +37,15 @@ export function RegulationViewer() {
   const [showVersionHistory, setShowVersionHistory] = useState(false);
   const { toast } = useToast();
   const { user } = useAuth();
-  const [location, navigate] = useLocation();
+  const [_location, navigate] = useLocation();
 
-  // Check for admin access
-  if (!user || user.role?.toLowerCase() !== "admin") {
-    return <Redirect to="/" />;
-  }
-
-  // Fetch regulations
   const { data: regulations, isLoading } = useQuery<RegulationData[]>({
     queryKey: ['/api/regulations'],
   });
+
+  if (!user || user.role?.toLowerCase() !== "admin") {
+    return <Redirect to="/" />;
+  }
 
   // Export to CSV
   const exportToCSV = () => {

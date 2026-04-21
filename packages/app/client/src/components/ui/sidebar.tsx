@@ -46,10 +46,10 @@ const SIDEBAR_WIDTH_ICON = "3rem"
 const SIDEBAR_KEYBOARD_SHORTCUT = "b"
 
 /**
- * @interface SidebarContext
+ * @interface SidebarContextType
  * @description Context type definition for sidebar state management
  */
-type SidebarContext = {
+type SidebarContextType = {
   /** Current expansion state */
   state: "expanded" | "collapsed";
   /** Whether sidebar is open */
@@ -66,13 +66,13 @@ type SidebarContext = {
   toggleSidebar: () => void;
 }
 
-const SidebarContext = React.createContext<SidebarContext | null>(null)
+const SidebarContext = React.createContext<SidebarContextType | null>(null)
 
 /**
  * @function useSidebar
  * @description Custom hook for accessing sidebar context
  * @throws {Error} If used outside of SidebarProvider
- * @returns {SidebarContext} The sidebar context
+ * @returns {SidebarContextType} The sidebar context
  * 
  * @example
  * ```tsx
@@ -161,7 +161,7 @@ const SidebarProvider = React.forwardRef<
     // This makes it easier to style the sidebar with Tailwind classes.
     const state = open ? "expanded" : "collapsed"
 
-    const contextValue = React.useMemo<SidebarContext>(
+    const contextValue = React.useMemo<SidebarContextType>(
       () => ({
         state,
         open,

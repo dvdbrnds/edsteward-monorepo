@@ -6,17 +6,17 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 describe('Keyboard Shortcuts', () => {
-  let mockNavigate: ReturnType<typeof vi.fn>;
-  let keydownHandler: ((event: KeyboardEvent) => void) | null = null;
+  let _mockNavigate: ReturnType<typeof vi.fn>;
+  let _keydownHandler: ((event: KeyboardEvent) => void) | null = null;
 
   beforeEach(() => {
-    mockNavigate = vi.fn();
-    keydownHandler = null;
+    _mockNavigate = vi.fn();
+    _keydownHandler = null;
     
     // Mock window event listener
     vi.spyOn(window, 'addEventListener').mockImplementation((event, handler) => {
       if (event === 'keydown') {
-        keydownHandler = handler as (event: KeyboardEvent) => void;
+        _keydownHandler = handler as (event: KeyboardEvent) => void;
       }
     });
     

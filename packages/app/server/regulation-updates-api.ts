@@ -753,7 +753,7 @@ export function setupRegulationUpdatesApi(app: Express) {
             
             // Convert MCP Engine format to EdSteward format
             // Resolve camelCase vs snake_case field names (prefer camelCase)
-            const resolvedRegText = mcpData.regulationText || mcpData.regulation_text;
+            const _resolvedRegText = mcpData.regulationText || mcpData.regulation_text;
             const resolvedSubmissionGuidelines = mcpData.submissionGuidelines || mcpData.submission_guidelines;
             const resolvedAgencyName = mcpData.agencyName || mcpData.agency_name;
             const resolvedAgencyUrl = mcpData.agencyUrl || mcpData.agency_url;

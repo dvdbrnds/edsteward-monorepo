@@ -429,16 +429,17 @@ export async function sendDeadlineCreationNotification(deadline: Deadline) {
 export async function getNotificationTimelineSummary(daysFromNow: number[] = [90, 60, 30, 14, 7, 3, 1, 0]): Promise<void> {
   
   for (const days of daysFromNow) {
-    const wouldSend = shouldSendNotification(days, { notificationSchedule: DEFAULT_NOTIFICATION_SCHEDULES } as unknown as Regulation);
+    const _wouldSend = shouldSendNotification(days, { notificationSchedule: DEFAULT_NOTIFICATION_SCHEDULES } as unknown as Regulation);
     const recipients = await getNotificationRecipients(days);
-    const urgency = getUrgencyLevel(days);
-    const timeDesc = formatTimeRemaining(days);
+    const _urgency = getUrgencyLevel(days);
+    const _timeDesc = formatTimeRemaining(days);
     
     
     if (recipients.length > 0) {
-      recipients.forEach(user => {
+      recipients.forEach(_user => {
       });
     } else {
+      // intentionally empty
     }
   }
   

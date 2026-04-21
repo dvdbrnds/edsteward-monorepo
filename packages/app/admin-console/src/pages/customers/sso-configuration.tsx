@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { 
   Shield, Key, Server, Globe, CheckCircle, XCircle, AlertCircle,
-  Loader2, Copy, ExternalLink, RefreshCw
+  Loader2, Copy, RefreshCw
 } from 'lucide-react';
 
 const API_BASE = import.meta.env.DEV ? 'http://localhost:4000' : '';
@@ -249,7 +249,7 @@ const SSOConfiguration: React.FC<SSOConfigurationProps> = ({
       const result = await response.json();
       setTestResults(result.tests || []);
       
-    } catch (err) {
+    } catch {
       setTestResults([{ name: 'Connection', status: 'failed', error: 'Failed to run tests' }]);
     } finally {
       setTesting(false);

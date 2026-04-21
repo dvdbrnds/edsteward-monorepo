@@ -9,7 +9,7 @@
  * - version_conflicts
  */
 
-import { db, pool } from '../db';
+import { db } from '../db';
 import { syslog, LogLevel, LogFacility } from '../services/syslog';
 
 async function createMCPIntegrationTables() {

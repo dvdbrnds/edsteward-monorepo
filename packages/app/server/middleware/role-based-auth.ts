@@ -263,7 +263,7 @@ export function debugUserRoles(req: Request, res: Response, next: NextFunction):
   if (req.isAuthenticated() && req.user) {
     const user = req.user;
     const userRoles = parseUserRoles(user);
-    const permissions = getCombinedPermissions(userRoles);
+    const _permissions = getCombinedPermissions(userRoles);
     // Permissions loaded for user
   }
   

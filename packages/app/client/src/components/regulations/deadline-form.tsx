@@ -101,7 +101,7 @@ export default function DeadlineForm({ regulationId, onSubmit, initialData, onCa
         <FormField
           control={form.control}
           name="dueDate"
-          render={({ field }) => (
+          render={({ field: _field }) => (
             <FormItem className="flex flex-col">
               <FormLabel>Due Date</FormLabel>
               <Popover>

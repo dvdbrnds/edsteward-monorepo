@@ -32,7 +32,7 @@ type Difference = {
   value: string;
 };
 
-type DiffData = {
+type _DiffData = {
   differences: Difference[];
   addedPercentage: number;
   removedPercentage: number;
@@ -43,7 +43,7 @@ type DiffData = {
   updatedLength: number;
 };
 
-type RegulationUpdate = {
+type _RegulationUpdate = {
   id: number;
   regulationId: number;
   updatedContent: string;
@@ -56,7 +56,7 @@ type RegulationUpdate = {
   rejectionReason: string | null;
 };
 
-type Regulation = {
+type _Regulation = {
   id: number;
   name: string;
   jurisdiction: string;
@@ -66,7 +66,7 @@ type Regulation = {
 
 export const DifferentialView: FC<DifferentialViewProps> = ({ updateId }) => {
   const [viewMode, setViewMode] = useState<'diff' | 'side-by-side' | 'statistics'>('diff');
-  const [selectedTab, setSelectedTab] = useState<'before' | 'after' | 'diff'>('diff');
+  const [_selectedTab, _setSelectedTab] = useState<'before' | 'after' | 'diff'>('diff');
   const [signature, setSignature] = useState('');
   const [rejectionReason, setRejectionReason] = useState('');
   const [, setLocation] = useLocation();

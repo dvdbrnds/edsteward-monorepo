@@ -16,7 +16,7 @@ import {
   attestationTokens,
   users
 } from '@shared/schema';
-import { lt, sql, and, isNotNull } from 'drizzle-orm';
+import { lt, sql, and } from 'drizzle-orm';
 import { syslog, LogLevel, LogFacility } from './syslog';
 
 // Retention periods in days
@@ -109,7 +109,7 @@ export class DataRetentionService {
         let deleted = 0;
         
         while (deleted < recordsToDelete) {
-          const result = await db
+          const _result = await db
             .delete(systemLogs)
             .where(lt(systemLogs.timestamp, cutoffDate));
           

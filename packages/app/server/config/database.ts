@@ -83,9 +83,11 @@ try {
     if (fs.existsSync(certPath)) {
       poolConfig.ssl.ca = fs.readFileSync(certPath);
     } else {
+      // intentionally empty
     }
     
     if (isRDS) {
+      // intentionally empty
     }
   }
   
@@ -119,7 +121,9 @@ try {
   };
   
   if (isRDSFallback) {
+    // intentionally empty
   } else {
+    // intentionally empty
   }
 }
 
@@ -160,15 +164,21 @@ export async function testDatabaseConnection(maxRetries: number = 5): Promise<bo
         
         // Log specific error types
         if (error.message.includes('ETIMEDOUT')) {
+          // intentionally empty
         } else if (error.message.includes('ECONNREFUSED')) {
+          // intentionally empty
         } else if (error.message.includes('ENOTFOUND')) {
+          // intentionally empty
         } else if (error.message.includes('timeout')) {
+          // intentionally empty
         }
         
         // Only log stack trace for non-timeout errors
         if (!error.message.includes('timeout') && !error.message.includes('ETIMEDOUT')) {
+          // intentionally empty
         }
       } else {
+        // intentionally empty
       }
       
       const errorMsg = error instanceof Error ? error.message : String(error);
@@ -266,6 +276,7 @@ export async function ensureDatabaseSchema(): Promise<void> {
       `);
       
     } else {
+      // intentionally empty
     }
   } catch (error) {
     console.error("❌ Error checking/creating database schema:", error);

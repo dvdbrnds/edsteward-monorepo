@@ -218,7 +218,7 @@ export function useWebSocket(options: WebSocketHookOptions = {}) {
           };
           ws.send(JSON.stringify(subscribeMessage));
         } else {
-          
+          // intentionally empty
         }
       };
 

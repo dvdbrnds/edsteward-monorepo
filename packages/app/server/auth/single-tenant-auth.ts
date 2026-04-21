@@ -76,8 +76,9 @@ export function configureAuth(app: Express): void {
     const fakeCert = "-----BEGIN CERTIFICATE-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA1234567890\n-----END CERTIFICATE-----";
     
     if (useFakeCert) {
+      // intentionally empty
     } else {
-      const samlCert = institutionConfig.authentication.samlCertificate;
+      const _samlCert = institutionConfig.authentication.samlCertificate;
     }
     
     // Check if we should disable signature validation (for debugging)

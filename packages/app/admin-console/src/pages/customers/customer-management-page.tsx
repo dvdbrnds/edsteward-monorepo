@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { apiGet, apiPost } from '@/lib/api';
+import { apiGet } from '@/lib/api';
 import { TenantDeletionDialog } from '@/components/tenant-deletion-dialog';
 import SSOConfiguration from './sso-configuration';
 import TemplateSyncDialog from './template-sync-dialog';

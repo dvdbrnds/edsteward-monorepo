@@ -52,11 +52,12 @@ export const sessionConfig: session.SessionOptions = {
   },
   
   // Context7 Best Practice: Custom session ID generation
-  genid: (req) => {
+  genid: (_req) => {
     const sessionId = crypto.randomBytes(32).toString('hex'); // 256-bit session ID
     
     // Enhanced debugging for Context7 compliance
     if (!isProduction) {
+      // intentionally empty
     }
     
     return sessionId;

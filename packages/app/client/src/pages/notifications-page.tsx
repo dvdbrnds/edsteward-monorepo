@@ -62,7 +62,7 @@ type SortOrder = "asc" | "desc";
 // ── Page ───────────────────────────────────────────────────────
 
 export default function NotificationsPage() {
-  const { user } = useAuth();
+  const { user: _user } = useAuth();
 
   // Alerts state
   const [alertTab, setAlertTab] = useState<"overdue" | "dueSoon">("overdue");

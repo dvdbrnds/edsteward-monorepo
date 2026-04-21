@@ -10,10 +10,10 @@ interface ActionButtonProps {
   onStatusChange?: (status: string) => void;
 }
 
-function ActionButton({ action, regulationId, regulation, isAdmin, onRequiredChange, onStatusChange }: ActionButtonProps) {
-  const [showWebPublishDialog, setShowWebPublishDialog] = useState(false);
-  const [showCommunicationDialog, setShowCommunicationDialog] = useState(false);
-  const [showSubmissionWizard, setShowSubmissionWizard] = useState(false);
+function ActionButton({ action, regulationId: _regulationId, regulation: _regulation, isAdmin: _isAdmin, onRequiredChange: _onRequiredChange, onStatusChange }: ActionButtonProps) {
+  const [_showWebPublishDialog, setShowWebPublishDialog] = useState(false);
+  const [_showCommunicationDialog, setShowCommunicationDialog] = useState(false);
+  const [_showSubmissionWizard, setShowSubmissionWizard] = useState(false);
 
   const handleActionClick = () => {
     if (action.type === 'website_publish') {

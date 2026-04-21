@@ -1,7 +1,7 @@
 import passport from 'passport';
 import { MultiSamlStrategy } from '@node-saml/passport-saml';
 import { Express, Request, Response, NextFunction } from 'express';
-import { TenantService, extractTenantFromSAML } from '../middleware/tenant';
+import { TenantService } from '../middleware/tenant';
 import { getDatabaseStorage } from '../services/database';
 import { syslog, LogLevel } from '../services/syslog';
 
@@ -44,7 +44,7 @@ interface SamlProfile {
 }
 
 // Dynamic SAML configuration based on tenant
-async function getTenantSamlConfig(tenantId: string, req: Request) {
+async function getTenantSamlConfig(tenantId: string, _req: Request) {
   const tenant = await TenantService.getTenantById(tenantId);
   
   if (!tenant || !tenant.samlConfig) {
@@ -519,8 +519,7 @@ function generateTenantServiceProviderMetadata(tenant: any): string {
   const callbackUrl = `${baseUrl}/auth/saml/callback`;
   const sloUrl = `${baseUrl}/auth/saml/logout`;
   
-  // Check if eduPerson mode is enabled
-  const eduPersonEnabled = tenant.ssoConfig?.saml?.eduPersonEnabled || tenant.samlConfig?.eduPersonEnabled;
+  const _eduPersonEnabled = tenant.ssoConfig?.saml?.eduPersonEnabled || tenant.samlConfig?.eduPersonEnabled;
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata"

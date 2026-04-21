@@ -44,7 +44,7 @@ router.get("/", requireAuth, async (req, res) => {
           if (typeof notification.content === 'string') {
             try {
               parsedContent = JSON.parse(notification.content);
-            } catch (_e) {
+            } catch {
               // Keep as string if not valid JSON
             }
           }

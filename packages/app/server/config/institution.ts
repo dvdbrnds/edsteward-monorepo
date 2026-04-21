@@ -61,7 +61,7 @@ function loadSamlCertificate(): string | undefined {
     const certPath = join(__dirname, '../../certs/okta-cert.pem');
     const certContent = readFileSync(certPath, 'utf8');
     return certContent.trim();
-  } catch (error) {
+  } catch {
     console.warn('⚠️ SAML certificate not found in env or certs/okta-cert.pem');
     return undefined;
   }

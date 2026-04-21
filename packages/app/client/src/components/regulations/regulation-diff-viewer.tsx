@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
@@ -13,7 +13,7 @@ export function RegulationDiffViewer({ currentRegulation }: RegulationDiffProps)
   const [compareVersionId, setCompareVersionId] = useState<number | null>(
     currentRegulation.previousVersionId
   );
-  const { toast } = useToast();
+  const { toast: _toast } = useToast();
 
   const { data: previousVersion } = useQuery<Regulation>({
     queryKey: [`/api/regulations/${compareVersionId}`],

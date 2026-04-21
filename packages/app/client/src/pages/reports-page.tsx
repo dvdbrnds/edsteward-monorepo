@@ -1,5 +1,5 @@
 import Navigation from "@/components/layout/navigation";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import type { Regulation, Deadline } from "@shared/schema";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -11,12 +11,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { format } from "date-fns";
-import { Download, FileText, Upload, X, CheckCircle, AlertCircle, Clock, ExternalLink } from "lucide-react";
+import { Download, FileText, X, CheckCircle, AlertCircle, Clock, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer } from "recharts";
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 
 // Extended color palette with Moravian brand colors and complementary shades
@@ -154,7 +153,7 @@ const CustomPieChart = ({
                 verticalAlign="bottom"
                 height={80}
                 iconType="circle"
-                payload={legendData.map((entry, index) => ({
+                payload={legendData.map((entry, _index) => ({
                   value: entry.name,
                   type: 'circle',
                   color: COLORS[sortedData.findIndex(d => d.name === entry.name) % COLORS.length],
@@ -271,11 +270,11 @@ const getCongressUrl = (statute: string): string | null => {
 };
 
 export default function ReportsPage() {
-  const [location, setLocation] = useLocation();
+  const [_location, setLocation] = useLocation();
   const [sortConfig, setSortConfig] = useState<SortConfig>(null);
   const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
-  const { toast } = useToast();
+  const { toast: _toast } = useToast();
 
   const { data: regulations, isLoading: regulationsLoading } = useQuery<Regulation[]>({
     queryKey: ["/api/regulations"],
@@ -315,7 +314,7 @@ export default function ReportsPage() {
     });
   };
 
-  const requestSort = (key: keyof Regulation) => {
+  const _requestSort = (key: keyof Regulation) => {
     setSortConfig(current => {
       if (!current || current.key !== key) {
         return { key, direction: 'asc' };
@@ -327,7 +326,7 @@ export default function ReportsPage() {
     });
   };
 
-  const getColumnStyle = (key: keyof Regulation) => {
+  const _getColumnStyle = (key: keyof Regulation) => {
     if (!sortConfig || sortConfig.key !== key) {
       return "cursor-pointer hover:bg-background";
     }
@@ -352,7 +351,7 @@ export default function ReportsPage() {
     return acc;
   }, {} as Record<string, number>) || {};
 
-  const calculateDeadlineStatus = (deadline: any) => {
+  const _calculateDeadlineStatus = (deadline: any) => {
     const today = new Date();
     const dueDate = new Date(deadline.dueDate);
     if (deadline.status === "completed") return "completed";
@@ -391,7 +390,7 @@ export default function ReportsPage() {
     };
   });
 
-  const getStatusColor = (status: string) => {
+  const _getStatusColor = (status: string) => {
     switch (status) {
       case "completed":
         return "text-green-600";

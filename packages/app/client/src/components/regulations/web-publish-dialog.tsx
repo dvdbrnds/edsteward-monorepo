@@ -9,7 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Copy, Check } from "lucide-react";
+import { Copy } from "lucide-react";
 import type { Regulation } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
 
@@ -130,7 +130,7 @@ export function WebPublishDialog({ regulation, open, onOpenChange, onComplete }:
         description: "The website code has been copied to your clipboard.",
       });
       onComplete?.();
-    } catch (error) {
+    } catch {
       toast({
         title: "Copy Failed",
         description: "Failed to copy code to clipboard.",

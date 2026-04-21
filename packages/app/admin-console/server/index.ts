@@ -57,8 +57,7 @@ import {
   restoreTenant,
   getDeletedTenants,
   getDeletionAuditLog,
-  TenantProvisioningRequest,
-  TenantDeletionRequest
+  TenantProvisioningRequest
 } from './services/tenant-provisioning.js';
 
 const app = express();
@@ -575,7 +574,7 @@ app.put('/api/customers/:id/sso', requireAuth, async (req, res) => {
         method: 'POST',
       });
       console.log('✅ Main app tenant registry refreshed');
-    } catch (refreshError) {
+    } catch {
       console.warn('⚠️ Could not refresh main app tenant registry');
     }
 
@@ -615,7 +614,7 @@ app.post('/api/customers/:id/sso/test', requireAuth, async (req, res) => {
         ssoConfig = typeof (tenant as any).sso_config === 'string' 
           ? JSON.parse((tenant as any).sso_config) 
           : (tenant as any).sso_config;
-      } catch (e) {
+      } catch {
         results.tests.push({ name: 'Parse Config', status: 'failed', error: 'Invalid sso_config JSON' });
         return res.json(results);
       }
@@ -650,7 +649,7 @@ app.post('/api/customers/:id/sso/test', requireAuth, async (req, res) => {
         try {
           const urlObj = new URL(ssoUrl);
           results.tests.push({ name: 'SAML SSO URL Format', status: 'passed', url: urlObj.origin });
-        } catch (e) {
+        } catch {
           results.tests.push({ name: 'SAML SSO URL Format', status: 'failed', error: 'Invalid URL format' });
         }
       }
@@ -677,10 +676,10 @@ app.post('/api/customers/:id/sso/test', requireAuth, async (req, res) => {
           } else {
             results.tests.push({ name: 'OIDC Discovery', status: 'warning', message: `HTTP ${response.status}` });
           }
-        } catch (e) {
+        } catch {
           results.tests.push({ name: 'OIDC Discovery', status: 'warning', message: 'Could not reach discovery endpoint' });
         }
-      } catch (e) {
+      } catch {
         results.tests.push({ name: 'OIDC Issuer URL', status: 'failed', error: 'Invalid URL format' });
       }
 
@@ -713,10 +712,10 @@ app.post('/api/customers/:id/sso/test', requireAuth, async (req, res) => {
           clearTimeout(timeoutId);
           
           results.tests.push({ name: 'CAS Server Reachable', status: 'passed', httpStatus: response.status });
-        } catch (e) {
+        } catch {
           results.tests.push({ name: 'CAS Server Reachable', status: 'warning', message: 'Could not reach CAS server' });
         }
-      } catch (e) {
+      } catch {
         results.tests.push({ name: 'CAS Server URL', status: 'failed', error: 'Invalid URL format' });
       }
     }
@@ -754,7 +753,7 @@ app.delete('/api/customers/:id/sso', requireAuth, async (req, res) => {
       await fetch(`${APP_BASE_URL}/api/admin/tenant-registry/refresh`, {
         method: 'POST',
       });
-    } catch (e) {
+    } catch {
       // Non-critical
     }
 

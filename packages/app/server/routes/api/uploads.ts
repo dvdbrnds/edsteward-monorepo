@@ -2,7 +2,6 @@ import express from 'express';
 import multer from 'multer';
 import path from 'path';
 import { syslog, LogLevel, LogFacility } from '../../services/syslog';
-import { uploadLimiter } from '../../middleware/rate-limiter';
 
 const router = express.Router();
 
@@ -67,7 +66,7 @@ const brandingUpload = multer({
 });
 
 // Simple auth middleware for uploads
-const requireAuth = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+const _requireAuth = (req: express.Request, res: express.Response, next: express.NextFunction) => {
   if (!req.isAuthenticated()) {
     return res.status(401).json({ error: 'Authentication required' });
   }

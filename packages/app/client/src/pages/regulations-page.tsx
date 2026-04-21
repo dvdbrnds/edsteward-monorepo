@@ -2,7 +2,7 @@ import React from "react";
 import { useLocation } from "wouter";
 
 export default function RegulationsPage() {
-  const [location, navigate] = useLocation();
+  const [_location, navigate] = useLocation();
 
   // This page has been decommissioned in favor of the superior dashboard
   // Redirect users to the main dashboard

@@ -30,7 +30,7 @@ export interface IdentityProviderConfig {
 const getServiceProviderCert = (): string => {
   try {
     return readFileSync(join(process.cwd(), 'certs', 'sp-cert.pem'), 'utf8');
-  } catch (_error) {
+  } catch {
     console.warn('Service Provider certificate not found. Using placeholder for development.');
     return process.env.SAML_SP_CERT || '';
   }
@@ -39,7 +39,7 @@ const getServiceProviderCert = (): string => {
 const getServiceProviderKey = (): string => {
   try {
     return readFileSync(join(process.cwd(), 'certs', 'sp-key.pem'), 'utf8');
-  } catch (_error) {
+  } catch {
     console.warn('Service Provider private key not found. Using placeholder for development.');
     return process.env.SAML_SP_PRIVATE_KEY || '';
   }

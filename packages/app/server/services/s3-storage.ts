@@ -1,6 +1,5 @@
 import { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import { config } from '../config/environment';
 import { log } from '../vite';
 
 export class S3StorageService {
@@ -93,7 +92,7 @@ export class S3StorageService {
 
       await this.s3Client.send(command);
       return true;
-    } catch (error) {
+    } catch {
       return false;
     }
   }

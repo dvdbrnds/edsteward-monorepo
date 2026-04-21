@@ -231,6 +231,7 @@ export function performanceMetricsMiddleware() {
       
       // Store metrics (in production, send to monitoring service)
       if (process.env.NODE_ENV === 'development') {
+        // intentionally empty
       }
       
       // Add performance headers

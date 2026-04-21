@@ -121,7 +121,7 @@ function checkPageBreak(doc: jsPDF, currentY: number, neededSpace: number): numb
  */
 export function generateHecvatFullPDF(report: HecvatReport): void {
   const doc = new jsPDF('portrait', 'mm', 'a4');
-  let currentPage = 1;
+  let _currentPage = 1;
 
   // =========================================================================
   // COVER PAGE
@@ -207,7 +207,7 @@ export function generateHecvatFullPDF(report: HecvatReport): void {
   // TABLE OF CONTENTS
   // =========================================================================
   doc.addPage();
-  currentPage++;
+  _currentPage++;
   addPageHeader(doc, 'HECVAT Compliance Report');
 
   y = 25;
@@ -247,7 +247,7 @@ export function generateHecvatFullPDF(report: HecvatReport): void {
   // EXECUTIVE SUMMARY
   // =========================================================================
   doc.addPage();
-  currentPage++;
+  _currentPage++;
   addPageHeader(doc, 'HECVAT Compliance Report');
 
   y = 25;
@@ -371,7 +371,7 @@ EdSteward maintains compliance with FERPA, supports GDPR (where applicable), and
     const section = report.sections[sIdx];
     
     doc.addPage();
-    currentPage++;
+    _currentPage++;
     addPageHeader(doc, 'HECVAT Compliance Report');
 
     y = 25;
@@ -385,7 +385,7 @@ EdSteward maintains compliance with FERPA, supports GDPR (where applicable), and
     doc.text(`Section ${sIdx + 3}: ${section.name}`, PAGE_MARGIN + 5, y + 5);
     
     // Status badge
-    const statusColor = getStatusColor(section.status);
+    const _statusColor = getStatusColor(section.status);
     const statusLabel = getStatusLabel(section.status);
     doc.setFontSize(9);
     doc.text(statusLabel, PAGE_WIDTH - PAGE_MARGIN - 5 - doc.getTextWidth(statusLabel), y + 5);
@@ -473,7 +473,7 @@ EdSteward maintains compliance with FERPA, supports GDPR (where applicable), and
   // THIRD-PARTY CERTIFICATIONS
   // =========================================================================
   doc.addPage();
-  currentPage++;
+  _currentPage++;
   addPageHeader(doc, 'HECVAT Compliance Report');
 
   y = 25;

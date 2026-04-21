@@ -222,7 +222,7 @@ router.get('/summary', requireAuth, async (req: Request, res: Response) => {
         correction: 'Profile information can be updated in account settings',
       }
     });
-  } catch (error) {
+  } catch {
     // pool is shared tenant pool — do not close
     res.status(500).json({ error: 'Failed to retrieve data summary' });
   }

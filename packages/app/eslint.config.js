@@ -26,6 +26,11 @@ export default [
         ...globals.browser,
         ...globals.node,
         console: 'readonly',
+        JSX: 'readonly',
+        React: 'readonly',
+        NodeJS: 'readonly',
+        Express: 'readonly',
+        BodyInit: 'readonly',
       },
     },
     plugins: {
@@ -157,6 +162,24 @@ export default [
     },
   },
   
+  // Test files: add Vitest globals
+  {
+    files: ['tests/**/*.{ts,tsx}', '**/*.test.{ts,tsx}', '**/*.spec.{ts,tsx}'],
+    languageOptions: {
+      globals: {
+        vi: 'readonly',
+        describe: 'readonly',
+        it: 'readonly',
+        expect: 'readonly',
+        beforeEach: 'readonly',
+        afterEach: 'readonly',
+        beforeAll: 'readonly',
+        afterAll: 'readonly',
+        test: 'readonly',
+      },
+    },
+  },
+
   // Ignore patterns
   {
     ignores: [
@@ -170,6 +193,12 @@ export default [
       'migration_env/**',
       'attached_assets/**',
       'archived_files/**',
+      'archive/**',
+      'html/**',
+      'admin-console/dist/**',
+      '**/dist/**',
+      'attest/**',
+      'scripts/**',
     ],
   },
 ]; 

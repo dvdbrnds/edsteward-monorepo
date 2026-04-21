@@ -1,7 +1,7 @@
 import express, { type Request, Response } from "express";
 import { getDatabaseStorage, getTenantDb } from "./services/database";
 import { sql, eq, and } from "drizzle-orm";
-import { regulations, complianceTasks, roleAssignments, executiveOrders as executiveOrdersTable, eoRegulationImpacts, circuitInterpretations, circuitSplits } from "@shared/schema";
+import { regulations, complianceTasks, roleAssignments, circuitInterpretations, circuitSplits } from "@shared/schema";
 import { syslog, LogLevel, LogFacility } from './services/syslog';
 import { z } from "zod";
 import { ValidationLevel } from "@shared/schema";
@@ -1242,7 +1242,7 @@ export function setupMCPIntegrationApi(app: express.Application) {
     
     try {
       const db = getDb(req);
-      const storage = getStorage(req);
+      const _storage = getStorage(req);
       const data = req.body;
       
       // Validate required fields

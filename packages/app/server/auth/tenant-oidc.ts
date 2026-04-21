@@ -64,7 +64,7 @@ const OIDC_PRESETS: Record<string, Partial<TenantOIDCConfig>> = {
 /**
  * Get OIDC configuration for a tenant
  */
-async function getTenantOIDCConfig(tenantId: string, req: Request): Promise<{
+async function getTenantOIDCConfig(tenantId: string, _req: Request): Promise<{
   issuerURL: string;
   clientID: string;
   clientSecret: string;
@@ -225,7 +225,7 @@ export function setupTenantOIDCAuth(app: Express) {
   /**
    * OIDC Callback handler
    */
-  app.get('/auth/oidc/callback', async (req: Request, res: Response, next: NextFunction) => {
+  app.get('/auth/oidc/callback', async (req: Request, res: Response, _next: NextFunction) => {
     try {
       // Get tenant from session
       const tenantId = req.session?.oidcTenantId;
