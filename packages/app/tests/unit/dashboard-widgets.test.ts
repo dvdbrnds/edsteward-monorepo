@@ -73,12 +73,12 @@ describe('Dashboard Widgets', () => {
       });
     });
 
-    it('should include regulation list widget that cannot be hidden', async () => {
+    it('should include all expected widget IDs', async () => {
       const { DASHBOARD_WIDGETS } = await import('@/hooks/use-dashboard-widgets');
       
-      const regulationListWidget = DASHBOARD_WIDGETS.find(w => w.id === 'regulationList');
-      expect(regulationListWidget).toBeDefined();
-      expect(regulationListWidget?.canHide).toBe(false);
+      const widgetIds = DASHBOARD_WIDGETS.map(w => w.id);
+      expect(widgetIds).toContain('myTasks');
+      expect(widgetIds).toContain('upcomingDeadlines');
     });
   });
 
