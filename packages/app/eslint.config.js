@@ -47,7 +47,7 @@ export default [
         argsIgnorePattern: '^_',
         varsIgnorePattern: '^_' 
       }],
-      '@typescript-eslint/no-explicit-any': 'warn',
+      '@typescript-eslint/no-explicit-any': 'off',
       'react/jsx-uses-react': 'error',
       'react/jsx-uses-vars': 'error',
       'react-hooks/rules-of-hooks': 'error',
