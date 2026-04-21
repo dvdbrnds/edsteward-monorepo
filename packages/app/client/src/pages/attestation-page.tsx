@@ -64,6 +64,7 @@ interface AttestationData {
     confidentialDataTypes: string[] | null;
     externalSystemReference: string | null;
     assignedRole: string | null;
+    responsibleOffice?: string | null;
     attestationStatus: string;
     regulation: {
       id: number;
@@ -428,12 +429,12 @@ const AttestationPage: React.FC = () => {
                   </span>
                 </div>
               )}
-              {(task.responsibleOffice || task.assignedRole) && (
+              {((task as any).responsibleOffice || task.assignedRole) && (
                 <div className="flex items-center gap-2">
                   <Building2 className="h-4 w-4 text-slate-400" />
                   <span className="text-sm text-slate-600">
-                    {task.responsibleOffice
-                      ? `${task.responsibleOffice}${task.assignedRole ? ` — ${task.assignedRole}` : ''}`
+                    {(task as any).responsibleOffice
+                      ? `${(task as any).responsibleOffice}${task.assignedRole ? ` — ${task.assignedRole}` : ''}`
                       : `Suggested: ${task.assignedRole}`}
                   </span>
                 </div>

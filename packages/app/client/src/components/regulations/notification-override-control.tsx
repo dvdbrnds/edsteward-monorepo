@@ -57,14 +57,14 @@ export function NotificationOverrideControl({ regulationId }: NotificationOverri
   // Fetch notification status
   const { data: notificationStatus, isLoading } = useQuery<NotificationStatus>({
     queryKey: [`/api/regulation-notifications/${regulationId}/status`],
-    queryFn: async () => {
+    queryFn: async (): Promise<NotificationStatus> => {
       const response = await fetch(`/api/regulation-notifications/${regulationId}/status`);
       if (!response.ok) {
         throw new Error('Failed to fetch notification status');
       }
       return response.json();
     },
-    enabled: !!regulationId && hasPermission,
+    enabled: !!regulationId && !!hasPermission,
   });
 
   // Toggle notification override mutation

@@ -1343,9 +1343,8 @@ export function registerRoutes(app: express.Application): Server {
       }
 
       // Check if MFA is enabled for this user
-      if (user.mfa_enabled) {
-        // Store user info in session for MFA verification
-        req.session.mfaUser = {
+      if (user.mfaEnabled) {
+        (req.session as any).mfaUser = {
           id: user.id,
           email: user.email,
           username: user.username,
@@ -1365,9 +1364,8 @@ export function registerRoutes(app: express.Application): Server {
       (user as any)._tenantId = tenantId;
       console.log(`[AUTH] routes/index.ts login successful for '${user.username}' in tenant '${tenantId}'`);
 
-      req.login(user, async (err) => {
+      req.login(user as any, async (err) => {
         if (err) {
-          // Log login session error
           await syslog.log(
             LogFacility.AUTH,
             LogLevel.ERROR,
@@ -1452,7 +1450,7 @@ export function registerRoutes(app: express.Application): Server {
       }
 
       // Get user from session
-      const mfaUser = req.session.mfaUser;
+      const mfaUser = (req.session as any).mfaUser;
       if (!mfaUser) {
         return res.status(400).json({ error: 'No MFA session found. Please login again.' });
       }
@@ -1460,16 +1458,15 @@ export function registerRoutes(app: express.Application): Server {
       // Check if MFA session is not too old (5 minutes max)
       const sessionAge = Date.now() - new Date(mfaUser.loginAttemptTime).getTime();
       if (sessionAge > 5 * 60 * 1000) {
-        delete req.session.mfaUser;
+        delete (req.session as any).mfaUser;
         return res.status(400).json({ error: 'MFA session expired. Please login again.' });
       }
 
-      // Get full user from database
       const tenantStorage = getDatabaseStorage(req.tenantId);
       const user = await tenantStorage.getUserByEmail(mfaUser.email);
       
-      if (!user || !user.mfa_enabled) {
-        delete req.session.mfaUser;
+      if (!user || !user.mfaEnabled) {
+        delete (req.session as any).mfaUser;
         return res.status(400).json({ error: 'MFA not enabled for this user' });
       }
 
@@ -1497,12 +1494,11 @@ export function registerRoutes(app: express.Application): Server {
       }
 
       // MFA verification successful, complete login
-      delete req.session.mfaUser;
+      delete (req.session as any).mfaUser;
       
-      // CRITICAL: Attach tenantId to user for session serialization
       (user as any)._tenantId = req.tenantId || 'default';
 
-      req.login(user, async (err) => {
+      req.login(user as any, async (err) => {
         if (err) {
           await syslog.log(
             LogFacility.AUTH,
@@ -1622,11 +1618,9 @@ export function registerRoutes(app: express.Application): Server {
         return res.status(401).json({ error: 'Incorrect password. Please check your password and try again.' });
       }
 
-      // Check if MFA is enabled
-      if (user.mfa_enabled || user.mfaEnabled) {
+      if (user.mfaEnabled) {
         if (!mfaCode) {
-          // First step: password verified, now need MFA code
-          req.session.mfaUser = {
+          (req.session as any).mfaUser = {
             id: user.id,
             email: user.email,
             username: user.username,
@@ -1664,11 +1658,9 @@ export function registerRoutes(app: express.Application): Server {
         }
       }
 
-      // Login successful (either no MFA or MFA verified)
-      // CRITICAL: Attach tenantId to user for session serialization
       (user as any)._tenantId = req.tenantId || 'default';
 
-      req.login(user, async (err) => {
+      req.login(user as any, async (err) => {
         if (err) {
           await syslog.log(
             LogFacility.AUTH,
@@ -1701,7 +1693,7 @@ export function registerRoutes(app: express.Application): Server {
               role: user.role,
               ip: clientIp,
               userAgent,
-              mfaUsed: !!user.mfa_enabled
+              mfaUsed: !!user.mfaEnabled
             }
           }
         );
@@ -1761,7 +1753,7 @@ export function registerRoutes(app: express.Application): Server {
       // CRITICAL: Attach tenantId to user for session serialization
       (user as any)._tenantId = req.tenantId || 'default';
 
-      req.login(user, (err) => {
+      req.login(user as any, (err) => {
         if (err) {
           return res.status(500).json({ error: 'Login failed' });
         }

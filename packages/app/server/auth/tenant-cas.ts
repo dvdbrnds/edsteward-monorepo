@@ -7,6 +7,7 @@
  */
 
 import passport from 'passport';
+// @ts-ignore untyped module
 import CasStrategy from 'passport-cas2';
 import { Express, Request, Response, NextFunction } from 'express';
 import { TenantService } from '../middleware/tenant';
@@ -207,9 +208,9 @@ export function setupTenantCASAuth(app: Express) {
             const userData = extractCASUserAttributes(username, profile, currentTenant);
             
             // Verify user belongs to this tenant (domain validation)
-            if (userData.email && currentTenant.ssoConfig?.allowedDomains?.length > 0) {
+            if (userData.email && currentTenant.ssoConfig?.allowedDomains && currentTenant.ssoConfig.allowedDomains.length > 0) {
               const emailDomain = userData.email.split('@')[1];
-              if (!currentTenant.ssoConfig.allowedDomains.includes(emailDomain)) {
+              if (!currentTenant.ssoConfig!.allowedDomains!.includes(emailDomain)) {
                 throw new Error(`User domain ${emailDomain} not allowed for tenant ${currentTenant.name}`);
               }
             }

@@ -115,7 +115,7 @@ const DifferentialViewPage: React.FC<DifferentialViewPageProps> = ({ isDemo = fa
       addedPercentage: 83,
       removedPercentage: 12,
       changedPercentage: 71,
-      differences: []
+      differences: [] as ReturnType<typeof diffWords>
     }
   };
   
@@ -123,7 +123,7 @@ const DifferentialViewPage: React.FC<DifferentialViewPageProps> = ({ isDemo = fa
     queryKey: isDemo ? ['demo-regulation-update'] : [`/api/regulation-updates/${updateId}`],
     queryFn: async () => {
       if (isDemo) {
-        demoData.diffData.differences = diffWords(demoData.original.content, demoData.update.updatedContent);
+        (demoData.diffData as any).differences = diffWords(demoData.original.content, demoData.update.updatedContent);
         return demoData;
       }
       

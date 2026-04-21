@@ -198,15 +198,13 @@ export function setupTenantOIDCAuth(app: Express) {
           clientSecret: oidcConfig.clientSecret,
           callbackURL: oidcConfig.callbackURL,
           scope: oidcConfig.scope,
-          state: true,
-        },
+        } as any,
         (
           issuer: string,
           profile: Profile,
           done: VerifyCallback
         ) => {
-          // This won't be called during login initiation
-          done(null, profile);
+          done(null, profile as any);
         }
       );
 
@@ -261,10 +259,9 @@ export function setupTenantOIDCAuth(app: Express) {
           clientSecret: oidcConfig.clientSecret,
           callbackURL: oidcConfig.callbackURL,
           scope: oidcConfig.scope,
-          state: true,
           passReqToCallback: true,
-        },
-        async (
+        } as any,
+        (async (
           req: Request,
           issuer: string,
           profile: Profile,
@@ -278,9 +275,9 @@ export function setupTenantOIDCAuth(app: Express) {
             const userData = extractOIDCUserAttributes(profile as OIDCUserProfile, tenant);
             
             // Verify user belongs to this tenant (domain validation)
-            if (userData.email && tenant.ssoConfig?.allowedDomains?.length > 0) {
+            if (userData.email && tenant.ssoConfig?.allowedDomains && tenant.ssoConfig.allowedDomains.length > 0) {
               const emailDomain = userData.email.split('@')[1];
-              if (!tenant.ssoConfig.allowedDomains.includes(emailDomain)) {
+              if (!tenant.ssoConfig!.allowedDomains!.includes(emailDomain)) {
                 throw new Error(`User domain ${emailDomain} not allowed for tenant ${tenant.name}`);
               }
             }
@@ -311,7 +308,7 @@ export function setupTenantOIDCAuth(app: Express) {
                 user.username,
                 { tenantId, provider: 'oidc' }
               );
-              return done(null, user);
+              return done(null, user as Express.User);
             } else if (tenant.ssoConfig?.autoProvisioning) {
               // Create new user for this tenant
               const newUser = await tenantStorage.createUser({
@@ -326,7 +323,7 @@ export function setupTenantOIDCAuth(app: Express) {
                 newUser.username,
                 { tenantId, provider: 'oidc' }
               );
-              return done(null, newUser);
+              return done(null, newUser as Express.User);
             } else {
               throw new Error(`Auto-provisioning disabled for tenant ${tenant.name}. Contact administrator.`);
             }
@@ -342,9 +339,8 @@ export function setupTenantOIDCAuth(app: Express) {
             return done(error instanceof Error ? error : new Error(errorMessage));
           }
         }
-      );
+      ) as any);
 
-      // Use the strategy
       passport.use(`oidc-callback-${tenantId}`, strategy);
       
       passport.authenticate(`oidc-callback-${tenantId}`, {

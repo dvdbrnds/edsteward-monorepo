@@ -28,22 +28,22 @@ export default function RegulationForm({ onSuccess }: { onSuccess: () => void })
       name: "",
       topic: "",
       statute: "",
-      statuteIds: "",
-      requirements: "",
-      requirementsUrl: "",
-      regulationUrl: "",
-      summary: "",
+      statuteIds: undefined,
+      requirements: undefined,
+      requirementsUrl: undefined,
+      regulationUrl: undefined,
+      summary: undefined,
       category: "",
-      jurisdiction: "federal",
-      agency_url: "",
-      agency_name: "",
-      agency_department: "",
-      submissionGuideUrl: "",
-      formsUrl: "",
-      submissionGuidelines: "",
+      jurisdictionSource: "federal",
+      agency_url: undefined,
+      agency_name: undefined,
+      agency_department: undefined,
+      submissionGuideUrl: undefined,
+      formsUrl: undefined,
+      submissionGuidelines: undefined,
       isApplicable: true,
       filingDeadlines: [],
-      reportingFrequency: "",
+      reportingFrequency: undefined,
       applicableforms: [],
       relatedRegulations: [],
       notificationSchedule: {
@@ -168,7 +168,7 @@ export default function RegulationForm({ onSuccess }: { onSuccess: () => void })
             <FormItem>
               <FormLabel>Summary</FormLabel>
               <FormControl>
-                <Textarea {...field} placeholder="Brief overview of the regulation" />
+                <Textarea {...field} value={field.value ?? ""} placeholder="Brief overview of the regulation" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -185,7 +185,7 @@ export default function RegulationForm({ onSuccess }: { onSuccess: () => void })
                 Enter the detailed requirements for compliance
               </FormDescription>
               <FormControl>
-                <Textarea {...field} placeholder="List specific requirements and obligations" />
+                <Textarea {...field} value={field.value ?? ""} placeholder="List specific requirements and obligations" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -206,7 +206,7 @@ export default function RegulationForm({ onSuccess }: { onSuccess: () => void })
                   Detailed instructions for submitting compliance documentation
                 </FormDescription>
                 <FormControl>
-                  <Textarea {...field} placeholder="Step-by-step submission process and requirements" />
+                  <Textarea {...field} value={field.value ?? ""} placeholder="Step-by-step submission process and requirements" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -223,7 +223,7 @@ export default function RegulationForm({ onSuccess }: { onSuccess: () => void })
                   Link to official submission guidelines or documentation
                 </FormDescription>
                 <FormControl>
-                  <Input {...field} type="url" placeholder="https://example.com/submission-guide" />
+                  <Input {...field} value={field.value ?? ""} type="url" placeholder="https://example.com/submission-guide" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -240,7 +240,7 @@ export default function RegulationForm({ onSuccess }: { onSuccess: () => void })
                   Link to required forms or templates
                 </FormDescription>
                 <FormControl>
-                  <Input {...field} type="url" placeholder="https://example.com/required-forms" />
+                  <Input {...field} value={field.value ?? ""} type="url" placeholder="https://example.com/required-forms" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -258,7 +258,11 @@ export default function RegulationForm({ onSuccess }: { onSuccess: () => void })
                 </FormDescription>
                 <FormControl>
                   <select
-                    {...field}
+                    name={field.name}
+                    value={(field.value as string) ?? ''}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                    disabled={field.disabled}
                     className="w-full p-2 border rounded-md"
                   >
                     <option value="">Select frequency</option>
@@ -282,7 +286,7 @@ export default function RegulationForm({ onSuccess }: { onSuccess: () => void })
             <FormItem>
               <FormLabel>Agency Name</FormLabel>
               <FormControl>
-                <Input {...field} placeholder="Name of the regulatory agency" />
+                <Input {...field} value={field.value ?? ""} placeholder="Name of the regulatory agency" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -296,7 +300,7 @@ export default function RegulationForm({ onSuccess }: { onSuccess: () => void })
             <FormItem>
               <FormLabel>Agency Department</FormLabel>
               <FormControl>
-                <Input {...field} placeholder="Specific department or division" />
+                <Input {...field} value={field.value ?? ""} placeholder="Specific department or division" />
               </FormControl>
               <FormMessage />
             </FormItem>

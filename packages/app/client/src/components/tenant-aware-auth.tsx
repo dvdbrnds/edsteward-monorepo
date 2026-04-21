@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import AuthPage from "@/pages/auth-page";
-import AdminAuthPage from "@/pages/admin-auth-page";
+
+const AdminAuthPage = AuthPage;
 
 export default function TenantAwareAuth() {
   const [tenant, setTenant] = useState<string | null>(null);

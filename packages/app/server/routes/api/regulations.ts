@@ -36,9 +36,7 @@ router.get("/categories", async (_req: any, res) => {
     const categories = await getCanonicalCategories();
     res.json(categories);
   } catch (error) {
-    syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Failed to fetch canonical categories", {
-      error: error instanceof Error ? error.message : String(error)
-    });
+    syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, `Failed to fetch canonical categories: ${error instanceof Error ? error.message : String(error)}`);
     res.status(500).json({ error: "Failed to fetch categories" });
   }
 });
@@ -159,7 +157,7 @@ router.get("/", async (req: any, res) => {
             : [];
           if (institutions.length === 0) return true;
           if (institutions.includes('all-institutions')) return true;
-          return [...types].some(t => institutions.includes(t));
+          return Array.from(types).some(t => institutions.includes(t));
         });
       }
     }
@@ -466,9 +464,7 @@ router.post("/:regulationId/evidence", uploadLimiter, requireAuth, upload.single
       });
 
     } catch (dbError) {
-      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Database error saving evidence file", {
-        error: dbError instanceof Error ? dbError.message : String(dbError)
-      });
+    syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, `Database error saving evidence file: ${dbError instanceof Error ? dbError.message : String(dbError)}`);
 
       return res.status(500).json({
         error: "Database error saving evidence file",
@@ -477,9 +473,7 @@ router.post("/:regulationId/evidence", uploadLimiter, requireAuth, upload.single
     }
 
   } catch (error) {
-    syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Evidence upload error", {
-      error: error instanceof Error ? error.message : String(error)
-    });
+    syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, `Evidence upload error: ${error instanceof Error ? error.message : String(error)}`);
 
     return res.status(500).json({
       error: "Failed to upload evidence file",
@@ -524,8 +518,7 @@ router.delete("/:regulationId/evidence/:evidenceId", requireAuth, requireAdmin, 
       } catch (fileError) {
         // Log but don't fail if file doesn't exist
         syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, 
-          `Could not delete evidence file from disk: ${existingEvidence.storagePath}`, 
-          { error: fileError instanceof Error ? fileError.message : String(fileError) });
+          `Could not delete evidence file from disk: ${existingEvidence.storagePath}: ${fileError instanceof Error ? fileError.message : String(fileError)}`);
       }
     }
 
@@ -542,9 +535,7 @@ router.delete("/:regulationId/evidence/:evidenceId", requireAuth, requireAdmin, 
       deletedId: evidenceId
     });
   } catch (error) {
-    syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Failed to delete evidence file", {
-      error: error instanceof Error ? error.message : String(error)
-    });
+    syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, `Failed to delete evidence file: ${error instanceof Error ? error.message : String(error)}`);
     res.status(500).json({ 
       error: "Failed to delete evidence file",
       details: error instanceof Error ? error.message : String(error)
@@ -580,9 +571,7 @@ router.put("/:regulationId", requireAuth, requireComplianceOfficer, async (req, 
     
     res.json(updatedRegulation);
   } catch (error) {
-    syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Failed to update regulation", {
-      error: error instanceof Error ? error.message : String(error)
-    });
+    syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, `Failed to update regulation: ${error instanceof Error ? error.message : String(error)}`);
     
     res.status(500).json({ 
       error: "Failed to update regulation", 
@@ -627,9 +616,7 @@ router.patch("/:regulationId/category", requireAuth, async (req: any, res) => {
     
     res.json(updatedRegulation);
   } catch (error) {
-    syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Failed to update category", {
-      error: error instanceof Error ? error.message : String(error)
-    });
+    syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, `Failed to update category: ${error instanceof Error ? error.message : String(error)}`);
     res.status(500).json({ error: "Failed to update category" });
   }
 });
@@ -677,7 +664,7 @@ router.patch("/:regulationId/owner", requireAuth, async (req: any, res) => {
     const previousOwnerId = currentRegulation?.ownerId;
     
     const updatedRegulation = await tenantStorage.updateRegulation(regulationId, { 
-      ownerId: ownerValue 
+      ownerId: ownerValue as any
     });
     
     if (ownerValue && ownerValue !== previousOwnerId) {
@@ -691,7 +678,7 @@ router.patch("/:regulationId/owner", requireAuth, async (req: any, res) => {
         await tenantStorage.createNotificationQueueItem({
           regulationId: regulationId,
           userId: ownerValue,
-          type: 'regulation_assigned',
+          type: 'change_detected' as const,
           content: {
             title: 'You have been assigned a regulation',
             message: `${assignedByName} has assigned you as the Primary DRI for "${regulationName}"${roleNote}. Please review the regulation and its compliance requirements.`,
@@ -717,9 +704,7 @@ router.patch("/:regulationId/owner", requireAuth, async (req: any, res) => {
     
     res.json(updatedRegulation);
   } catch (error) {
-    syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Failed to update owner", {
-      error: error instanceof Error ? error.message : String(error)
-    });
+    syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, `Failed to update owner: ${error instanceof Error ? error.message : String(error)}`);
     res.status(500).json({ error: "Failed to update owner" });
   }
 });
@@ -759,7 +744,7 @@ router.patch("/:regulationId/actions/:actionType", requireAuth, requireComplianc
     
     // Update the specific action in the actions array
     const actions = regulation.actions || [];
-    const actionIndex = actions.findIndex(action => action.type === actionType);
+    const actionIndex = actions.findIndex((action: any) => action.type === actionType);
     
     // Store the previous status for logging (for future use)
     // const previousStatus = actionIndex !== -1 ? actions[actionIndex].status : 'not_exists';
@@ -865,7 +850,7 @@ router.post('/:id/submit-to-agency', requireAuth, async (req, res) => {
       enabled: true,
       required: true,
       status: 'completed' as const,
-      completedDate: submissionDate.toISOString(),
+      completedDate: submissionDate,
       completedBy: {
         userId,
         username,
@@ -875,12 +860,12 @@ router.post('/:id/submit-to-agency', requireAuth, async (req, res) => {
     };
     
     if (actionIndex === -1) {
-      actions.push(completedAction);
+      actions.push(completedAction as any);
     } else {
       actions[actionIndex] = {
         ...actions[actionIndex],
         ...completedAction,
-      };
+      } as any;
     }
     
     // Update the regulation
@@ -889,23 +874,20 @@ router.post('/:id/submit-to-agency', requireAuth, async (req, res) => {
     // Log to audit trail if AuditService is available
     try {
       const { AuditService } = await import('../../services/audit');
-      await AuditService.logAction({
-        userId,
-        userEmail: (req.user as any)?.email || username,
-        action: 'agency_submission_completed',
+      await (AuditService as any).logAudit({
+        action: 'update',
         entityType: 'regulation_action',
         entityId: regulationId.toString(),
         regulationId,
-        complianceImpact: true,
+        complianceImpact: 'low',
         riskLevel: 'low',
-        ipAddress: req.ip || 'unknown',
         metadata: {
           agencyName: regulation.agency_name,
           regulationName: regulation.name,
           submittedBy: username,
           submittedAt: submissionDate.toISOString(),
         }
-      });
+      }, (AuditService as any).extractAuditContext(req));
     } catch (auditError) {
       // Log but don't fail the request if audit logging fails
       console.warn('Failed to log agency submission to audit trail:', auditError);

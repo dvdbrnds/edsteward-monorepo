@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import type { RegulationAction } from '@shared/schema';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -287,7 +288,7 @@ export const EnhancedRegulationTimeline: React.FC<EnhancedRegulationTimelineProp
 
     // Add events from regulation actions (completed actions)
     if (regulation.actions) {
-      regulation.actions.forEach((action, index) => {
+      (regulation.actions as RegulationAction[]).forEach((action: RegulationAction, index: number) => {
         if (action.status === 'completed' && action.completedDate) {
           const actionIcons = {
             attestation: <CheckCircle className="h-4 w-4 text-green-500" />,
@@ -339,7 +340,7 @@ export const EnhancedRegulationTimeline: React.FC<EnhancedRegulationTimelineProp
             <CheckCircle className="h-4 w-4 text-green-500" /> :
             <AlertCircle className="h-4 w-4 text-red-500" />,
           user: log.user ? `${log.user.firstName || ''} ${log.user.lastName || log.user.username}`.trim() : undefined,
-          outcome: log.outcome,
+          outcome: (log.outcome === 'partial' ? 'pending' : log.outcome) as 'success' | 'failure' | 'pending',
         });
       }
     });
@@ -592,7 +593,7 @@ export const EnhancedRegulationTimeline: React.FC<EnhancedRegulationTimelineProp
                       Current Compliance Status
                     </h4>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                      {regulation.actions?.map((action) => (
+                      {(regulation.actions as RegulationAction[] | undefined)?.map((action: RegulationAction) => (
                         <div 
                           key={action.type}
                           className={`p-3 rounded-lg border ${

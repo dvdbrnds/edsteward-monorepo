@@ -22,14 +22,14 @@ declare global {
 
 const DebugTools: React.FC<DebugToolsProps> = ({ className }) => {
   // Temporarily disabled due to circular dependency fix
-  const connectionState = 'disconnected';
+  const connectionState: string = 'disconnected';
   const useMCPEngine = false;
   const clientId = null;
   const subscribedRegulations: string[] = [];
   const reconnectCount = 0;
   const connect = () => console.log('WebSocket connect disabled');
   const disconnect = () => console.log('WebSocket disconnect disabled');
-  const subscribeToRegulations = () => false;
+  const subscribeToRegulations = (_ids: string[]) => false;
 
   const handleClearCache = () => {
     localStorage.clear();

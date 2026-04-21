@@ -215,7 +215,7 @@ function shouldSendNotification(daysRemaining: number, regulation: Regulation): 
     return false;
   }
 
-  const schedules = regulation.notificationSchedule || DEFAULT_NOTIFICATION_SCHEDULES;
+  const schedules = (regulation.notificationSchedule || DEFAULT_NOTIFICATION_SCHEDULES) as typeof DEFAULT_NOTIFICATION_SCHEDULES;
 
   // 90-day notice (initial reminder to Compliance Officer)
   if (daysRemaining === schedules.initialReminder) return true;
@@ -318,21 +318,21 @@ export async function sendDeadlineCreationNotification(deadline: Deadline) {
     }
     
     // 3. Find all compliance officers in the system
-    const allUsers = await tenantStorage.getUsers();
-    const complianceOfficers = allUsers.filter(user => 
+    const allUsers = await tenantStorage.getAllUsers();
+    const complianceOfficers = allUsers.filter((user: User) => 
       user.role === 'compliance_officer' || 
       (user.roles && JSON.parse(user.roles || '[]').includes('compliance_officer'))
     );
     
-    complianceOfficers.forEach(officer => recipients.add(officer.email));
+    complianceOfficers.forEach((officer: User) => recipients.add(officer.email));
     
     // 4. Find all admins as backup
-    const admins = allUsers.filter(user => 
+    const admins = allUsers.filter((user: User) => 
       user.role === 'admin' || 
       (user.roles && JSON.parse(user.roles || '[]').includes('admin'))
     );
     
-    admins.forEach(admin => recipients.add(admin.email));
+    admins.forEach((admin: User) => recipients.add(admin.email));
 
     const subject = `🚨 New Compliance Deadline Created: ${regulation.name}`;
     
@@ -388,7 +388,7 @@ export async function sendDeadlineCreationNotification(deadline: Deadline) {
 
     // Send to all recipients with delivery tracking
     const emailPromises = Array.from(recipients).map(email => {
-      const user = allUsers.find(u => u.email === email);
+      const user = allUsers.find((u: User) => u.email === email);
       const tracking: EmailTrackingContext = {
         emailType: 'deadline_warning',
         relatedEntityType: 'regulation',
@@ -402,20 +402,13 @@ export async function sendDeadlineCreationNotification(deadline: Deadline) {
     
     // Create in-app notifications for all recipients
     const notificationPromises = Array.from(recipients).map(async (email) => {
-      const user = allUsers.find(u => u.email === email);
+      const user = allUsers.find((u: User) => u.email === email);
       if (user) {
         return tenantStorage.createNotification({
           userId: user.id,
+          regulationId: regulation.id,
           type: 'deadline_created',
-          title: `New Deadline: ${regulation.name}`,
-          message: `A new compliance deadline has been created, due ${dueDate}. Assigned to: ${assignedUser.firstName} ${assignedUser.lastName}`,
-          data: JSON.stringify({
-            deadlineId: deadline.id,
-            regulationId: regulation.id,
-            dueDate: deadline.dueDate,
-            assignedTo: deadline.assignedTo
-          }),
-          isRead: false
+          frequency: 'once',
         });
       }
     });
@@ -436,7 +429,7 @@ export async function sendDeadlineCreationNotification(deadline: Deadline) {
 export async function getNotificationTimelineSummary(daysFromNow: number[] = [90, 60, 30, 14, 7, 3, 1, 0]): Promise<void> {
   
   for (const days of daysFromNow) {
-    const wouldSend = shouldSendNotification(days, { notificationSchedule: DEFAULT_NOTIFICATION_SCHEDULES } as Regulation);
+    const wouldSend = shouldSendNotification(days, { notificationSchedule: DEFAULT_NOTIFICATION_SCHEDULES } as unknown as Regulation);
     const recipients = await getNotificationRecipients(days);
     const urgency = getUrgencyLevel(days);
     const timeDesc = formatTimeRemaining(days);

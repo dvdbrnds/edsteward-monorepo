@@ -199,7 +199,7 @@ export function getTenantMetrics(tenantId: string): TenantMetrics | null {
 export function getAllTenantMetrics(): Record<string, TenantMetrics & { avgResponseTime: number }> {
   const result: Record<string, TenantMetrics & { avgResponseTime: number }> = {};
   
-  for (const [tenantId, metrics] of tenantMetrics.entries()) {
+  for (const [tenantId, metrics] of Array.from(tenantMetrics.entries())) {
     result[tenantId] = {
       ...metrics,
       avgResponseTime: metrics.requests > 0 

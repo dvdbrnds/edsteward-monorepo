@@ -70,18 +70,20 @@ function extractUserAttributes(profile: SamlProfile, idpType: string): Record<st
     // Map educational roles to application roles
     const roles: string[] = ['viewer'];
     
-    if (affiliation) {
-      if (affiliation.includes('faculty') || affiliation.includes('staff')) {
+    const affiliationStr = (affiliation || '') as string;
+    const entitlementStr = (entitlement || '') as string;
+    if (affiliationStr) {
+      if (affiliationStr.includes('faculty') || affiliationStr.includes('staff')) {
         roles.push('compliance_officer');
       }
-      if (entitlement && entitlement.includes('admin')) {
+      if (entitlementStr && entitlementStr.includes('admin')) {
         roles.push('admin');
       }
     }
     
-    extractedData.roles = [...new Set(roles)]; // Remove duplicates
+    extractedData.roles = Array.from(new Set(roles));
     extractedData.role = getHighestPriorityRole(extractedData.roles);
-    extractedData.organization = profile[mapping.organization] || '';
+    extractedData.organization = (profile[mapping.organization] || '') as string;
   }
 
   return extractedData;
@@ -163,8 +165,11 @@ export function setupSamlAuth(app: Express) {
         }
       }
     },
-    async (req, profile: SamlProfile, done) => {
+    async (req, profile: SamlProfile | null, done) => {
       try {
+        if (!profile) {
+          return done(new Error('No SAML profile received'));
+        }
         const providerParam = req.params.provider || req.query.provider;
         const providerId = Array.isArray(providerParam) ? providerParam[0] : (providerParam || 'okta-demo');
         
@@ -179,9 +184,9 @@ export function setupSamlAuth(app: Express) {
         const userStorage = tenantId ? getTenantStorage(tenantId) : storage;
         
         // Check if user exists by external ID or email in this tenant
-        let user = await userStorage.getUserByExternalId(userData.externalId);
+        let user = await userStorage.getUserByExternalId(userData.externalId as string);
         if (!user && userData.email) {
-          user = await userStorage.getUserByEmail(userData.email);
+          user = await userStorage.getUserByEmail(userData.email as string);
         }
 
         if (user) {
@@ -194,18 +199,18 @@ export function setupSamlAuth(app: Express) {
           };
           
           // Add roles array if supported by storage layer
-          if (userData.roles && userData.roles.length > 0) {
-            updateData.roles = JSON.stringify(userData.roles);
+          const userRoles = userData.roles as string[];
+          if (userRoles && userRoles.length > 0) {
+            updateData.roles = JSON.stringify(userRoles);
           }
           
           await userStorage.updateUser(user.id, updateData);
           
-          // Enhance user object with roles for session
           const enhancedUser = {
             ...user,
             role: userData.role,
-            roles: userData.roles || [userData.role],
-            groups: userData.groups || []
+            roles: userRoles || [userData.role],
+            groups: (userData.groups as string[]) || []
           };
           
           await syslog.logAuthEvent(LogLevel.INFO, `SAML login successful via ${idpType}`, user.id, user.username, {
@@ -232,17 +237,18 @@ export function setupSamlAuth(app: Express) {
           };
           
           // Add roles array if supported by storage layer
-          if (userData.roles && userData.roles.length > 0) {
-            createUserData.roles = JSON.stringify(userData.roles);
+          const createRoles = userData.roles as string[];
+          if (createRoles && createRoles.length > 0) {
+            createUserData.roles = JSON.stringify(createRoles);
           }
           
-          const newUser = await userStorage.createUser(createUserData);
+          const newUser = await userStorage.createUser(createUserData as any);
           
           // Enhance user object with roles for session
           const enhancedUser = {
             ...newUser,
-            roles: userData.roles || [userData.role],
-            groups: userData.groups || []
+            roles: createRoles || [userData.role],
+            groups: (userData.groups as string[]) || []
           };
           
           await syslog.logAuthEvent(LogLevel.INFO, `New SAML user created via ${idpType}`, newUser.id, newUser.username, {
@@ -255,22 +261,20 @@ export function setupSamlAuth(app: Express) {
         }
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-        await syslog.logAuthEvent(LogLevel.ERROR, `SAML authentication error: ${errorMessage}`, undefined, profile.nameID);
+        await syslog.logAuthEvent(LogLevel.ERROR, `SAML authentication error: ${errorMessage}`, undefined, profile?.nameID);
         return done(error instanceof Error ? error : new Error(errorMessage));
       }
     },
-    async (req, profile: SamlProfile, done) => {
-      // Logout callback - handle SAML logout
+    async (req, profile: SamlProfile | null, done) => {
       try {
-        // Find user by nameID for logout
-        const user = await storage.getUserByExternalId(profile.nameID || '');
+        const user = await storage.getUserByExternalId(profile?.nameID || '');
         if (user) {
           await syslog.logAuthEvent(LogLevel.INFO, 'SAML logout successful', user.id, user.username);
         }
         return done(null, user);
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-        await syslog.logAuthEvent(LogLevel.ERROR, `SAML logout error: ${errorMessage}`, undefined, profile.nameID);
+        await syslog.logAuthEvent(LogLevel.ERROR, `SAML logout error: ${errorMessage}`, undefined, profile?.nameID);
         return done(error instanceof Error ? error : new Error(errorMessage));
       }
     }

@@ -245,7 +245,7 @@ function RegulationDetailPage() {
   });
 
   // Fetch pending updates for this regulation
-  const { data: pendingUpdates = [] } = useQuery({
+  const { data: pendingUpdates = [] } = useQuery<Array<{ id: number; name: string; status: string; updateDate: string; metadata?: any }>>({
     queryKey: ['/api/regulations', regulationId, 'pending-updates'],
     queryFn: async () => {
       const response = await fetch(`/api/regulations/${regulationId}/pending-updates`);
@@ -673,15 +673,13 @@ function RegulationDetailPage() {
         userId: user.id,
         username: user.username,
         fullName,
-        email: user.email,
-        completedAt: now.toISOString()
       };
       updatedAction.completedAt = now;
       updatedAction.completedDate = now;
     }
 
     updateActionMutation.mutate({
-      regulationId,
+      regulationId: Number(regulationId),
       action: updatedAction
     });
   };
@@ -1111,7 +1109,7 @@ function RegulationDetailPage() {
                 <Button
                   variant="outline"
                   className="flex items-center justify-center gap-2"
-                  onClick={() => window.open(regulation.regulationUrl, '_blank')}
+                  onClick={() => window.open(regulation.regulationUrl ?? undefined, '_blank')}
                 >
                   <Globe className="h-4 w-4" />
                   View Regulation Website
@@ -1341,14 +1339,11 @@ function RegulationDetailPage() {
                       <div className="flex-1">
                         <p className="text-xs text-green-700 font-semibold uppercase tracking-wide">Attested by (Directly Responsible Individual)</p>
                         <p className="text-xl font-bold text-slate-800">
-                          {attestedBy.fullName || attestedBy.username || attestedBy.email || 'Unknown'}
+                          {attestedBy.fullName || attestedBy.username || 'Unknown'}
                         </p>
-                        {attestedBy.email && attestedBy.fullName && (
-                          <p className="text-sm text-muted-foreground">{attestedBy.email}</p>
-                        )}
-                        {attestedBy.completedAt ? (
+                        {attestationAction?.completedAt ? (
                           <p className="text-sm text-green-700 font-medium mt-1">
-                            Signed: {format(new Date(attestedBy.completedAt), "EEEE, MMMM d, yyyy 'at' h:mm:ss a")}
+                            Signed: {format(new Date(attestationAction.completedAt), "EEEE, MMMM d, yyyy 'at' h:mm:ss a")}
                           </p>
                         ) : attestationAction?.completedAt ? (
                           <p className="text-sm text-green-700 font-medium mt-1">
@@ -1398,7 +1393,7 @@ function RegulationDetailPage() {
 
                   {/* Quick Actions Row */}
                   <div className="flex flex-wrap gap-2 mb-4">
-                    {regulation.actions?.map((action) => {
+                    {(regulation.actions as RegulationAction[] | undefined)?.map((action: RegulationAction) => {
                       const isComplete = action.status === 'completed';
                       const isRequired = action.required;
                       return (
@@ -1439,7 +1434,7 @@ function RegulationDetailPage() {
                               checked={action.required}
                               onCheckedChange={(required) => {
                                 updateActionMutation.mutate({
-                                  regulationId,
+                                  regulationId: Number(regulationId),
                                   action: { ...action, required },
                                 });
                               }}
@@ -1745,7 +1740,7 @@ function RegulationDetailPage() {
                       <h4 className="text-sm font-medium text-foreground mb-3 flex items-center gap-2">
                         <FolderOpen className="h-4 w-4" /> Evidence Files
                       </h4>
-                      <EvidenceFiles regulationId={regulationId} isAdmin={isRegulationAdmin} />
+                      <EvidenceFiles regulationId={Number(regulationId)} isAdmin={isRegulationAdmin} />
                     </div>
                     <div className="border-t pt-4">
                       <h4 className="text-sm font-medium text-foreground mb-3 flex items-center gap-2">
@@ -1940,7 +1935,7 @@ function RegulationDetailPage() {
               responsibleOfficeEmail: regulation.responsibleOfficeEmail,
               escalationTarget: regulation.escalationTarget,
               escalationEmail: regulation.escalationEmail,
-              ownerId: regulation.ownerId,
+              ownerId: regulation.ownerId ?? undefined,
               actions: regulation.actions,
             }}
             deadlines={regulationDeadlines}

@@ -56,7 +56,9 @@ export function useWebSocket(options: WebSocketHookOptions = {}) {
     heartbeatInterval = 30000,
   } = options;
 
-  const { getToken, isAuthenticated } = useAuth();
+  const { user } = useAuth();
+  const isAuthenticated = !!user;
+  const getToken = () => null;
   const [clientId, setClientId] = useState<string | null>(null);
   const [subscribedRegulations, setSubscribedRegulations] = useState<string[]>([]);
   const queryClient = useQueryClient();

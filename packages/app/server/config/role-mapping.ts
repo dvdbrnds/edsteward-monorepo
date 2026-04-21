@@ -312,7 +312,7 @@ export function mapOktaGroupsToRoles(oktaGroups: string[]): string[] {
   }
   
   // Return unique roles sorted by hierarchy (highest first)
-  const uniqueRoles = [...new Set(mappedRoles)];
+  const uniqueRoles = Array.from(new Set(mappedRoles));
   return uniqueRoles.sort((a, b) => 
     edStewardRoles[b].hierarchy - edStewardRoles[a].hierarchy
   );

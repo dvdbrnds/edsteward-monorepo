@@ -1,8 +1,19 @@
-// Previous imports remain the same...
+import { useState } from "react";
+import type { Regulation, RegulationAction } from "@shared/schema";
+
+interface ActionButtonProps {
+  action: RegulationAction;
+  regulationId: number;
+  regulation: Regulation;
+  isAdmin?: boolean;
+  onRequiredChange?: (required: boolean) => void;
+  onStatusChange?: (status: string) => void;
+}
 
 function ActionButton({ action, regulationId, regulation, isAdmin, onRequiredChange, onStatusChange }: ActionButtonProps) {
   const [showWebPublishDialog, setShowWebPublishDialog] = useState(false);
-  // ... other state declarations
+  const [showCommunicationDialog, setShowCommunicationDialog] = useState(false);
+  const [showSubmissionWizard, setShowSubmissionWizard] = useState(false);
 
   const handleActionClick = () => {
     if (action.type === 'website_publish') {
@@ -20,21 +31,13 @@ function ActionButton({ action, regulationId, regulation, isAdmin, onRequiredCha
   return (
     <>
       <div className={`flex flex-col space-y-4 p-4 border rounded-lg ${action.required ? 'border-red-200' : ''}`}>
-        {/* ... previous ActionButton content ... */}
+        <button onClick={handleActionClick}>
+          {action.type.replace('_', ' ')}
+        </button>
       </div>
-
-      {action.type === 'website_publish' && (
-        <WebPublishDialog
-          regulation={regulation}
-          open={showWebPublishDialog}
-          onOpenChange={setShowWebPublishDialog}
-          onComplete={() => onStatusChange?.('completed')}
-        />
-      )}
-
-      {/* ... other dialogs remain the same ... */}
     </>
   );
 }
 
-// Rest of the file remains the same...
+export { ActionButton };
+export type { ActionButtonProps };

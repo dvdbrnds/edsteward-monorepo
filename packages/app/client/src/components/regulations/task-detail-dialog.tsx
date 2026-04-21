@@ -128,7 +128,10 @@ interface ComplianceTask {
   sortOrder: number;
   assignedUser?: User | null;
   evidenceCount: number;
-  // Escalation path
+  attestationSignature?: string | null;
+  responsibleOffice?: string | null;
+  responsibleOfficeEmail?: string | null;
+  statutoryCitation?: string | null;
   escalationEmail: string | null;
   escalationName: string | null;
 }

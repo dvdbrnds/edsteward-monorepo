@@ -36,18 +36,18 @@ export default function RegulationWizard({ onSuccess }: RegulationWizardProps) {
       itemId: "",
       topic: "",
       statute: "",
-      statuteIds: "",
-      requirements: "",
-      requirementsUrl: "",
-      regulationUrl: "",
-      summary: "",
+      statuteIds: undefined,
+      requirements: undefined,
+      requirementsUrl: undefined,
+      regulationUrl: undefined,
+      summary: undefined,
       category: "",
-      agency_url: "",
-      agency_name: "",
-      agency_contact: "",
-      agency_department: "",
+      agency_url: undefined,
+      agency_name: undefined,
+      agency_contact: undefined,
+      agency_department: undefined,
       jurisdictionSource: "federal",
-    applicableInstitutions: ["all-institutions"],
+      applicableInstitutions: ["all-institutions"],
       isApplicable: true,
     }
   });
@@ -74,7 +74,17 @@ export default function RegulationWizard({ onSuccess }: RegulationWizardProps) {
     },
   });
 
-  const steps = [
+  const steps: Array<{
+    title: string;
+    description: string;
+    fields: Array<{
+      name: string;
+      label: string;
+      type: string;
+      options?: string[];
+      description?: string;
+    }>;
+  }> = [
     {
       title: "Basic Information",
       description: "Enter the fundamental details of the regulation",
@@ -200,11 +210,13 @@ export default function RegulationWizard({ onSuccess }: RegulationWizardProps) {
                         {field.type === 'textarea' ? (
                           <Textarea 
                             {...formField}
+                            value={(formField.value as string) ?? ""}
                             placeholder={`Enter ${field.label.toLowerCase()}`}
                           />
                         ) : field.type === 'select' ? (
                           <select
                             {...formField}
+                            value={(formField.value as string) ?? ""}
                             className="w-full p-2 border rounded-md"
                           >
                             <option value="">Select a category</option>
@@ -217,7 +229,8 @@ export default function RegulationWizard({ onSuccess }: RegulationWizardProps) {
                         ) : (
                           <Input
                             {...formField}
-                            type={field.type}
+                            value={(formField.value as string) ?? ""}
+                            type={field.type === 'url' ? 'url' : 'text'}
                             placeholder={`Enter ${field.label.toLowerCase()}`}
                           />
                         )}

@@ -216,9 +216,9 @@ export default function DeadlineCalendar() {
                             {deadline.status}
                           </Badge>
                         </div>
-                        {deadline.title && (
+                        {deadline.description && (
                           <p className="text-xs text-muted-foreground mt-1 truncate pl-4">
-                            {deadline.title}
+                            {deadline.description}
                           </p>
                         )}
                       </div>

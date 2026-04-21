@@ -127,7 +127,8 @@ export function DashboardWidgetsProvider({ children }: { children: ReactNode }) 
   useEffect(() => {
     if (isLoaded) {
       try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify([...hiddenWidgets]));
+        const arr: WidgetId[] = []; hiddenWidgets.forEach(w => arr.push(w));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
       } catch {
         // Ignore storage errors
       }
@@ -174,7 +175,12 @@ export function DashboardWidgetsProvider({ children }: { children: ReactNode }) 
     const widget = DASHBOARD_WIDGETS.find(w => w.id === widgetId);
     if (!widget?.canHide) return;
 
-    setHiddenWidgets(prev => new Set([...prev, widgetId]));
+    setHiddenWidgets(prev => {
+      const next = new Set<WidgetId>();
+      prev.forEach(w => next.add(w));
+      next.add(widgetId);
+      return next;
+    });
   }, []);
 
   const showWidget = useCallback((widgetId: WidgetId) => {

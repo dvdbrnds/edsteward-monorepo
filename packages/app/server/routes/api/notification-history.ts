@@ -92,10 +92,9 @@ router.get("/", requireAuth, async (req, res) => {
 
     // Apply sorting
     enrichedNotifications.sort((a, b) => {
-      let aValue = a[sortBy as keyof typeof a];
-      let bValue = b[sortBy as keyof typeof b];
+      let aValue: any = (a as any)[sortBy as string];
+      let bValue: any = (b as any)[sortBy as string];
       
-      // Handle date sorting
       if (sortBy === 'createdAt' || sortBy === 'sentAt') {
         aValue = new Date(aValue as string).getTime();
         bValue = new Date(bValue as string).getTime();
@@ -264,7 +263,7 @@ router.post("/send", requireAuth, async (req, res) => {
         userId: recipient.id,
         type: type,
         content: notificationContent,
-        status: sendImmediately ? 'pending' : 'draft',
+        status: 'pending' as const,
         priority: priority,
         retryCount: 0
       });

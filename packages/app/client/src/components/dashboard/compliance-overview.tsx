@@ -23,7 +23,7 @@ export default function ComplianceOverview({ onCategorySelect, selectedCategory 
 
   const data = Object.entries(categories).map(([name, value]) => ({
     name,
-    value,
+    value: value as number,
   }));
 
   return (

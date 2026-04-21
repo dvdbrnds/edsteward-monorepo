@@ -14,7 +14,7 @@ const requireAuth = (req: express.Request, res: express.Response, next: express.
 // Admin check helper
 const checkIsAdmin = (req: express.Request): boolean => {
   const userRole = req.user?.role?.toLowerCase();
-  const userRoles = req.user?.roles ? JSON.parse(req.user.roles || '[]') : [];
+  const userRoles = req.user?.roles ? JSON.parse(req.user.roles as string || '[]') : [];
   
   return userRole === 'admin' || 
          userRole === 'administrator' ||
@@ -56,7 +56,7 @@ router.get("/", requireAuth, async (req, res) => {
 
     // Check if user is admin - check multiple possible admin values
     const userRole = req.user?.role?.toLowerCase();
-    const userRoles = req.user?.roles ? JSON.parse(req.user.roles || '[]') : [];
+    const userRoles = req.user?.roles ? JSON.parse(req.user.roles as string || '[]') : [];
     
     const isAdmin = userRole === 'admin' || 
                    userRole === 'administrator' ||
@@ -87,11 +87,11 @@ router.get("/", requireAuth, async (req, res) => {
       email: user.email,
       role: user.role,
       department: user.department || null,
-      isActive: user.isActive !== false // Default to true if not specified
+      isActive: (user as any).isActive !== false
     }));
 
     syslog.log(LogFacility.LOCAL0, LogLevel.INFO, 
-      `Admin ${req.user.email} retrieved ${userList.length} users for notifications`);
+      `Admin ${req.user!.email} retrieved ${userList.length} users for notifications`);
     
     res.json(userList);
   } catch (error) {
@@ -114,13 +114,12 @@ router.get("/:id", requireAuth, async (req, res) => {
 
     const userId = parseInt(req.params.id);
     const tenantStorage = getDatabaseStorage(req.tenantId);
-    const user = await tenantStorage.getUserById(userId);
+    const user = await tenantStorage.getUser(userId);
     
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
 
-    // Don't return password hash
     const { password: _password, ...userWithoutPassword } = user;
     res.json(userWithoutPassword);
   } catch (error) {
@@ -170,13 +169,11 @@ router.post("/", requireAuth, async (req, res) => {
       lastName,
       role: role || 'user',
       department: department || null,
-      isActive: true,
-    });
+    } as any);
 
     syslog.log(LogFacility.LOCAL0, LogLevel.INFO, 
       `Admin ${req.user?.email} created new user: ${email} with role ${role || 'user'}`);
 
-    // Don't return password
     const { password: _password, ...userWithoutPassword } = newUser;
     res.status(201).json(userWithoutPassword);
   } catch (error) {
@@ -199,7 +196,7 @@ router.patch("/:id", requireAuth, async (req, res) => {
     const tenantStorage = getDatabaseStorage(req.tenantId);
     
     // Check user exists
-    const existingUser = await tenantStorage.getUserById(userId);
+    const existingUser = await tenantStorage.getUser(userId);
     if (!existingUser) {
       return res.status(404).json({ error: "User not found" });
     }
@@ -217,7 +214,6 @@ router.patch("/:id", requireAuth, async (req, res) => {
     if (email !== undefined) updates.email = email;
     if (role !== undefined) updates.role = role;
     if (department !== undefined) updates.department = department;
-    if (isActive !== undefined) updates.isActive = isActive;
     if (password) updates.password = await hashPassword(password);
 
     const updatedUser = await tenantStorage.updateUser(userId, updates);
@@ -252,7 +248,7 @@ router.delete("/:id", requireAuth, async (req, res) => {
     const tenantStorage = getDatabaseStorage(req.tenantId);
     
     // Soft delete - just deactivate
-    await tenantStorage.updateUser(userId, { isActive: false });
+    await tenantStorage.updateUser(userId, { isActive: false } as any);
 
     syslog.log(LogFacility.LOCAL0, LogLevel.INFO, 
       `Admin ${req.user?.email} deactivated user ${userId}`);

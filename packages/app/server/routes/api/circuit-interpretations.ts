@@ -95,7 +95,7 @@ router.get('/', requireAuth, async (req: Request, res: Response) => {
     }
 
     const whereClause = conditions.length > 0
-      ? conditions.reduce((acc, cond) => and(acc, cond))
+      ? conditions.reduce((acc, cond) => and(acc, cond)!)
       : undefined;
 
     const results = await db.select({
@@ -420,7 +420,7 @@ router.get('/splits/all', requireAuth, async (req: Request, res: Response) => {
     }
 
     const whereClause = conditions.length > 0
-      ? conditions.reduce((acc, cond) => and(acc, cond))
+      ? conditions.reduce((acc, cond) => and(acc, cond)!)
       : undefined;
 
     const splits = await db.select({

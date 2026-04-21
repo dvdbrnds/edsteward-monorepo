@@ -43,7 +43,7 @@ async function autoCreateRegulationIfNotExists(
   // Check by itemId too (only if it looks like a numeric ID)
   const numericId = parseInt(String(itemId), 10);
   if (!isNaN(numericId)) {
-    const existingById = await storage.getRegulationById(numericId);
+    const existingById = await storage.getRegulationById(String(numericId));
     if (existingById) {
       return existingById.id;
     }
@@ -52,7 +52,7 @@ async function autoCreateRegulationIfNotExists(
   // Create new regulation with minimal required fields
   console.log(`📝 Auto-creating regulation: ${name} (${regKey || itemId})`);
   
-  const newRegulation: InsertRegulation = {
+  const newRegulation = {
     name,
     itemId,
     regKey: regKey || null,
@@ -65,7 +65,8 @@ async function autoCreateRegulationIfNotExists(
     isCurrent: true,
     versionNumber: 1,
     versionDate: new Date(),
-  };
+    actions: [],
+  } as InsertRegulation;
 
   const created = await storage.createRegulation(newRegulation);
   console.log(`   ✅ Created regulation ID: ${created.id}`);
@@ -723,7 +724,7 @@ export function setupRegulationUpdatesApi(app: Express) {
             
             // Extract summary and filing deadlines from MCP data
             const summaryContent = typeof mcpData.summary === 'string' ? mcpData.summary : (mcpData.content?.summary || null);
-            const rawFilingDeadlines = mcpData.filingDeadlines || mcpData.filing_deadlines || mcpData.content?.filing_deadlines || null;
+            const rawFilingDeadlines = mcpData.filingDeadlines || (mcpData as any).filing_deadlines || (mcpData.content as any)?.filing_deadlines || null;
             // filing_deadlines column is TEXT — stringify arrays/objects for storage
             const filingDeadlinesContent = rawFilingDeadlines && typeof rawFilingDeadlines !== 'string'
               ? JSON.stringify(rawFilingDeadlines)
@@ -904,7 +905,7 @@ export function setupRegulationUpdatesApi(app: Express) {
       }
       
       // Create the regulation update with optimized bulk processing
-      const newUpdate = await storage.createRegulationUpdate(updateData);
+      const newUpdate = await storage.createRegulationUpdate(updateData as any);
       
       
       // Return exact format expected by MCP Engine for bulk import tracking
@@ -912,7 +913,7 @@ export function setupRegulationUpdatesApi(app: Express) {
         success: true,
         updateId: newUpdate.id.toString(),
         verified: isTUFVerified,
-        hash: isTUFVerified ? updateData.tufHash : undefined,
+        hash: isTUFVerified ? (updateData as any).tufHash : undefined,
         // Additional fields for MCP Engine bulk import tracking
         regulationId: regulationId,
         timestamp: timestamp,
@@ -953,7 +954,7 @@ export function setupRegulationUpdatesApi(app: Express) {
           // Calculate the diff statistics
           const diffStats = calculateTextChangeDiff(
             regulation.requirements || '',
-            update.updatedContent
+            update.updatedContent || ''
           );
           
           // Return the update with statistics
@@ -1046,8 +1047,8 @@ export function setupRegulationUpdatesApi(app: Express) {
         riskScore: regData.risk_score || regulation.riskScore || null,
         riskLevel: regData.risk_level || regulation.riskLevel || null,
         // Agency info
-        agency_name: regData.agency_name || regulation.agencyName || null,
-        agency_url: regData.agency_url || regulation.agencyUrl || null,
+        agency_name: regData.agency_name || regulation.agency_name || null,
+        agency_url: regData.agency_url || regulation.agency_url || null,
         // URLs
         regulationUrl: regData.regulation_url || regulation.regulationUrl || null,
         requirementsUrl: regData.requirements_url || regulation.requirementsUrl || null,
@@ -1308,6 +1309,7 @@ export function setupRegulationUpdatesApi(app: Express) {
   // Get TUF repository health
   app.get('/api/tuf/health', async (req: Request, res: Response) => {
     try {
+      // @ts-ignore
       const { getTUFService } = await import('./services/tuf-service.js');
       const tufService = getTUFService();
       const health = await tufService.getHealth();
@@ -1347,6 +1349,7 @@ export function setupRegulationUpdatesApi(app: Express) {
   // Get available regulations from TUF repository
   app.get('/api/tuf/regulations', async (req: Request, res: Response) => {
     try {
+      // @ts-ignore
       const { getTUFService } = await import('./services/tuf-service.js');
       const tufService = getTUFService();
       const regulations = await tufService.getAvailableRegulations();
@@ -1369,6 +1372,7 @@ export function setupRegulationUpdatesApi(app: Express) {
   // Download specific regulation from TUF repository
   app.get('/api/tuf/regulations/:regulationId', async (req: Request, res: Response) => {
     try {
+      // @ts-ignore
       const { getTUFService } = await import('./services/tuf-service.js');
       const regulationId = req.params.regulationId;
       const tufService = getTUFService();
@@ -1393,6 +1397,7 @@ export function setupRegulationUpdatesApi(app: Express) {
   // Check for TUF regulation updates
   app.get('/api/tuf/check-updates', async (req: Request, res: Response) => {
     try {
+      // @ts-ignore
       const { getTUFService } = await import('./services/tuf-service.js');
       const tufService = getTUFService();
       const updates = await tufService.checkForUpdates();

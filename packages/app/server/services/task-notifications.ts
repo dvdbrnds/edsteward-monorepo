@@ -12,6 +12,7 @@ import { emailService } from './email';
 import type { EmailTrackingContext } from './email';
 import { differenceInDays, format, addDays } from 'date-fns';
 import { getDatabaseStorage } from './database';
+import { sql } from 'drizzle-orm';
 import type { User } from '@shared/schema';
 
 // Notification schedules for tasks
@@ -68,7 +69,7 @@ async function getTasksNeedingNotification(tenantId?: string): Promise<TaskNotif
 
   try {
     // Raw query to get tasks with due dates in notification window
-    const result = await db.execute(`
+    const result = await db.execute(sql`
       SELECT 
         ct.id, ct.title, ct.description, ct.due_date, 
         ct.assigned_role, ct.assigned_to, ct.priority, 
@@ -78,9 +79,9 @@ async function getTasksNeedingNotification(tenantId?: string): Promise<TaskNotif
       JOIN regulations r ON ct.regulation_id = r.id
       WHERE ct.status != 'completed'
         AND ct.due_date IS NOT NULL
-        AND ct.due_date BETWEEN $1 AND $2
+        AND ct.due_date BETWEEN ${pastDate.toISOString()} AND ${futureDate.toISOString()}
       ORDER BY ct.due_date ASC
-    `, [pastDate.toISOString(), futureDate.toISOString()]);
+    `);
 
     const tasks: TaskNotificationContext[] = [];
     
@@ -92,7 +93,7 @@ async function getTasksNeedingNotification(tenantId?: string): Promise<TaskNotif
       // Get assigned user if available
       let assignedUser: User | null = null;
       if (row.assigned_to) {
-        assignedUser = await storage.getUserById(row.assigned_to);
+        assignedUser = (await storage.getUser(row.assigned_to)) ?? null;
       }
 
       tasks.push({
@@ -130,7 +131,7 @@ async function getTasksNeedingNotification(tenantId?: string): Promise<TaskNotif
  */
 function shouldSendNotification(daysUntilDue: number): boolean {
   // Check if this is a reminder day
-  if (TASK_NOTIFICATION_CONFIG.reminderDays.includes(daysUntilDue)) {
+  if ((TASK_NOTIFICATION_CONFIG.reminderDays as readonly number[]).includes(daysUntilDue)) {
     return true;
   }
   
@@ -418,7 +419,7 @@ export async function sendImmediateTaskNotification(
   }
 
   try {
-    const result = await db.execute(`
+    const result = await db.execute(sql`
       SELECT 
         ct.id, ct.title, ct.description, ct.due_date, 
         ct.assigned_role, ct.assigned_to, ct.priority, 
@@ -426,8 +427,8 @@ export async function sendImmediateTaskNotification(
         r.name as regulation_name
       FROM compliance_tasks ct
       JOIN regulations r ON ct.regulation_id = r.id
-      WHERE ct.id = $1
-    `, [taskId]);
+      WHERE ct.id = ${taskId}
+    `);
 
     if (!result.rows.length) {
       console.error(`[TaskNotifications] Task ${taskId} not found`);
@@ -440,7 +441,7 @@ export async function sendImmediateTaskNotification(
 
     let assignedUser: User | null = null;
     if (row.assigned_to) {
-      assignedUser = await storage.getUserById(row.assigned_to);
+      assignedUser = (await storage.getUser(row.assigned_to)) ?? null;
     }
 
     const context: TaskNotificationContext = {
@@ -492,13 +493,13 @@ export async function checkAndNotifyRegulationReadyForAttestation(
 
   try {
     // Get regulation details
-    const regResult = await db.execute(`
+    const regResult = await db.execute(sql`
       SELECT r.id, r.name, r.dro, r.owner_id, r.responsible_office_email,
              u.email as owner_email, u.first_name as owner_first_name, u.last_name as owner_last_name
       FROM regulations r
       LEFT JOIN users u ON r.owner_id = u.id
-      WHERE r.id = $1
-    `, [regulationId]);
+      WHERE r.id = ${regulationId}
+    `);
 
     if (!regResult.rows.length) {
       console.error(`[FinalAttestation] Regulation ${regulationId} not found`);
@@ -508,12 +509,12 @@ export async function checkAndNotifyRegulationReadyForAttestation(
     const regulation = regResult.rows[0] as any;
 
     // Get all tasks for this regulation (excluding sub-tasks that are part of parent tasks)
-    const tasksResult = await db.execute(`
+    const tasksResult = await db.execute(sql`
       SELECT id, title, status, attestation_status, assigned_to
       FROM compliance_tasks
-      WHERE regulation_id = $1
+      WHERE regulation_id = ${regulationId}
         AND status != 'not_applicable'
-    `, [regulationId]);
+    `);
 
     const tasks = tasksResult.rows as any[];
 

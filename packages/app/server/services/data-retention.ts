@@ -212,7 +212,7 @@ export class DataRetentionService {
         .from(users)
         .where(
           and(
-            sql`${users.isActive} = false`,
+            sql`is_active = false`,
             lt(users.updatedAt, cutoffDate)
           )
         );
@@ -233,7 +233,7 @@ export class DataRetentionService {
           })
           .where(
             and(
-              sql`${users.isActive} = false`,
+              sql`is_active = false`,
               lt(users.updatedAt, cutoffDate)
             )
           );
@@ -243,7 +243,7 @@ export class DataRetentionService {
           .delete(users)
           .where(
             and(
-              sql`${users.isActive} = false`,
+              sql`is_active = false`,
               lt(users.updatedAt, cutoffDate)
             )
           );

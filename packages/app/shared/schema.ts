@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, timestamp, boolean, date, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, timestamp, boolean, date, jsonb, type AnyPgColumn } from "drizzle-orm/pg-core";
 import { index } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
@@ -313,7 +313,7 @@ export const regulations = pgTable("regulations", {
   lastVerified: timestamp("last_verified"),
   nextReviewDate: timestamp("next_review_date"),
   versionNumber: integer("version_number").notNull().default(1),
-  previousVersionId: integer("previous_version_id").references(() => regulations.id),
+  previousVersionId: integer("previous_version_id").references((): AnyPgColumn => regulations.id),
   versionDate: timestamp("version_date").notNull().defaultNow(),
   changeSummary: text("change_summary"),
   isCurrent: boolean("is_current").notNull().default(true),
@@ -830,7 +830,7 @@ export type InsertRegulationUpdate = z.infer<typeof insertRegulationUpdateSchema
 // MCP Integration Tables
 export const regulationVersions = pgTable("regulation_versions", {
   id: serial("id").primaryKey(),
-  regulationId: integer("regulation_id").notNull().references(() => regulations.id),
+  regulationId: integer("regulation_id").notNull().references((): AnyPgColumn => regulations.id),
   versionNumber: integer("version_number").notNull(),
   content: text("content").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
@@ -843,7 +843,7 @@ export const regulationVersions = pgTable("regulation_versions", {
 export const validationStatus = pgTable("validation_status", {
   id: serial("id").primaryKey(),
   regulationId: integer("regulation_id").notNull().references(() => regulations.id),
-  versionId: integer("version_id").references(() => regulationVersions.id),
+  versionId: integer("version_id").references((): AnyPgColumn => regulationVersions.id),
   level: text("level").notNull(), // ValidationLevel enum value
   status: text("status").notNull(), // 'passed', 'failed', 'pending', 'in_progress'
   details: jsonb("details").$type<{
@@ -897,7 +897,7 @@ export const notificationQueue = pgTable("notification_queue", {
 export const versionConflicts = pgTable("version_conflicts", {
   id: serial("id").primaryKey(),
   regulationId: integer("regulation_id").notNull().references(() => regulations.id),
-  localVersionId: integer("local_version_id").references(() => regulationVersions.id),
+  localVersionId: integer("local_version_id").references((): AnyPgColumn => regulationVersions.id),
   remoteVersionId: text("remote_version_id").notNull(), // ID from MCP system
   conflicts: jsonb("conflicts").$type<MCPVersionConflict[]>(),
   status: text("status").notNull().default("pending"), // 'pending', 'resolved', 'rejected'

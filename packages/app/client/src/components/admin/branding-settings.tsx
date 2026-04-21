@@ -266,7 +266,7 @@ const FileUploadField: React.FC<{
       {/* Preview */}
       {previewUrl && (
         <div className="flex items-center space-x-3 p-3 bg-background rounded-lg">
-          {console.log(`🔍 PREVIEW: Rendering preview container for ${type} with URL:`, previewUrl)}
+          {void console.log(`🔍 PREVIEW: Rendering preview container for ${type} with URL:`, previewUrl)}
           <div className="flex-shrink-0">
             {type === 'favicon' ? (
               <div className="w-8 h-8 border-2 border-border rounded bg-gray-800 flex items-center justify-center">
@@ -908,7 +908,7 @@ export function BrandingSettingsV2({ onConfigUpdate }: BrandingSettingsProps) {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Upload Only - No URL Fields */}
                   <div>
-                    {console.log('🔍 FORM: Rendering logo FileUploadField with currentUrl:', form.watch('logoUrl'))}
+                    {(console.log('🔍 FORM: Rendering logo FileUploadField with currentUrl:', form.watch('logoUrl')), null)}
                     <FileUploadField
                       key={`logo-${form.watch('logoUrl') || 'empty'}`}
                       label="Logo"

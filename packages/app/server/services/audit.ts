@@ -60,7 +60,7 @@ export class AuditService {
       // Determine risk level if not provided
       const riskLevel = entry.riskLevel || this.determineRiskLevel(entry, complianceImpact);
 
-      const auditLogEntry: InsertAuditLog = {
+      const auditLogEntry = {
         entityType: entry.entityType,
         entityId: entry.entityId,
         action: entry.action,
@@ -303,7 +303,7 @@ export class AuditService {
     const changes: Record<string, { old: any; new: any }> = {};
     const allKeys = new Set([...Object.keys(previousValues), ...Object.keys(newValues)]);
 
-    for (const key of allKeys) {
+    for (const key of Array.from(allKeys)) {
       const oldValue = previousValues[key];
       const newValue = newValues[key];
 

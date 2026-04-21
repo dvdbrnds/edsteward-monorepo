@@ -188,8 +188,7 @@ export default function AuthPage() {
                           if (loginCredentials && mfaCode.length === 6) {
                             loginMutation.mutate({
                               ...loginCredentials,
-                              mfaCode
-                            });
+                            } as any);
                           }
                         }}
                         disabled={mfaCode.length !== 6 || loginMutation.isPending}

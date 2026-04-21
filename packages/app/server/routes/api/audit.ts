@@ -394,7 +394,7 @@ router.get('/compliance-report', requireAuth, requirePermission('canManageSystem
       csvRows.push('=== SUMMARY ===');
       csvRows.push(`Total Actions,${summary.totalActions || 0}`);
       csvRows.push(`High Risk Actions,${summary.highRiskActions || 0}`);
-      csvRows.push(`Unique Users,${summary.uniqueUsers || 0}`);
+      csvRows.push(`Unique Users,${(summary as any).uniqueUsers || 0}`);
       csvRows.push('');
       
       // Actions by type

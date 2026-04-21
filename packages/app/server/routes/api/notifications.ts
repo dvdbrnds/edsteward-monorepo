@@ -20,7 +20,7 @@ router.get("/", requireAuth, async (req, res) => {
     const tenantStorage = getDatabaseStorage(req.tenantId);
     
     
-    const notifications = await tenantStorage.getNotificationsByUser(req.user?.id);
+    const notifications = await tenantStorage.getNotificationsByUser(req.user!.id);
     
     syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Fetched ${notifications.length} notifications for user ${req.user?.id}`);
     res.json(notifications);

@@ -1,7 +1,23 @@
 import { db } from '../db';
-import { tenants } from '@shared/schema';
-import { eq } from 'drizzle-orm';
-import { FEATURE_FLAGS, FeatureFlag, TenantFeatureConfig } from '@shared/feature-flags';
+import { eq, sql } from 'drizzle-orm';
+import { pgTable, text, jsonb, timestamp } from 'drizzle-orm/pg-core';
+import { FEATURE_FLAGS, FeatureFlag } from '@shared/feature-flags';
+
+interface TenantFeatureConfig {
+  tenantId: string;
+  features: Record<string, boolean>;
+  updatedAt: Date;
+  updatedBy: string;
+}
+
+const tenants = pgTable("tenants", {
+  id: text("id").primaryKey(),
+  settings: jsonb("settings").$type<{
+    featureFlags?: Record<string, boolean>;
+    [key: string]: any;
+  }>(),
+  updatedAt: timestamp("updated_at"),
+});
 
 /**
  * Feature Flag Service for Multi-Tenant Application

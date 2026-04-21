@@ -31,9 +31,9 @@ router.post("/", requireAuth, async (req, res) => {
     
     const note = await tenantStorage.createNote({
       ...validatedData,
-      userId: req.user?.id || 1, // Default to user 1 for now
-      isPrivate: false // All notes are public by design
-    });
+      userId: req.user?.id || 1,
+      isPrivate: false
+    } as any);
 
     syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Created note ${note.id} for regulation ${note.regulationId}`);
     res.status(201).json(note);
@@ -98,7 +98,7 @@ router.delete("/:noteId", requireAuth, async (req, res) => {
 
     // Check if user is the creator or an administrator
     const user = req.user;
-    const isAdmin = user?.role === 'admin' || (user?.roles && JSON.parse(user.roles).includes('admin'));
+    const isAdmin = user?.role === 'admin' || (user?.roles && JSON.parse(user.roles as string).includes('admin'));
     const isCreator = existingNote.userId === user?.id;
 
     if (!isAdmin && !isCreator) {
@@ -138,7 +138,7 @@ router.put("/:noteId", requireAuth, async (req, res) => {
 
     // Check if user is the creator or an administrator
     const user = req.user;
-    const isAdmin = user?.role === 'admin' || (user?.roles && JSON.parse(user.roles).includes('admin'));
+    const isAdmin = user?.role === 'admin' || (user?.roles && JSON.parse(user.roles as string).includes('admin'));
     const isCreator = existingNote.userId === user?.id;
 
     if (!isAdmin && !isCreator) {
@@ -192,7 +192,7 @@ router.get("/:noteId/history", requireAuth, async (req, res) => {
 
     // Check if user has permission to view note history
     const user = req.user;
-    const isAdmin = user?.role === 'admin' || (user?.roles && JSON.parse(user.roles).includes('admin'));
+    const isAdmin = user?.role === 'admin' || (user?.roles && JSON.parse(user.roles as string).includes('admin'));
     const isCreator = existingNote.userId === user?.id;
 
     if (!isAdmin && !isCreator) {

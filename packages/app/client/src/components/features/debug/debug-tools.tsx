@@ -166,27 +166,27 @@ export function NoteDebugger() {
           </div>
         )}
 
-        {result && (
+        {!!result && (
           <div className="p-3 bg-background border border-border rounded-md">
             <h4 className="font-medium text-sm mb-1">Result:</h4>
             <pre className="text-xs overflow-auto max-h-40">
-              {typeof result === 'string' ? result : JSON.stringify(result, null, 2)}
+              {typeof result === 'string' ? result : JSON.stringify(result as object, null, 2)}
             </pre>
           </div>
         )}
-        {schemaInfo && (
+        {!!schemaInfo && (
           <div className="p-3 bg-background border border-border rounded-md">
             <h4 className="font-medium text-sm mb-1">Schema Info:</h4>
             <pre className="text-xs overflow-auto max-h-40">
-              {typeof schemaInfo === 'string' ? schemaInfo : JSON.stringify(schemaInfo, null, 2)}
+              {typeof schemaInfo === 'string' ? schemaInfo : JSON.stringify(schemaInfo as object, null, 2)}
             </pre>
           </div>
         )}
-        {reqResponse && (
+        {!!reqResponse && (
           <div className="p-3 bg-background border border-border rounded-md">
             <h4 className="font-medium text-sm mb-1">Request Response:</h4>
             <pre className="text-xs overflow-auto max-h-40">
-              {typeof reqResponse === 'string' ? reqResponse : JSON.stringify(reqResponse, null, 2)}
+              {typeof reqResponse === 'string' ? reqResponse : JSON.stringify(reqResponse as object, null, 2)}
             </pre>
           </div>
         )}
@@ -276,7 +276,7 @@ export function RegulationImportDebugger() {
   const [importStatus, setImportStatus] = useState<'idle' | 'running' | 'completed' | 'error'>('idle');
   const [logs, setLogs] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
-  const [openAiStatus, setOpenAiStatus] = useState<'unchecked' | 'ready' | 'error'>('unchecked');
+  const [openAiStatus, setOpenAiStatus] = useState<'unchecked' | 'checking' | 'ready' | 'error'>('unchecked');
   const [analysisResult, setAnalysisResult] = useState<any>(null);
 
   const checkOpenAiStatus = async () => {

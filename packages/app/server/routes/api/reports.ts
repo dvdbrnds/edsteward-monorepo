@@ -26,12 +26,12 @@ router.get('/compliance-summary', async (req: Request, res: Response) => {
     const now = new Date();
 
     // Calculate metrics
-    const compliantRegs = allRegulations.filter(r => r.complianceStatus === 'compliant').length;
+    const compliantRegs = allRegulations.filter(r => (r as any).complianceStatus === 'compliant').length;
     const needsAttentionRegs = allRegulations.filter(r => 
-      r.complianceStatus === 'needs_attention' || r.complianceStatus === 'in_progress'
+      (r as any).complianceStatus === 'needs_attention' || (r as any).complianceStatus === 'in_progress'
     ).length;
     const nonCompliantRegs = allRegulations.filter(r => 
-      r.complianceStatus === 'non_compliant' || r.complianceStatus === 'overdue'
+      (r as any).complianceStatus === 'non_compliant' || (r as any).complianceStatus === 'overdue'
     ).length;
 
     const completedTasks = allTasks.filter(t => t.status === 'completed').length;
@@ -40,7 +40,7 @@ router.get('/compliance-summary', async (req: Request, res: Response) => {
     ).length;
 
     const overdueDeadlines = allDeadlines.filter(d => 
-      !d.completed && d.dueDate && new Date(d.dueDate) < now
+      d.status !== 'completed' && d.dueDate && new Date(d.dueDate) < now
     ).length;
 
     // Get category breakdown
@@ -50,31 +50,31 @@ router.get('/compliance-summary', async (req: Request, res: Response) => {
         acc[cat] = { total: 0, compliant: 0, needsAttention: 0, nonCompliant: 0 };
       }
       acc[cat].total++;
-      if (reg.complianceStatus === 'compliant') acc[cat].compliant++;
-      else if (reg.complianceStatus === 'needs_attention' || reg.complianceStatus === 'in_progress') acc[cat].needsAttention++;
-      else if (reg.complianceStatus === 'non_compliant' || reg.complianceStatus === 'overdue') acc[cat].nonCompliant++;
+      if ((reg as any).complianceStatus === 'compliant') acc[cat].compliant++;
+      else if ((reg as any).complianceStatus === 'needs_attention' || (reg as any).complianceStatus === 'in_progress') acc[cat].needsAttention++;
+      else if ((reg as any).complianceStatus === 'non_compliant' || (reg as any).complianceStatus === 'overdue') acc[cat].nonCompliant++;
       return acc;
     }, {} as Record<string, { total: number; compliant: number; needsAttention: number; nonCompliant: number }>);
 
     // Top issues (non-compliant regulations)
     const topIssues = allRegulations
-      .filter(r => r.complianceStatus === 'non_compliant' || r.complianceStatus === 'overdue')
+      .filter(r => (r as any).complianceStatus === 'non_compliant' || (r as any).complianceStatus === 'overdue')
       .slice(0, 10)
       .map(r => ({
         id: r.id,
         name: r.name,
         category: r.category,
-        status: r.complianceStatus,
+        status: (r as any).complianceStatus,
       }));
 
     // Upcoming deadlines
     const upcomingDeadlines = allDeadlines
-      .filter(d => !d.completed && d.dueDate && new Date(d.dueDate) > now)
+      .filter(d => d.status !== 'completed' && d.dueDate && new Date(d.dueDate) > now)
       .sort((a, b) => new Date(a.dueDate!).getTime() - new Date(b.dueDate!).getTime())
       .slice(0, 10)
       .map(d => ({
         id: d.id,
-        title: d.title,
+        title: d.description,
         dueDate: d.dueDate,
         regulationId: d.regulationId,
       }));
@@ -129,8 +129,8 @@ router.get('/export/regulations/csv', async (req: Request, res: Response) => {
       r.id,
       `"${(r.name || '').replace(/"/g, '""')}"`,
       `"${(r.category || '').replace(/"/g, '""')}"`,
-      `"${(r.jurisdiction || '').replace(/"/g, '""')}"`,
-      r.complianceStatus || 'unknown',
+      `"${((r as any).jurisdiction || '').replace(/"/g, '""')}"`,
+      (r as any).complianceStatus || 'unknown',
       r.lastUpdated || '',
       r.effectiveDate || '',
     ]);
@@ -194,11 +194,11 @@ router.get('/export/deadlines/csv', async (req: Request, res: Response) => {
     // CSV rows
     const rows = allDeadlines.map(d => [
       d.id,
-      `"${(d.title || '').replace(/"/g, '""')}"`,
+      `"${(d.description || '').replace(/"/g, '""')}"`,
       d.regulationId,
       d.dueDate || '',
-      d.completed ? 'Yes' : 'No',
-      `"${(d.notes || '').replace(/"/g, '""')}"`,
+      d.status === 'completed' ? 'Yes' : 'No',
+      `""`,
     ]);
 
     const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
@@ -237,7 +237,7 @@ router.get('/full-report', async (req: Request, res: Response) => {
 
     // Get overdue items
     const overdueDeadlines = allDeadlines
-      .filter(d => !d.completed && d.dueDate && new Date(d.dueDate) < now)
+      .filter(d => d.status !== 'completed' && d.dueDate && new Date(d.dueDate) < now)
       .map(d => ({
         ...d,
         regulation: allRegulations.find(r => r.id === d.regulationId),

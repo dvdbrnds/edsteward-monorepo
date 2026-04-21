@@ -28,7 +28,7 @@ const generateDrupalCode = (regulation: Regulation): string => {
   <div class="regulation-metadata">
     <p class="regulation-id">Regulation ID: ${regulation.itemId}</p>
     <p class="regulation-category">${regulation.category}</p>
-    <p class="last-verified">Last Verified: ${new Date(regulation.lastVerified).toLocaleDateString()}</p>
+    <p class="last-verified">Last Verified: ${regulation.lastVerified ? new Date(regulation.lastVerified).toLocaleDateString() : 'N/A'}</p>
   </div>
 
   <div class="regulation-content">
@@ -91,7 +91,7 @@ const generateUniversalCode = (regulation: Regulation): string => {
   <div class="regulation-metadata">
     <p><strong>Regulation ID:</strong> ${regulation.itemId}</p>
     <p><strong>Category:</strong> ${regulation.category}</p>
-    <p><strong>Last Verified:</strong> ${new Date(regulation.lastVerified).toLocaleDateString()}</p>
+    <p><strong>Last Verified:</strong> ${regulation.lastVerified ? new Date(regulation.lastVerified).toLocaleDateString() : 'N/A'}</p>
   </div>
 
   <div class="regulation-content">

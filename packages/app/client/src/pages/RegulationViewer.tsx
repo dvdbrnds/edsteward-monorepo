@@ -42,18 +42,7 @@ import { RegulationDiffViewer } from "@/components/regulations/regulation-diff-v
 import type { Regulation } from "@shared/schema";
 import { format } from "date-fns";
 
-interface RegulationData extends Regulation {
-  notificationOverride?: {
-    email: string | null;
-    phone: string | null;
-  };
-  notificationSchedule?: {
-    initialReminder: number;
-    weeklyReminder: number;
-    dailyReminder: number;
-    finalDayReminders: boolean;
-  };
-}
+type RegulationData = Regulation;
 
 export function RegulationViewer() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -106,7 +95,7 @@ export function RegulationViewer() {
   });
 
   const categories = regulations 
-    ? [...new Set(regulations.map(reg => reg.category))]
+    ? regulations.map(reg => reg.category).filter((v, i, a) => a.indexOf(v) === i)
     : [];
 
   // Helper function to determine cell color based on update time
@@ -193,14 +182,14 @@ export function RegulationViewer() {
               >
                 <TableCell>{regulation.id}</TableCell>
                 <TableCell>{regulation.itemId}</TableCell>
-                <TableCell className={getCellColor(regulation.lastUpdated)}>
+                <TableCell className={getCellColor(regulation.lastUpdated as any)}>
                   {regulation.name}
                 </TableCell>
                 <TableCell>{regulation.topic}</TableCell>
                 <TableCell>{regulation.category}</TableCell>
-                <TableCell>{regulation.jurisdiction}</TableCell>
+                <TableCell>{(regulation as any).jurisdiction}</TableCell>
                 <TableCell>{regulation.versionNumber}</TableCell>
-                <TableCell>{new Date(regulation.lastUpdated).toLocaleString()}</TableCell>
+                <TableCell>{regulation.lastUpdated ? new Date(regulation.lastUpdated).toLocaleString() : 'N/A'}</TableCell>
               </TableRow>
             ))}
           </TableBody>

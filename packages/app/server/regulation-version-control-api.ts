@@ -131,10 +131,10 @@ export function setupRegulationVersionControlApi(app: Express) {
       const rollbackVersion = await storage.createRegulationVersion({
         regulationId,
         content: targetVersion.content,
+        versionNumber: targetVersion.versionNumber + 1,
         createdBy: user.id,
         source: 'rollback',
-        sourceId: `rollback-from-v${targetVersion.versionNumber}`,
-        changesSummary: `Rolled back to version ${targetVersion.versionNumber}${reason ? `: ${reason}` : ''}`
+        sourceId: `rollback-from-v${targetVersion.versionNumber}`
       });
 
       // Update the main regulation record with the rolled-back content
@@ -227,12 +227,12 @@ export function setupRegulationVersionControlApi(app: Express) {
       // Create a new version as a snapshot
       const snapshot = await storage.createRegulationVersion({
         regulationId,
-        content: regulation.summary || '', // Use appropriate content field
+        content: regulation.summary || '',
+        versionNumber: 0,
         createdBy: user.id,
         source: 'local',
-        sourceId: `snapshot-${Date.now()}`,
-        changesSummary: `Manual snapshot${reason ? `: ${reason}` : ''}`
-      });
+        sourceId: `snapshot-${Date.now()}`
+      } as any);
 
 
       res.json({

@@ -339,7 +339,7 @@ export class RegulationValidator {
     };
 
     actionTypes.forEach(type => {
-      const action = regulation.actions?.find(a => a.type === type);
+      const action = regulation.actions?.find((a: { type: string }) => a.type === type);
       if (!action) {
         errors.push({
           regulationId: regulation.itemId,

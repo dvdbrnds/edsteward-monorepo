@@ -29,7 +29,7 @@ async function createViteInstance(app: Express, server: Server): Promise<ViteDev
   const serverOptions = {
     middlewareMode: true,
     hmr: { server },
-    allowedHosts: true,
+    allowedHosts: true as const,
   };
 
   const vite = await createViteServer({

@@ -538,7 +538,7 @@ async function setupFrontend() {
 }
 
 // Start server
-httpServer.listen(PORT, '0.0.0.0', async () => {
+httpServer.listen(Number(PORT), '0.0.0.0', async () => {
   const isMultiTenant = process.env.MULTI_TENANT === 'true';
 
   const startupTasks: Array<{ name: string; task: Promise<void> }> = [

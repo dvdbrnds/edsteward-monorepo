@@ -131,18 +131,18 @@ router.get('/', requireAuth, async (req: Request, res: Response) => {
       profile: userResult.rows[0] || null,
       assignedTasks: tasksResult.rows,
       activityHistory: activityResult.rows,
-      uploadedEvidence: evidenceResult.rows.map(e => ({
+      uploadedEvidence: evidenceResult.rows.map((e: any) => ({
         ...e,
         // Don't include actual file content, just metadata
         downloadNote: 'File contents available separately upon request'
       })),
       notes: notesResult.rows,
-      attestations: attestationsResult.rows.map(a => ({
+      attestations: attestationsResult.rows.map((a: any) => ({
         ...a,
         token: '[REDACTED]' // Don't expose tokens
       })),
       auditTrail: auditResult.rows,
-      authenticationLogs: authLogsResult.rows.map(log => ({
+      authenticationLogs: authLogsResult.rows.map((log: any) => ({
         id: log.id,
         timestamp: log.timestamp,
         event: log.message,

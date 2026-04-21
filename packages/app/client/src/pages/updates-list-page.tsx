@@ -53,11 +53,11 @@ const UpdatesListPage: React.FC = () => {
       
       return Array.isArray(jsonData) ? jsonData : [];
     },
-    refetchInterval: 30000, // Refetch every 30 seconds (reduced from 3 seconds)
-    refetchOnWindowFocus: true, // Refetch when window gains focus
-    refetchOnMount: true, // Always refetch on mount
-    staleTime: 10000, // Consider data stale after 10 seconds
-    cacheTime: 60000, // Cache data for 1 minute
+    refetchInterval: 30000,
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
+    staleTime: 10000,
+    gcTime: 60000,
   });
 
   
@@ -113,7 +113,7 @@ const UpdatesListPage: React.FC = () => {
           
           results.push({ id, success: true });
         } catch (error) {
-          results.push({ id, success: false, error: error.message });
+          results.push({ id, success: false, error: (error as Error).message });
         }
       }
       return results;
@@ -204,7 +204,7 @@ const UpdatesListPage: React.FC = () => {
         <div className="container mx-auto px-4 py-8">
           <div className="text-center">
             <h1 className="text-2xl font-bold text-red-600 mb-4">Error Loading Updates</h1>
-            <p className="text-muted-foreground">{error.message}</p>
+            <p className="text-muted-foreground">{(error as Error).message}</p>
           </div>
         </div>
       </div>
@@ -269,13 +269,8 @@ const UpdatesListPage: React.FC = () => {
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-2">
                   <Checkbox
-                    checked={isAllSelected}
+                    checked={isSomeSelected ? "indeterminate" : isAllSelected}
                     onCheckedChange={handleSelectAll}
-                    ref={(el) => {
-                      if (el) {
-                        el.indeterminate = isSomeSelected;
-                      }
-                    }}
                   />
                   <span className="text-sm font-medium">
                     {selectedIds.length === 0 

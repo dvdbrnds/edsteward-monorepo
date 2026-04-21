@@ -212,7 +212,7 @@ export async function handleEmailBounce(ctx: BounceContext): Promise<void> {
       auth: { user: config.smtpUser, pass: config.smtpPass },
     });
 
-    for (const [email] of alertRecipients) {
+    for (const [email] of Array.from(alertRecipients)) {
       try {
         await transporter.sendMail({
           from: config.fromEmail,

@@ -138,7 +138,10 @@ interface ComplianceTask {
   evidenceCount: number;
   evidenceItems?: EvidenceItem[];
   subTasks: ComplianceTask[];
-  // Escalation path
+  attestationSignature?: string | null;
+  responsibleOffice?: string | null;
+  responsibleOfficeEmail?: string | null;
+  statutoryCitation?: string | null;
   escalationEmail: string | null;
   escalationName: string | null;
 }
@@ -935,7 +938,7 @@ export function ComplianceTasksPanel({ regulationId, regulationName: _regulation
       onSuccess: () => {
         const assignedCount = cascadable.length;
         if (skipped.length > 0) {
-          const skippedRoles = [...new Set(skipped.map(s => s.assignedRole).filter(Boolean))];
+          const skippedRoles = Array.from(new Set(skipped.map(s => s.assignedRole).filter(Boolean)));
           toast({
             title: `Assigned ${assignedCount} task${assignedCount > 1 ? 's' : ''}`,
             description: `${skipped.length} subtask${skipped.length > 1 ? 's' : ''} skipped (assigned to ${skippedRoles.join(', ')})`,
@@ -1362,10 +1365,10 @@ export function ComplianceTasksPanel({ regulationId, regulationName: _regulation
           {/* Bulk Operations Bar */}
           <BulkTaskOperations
             regulationId={regulationId}
-            tasks={data?.tasks?.flatMap(t => [t, ...t.subTasks]) || []}
+            tasks={(data?.tasks?.flatMap(t => [t, ...t.subTasks]) || []) as any}
             selectedTaskIds={selectedTaskIds}
             onSelectionChange={setSelectedTaskIds}
-            isAdmin={isAdmin}
+            isAdmin={isAdmin ?? false}
           />
           
           {/* Task List */}
@@ -1421,7 +1424,7 @@ export function ComplianceTasksPanel({ regulationId, regulationName: _regulation
                       const toRemove = new Set(allIds);
                       return prev.filter(id => !toRemove.has(id));
                     } else {
-                      return [...new Set([...prev, ...allIds])];
+                      return Array.from(new Set([...prev, ...allIds]));
                     }
                   });
                 }}

@@ -70,7 +70,7 @@ router.post('/setup/generate', requireAuth, async (req: Request, res: Response) 
     const setupData = await MFAService.generateSetup(user.id, user.email, (req as any).tenantId);
     
     // Store setup data in session temporarily (don't save to DB yet)
-    req.session.mfaSetup = {
+    (req.session as any).mfaSetup = {
       secret: setupData.secret,
       backupCodes: setupData.backupCodes,
       userId: user.id,
@@ -104,7 +104,7 @@ router.post('/setup/verify', requireAuth, async (req: Request, res: Response) =>
     const user = req.user!;
     
     // Get setup data from session
-    const mfaSetup = req.session.mfaSetup;
+    const mfaSetup = (req.session as any).mfaSetup;
     if (!mfaSetup || mfaSetup.userId !== user.id) {
       return res.status(400).json({
         success: false,
@@ -115,14 +115,13 @@ router.post('/setup/verify', requireAuth, async (req: Request, res: Response) =>
     // Check if setup is not too old (15 minutes max)
     const setupAge = Date.now() - new Date(mfaSetup.generatedAt).getTime();
     if (setupAge > 15 * 60 * 1000) {
-      delete req.session.mfaSetup;
+      delete (req.session as any).mfaSetup;
       return res.status(400).json({
         success: false,
         error: 'MFA setup expired. Please generate a new setup.',
       });
     }
 
-    // Enable MFA
     const success = await MFAService.enableMFA(
       user.id,
       mfaSetup.secret,
@@ -132,8 +131,7 @@ router.post('/setup/verify', requireAuth, async (req: Request, res: Response) =>
     );
 
     if (success) {
-      // Clear setup data from session
-      delete req.session.mfaSetup;
+      delete (req.session as any).mfaSetup;
       
       res.json({
         success: true,
@@ -281,19 +279,12 @@ router.post('/disable', requireAuth, async (req: Request, res: Response) => {
       });
     }
 
-    const success = await MFAService.disableMFA(user.id, (req as any).tenantId);
+    await MFAService.disableMFA(user.id, (req as any).tenantId);
     
-    if (success) {
-      res.json({
-        success: true,
-        message: 'MFA disabled successfully',
-      });
-    } else {
-      res.status(500).json({
-        success: false,
-        error: 'Failed to disable MFA',
-      });
-    }
+    res.json({
+      success: true,
+      message: 'MFA disabled successfully',
+    });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return res.status(400).json({
@@ -316,7 +307,7 @@ router.post('/disable', requireAuth, async (req: Request, res: Response) => {
  */
 router.delete('/setup/cancel', requireAuth, (req: Request, res: Response) => {
   try {
-    delete req.session.mfaSetup;
+    delete (req.session as any).mfaSetup;
     
     res.json({
       success: true,

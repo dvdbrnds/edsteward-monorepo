@@ -6,11 +6,18 @@
 import { Express, Request, Response, NextFunction } from 'express';
 import passport from 'passport';
 import { Strategy as LocalStrategy } from 'passport-local';
-import { Strategy as SamlStrategy } from '@node-saml/passport-saml';
+import { Strategy as SamlStrategy, type VerifiedCallback } from '@node-saml/passport-saml';
+import { ValidateInResponseTo } from '@node-saml/node-saml';
 import { verifyPassword } from '../auth';  // Import our new scrypt-based function
 import { institutionConfig } from '../config/institution';
 import { getDatabaseStorage } from '../services/database';
 import { mapOktaGroupsToRoles, getHighestPriorityRole } from '../config/role-mapping';
+
+declare module 'express-session' {
+  interface SessionData {
+    pendingMFAUser?: Express.User;
+  }
+}
 
 /**
  * Configure authentication strategies
@@ -26,7 +33,7 @@ export function configureAuth(app: Express): void {
         passReqToCallback: true, // CRITICAL: Need request for tenant context
       },
        
-      async (req: Request, username: string, password: string, done: (_error: unknown, _user?: unknown, _info?: unknown) => void) => {
+      async (req: Request, username: string, password: string, done: (error: any, user?: Express.User | false, info?: { message: string }) => void) => {
         try {
           // MULTI-TENANT FIX: Get tenant from request (set by tenant middleware)
           const tenantId = (req as any).tenantId || 'default';
@@ -85,22 +92,21 @@ export function configureAuth(app: Express): void {
         issuer: institutionConfig.authentication.samlEntityId!,
         callbackUrl: `${process.env.BASE_URL || 'http://localhost:3000'}/auth/saml/callback`,
         // Use fake certificate when flag is set, otherwise use real certificate
-        idpCert: useFakeCert ? fakeCert : institutionConfig.authentication.samlCertificate?.trim(),
-        signatureAlgorithm: 'sha256',
-        // Signature validation can be disabled for debugging
+        idpCert: useFakeCert ? fakeCert : (institutionConfig.authentication.samlCertificate?.trim() || ''),
+        signatureAlgorithm: 'sha256' as const,
         wantAssertionsSigned: !disableSignatureValidation,
         wantAuthnResponseSigned: !disableSignatureValidation,
-        validateInResponseTo: 'never', // Disable InResponseTo validation
+        validateInResponseTo: ValidateInResponseTo.never,
         disableRequestedAuthnContext: true,
         // Request groups attribute in SAML assertion
         identifierFormat: 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress',
       },
        
-      async (profile: unknown, done: (_error: unknown, _user?: unknown, _info?: unknown) => void) => {
+      async (profile: any, done: VerifiedCallback) => {
         try {
           const storage = getDatabaseStorage();
           const samlProfile = profile as Record<string, unknown>;
-          const email = samlProfile.email || samlProfile.nameID;
+          const email = (samlProfile.email || samlProfile.nameID) as string | undefined;
 
           // Extract groups from SAML profile
           let groups: string[] = [];
@@ -119,7 +125,7 @@ export function configureAuth(app: Express): void {
           }
 
           // Find or create user
-          let user = await storage.getUserByEmail(email, undefined);
+          let user = await storage.getUserByEmail(email as string, undefined);
 
 
           if (!user && institutionConfig.authentication.allowSelfRegistration) {
@@ -128,7 +134,7 @@ export function configureAuth(app: Express): void {
               username: email as string,
               firstName: (samlProfile.firstName || samlProfile.displayName || '') as string,
               lastName: (samlProfile.lastName || '') as string,
-              role: primaryRole, // ✅ Now uses Okta group mapping!
+              role: primaryRole as "user" | "viewer" | "department_head" | "admin" | "compliance_officer",
               roles: JSON.stringify(mappedRoles), // Store all roles
               externalId: samlProfile.nameID as string,
               identityProvider: 'saml',
@@ -136,9 +142,8 @@ export function configureAuth(app: Express): void {
           } else if (user) {
             // Update existing user's data from Okta on each login (Okta is source of truth)
             await storage.updateUser(user.id, {
-              role: primaryRole,
+              role: primaryRole as "user" | "viewer" | "department_head" | "admin" | "compliance_officer",
               roles: JSON.stringify(mappedRoles),
-              // Always sync name from Okta - Okta is the source of truth
               firstName: (samlProfile.firstName || samlProfile.displayName || user.firstName || '') as string,
               lastName: (samlProfile.lastName || user.lastName || '') as string,
               identityProvider: 'saml',
@@ -146,7 +151,7 @@ export function configureAuth(app: Express): void {
             }, undefined);
             
             // Refresh user object with updated data
-            user = await storage.getUserByEmail(email, undefined);
+            user = await storage.getUserByEmail(email as string, undefined);
           }
 
           if (!user) {
@@ -156,8 +161,11 @@ export function configureAuth(app: Express): void {
           return done(null, user);
         } catch (error) {
           console.error('🔐 SAML authentication error:', error);
-          return done(error, false);
+          return done(error instanceof Error ? error : new Error(String(error)));
         }
+      },
+      async (profile: any, done: VerifiedCallback) => {
+        done(null);
       }
     ));
   }

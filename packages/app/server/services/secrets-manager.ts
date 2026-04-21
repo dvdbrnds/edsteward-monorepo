@@ -80,6 +80,7 @@ async function isAwsAvailable(): Promise<boolean> {
 async function getFromAwsSecretsManager(secretId: string): Promise<string | null> {
   try {
     // Dynamic import to avoid bundling AWS SDK in development
+    // @ts-ignore - AWS SDK only available in production
     const { SecretsManagerClient, GetSecretValueCommand } = await import('@aws-sdk/client-secrets-manager');
     
     const client = new SecretsManagerClient({

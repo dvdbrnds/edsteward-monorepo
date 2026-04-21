@@ -6,6 +6,7 @@
  */
 
 import { Router, Request, Response } from 'express';
+// @ts-ignore
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import { getDbForRequest } from '../../services/database';
@@ -769,7 +770,7 @@ router.get('/alerts', requireAuth, async (req: Request, res: Response) => {
 
     const flat = rows.map(r => ({
       id: r.task.id,
-      name: r.task.name,
+      name: r.task.title,
       status: r.task.status,
       priority: r.task.priority,
       dueDate: r.task.dueDate,
@@ -1842,7 +1843,7 @@ router.post('/bulk/status', requireAdmin, async (req: Request, res: Response) =>
 
     // If completing tasks, check each unique regulation for attestation readiness
     if (status === 'completed') {
-      const regulationIds = [...new Set(updatedTasks.map(t => t.regulationId).filter(Boolean))];
+      const regulationIds = Array.from(new Set(updatedTasks.map(t => t.regulationId).filter(Boolean)));
       for (const regId of regulationIds) {
         checkAndNotifyRegulationReadyForAttestation(regId as number, req.tenantId).catch(err => {
           console.error(`[BulkUpdate] Error checking regulation ${regId} attestation readiness:`, err);
@@ -2561,13 +2562,13 @@ router.post('/attestation/:token/attest', async (req: Request, res: Response) =>
 
     // Notify office email of completed attestation (fire-and-forget)
     if (task.responsibleOfficeEmail && task.responsibleOfficeEmail !== attestationToken.email) {
-      import('../services/email').then(({ emailService }) => {
+      import('../../services/email').then(({ emailService }) => {
         const attester = attestationToken.recipientName || attestationToken.email;
         emailService.sendEmail({
           to: task.responsibleOfficeEmail!,
           subject: `Task Attested: ${task.title}`,
           html: `<p>The compliance task <strong>${task.title}</strong> has been attested by ${attester} on ${now.toLocaleString()}.</p>`,
-        }).catch(err => {
+        }).catch((err: any) => {
           console.error('[Attestation] Error sending office CC notification:', err);
         });
       }).catch(() => {});

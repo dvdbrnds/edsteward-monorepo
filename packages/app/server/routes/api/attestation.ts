@@ -203,7 +203,7 @@ router.get('/verify/:token', async (req: Request, res: Response) => {
       .limit(1);
 
     // Get user details
-    const [user] = await db.select({
+    const [user] = tokenRecord.userId ? await db.select({
       id: users.id,
       email: users.email,
       firstName: users.firstName,
@@ -211,7 +211,7 @@ router.get('/verify/:token', async (req: Request, res: Response) => {
     })
       .from(users)
       .where(eq(users.id, tokenRecord.userId))
-      .limit(1);
+      .limit(1) : [null];
 
     res.json({
       valid: true,
@@ -280,10 +280,10 @@ router.post('/confirm/:token', async (req: Request, res: Response) => {
     }
 
     // Get user info for the action record
-    const [user] = await db.select()
+    const [user] = tokenRecord.userId ? await db.select()
       .from(users)
       .where(eq(users.id, tokenRecord.userId))
-      .limit(1);
+      .limit(1) : [undefined];
 
     // Get the regulation to update its actions
     const [regulation] = await db.select()
@@ -364,8 +364,7 @@ router.get('/pending', requireAuth, requireAdmin, async (req: Request, res: Resp
       attestationType: attestationTokens.attestationType,
       attestationPeriod: attestationTokens.attestationPeriod,
       expiresAt: attestationTokens.expiresAt,
-      emailSentAt: attestationTokens.emailSentAt,
-      emailSentTo: attestationTokens.emailSentTo,
+      email: attestationTokens.email,
       createdAt: attestationTokens.createdAt,
     })
       .from(attestationTokens)
@@ -399,8 +398,7 @@ router.get('/history/:regulationId', requireAuth, async (req: Request, res: Resp
       attestationPeriod: attestationTokens.attestationPeriod,
       attestationStatement: attestationTokens.attestationStatement,
       createdAt: attestationTokens.createdAt,
-      emailSentAt: attestationTokens.emailSentAt,
-      emailSentTo: attestationTokens.emailSentTo,
+      email: attestationTokens.email,
       completedAt: attestationTokens.completedAt,
       expiresAt: attestationTokens.expiresAt,
     })

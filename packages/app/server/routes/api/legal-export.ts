@@ -103,7 +103,7 @@ router.get('/regulation/:regulationId', requireAuth, requirePermission('canManag
     `, [regulationId]);
 
     // 3. Get all task activity for tasks in this regulation
-    const taskIds = tasksResult.rows.map(t => t.id);
+    const taskIds = tasksResult.rows.map((t: any) => t.id);
     let taskActivityResult = { rows: [] as any[] };
     if (taskIds.length > 0) {
       taskActivityResult = await pool.query(`
@@ -335,7 +335,7 @@ router.get('/regulation/:regulationId/download', requireAuth, requirePermission(
       WHERE ct.regulation_id = $1
     `, [regulationId]);
 
-    const taskIds = tasksResult.rows.map(t => t.id);
+    const taskIds = tasksResult.rows.map((t: any) => t.id);
 
     // Get task activity
     let taskActivityResult = { rows: [] as any[] };

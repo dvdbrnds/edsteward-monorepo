@@ -80,7 +80,7 @@ function createTenantAwareLimiter(options: TenantRateLimitOptions) {
     },
     handler: (req: Request, res: Response) => {
       const tenantId = req.tenantId || 'unknown';
-      const resetTime = req.rateLimit?.resetTime?.getTime() || Date.now() + windowMs;
+      const resetTime = (req as unknown as { rateLimit?: { resetTime?: Date } }).rateLimit?.resetTime?.getTime() || Date.now() + windowMs;
       const retryAfter = Math.ceil((resetTime - Date.now()) / 1000);
       
       // Log rate limit hit for monitoring

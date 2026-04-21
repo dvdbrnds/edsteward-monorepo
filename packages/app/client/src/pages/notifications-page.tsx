@@ -24,6 +24,7 @@ interface AlertTask {
   priority: string;
   dueDate: string;
   assignedRole: string | null;
+  responsibleOffice?: string | null;
   regulationId: number;
   regulationName: string | null;
   regulationTopic: string | null;

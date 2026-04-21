@@ -28,13 +28,7 @@ function parseUserRoles(user: any): string[] {
 declare global {
   namespace Express {
     interface User {
-      id: number;
-      username: string;
-      email: string;
-      role: string;
-      roles?: string[];
       groups?: string[];
-      department?: string;
       [key: string]: unknown;
     }
   }
@@ -191,8 +185,8 @@ export function attachUserPermissions(req: Request, res: Response, next: NextFun
     const userRoles = parseUserRoles(user);
     
     // Attach permissions to request for easy access in route handlers
-    (req as Record<string, unknown>).userPermissions = getCombinedPermissions(userRoles);
-    (req as Record<string, unknown>).userRoles = userRoles;
+    (req as unknown as Record<string, unknown>).userPermissions = getCombinedPermissions(userRoles);
+    (req as unknown as Record<string, unknown>).userRoles = userRoles;
   }
   
   next();
@@ -238,7 +232,7 @@ export function requireRoleHierarchy(req: Request, res: Response, next: NextFunc
   }
 
   const currentUser = req.user;
-  const currentUserRoles = currentUser.roles || [currentUser.role];
+  const currentUserRoles = parseUserRoles(currentUser);
   
   // Get the highest hierarchy level for current user (for future use)
   // const currentUserHierarchy = Math.max(

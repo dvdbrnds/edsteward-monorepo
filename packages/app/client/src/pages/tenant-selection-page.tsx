@@ -29,11 +29,9 @@ export default function TenantSelectionPage() {
       // Set tenant context in API client
       // Note: The apiClient already has tenant management built-in
       // We need to update the tenantId in the API client
-      if (typeof apiClient.setTenantId === 'function') {
-        apiClient.setTenantId(tenant.id);
+      if ('setTenantId' in apiClient && typeof (apiClient as any).setTenantId === 'function') {
+        (apiClient as any).setTenantId(tenant.id);
       } else {
-        // Fallback: Set tenant header directly if method doesn't exist
-        // This updates the X-Tenant header for all future API calls
         console.log('⚠️ setTenantId method not found, using fallback');
       }
 
@@ -73,7 +71,7 @@ export default function TenantSelectionPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <TenantSelector onTenantSelect={handleTenantSelect} />
+      <TenantSelector onTenantSelect={() => handleTenantSelect({ id: 'default', name: 'Default', domain: '', description: '', userCount: 0, status: 'active', samlEnabled: false })} />
     </div>
   );
 } 

@@ -33,10 +33,10 @@ We are pleased to announce that our institution maintains active compliance with
 This regulation, overseen by the ${regulation.agency_name} ${regulation.agency_department ? `through their ${regulation.agency_department}` : ''}, establishes essential standards for higher education institutions. Our commitment to maintaining these standards reflects our dedication to excellence and regulatory adherence.
 
 Key Compliance Areas:
-${regulation.requirements ? `${regulation.requirements.split('\n').filter(line => line.trim()).map(line => `• ${line.trim()}`).join('\n')}` : 'All applicable requirements have been met and verified.'}
+${regulation.requirements ? `${regulation.requirements.split('\n').filter((line: string) => line.trim()).map((line: string) => `• ${line.trim()}`).join('\n')}` : 'All applicable requirements have been met and verified.'}
 
 Verification Status:
-Our compliance with this regulation was last verified on ${new Date(regulation.lastVerified).toLocaleDateString()} and is regularly monitored to ensure continued adherence to all requirements.
+Our compliance with this regulation was last verified on ${regulation.lastVerified ? new Date(regulation.lastVerified).toLocaleDateString() : 'N/A'} and is regularly monitored to ensure continued adherence to all requirements.
 
 For inquiries regarding our compliance status or for more detailed information, please contact our compliance office.
 

@@ -15,9 +15,8 @@ export function RegulationDiffViewer({ currentRegulation }: RegulationDiffProps)
   );
   const { toast } = useToast();
 
-  // Fetch previous version if one is selected
   const { data: previousVersion } = useQuery<Regulation>({
-    queryKey: compareVersionId ? [`/api/regulations/${compareVersionId}`] : null,
+    queryKey: [`/api/regulations/${compareVersionId}`],
     enabled: !!compareVersionId,
   });
 
@@ -86,11 +85,11 @@ Submission Guidelines: ${regulation.submissionGuidelines || ''}
         </div>
       </div>
 
-      {currentRegulation.versionMetadata?.changes && (
+      {(currentRegulation.versionMetadata as any)?.changes && (
         <div className="mt-4">
           <h4 className="font-medium mb-2">Change Summary</h4>
           <ul className="list-disc list-inside">
-            {currentRegulation.versionMetadata.changes.map((change, idx) => (
+            {(currentRegulation.versionMetadata as any).changes.map((change: { field: string; type: string; oldValue: string; newValue: string }, idx: number) => (
               <li key={idx} className="text-sm">
                 <span className="font-medium">{change.field}:</span>{' '}
                 <span className={`

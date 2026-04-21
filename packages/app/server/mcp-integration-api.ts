@@ -123,7 +123,7 @@ export function setupMCPIntegrationApi(app: express.Application) {
       res.json(syncStatuses);
     } catch (error) {
       console.error('Error fetching sync statuses:', error);
-      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Error fetching MCP sync statuses", { error: String(error) });
+      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Error fetching MCP sync statuses", { error: String(error) } as any);
       res.status(500).json({ error: 'Failed to fetch sync statuses' });
     }
   });
@@ -159,7 +159,7 @@ export function setupMCPIntegrationApi(app: express.Application) {
       });
     } catch (error) {
       console.error(`Error fetching sync status for regulation ${req.params.regulationId}:`, error);
-      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, `Error fetching MCP sync status for regulation ${req.params.regulationId}`, { error: String(error) });
+      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, `Error fetching MCP sync status for regulation ${req.params.regulationId}`, { error: String(error) } as any);
       res.status(500).json({ error: 'Failed to fetch sync status' });
     }
   });
@@ -183,7 +183,7 @@ export function setupMCPIntegrationApi(app: express.Application) {
       res.json(latestVersion);
     } catch (error) {
       console.error(`Error fetching latest version for regulation ${req.params.regulationId}:`, error);
-      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, `Error fetching latest MCP version for regulation ${req.params.regulationId}`, { error: String(error) });
+      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, `Error fetching latest MCP version for regulation ${req.params.regulationId}`, { error: String(error) } as any);
       res.status(500).json({ error: 'Failed to fetch latest version' });
     }
   });
@@ -203,7 +203,7 @@ export function setupMCPIntegrationApi(app: express.Application) {
       res.json(versions);
     } catch (error) {
       console.error(`Error fetching versions for regulation ${req.params.regulationId}:`, error);
-      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, `Error fetching MCP versions for regulation ${req.params.regulationId}`, { error: String(error) });
+      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, `Error fetching MCP versions for regulation ${req.params.regulationId}`, { error: String(error) } as any);
       res.status(500).json({ error: 'Failed to fetch versions' });
     }
   });
@@ -249,8 +249,8 @@ export function setupMCPIntegrationApi(app: express.Application) {
         source: data.source,
         sourceId: data.sourceId,
         validationStatus: data.validationStatus,
-        createdBy: 1 // System user ID - should be configured appropriately
-      });
+        createdBy: 1,
+      } as any);
       
       // Update the sync control to record this sync
       await storage.recordSyncAttempt(regulationId, true);
@@ -271,12 +271,12 @@ export function setupMCPIntegrationApi(app: express.Application) {
       syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `New version created for regulation ${regulationId} from MCP`, { 
         versionId: newVersion.id,
         versionNumber 
-      });
+      } as any);
       
       res.status(201).json(newVersion);
     } catch (error) {
       console.error(`Error creating version for regulation ${req.params.regulationId}:`, error);
-      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, `Error creating MCP version for regulation ${req.params.regulationId}`, { error: String(error) });
+      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, `Error creating MCP version for regulation ${req.params.regulationId}`, { error: String(error) } as any);
       res.status(500).json({ error: 'Failed to create version' });
     }
   });
@@ -335,12 +335,12 @@ export function setupMCPIntegrationApi(app: express.Application) {
       syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, `Version conflict detected for regulation ${regulationId}`, { 
         conflictId: conflict.id,
         conflictCount: data.conflicts.length 
-      });
+      } as any);
       
       res.status(201).json(conflict);
     } catch (error) {
       console.error(`Error registering conflict for regulation ${req.params.regulationId}:`, error);
-      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, `Error registering MCP conflict for regulation ${req.params.regulationId}`, { error: String(error) });
+      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, `Error registering MCP conflict for regulation ${req.params.regulationId}`, { error: String(error) } as any);
       res.status(500).json({ error: 'Failed to register conflict' });
     }
   });
@@ -363,7 +363,7 @@ export function setupMCPIntegrationApi(app: express.Application) {
       res.json(enrichedConflicts);
     } catch (error) {
       console.error('Error fetching pending conflicts:', error);
-      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, 'Error fetching pending MCP conflicts', { error: String(error) });
+      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, 'Error fetching pending MCP conflicts', { error: String(error) } as any);
       res.status(500).json({ error: 'Failed to fetch pending conflicts' });
     }
   });
@@ -383,7 +383,7 @@ export function setupMCPIntegrationApi(app: express.Application) {
       res.json(conflicts);
     } catch (error) {
       console.error(`Error fetching conflicts for regulation ${req.params.regulationId}:`, error);
-      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, `Error fetching MCP conflicts for regulation ${req.params.regulationId}`, { error: String(error) });
+      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, `Error fetching MCP conflicts for regulation ${req.params.regulationId}`, { error: String(error) } as any);
       res.status(500).json({ error: 'Failed to fetch conflicts' });
     }
   });
@@ -456,12 +456,12 @@ export function setupMCPIntegrationApi(app: express.Application) {
       
       syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Sync scheduled for regulation ${regulationId}`, { 
         nextSync: nextSync.toISOString() 
-      });
+      } as any);
       
       res.json(updatedControl);
     } catch (error) {
       console.error(`Error scheduling sync for regulation ${req.params.regulationId}:`, error);
-      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, `Error scheduling MCP sync for regulation ${req.params.regulationId}`, { error: String(error) });
+      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, `Error scheduling MCP sync for regulation ${req.params.regulationId}`, { error: String(error) } as any);
       res.status(500).json({ error: 'Failed to schedule sync' });
     }
   });
@@ -488,12 +488,12 @@ export function setupMCPIntegrationApi(app: express.Application) {
       syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Validation completed for version ${versionId}`, { 
         passedCount: validationResults.filter(r => r.status === 'passed').length,
         failedCount: validationResults.filter(r => r.status === 'failed').length
-      });
+      } as any);
       
       res.json(validationResults);
     } catch (error) {
       console.error(`Error validating version ${req.params.versionId}:`, error);
-      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, `Error validating MCP version ${req.params.versionId}`, { error: String(error) });
+      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, `Error validating MCP version ${req.params.versionId}`, { error: String(error) } as any);
       res.status(500).json({ error: 'Failed to validate version' });
     }
   });
@@ -519,7 +519,7 @@ export function setupMCPIntegrationApi(app: express.Application) {
       res.json(validationResults);
     } catch (error) {
       console.error(`Error fetching validation status for version ${req.params.versionId}:`, error);
-      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, `Error fetching MCP validation status for version ${req.params.versionId}`, { error: String(error) });
+      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, `Error fetching MCP validation status for version ${req.params.versionId}`, { error: String(error) } as any);
       res.status(500).json({ error: 'Failed to fetch validation status' });
     }
   });
@@ -856,8 +856,8 @@ export function setupMCPIntegrationApi(app: express.Application) {
       
       // Build actions from engine-provided regulationActions, or fall back to defaults
       const hasDeadlines = data.filingDeadlines && data.filingDeadlines.length > 0;
-      const firstDeadline = hasDeadlines ? data.filingDeadlines[0] : null;
-      const engineActions = data.regulationActions;
+      const firstDeadline = hasDeadlines ? data.filingDeadlines![0] : null;
+      const engineActions = (data as any).regulationActions;
       const defaultActions = [
         {
           type: 'attestation' as const,
@@ -922,12 +922,10 @@ export function setupMCPIntegrationApi(app: express.Application) {
         effectiveDate: data.effectiveDate ? new Date(data.effectiveDate) : null,
         originationDate: data.originationDate ? new Date(data.originationDate) : null,
         nextReviewDate: data.nextReviewDate ? new Date(data.nextReviewDate) : null,
-        // Agency info (camelCase with snake_case fallback)
         agency_name: resolvedAgencyName,
         agency_url: resolvedAgencyUrl,
         agency_contact: resolvedAgencyContact,
         agency_department: resolvedAgencyDepartment,
-        // URLs
         regulationUrl: data.regulationUrl || null,
         requirementsUrl: data.requirementsUrl || null,
         submissionGuideUrl: data.submissionGuideUrl || null,
@@ -935,7 +933,6 @@ export function setupMCPIntegrationApi(app: express.Application) {
         submissionGuidelines: data.submissionGuidelines || null,
         reportingFrequency: data.reportingFrequency || null,
         filingDeadlines: data.filingDeadlines || null,
-        // New content fields (Feb 2026)
         publicLaw: data.publicLaw || null,
         purpose: data.purpose || null,
         scope: data.scope || null,
@@ -947,7 +944,6 @@ export function setupMCPIntegrationApi(app: express.Application) {
         relatedRegulations: data.relatedRegulations || null,
         applicableforms: data.applicableForms || null,
         sourceUrl: data.sourceUrl || null,
-        // Risk & validation
         riskScore: data.riskScore || null,
         riskLevel: data.riskLevel || null,
         riskAssessment: data.riskAssessment || null,
@@ -956,13 +952,11 @@ export function setupMCPIntegrationApi(app: express.Application) {
         versionHash: data.versionHash || null,
         stateCode: data.stateCode || null,
         countryCode: data.countryCode || null,
-        // Standard flags
         isApplicable: true,
         isCurrent: true,
         versionNumber: data.version || 1,
-        // Default actions for compliance workflow
         actions: defaultActions,
-      }).returning();
+      } as any).returning() as any[];
       
       console.log(`✅ Regulation created with ID: ${newRegulation.id}`);
       
@@ -1191,7 +1185,7 @@ export function setupMCPIntegrationApi(app: express.Application) {
         regulationId: newRegulation.id,
         taskCount: createdTasks.length,
         eoCount: createdEOs,
-      });
+      } as any);
       
       // Success response
       const response = {
@@ -1220,7 +1214,7 @@ export function setupMCPIntegrationApi(app: express.Application) {
       console.error('❌ Error creating regulation:', error);
       syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, 'Error creating regulation via MCP', { 
         error: String(error) 
-      });
+      } as any);
       
       res.status(500).json({
         success: false,
@@ -1288,7 +1282,7 @@ export function setupMCPIntegrationApi(app: express.Application) {
       }
       
       // Check if regulation exists - try reg_key first, then DB primary key, then item_id
-      let existingReg;
+      let existingReg: any[] = [];
       
       // 1. Try reg_key (universal key like REG-002) - most reliable match
       if (regKey) {
@@ -1461,12 +1455,10 @@ export function setupMCPIntegrationApi(app: express.Application) {
           effectiveDate: data.effectiveDate ? new Date(data.effectiveDate) : null,
           originationDate: data.originationDate ? new Date(data.originationDate) : null,
           nextReviewDate: data.nextReviewDate ? new Date(data.nextReviewDate) : null,
-          // Agency info
           agency_name: resolvedAgencyNameC || null,
           agency_url: resolvedAgencyUrlC || null,
           agency_contact: resolvedAgencyContactC || null,
           agency_department: resolvedAgencyDepartmentC || null,
-          // URLs
           regulationUrl: data.regulationUrl || null,
           requirementsUrl: data.requirementsUrl || null,
           submissionGuideUrl: data.submissionGuideUrl || null,
@@ -1474,7 +1466,6 @@ export function setupMCPIntegrationApi(app: express.Application) {
           submissionGuidelines: data.submissionGuidelines || null,
           reportingFrequency: data.reportingFrequency || null,
           filingDeadlines: data.filingDeadlines || null,
-          // New content fields (Feb 2026)
           publicLaw: data.publicLaw || null,
           purpose: data.purpose || null,
           scope: data.scope || null,
@@ -1486,11 +1477,9 @@ export function setupMCPIntegrationApi(app: express.Application) {
           relatedRegulations: data.relatedRegulations || null,
           applicableforms: data.applicableForms || null,
           sourceUrl: data.sourceUrl || null,
-          // Risk & validation
           riskScore: riskScore || null,
           riskLevel: riskLevel || null,
           riskAssessment: data.riskAssessment || null,
-          // Bespoke / enriched fields (Mar 2026)
           bespokeSource: data.bespokeSource ?? false,
           penalties: data.penalties || null,
           responsibleRoles: data.responsibleRoles || null,
@@ -1499,12 +1488,11 @@ export function setupMCPIntegrationApi(app: express.Application) {
           versionHash: data.versionHash || null,
           stateCode: data.stateCode || null,
           countryCode: data.countryCode || null,
-          // Standard flags
           isApplicable: true,
           isCurrent: true,
           versionNumber: data.version || 1,
           actions: defaultActions,
-        }).returning();
+        }).returning() as any[];
         
         regulationId = created.id;
         regulationRecord = created;
@@ -1907,7 +1895,7 @@ export function setupMCPIntegrationApi(app: express.Application) {
         itemId,
         isUpdate,
         taskCount: createdTasks.length,
-      });
+      } as any);
       
       const taskSyncMode = preserveTasks ? 'merge' : 'replace';
 
@@ -1974,7 +1962,7 @@ export function setupMCPIntegrationApi(app: express.Application) {
       
     } catch (error) {
       console.error('❌ Error syncing regulation:', error);
-      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, 'Error syncing regulation via MCP', { error: String(error) });
+      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, 'Error syncing regulation via MCP', { error: String(error) } as any);
       
       res.status(500).json({
         success: false,
@@ -2065,7 +2053,7 @@ export function setupMCPIntegrationApi(app: express.Application) {
         return res.status(404).json({ error: 'Regulation not found' });
       }
       
-      const tasks = await storage.getComplianceTasks?.(regulationId) || [];
+      const tasks = await (storage as any).getComplianceTasks?.(regulationId) || [];
       
       res.json({
         success: true,
@@ -2130,7 +2118,7 @@ export function setupMCPIntegrationApi(app: express.Application) {
       
     } catch (error) {
       console.error('Error fetching alignment status:', error);
-      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, 'Error fetching alignment status', { error: String(error) });
+      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, 'Error fetching alignment status', { error: String(error) } as any);
       res.status(500).json({ error: 'Failed to fetch alignment status' });
     }
   });
@@ -2163,7 +2151,7 @@ export function setupMCPIntegrationApi(app: express.Application) {
       
     } catch (error) {
       console.error('Error fetching regulation hashes:', error);
-      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, 'Error fetching regulation hashes', { error: String(error) });
+      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, 'Error fetching regulation hashes', { error: String(error) } as any);
       res.status(500).json({ error: 'Failed to fetch regulation hashes' });
     }
   });
@@ -2335,7 +2323,7 @@ export function setupMCPIntegrationApi(app: express.Application) {
       });
     } catch (error) {
       console.error('Error syncing circuit interpretations:', error);
-      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, 'Error syncing circuit interpretations from MCP Engine', { error: String(error) });
+      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, 'Error syncing circuit interpretations from MCP Engine', { error: String(error) } as any);
       res.status(500).json({ error: 'Failed to sync circuit interpretations' });
     }
   });

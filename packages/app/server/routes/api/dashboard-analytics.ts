@@ -26,15 +26,15 @@ router.get('/', async (req, res) => {
     const totalRegulations = allRegulations.length;
     
     // Count by compliance status
-    const compliantRegs = allRegulations.filter(r => r.complianceStatus === 'compliant').length;
+    const compliantRegs = allRegulations.filter(r => (r as any).complianceStatus === 'compliant').length;
     const needsAttentionRegs = allRegulations.filter(r => 
-      r.complianceStatus === 'needs_attention' || r.complianceStatus === 'in_progress'
+      (r as any).complianceStatus === 'needs_attention' || (r as any).complianceStatus === 'in_progress'
     ).length;
     const nonCompliantRegs = allRegulations.filter(r => 
-      r.complianceStatus === 'non_compliant' || r.complianceStatus === 'overdue'
+      (r as any).complianceStatus === 'non_compliant' || (r as any).complianceStatus === 'overdue'
     ).length;
     const pendingRegs = allRegulations.filter(r => 
-      !r.complianceStatus || r.complianceStatus === 'pending' || r.complianceStatus === 'not_started'
+      !(r as any).complianceStatus || (r as any).complianceStatus === 'pending' || (r as any).complianceStatus === 'not_started'
     ).length;
 
     // Count by category
@@ -45,7 +45,7 @@ router.get('/', async (req, res) => {
         categoryBreakdown[cat] = { total: 0, compliant: 0 };
       }
       categoryBreakdown[cat].total++;
-      if (reg.complianceStatus === 'compliant') {
+      if ((reg as any).complianceStatus === 'compliant') {
         categoryBreakdown[cat].compliant++;
       }
     });
@@ -124,8 +124,8 @@ router.get('/', async (req, res) => {
 
     // === ATTESTATION METRICS ===
     const allAttestations = await db.select().from(attestationTokens);
-    const completedAttestations = allAttestations.filter(a => a.usedAt !== null).length;
-    const pendingAttestations = allAttestations.filter(a => a.usedAt === null && new Date(a.expiresAt) > now).length;
+    const completedAttestations = allAttestations.filter(a => a.completedAt !== null).length;
+    const pendingAttestations = allAttestations.filter(a => a.completedAt === null && new Date(a.expiresAt) > now).length;
 
     // === CALCULATE OVERALL COMPLIANCE SCORE ===
     // Updated formula (MCP Engine sync Jan 2026):
@@ -180,7 +180,7 @@ router.get('/', async (req, res) => {
 
     // === TOP REGULATIONS NEEDING ATTENTION ===
     const regulationsNeedingAttention = allRegulations
-      .filter(r => r.complianceStatus !== 'compliant')
+      .filter(r => (r as any).complianceStatus !== 'compliant')
       .map(r => {
         const regTasks = tasksByRegulation[r.id] || { total: 0, completed: 0 };
         const completionRate = regTasks.total > 0 
@@ -190,7 +190,7 @@ router.get('/', async (req, res) => {
           id: r.id,
           name: r.name,
           category: r.category,
-          status: r.complianceStatus || 'pending',
+          status: (r as any).complianceStatus || 'pending',
           taskCompletion: completionRate,
           totalTasks: regTasks.total,
           completedTasks: regTasks.completed
@@ -251,7 +251,7 @@ router.get('/', async (req, res) => {
         overdue: overdueDeadlines,
         dueThisWeek: dueThisWeek.map(d => ({
           id: d.id,
-          title: d.title,
+          title: d.description,
           dueDate: d.dueDate,
           regulationId: d.regulationId
         })),

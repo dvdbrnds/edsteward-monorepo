@@ -245,7 +245,7 @@ export async function closeDatabaseConnections(): Promise<void> {
   storage = null;
   
   // Close all tenant pools
-  for (const [tenantId, tenantPool] of tenantPools.entries()) {
+  for (const [tenantId, tenantPool] of Array.from(tenantPools.entries())) {
     console.log(`[MULTI-TENANT] Closing pool for tenant '${tenantId}'`);
     await tenantPool.end();
   }

@@ -141,7 +141,7 @@ export function RegulationChanges({ currentRegulation }: RegulationChangesProps)
             );
           })}
 
-          {currentRegulation.versionMetadata?.changes.length === 0 && (
+          {(currentRegulation.versionMetadata as any)?.changes?.length === 0 && (
             <p className="text-muted-foreground italic">No significant changes detected between versions.</p>
           )}
         </div>

@@ -143,7 +143,7 @@ export default function LogsPage() {
       // CSV Header
       ['Timestamp', 'Username', 'Level', 'Facility', 'Message', 'IP Address', 'User Agent'].join(','),
       // CSV Data
-      ...data.logs.map(log => [
+      ...data.logs.map((log: any) => [
         format(new Date(log.timestamp), "yyyy-MM-dd HH:mm:ss"),
         log.username || 'system',
         LOG_LEVELS[log.severity as keyof typeof LOG_LEVELS]?.name || log.level,

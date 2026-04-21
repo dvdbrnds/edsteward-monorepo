@@ -53,7 +53,7 @@ router.post("/:id/toggle", requireAuth, requireComplianceRole, async (req, res) 
     const tenantStorage = getDatabaseStorage(req.tenantId);
     
     // Get current regulation
-    const regulation = await tenantStorage.getRegulationById(regulationId);
+    const regulation = await tenantStorage.getRegulation(regulationId);
     if (!regulation) {
       return res.status(404).json({ error: 'Regulation not found' });
     }
@@ -109,23 +109,22 @@ router.get("/:id/status", requireAuth, async (req, res) => {
     }
 
     const tenantStorage = getDatabaseStorage(req.tenantId);
-    const regulation = await tenantStorage.getRegulationById(regulationId);
+    const regulation = await tenantStorage.getRegulation(regulationId);
     
     if (!regulation) {
       return res.status(404).json({ error: 'Regulation not found' });
     }
 
-    // Handle both camelCase and snake_case field names (ORM might return either)
-    const notificationsDisabled = regulation.notificationsDisabled ?? regulation.notifications_disabled ?? false;
-    const notificationsDisabledBy = regulation.notificationsDisabledBy ?? regulation.notifications_disabled_by;
-    const notificationsDisabledAt = regulation.notificationsDisabledAt ?? regulation.notifications_disabled_at;
-    const notificationsDisabledReason = regulation.notificationsDisabledReason ?? regulation.notifications_disabled_reason;
+    const notificationsDisabled = regulation.notificationsDisabled ?? (regulation as any).notifications_disabled ?? false;
+    const notificationsDisabledBy = regulation.notificationsDisabledBy ?? (regulation as any).notifications_disabled_by;
+    const notificationsDisabledAt = regulation.notificationsDisabledAt ?? (regulation as any).notifications_disabled_at;
+    const notificationsDisabledReason = regulation.notificationsDisabledReason ?? (regulation as any).notifications_disabled_reason;
 
     // Get user info for disabled by field
     let disabledByUser = null;
     if (notificationsDisabledBy) {
       try {
-        disabledByUser = await tenantStorage.getUserById(notificationsDisabledBy);
+        disabledByUser = await tenantStorage.getUser(notificationsDisabledBy);
       } catch (e) {
         console.error('Error fetching user for notification status:', e);
       }

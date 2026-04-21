@@ -1,4 +1,5 @@
 import { SamlConfig } from '@node-saml/passport-saml';
+import { ValidateInResponseTo } from '@node-saml/node-saml';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 
@@ -139,8 +140,8 @@ const baseServiceProviderConfig = {
   authnRequestBinding: 'HTTP-Redirect' as const,
   skipRequestCompression: false,
   disableRequestedAuthnContext: false,
-  requestedAuthnContext: ['urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport'],
-  validateInResponseTo: 'always' as const,
+  authnContext: ['urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport'],
+  validateInResponseTo: ValidateInResponseTo.always,
   requestIdExpirationPeriodMs: 28800000, // 8 hours
   cacheProvider: createSamlCache()
 };
@@ -165,7 +166,7 @@ export const identityProviders: IdentityProviderConfig[] = [
         response_type: 'id_token',
         scope: 'openid email profile'
       }
-    },
+    } as unknown as SamlConfig,
     metadata: {
       entityId: process.env.OKTA_ENTITY_ID || 'http://www.okta.com/your-app-id',
       ssoUrl: process.env.OKTA_SSO_URL || '',
@@ -194,7 +195,7 @@ export const identityProviders: IdentityProviderConfig[] = [
       wantAuthnResponseSigned: true,
       forceAuthn: false,
       passive: false
-    },
+    } as unknown as SamlConfig,
     metadata: {
       entityId: process.env.SHIBBOLETH_ENTITY_ID || 'https://your-idp.example.edu/idp/shibboleth',
       ssoUrl: process.env.SHIBBOLETH_SSO_URL || '',
@@ -218,7 +219,7 @@ export const identityProviders: IdentityProviderConfig[] = [
       },
       // InCommon Federation specific settings
       disableRequestedAuthnContext: false,
-      requestedAuthnContext: [
+      authnContext: [
         'urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport',
         'urn:oasis:names:tc:SAML:2.0:ac:classes:TimeSyncToken'
       ],
@@ -233,7 +234,7 @@ export const identityProviders: IdentityProviderConfig[] = [
         entityID: '', // Will be set dynamically based on user selection
         return: process.env.SAML_CALLBACK_URL || 'http://localhost:3000/auth/saml/callback'
       }
-    },
+    } as unknown as SamlConfig,
     metadata: {
       entityId: process.env.INCOMMON_ENTITY_ID || 'https://wayf.incommonfederation.org',
       ssoUrl: process.env.INCOMMON_SSO_URL || '',

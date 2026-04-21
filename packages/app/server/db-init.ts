@@ -61,7 +61,7 @@ export async function initializeDatabase() {
 
     // Check if we have users
     const existingUsers = await db.execute(sql`SELECT COUNT(*) as count FROM users`);
-    const userCount = parseInt(existingUsers.rows[0]?.count || '0');
+    const userCount = parseInt(String(existingUsers.rows[0]?.count ?? '0'));
 
     if (userCount === 0) {
 
@@ -127,8 +127,8 @@ export async function initializeDatabase() {
       success: true,
       message: 'Database initialized successfully',
       stats: {
-        users: parseInt(finalUserCount.rows[0]?.count || '0'),
-        regulations: parseInt(finalRegCount.rows[0]?.count || '0')
+        users: parseInt(String(finalUserCount.rows[0]?.count ?? '0')),
+        regulations: parseInt(String(finalRegCount.rows[0]?.count ?? '0'))
       }
     };
 

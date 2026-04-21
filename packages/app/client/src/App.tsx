@@ -76,8 +76,8 @@ function AppContent() {
               {/* More specific routes MUST come before general ones */}
               <ProtectedRoute path="/regulations/validate" component={ValidationPage} />
               <ProtectedRoute path="/regulations/updates/demo" component={() => <DifferentialViewPage isDemo={true} />} />
-              <ProtectedRoute path="/regulations/updates/:id" component={DifferentialViewPage} />
-              <ProtectedRoute path="/regulations/updates" component={UpdatesListPage} />
+              <ProtectedRoute path="/regulations/updates/:id" component={DifferentialViewPage as unknown as () => JSX.Element} />
+              <ProtectedRoute path="/regulations/updates" component={UpdatesListPage as unknown as () => JSX.Element} />
               {/* Debug route */}
               <Route path="/test-route">
                 <div style={{padding: '20px', backgroundColor: 'yellow'}}>

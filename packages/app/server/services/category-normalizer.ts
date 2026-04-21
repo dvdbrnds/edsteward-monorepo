@@ -97,7 +97,7 @@ function fuzzyMatch(incoming: string): { canonicalId: number; canonicalName: str
   
   if (bestMatch) {
     // Find canonical ID
-    for (const [id, name] of canonicalCache.entries()) {
+    for (const [id, name] of Array.from(canonicalCache.entries())) {
       if (name === bestMatch.canonicalName) {
         return { canonicalId: id, canonicalName: bestMatch.canonicalName, confidence: bestMatch.score };
       }

@@ -124,7 +124,7 @@ interface RegulationListProps {
 }
 
 type SortConfig = {
-  key: keyof Regulation;
+  key: string;
   direction: 'asc' | 'desc';
 } | null;
 
@@ -347,8 +347,8 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter }: R
       return sortConfig.direction === 'asc' ? comparison : -comparison;
     }
 
-    const aValue = a[sortConfig.key];
-    const bValue = b[sortConfig.key];
+    const aValue = (a as Record<string, any>)[sortConfig.key];
+    const bValue = (b as Record<string, any>)[sortConfig.key];
 
     if (!aValue && !bValue) return 0;
     if (!aValue) return 1;
@@ -365,7 +365,7 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter }: R
     return sortConfig.direction === 'asc' ? comparison : -comparison;
   });
 
-  const handleSort = (key: keyof Regulation) => {
+  const handleSort = (key: string) => {
     setSortConfig(current => {
       if (!current || current.key !== key) {
         return { key, direction: 'asc' };
@@ -643,7 +643,7 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter }: R
                       label="ID" 
                       sortable 
                       sortKey="id" 
-                      activeSortKey={sortConfig?.key ?? null}
+                      activeSortKey={(sortConfig?.key as string) ?? null}
                       activeSortDirection={sortConfig?.direction ?? null}
                       onSort={handleSort}
                       onHide={toggleColumn}
@@ -657,7 +657,7 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter }: R
                       label="Name" 
                       sortable 
                       sortKey="name" 
-                      activeSortKey={sortConfig?.key ?? null}
+                      activeSortKey={(sortConfig?.key as string) ?? null}
                       activeSortDirection={sortConfig?.direction ?? null}
                       onSort={handleSort}
                       onHide={toggleColumn}
@@ -672,7 +672,7 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter }: R
                       label="Risk" 
                       sortable 
                       sortKey={'riskScore' as any} 
-                      activeSortKey={sortConfig?.key ?? null}
+                      activeSortKey={(sortConfig?.key as string) ?? null}
                       activeSortDirection={sortConfig?.direction ?? null}
                       onSort={handleSort}
                       onHide={toggleColumn}
@@ -686,7 +686,7 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter }: R
                       label="Category" 
                       sortable 
                       sortKey="category" 
-                      activeSortKey={sortConfig?.key ?? null}
+                      activeSortKey={(sortConfig?.key as string) ?? null}
                       activeSortDirection={sortConfig?.direction ?? null}
                       onSort={handleSort}
                       onHide={toggleColumn}
@@ -700,7 +700,7 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter }: R
                       label="DRO" 
                       sortable 
                       sortKey="dro" 
-                      activeSortKey={sortConfig?.key ?? null}
+                      activeSortKey={(sortConfig?.key as string) ?? null}
                       activeSortDirection={sortConfig?.direction ?? null}
                       onSort={handleSort}
                       onHide={toggleColumn}
@@ -732,7 +732,7 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter }: R
                       label="Last Updated" 
                       sortable 
                       sortKey="lastUpdated" 
-                      activeSortKey={sortConfig?.key ?? null}
+                      activeSortKey={(sortConfig?.key as string) ?? null}
                       activeSortDirection={sortConfig?.direction ?? null}
                       onSort={handleSort}
                       onHide={toggleColumn}
@@ -746,7 +746,7 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter }: R
                       label="Jurisdiction" 
                       sortable 
                       sortKey="jurisdictionSource" 
-                      activeSortKey={sortConfig?.key ?? null}
+                      activeSortKey={(sortConfig?.key as string) ?? null}
                       activeSortDirection={sortConfig?.direction ?? null}
                       onSort={handleSort}
                       onHide={toggleColumn}

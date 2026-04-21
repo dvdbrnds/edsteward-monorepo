@@ -104,9 +104,9 @@ export default function ValidationPage() {
         return acc;
       }, {} as Record<string, ValidationError[]>);
 
-      Object.entries(issuesByCategory).forEach(([category, issues]) => {
+      (Object.entries(issuesByCategory) as [string, ValidationError[]][]).forEach(([category, issues]) => {
         addLog(`${category}: ${issues.length} issues found`, issues[0].severity);
-        issues.forEach(issue => {
+        issues.forEach((issue: ValidationError) => {
           addLog(`  - ${issue.regulationId}: ${issue.error}`, issue.severity);
         });
       });

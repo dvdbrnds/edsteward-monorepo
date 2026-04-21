@@ -249,7 +249,7 @@ export default function MFASetup() {
               <Smartphone className="mr-2 h-4 w-4" />
               Start MFA Setup
             </Button>
-          ) : (
+          ) : setupData ? (
             <div className="space-y-6">
               {/* Step 1: QR Code */}
               <div>
@@ -348,7 +348,7 @@ export default function MFASetup() {
                 </Card>
               )}
             </div>
-          )}
+          ) : null}
         </CardContent>
       </Card>
     </div>

@@ -134,7 +134,8 @@ async function createMCPIntegrationTables() {
     await db.execute('ROLLBACK');
     console.error('Error creating MCP integration tables:', error);
     syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Error during MCP integration tables migration", {
-      error: String(error)
+      id: 'mcp-migration',
+      parameters: { error: String(error) }
     });
     throw error;
   } finally {
@@ -153,7 +154,7 @@ async function checkIfTablesExist(): Promise<boolean> {
     `);
     
     // Result is an array with the first element containing an object with the EXISTS property
-    return result[0].exists;
+    return (result as unknown as Array<{ exists: boolean }>)[0].exists;
   } catch (error) {
     console.error('Error checking if tables exist:', error);
     return false;

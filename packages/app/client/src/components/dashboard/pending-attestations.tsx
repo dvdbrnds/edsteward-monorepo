@@ -18,7 +18,7 @@ import {
   // CheckCheck - used by Quick Attest button (currently disabled)
 } from "lucide-react";
 import { Link } from "wouter";
-import type { Regulation } from "@shared/schema";
+import type { Regulation, RegulationAction } from "@shared/schema";
 import { SendAttestationDialog } from "@/components/regulations/send-attestation-dialog";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
@@ -95,15 +95,14 @@ export default function PendingAttestations() {
 
   // Find regulations needing attestation (attestation action not completed)
   const needsAttestation = (regulations || []).filter(reg => {
-    const actions = reg.actions || [];
-    const attestationAction = actions.find(a => a.type === 'attestation');
-    // Needs attestation if: no attestation action OR action exists but not completed
+    const actions: RegulationAction[] = reg.actions || [];
+    const attestationAction = actions.find((a: RegulationAction) => a.type === 'attestation');
     return !attestationAction || attestationAction.status !== 'completed';
-  }).slice(0, 5); // Show top 5
+  }).slice(0, 5);
 
   const completedCount = (regulations || []).filter(reg => {
-    const actions = reg.actions || [];
-    const attestationAction = actions.find(a => a.type === 'attestation');
+    const actions: RegulationAction[] = reg.actions || [];
+    const attestationAction = actions.find((a: RegulationAction) => a.type === 'attestation');
     return attestationAction?.status === 'completed';
   }).length;
 
@@ -127,8 +126,8 @@ export default function PendingAttestations() {
           {needsAttestation.length > 0 ? (
             <div className="space-y-3 flex-1">
               {needsAttestation.map((regulation) => {
-                const actions = regulation.actions || [];
-                const attestationAction = actions.find(a => a.type === 'attestation');
+                const actions: RegulationAction[] = regulation.actions || [];
+                const attestationAction = actions.find((a: RegulationAction) => a.type === 'attestation');
                 const isRequired = attestationAction?.required ?? true;
 
                 return (

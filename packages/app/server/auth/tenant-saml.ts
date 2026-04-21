@@ -321,9 +321,11 @@ export function setupTenantSamlAuth(app: Express) {
         }
       }
     },
-    // Sign-on verify callback
-    async (req, profile: SamlProfile, done) => {
+    async (req, profile: SamlProfile | null, done) => {
       try {
+        if (!profile) {
+          return done(new Error('No SAML profile received'));
+        }
         const tenantId = req.session?.tenantId || req.tenantId;
         
         if (!tenantId) {
@@ -395,19 +397,18 @@ export function setupTenantSamlAuth(app: Express) {
           LogLevel.ERROR, 
           `Tenant SAML authentication error: ${errorMessage}`, 
           undefined, 
-          profile.nameID,
+          profile?.nameID,
           { tenantId: req.tenantId }
         );
         return done(error instanceof Error ? error : new Error(errorMessage));
       }
     },
-    // Logout verify callback
-    async (req, profile: SamlProfile, done) => {
+    async (req, profile: SamlProfile | null, done) => {
       try {
         const tenantId = req.session?.tenantId || req.tenantId;
         if (tenantId) {
           const tenantStorage = getDatabaseStorage(tenantId);
-          const user = await tenantStorage.getUserByExternalId(profile.nameID || '', tenantId);
+          const user = await tenantStorage.getUserByExternalId(profile?.nameID || '', tenantId);
           if (user) {
             await syslog.logAuthEvent(
               LogLevel.INFO, 
@@ -419,7 +420,7 @@ export function setupTenantSamlAuth(app: Express) {
           }
           return done(null, user);
         }
-        return done(null, null);
+        return done(null, undefined);
       } catch (error) {
         return done(error instanceof Error ? error : new Error('Logout error'));
       }

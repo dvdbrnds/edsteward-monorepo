@@ -180,7 +180,8 @@ function createTenantFromPartial(id: string, partial: Partial<Tenant>): Tenant {
         maxRegulations: 5000,
       },
       institutionConfig: {
-        primaryTypes: ['public-universities', 'private-universities'],
+        primaryType: null,
+        characteristics: [],
         hideNonApplicable: true,
         allowUsersToToggle: true,
       },
@@ -281,7 +282,8 @@ function mapDatabaseRowToTenant(row: any): Tenant {
         logoUrl: row.logo_url,
       } : undefined,
       institutionConfig: {
-        primaryTypes: ['public-universities', 'private-universities'],
+        primaryType: null,
+        characteristics: [],
         hideNonApplicable: true,
         allowUsersToToggle: true,
       },
@@ -388,7 +390,7 @@ export function getAllCachedTenants(): Tenant[] {
   const seen = new Set<string>();
   const tenants: Tenant[] = [];
   
-  for (const [key, record] of tenantCache) {
+  for (const [key, record] of Array.from(tenantCache)) {
     if (!seen.has(record.tenant.id)) {
       seen.add(record.tenant.id);
       tenants.push(record.tenant);
@@ -404,7 +406,7 @@ export function getAllCachedTenants(): Tenant[] {
 export function getAllTenantDatabaseUrls(): Record<string, string> {
   const urls: Record<string, string> = {};
   
-  for (const [key, record] of tenantCache) {
+  for (const [key, record] of Array.from(tenantCache)) {
     if (record.databaseUrl && !urls[record.tenant.subdomain]) {
       urls[record.tenant.subdomain] = record.databaseUrl;
     }
