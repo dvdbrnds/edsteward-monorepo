@@ -26,14 +26,16 @@ aws ecs describe-task-definition --task-definition edsteward-saml-production \
 | Environment | .env Variable | Neon Host Prefix | Schema Version |
 |-------------|---------------|------------------|----------------|
 | Production (Moravian) | _not in .env_ — use ECS | `ep-weathered-term` | Current (has `reg_key`, `statutory_citation`) |
-| Local Dev + **Staging ECS** | `DATABASE_URL` | `ep-summer-pine` | Current |
-| Staging (unused) | `STAGING_DATABASE_URL` | `ep-fancy-scene` | Older (uses `item_id` not `reg_key`) |
+| Local Dev + **Staging ECS** + **Staging Tenant** | `DATABASE_URL` | `ep-summer-pine` | Current |
+| Staging (legacy, unused) | `STAGING_DATABASE_URL` | `ep-fancy-scene` | Older — DO NOT USE for tenant registry |
 | Dev DB | `DEV_DATABASE_URL` | `ep-square-art` | Older |
 | Wossamotta (demo) | `WOSSAMOTTA_DATABASE_URL` | `ep-damp-brook` | Older |
 | Template | `TEMPLATE_DATABASE_URL` | `ep-divine-cherry` | Older |
 | Template (ECS) | _not in .env_ — use ECS | `ep-weathered-term/template_edsteward` | Older |
 
-**NOTE:** The staging ECS service (`edsteward-staging-cluster`) gets its `DATABASE_URL` from AWS Secrets Manager (`edsteward/staging/database-url`), which currently resolves to `ep-summer-pine` — the same DB as local dev. The `.env` `STAGING_DATABASE_URL` (`ep-fancy-scene`) is NOT what the deployed staging app uses.
+**NOTE:** The staging ECS service (`edsteward-staging-cluster`) uses `ep-summer-pine` as both `DATABASE_URL` and the tenant registry URL for the `staging` tenant. The `.env` `STAGING_DATABASE_URL` (`ep-fancy-scene`) is a legacy database and is NOT used by the deployed staging app. The admin DB `tenants` table was updated 2026-04-20 to point `staging` → `ep-summer-pine`.
+
+**CRITICAL: When enabling `MULTI_TENANT=true`**, tenant-scoped queries route through the tenant registry (admin DB `tenants` table), NOT through `DATABASE_URL`. Always verify the tenant registry URL matches the ECS task definition's `DATABASE_URL` and that the target database has the current schema.
 
 ## Engine Database
 

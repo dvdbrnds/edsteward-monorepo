@@ -60,18 +60,22 @@ async function getTargetUrl() {
 
   if (filtered[0] === '--staging') {
     const url = execSync(
-      "aws ecs describe-task-definition --task-definition edsteward-staging-task " +
+      "aws ecs describe-task-definition --task-definition edsteward-multi-tenant-staging " +
       "--query 'taskDefinition.containerDefinitions[0].environment[?name==`DATABASE_URL`].value' --output text",
       { encoding: 'utf8' }
     ).trim();
     return { url, dryRun, label: 'staging' };
   }
 
+  if (filtered[0] === '--all-tenants') {
+    return { allTenants: true, dryRun, label: 'all-tenants' };
+  }
+
   if (filtered[0]) {
     return { url: filtered[0], dryRun, label: 'target' };
   }
 
-  console.error('Usage: node scripts/sync-schema.js <target-db-url | --production | --staging> [--dry-run]');
+  console.error('Usage: node scripts/sync-schema.js <target-db-url | --production | --staging | --all-tenants> [--dry-run]');
   process.exit(1);
 }
 
@@ -114,16 +118,7 @@ function buildColumnDef(col) {
   return def;
 }
 
-async function main() {
-  const { url: targetUrl, dryRun, label } = await getTargetUrl();
-
-  require('dotenv').config();
-  const sourceUrl = process.env.DATABASE_URL;
-  if (!sourceUrl) {
-    console.error('DATABASE_URL not set in .env');
-    process.exit(1);
-  }
-
+async function syncOne(sourceUrl, targetUrl, label, dryRun) {
   const sslConfig = { rejectUnauthorized: false };
   const sourcePool = new Pool({ connectionString: sourceUrl, ssl: sslConfig });
   const targetPool = new Pool({ connectionString: targetUrl, ssl: sslConfig });
@@ -191,7 +186,7 @@ async function main() {
     console.log('✅ Schema is in sync — no changes needed.\n');
     sc.release(); tc.release();
     await sourcePool.end(); await targetPool.end();
-    process.exit(0);
+    return;
   }
 
   console.log(`Found ${statements.length} schema difference(s):\n`);
@@ -210,7 +205,7 @@ async function main() {
     }
     sc.release(); tc.release();
     await sourcePool.end(); await targetPool.end();
-    process.exit(0);
+    return;
   }
 
   // Apply
@@ -230,11 +225,52 @@ async function main() {
   } catch (err) {
     await tc.query('ROLLBACK');
     console.error(`\n❌ Schema sync failed, rolled back: ${err.message}\n`);
-    process.exit(1);
+    throw err;
   }
 
   sc.release(); tc.release();
   await sourcePool.end(); await targetPool.end();
+}
+
+async function main() {
+  const config = await getTargetUrl();
+  require('dotenv').config();
+  const sourceUrl = process.env.DATABASE_URL;
+  if (!sourceUrl) {
+    console.error('DATABASE_URL not set in .env');
+    process.exit(1);
+  }
+
+  if (config.allTenants) {
+    const sslConfig = { rejectUnauthorized: false };
+    const adminPool = new Pool({ connectionString: sourceUrl, ssl: sslConfig });
+    const client = await adminPool.connect();
+    const result = await client.query('SELECT id, database_url FROM tenants WHERE status = \'active\' ORDER BY id');
+    client.release();
+    await adminPool.end();
+
+    console.log(`\n🔄 Syncing schema to ${result.rows.length} tenant database(s)...\n`);
+    let failed = 0;
+    for (const row of result.rows) {
+      if (row.database_url === sourceUrl) {
+        console.log(`⏭️  Skipping ${row.id} (same as source)\n`);
+        continue;
+      }
+      try {
+        await syncOne(sourceUrl, row.database_url, row.id, config.dryRun);
+      } catch (err) {
+        console.error(`❌ Failed to sync ${row.id}: ${err.message}\n`);
+        failed++;
+      }
+    }
+    if (failed > 0) {
+      console.error(`\n⚠️  ${failed} tenant(s) failed to sync.`);
+      process.exit(1);
+    }
+    console.log('✅ All tenant databases synced.\n');
+  } else {
+    await syncOne(sourceUrl, config.url, config.label, config.dryRun);
+  }
 }
 
 main().catch(err => {
