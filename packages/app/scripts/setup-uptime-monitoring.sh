@@ -88,14 +88,14 @@ create_health_check() {
 PROD_HC_ID=$(create_health_check \
     "edsteward-production" \
     "moravian.edsteward.ai" \
-    "/health" \
-    "OK")
+    "/api/health" \
+    "healthy")
 
 STAGING_HC_ID=$(create_health_check \
     "edsteward-staging" \
     "staging.edsteward.ai" \
-    "/health" \
-    "OK")
+    "/api/health" \
+    "healthy")
 
 # 3. Create CloudWatch alarms for health checks
 # Route53 health check metrics are always in us-east-1

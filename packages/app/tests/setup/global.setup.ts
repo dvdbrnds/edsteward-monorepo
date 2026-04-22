@@ -40,9 +40,13 @@ beforeEach(() => {
   // Reset all spies
   vi.restoreAllMocks()
   
-  // Clear localStorage and sessionStorage
-  window.localStorage.clear()
-  window.sessionStorage.clear()
+  // Clear localStorage and sessionStorage (guard against missing methods in some jsdom configs)
+  if (window.localStorage && typeof window.localStorage.clear === 'function') {
+    window.localStorage.clear()
+  }
+  if (window.sessionStorage && typeof window.sessionStorage.clear === 'function') {
+    window.sessionStorage.clear()
+  }
   
   // Reset fetch mock if it exists
   if (global.fetch && 'mockClear' in global.fetch) {

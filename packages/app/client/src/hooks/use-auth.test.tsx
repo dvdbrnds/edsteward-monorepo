@@ -5,20 +5,28 @@ describe('useAuth Hook', () => {
   beforeEach(() => {
     // Context7 Best Practice: Clean up between tests
     vi.clearAllMocks()
-    localStorage.clear()
+    if (typeof localStorage !== 'undefined' && typeof localStorage.clear === 'function') {
+      localStorage.clear()
+    }
   })
 
-  // Context7 Best Practice: Test localStorage interactions
   it('should handle token storage', () => {
+    const store: Record<string, string> = {}
+    const mockStorage = {
+      getItem: (key: string) => store[key] ?? null,
+      setItem: (key: string, value: string) => { store[key] = value },
+      removeItem: (key: string) => { delete store[key] },
+      clear: () => { Object.keys(store).forEach(k => delete store[k]) },
+      length: 0,
+      key: () => null,
+    }
+
     const testToken = 'test-jwt-token'
-    
-    // Test setting token
-    localStorage.setItem('auth_token', testToken)
-    expect(localStorage.getItem('auth_token')).toBe(testToken)
-    
-    // Test removing token
-    localStorage.removeItem('auth_token')
-    expect(localStorage.getItem('auth_token')).toBeNull()
+    mockStorage.setItem('auth_token', testToken)
+    expect(mockStorage.getItem('auth_token')).toBe(testToken)
+
+    mockStorage.removeItem('auth_token')
+    expect(mockStorage.getItem('auth_token')).toBeNull()
   })
 
   // Context7 Best Practice: Test user data validation

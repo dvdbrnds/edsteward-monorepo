@@ -38,3 +38,38 @@ alwaysApply: true
 
 1. **Backward-compatible changes only** — don't break existing endpoints or workflows
 2. **When in doubt, ask** — if a change could affect production or live users, confirm first
+
+## Backup & Recovery
+
+### Neon (Automatic)
+All tenant databases are on Neon Serverless PostgreSQL, which provides:
+- **Point-in-time recovery (PITR)** — restore to any second within the retention window
+- **Branching** — create instant database copies for testing or rollback
+- Recovery is done via the Neon Console: https://console.neon.tech
+
+### Application-Level (backup-service.ts)
+The app includes a `backup-service.ts` that supports manual `pg_dump` backups:
+- Daily, weekly, monthly tiers with configurable retention
+- Safety backups are created automatically before any restore
+- Triggered via admin API or scheduled tasks
+
+### Recovery Playbook
+1. **Schema mistake (bad migration):** Use Neon PITR to restore to pre-migration timestamp
+2. **Data corruption:** Use Neon branching to create a copy at a known-good point, then compare/merge
+3. **Full tenant restore:** Neon PITR or restore from `pg_dump` backup via backup-service
+4. **"Undo last deploy" data issue:** Roll back ECS task + Neon PITR to pre-deploy state
+
+## Uptime Monitoring
+
+- **Route53 health checks** ping `/api/health` on both production and staging every 30 seconds
+- **CloudWatch alarms** trigger SNS email alerts to `david@edsteward.ai` if health checks fail for 2+ minutes
+- View status: https://console.aws.amazon.com/route53/healthchecks
+
+## Secret Rotation
+
+The following secrets should be rotated periodically (recommended: every 90 days):
+- `SESSION_SECRET` — rotating invalidates all active sessions (users must re-login)
+- `MFA_ENCRYPTION_KEY` — rotating invalidates all MFA enrollments (users must re-enroll)
+- `ATTESTATION_JWT_SECRET` — rotating invalidates pending attestation tokens
+
+To rotate: generate a new value with `openssl rand -hex 32`, update the ECS task definition environment variable, and force a new deployment. Plan rotations during low-traffic windows.
