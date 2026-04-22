@@ -1,0 +1,12 @@
+{
+  "drillId": "drill-20260422-093431",
+  "timestamp": "2026-04-22T13:34:39Z",
+  "source": "staging",
+  "backupSizeMB": 5.48,
+  "dumpDurationSeconds": 6,
+  "criticalTablesFound": 5,
+  "copyStatements": 28,
+  "errors": 2,
+  "result": "FAIL",
+  "runner": "dvdbrnds"
+}

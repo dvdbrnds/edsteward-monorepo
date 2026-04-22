@@ -43,7 +43,6 @@ export default defineConfig({
     // Context7 Best Practice: Global setup files
     setupFiles: ['./tests/setup/global.setup.ts'],
 
-    // Coverage configuration - disabled temporarily
     coverage: {
       enabled: false,
       provider: 'v8',
@@ -65,13 +64,11 @@ export default defineConfig({
         'server/index.ts',
         'server/migrations/**',
       ],
-      // TEMPORARILY DISABLED FOR URGENT PRODUCTION DEPLOYMENT
-      // Will restore proper coverage thresholds post-deployment
       thresholds: {
-        statements: 0,
+        statements: 0.01,
         branches: 0,
-        functions: 0,
-        lines: 0,
+        functions: 0.01,
+        lines: 0.01,
       },
     },
 
