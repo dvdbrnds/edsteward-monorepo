@@ -676,7 +676,7 @@ router.post('/:taskId/escalate', requireAuth, requireAdmin, async (req: Request,
         </div>
         ${message ? `<div style="margin: 20px 0;"><strong>Message from ${senderName}:</strong><p style="padding: 10px; background: #f5f5f5; border-radius: 4px;">${message}</p></div>` : ''}
         <div style="background: #eff6ff; border-left: 4px solid #2563eb; padding: 15px; margin: 20px 0; border-radius: 0 8px 8px 0;">
-          <p style="margin: 0;"><strong>Action needed:</strong> Please ensure this compliance requirement is addressed promptly. If the current DRI is unable to complete this task, you may be reassigned as the Directly Responsible Individual. Contact ${senderName} or your compliance office to discuss reassignment.</p>
+          <p style="margin: 0;"><strong>Action needed:</strong> Please ensure this compliance requirement is addressed promptly. You can be reassigned as the Directly Responsible Individual for this task if necessary.</p>
         </div>
         <a href="${regulationUrl}" style="display: inline-block; background: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: 600;">View Regulation in EdSteward</a>
       `,
