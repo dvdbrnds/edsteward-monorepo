@@ -412,9 +412,9 @@ export function ExecutiveOrdersPanel({ regulationId, isAdmin }: ExecutiveOrdersP
               </div>
               
               <div className="space-y-2">
-                <label className="text-sm font-medium">Review Status</label>
+                <label htmlFor="eo-review-status" className="text-sm font-medium">Review Status</label>
                 <Select value={reviewStatus} onValueChange={setReviewStatus}>
-                  <SelectTrigger>
+                  <SelectTrigger id="eo-review-status">
                     <SelectValue placeholder="Select status..." />
                   </SelectTrigger>
                   <SelectContent>
@@ -426,8 +426,9 @@ export function ExecutiveOrdersPanel({ regulationId, isAdmin }: ExecutiveOrdersP
               </div>
               
               <div className="space-y-2">
-                <label className="text-sm font-medium">Notes (optional)</label>
+                <label htmlFor="eo-review-notes" className="text-sm font-medium">Notes (optional)</label>
                 <Textarea
+                  id="eo-review-notes"
                   value={reviewNotes}
                   onChange={(e) => setReviewNotes(e.target.value)}
                   placeholder="Add any notes about this review..."

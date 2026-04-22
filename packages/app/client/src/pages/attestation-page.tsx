@@ -591,7 +591,10 @@ const AttestationPage: React.FC = () => {
                 <>
                   {/* Standard File Upload Drop Zone */}
                   <div
+                    role="button"
+                    tabIndex={0}
                     onClick={() => !uploadFileMutation.isPending && fileInputRef.current?.click()}
+                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') !uploadFileMutation.isPending && fileInputRef.current?.click(); }}
                     onDrop={handleDrop}
                     onDragOver={handleDragOver}
                     onDragLeave={handleDragLeave}

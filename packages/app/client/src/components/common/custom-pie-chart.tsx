@@ -160,7 +160,10 @@ export default function CustomPieChart({
                   ${activeFilter === entry.name ? 'bg-gray-100 font-medium' : 'hover:bg-background'}
                   cursor-pointer
                 `}
+                role="button"
+                tabIndex={0}
                 onClick={() => onSegmentClick(entry.name)}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onSegmentClick(entry.name); }}
                 title={entry.name}
               >
                 <div 

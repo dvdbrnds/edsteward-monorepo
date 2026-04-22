@@ -84,7 +84,12 @@ function ColumnHeader({ columnKey, label, sortable, sortKey, activeSortKey, acti
     <div className="flex items-center gap-1 group">
       <div 
         className={cn("flex items-center gap-2 flex-1", sortable && "cursor-pointer")}
-        onClick={() => sortable && sortKey && onSort?.(sortKey)}
+        {...(sortable ? {
+          role: "button",
+          tabIndex: 0,
+          onClick: () => sortKey && onSort?.(sortKey),
+          onKeyDown: (e: React.KeyboardEvent) => { if (e.key === 'Enter' || e.key === ' ') sortKey && onSort?.(sortKey); },
+        } : {})}
       >
         {label}
         {sortable && <SortIcon className={cn("h-4 w-4", isActive && "text-foreground")} />}

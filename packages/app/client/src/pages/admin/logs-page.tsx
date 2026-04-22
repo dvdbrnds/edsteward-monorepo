@@ -205,9 +205,10 @@ export default function LogsPage() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
               <div className="space-y-2">
-                <label className="text-sm font-medium">Search</label>
+                <label htmlFor="logs-search" className="text-sm font-medium">Search</label>
                 <div className="flex space-x-2">
                   <Input
+                    id="logs-search"
                     placeholder="Search logs..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
@@ -223,7 +224,7 @@ export default function LogsPage() {
                 </div>
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium">Log Level</label>
+                <label htmlFor="logs-level-select" className="text-sm font-medium">Log Level</label>
                 <Select value={level} onValueChange={setLevel}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select level" />
@@ -239,7 +240,7 @@ export default function LogsPage() {
                 </Select>
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium">Facility</label>
+                <label htmlFor="logs-facility-select" className="text-sm font-medium">Facility</label>
                 <Select value={facility} onValueChange={setFacility}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select facility" />
@@ -269,7 +270,7 @@ export default function LogsPage() {
 
             {/* Date range section */}
             <div className="space-y-2 mb-6">
-              <label className="text-sm font-medium">Date Range</label>
+              <span className="text-sm font-medium">Date Range</span>
               <div className="flex gap-2">
                 <Popover>
                   <PopoverTrigger asChild>

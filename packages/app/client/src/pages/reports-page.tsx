@@ -170,7 +170,10 @@ const CustomPieChart = ({
                       ${value.length > 15 ? 'text-xs' : 'text-sm'}
                       ${activeFilter === value ? 'font-bold' : ''}
                     `}
+                    role="button"
+                    tabIndex={0}
                     onClick={() => onSegmentClick(value as string)}
+                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onSegmentClick(value as string); }}
                   >
                     {value}
                   </span>

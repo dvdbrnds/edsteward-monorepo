@@ -22,6 +22,7 @@ export function FeatureFlagProvider({ children, tenantId }: FeatureFlagProviderP
 
   useEffect(() => {
     fetchTenantFeatures();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tenantId]);
 
   const fetchTenantFeatures = async () => {

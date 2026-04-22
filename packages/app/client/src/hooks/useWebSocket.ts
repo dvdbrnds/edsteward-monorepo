@@ -58,7 +58,7 @@ export function useWebSocket(options: WebSocketHookOptions = {}) {
 
   const { user } = useAuth();
   const isAuthenticated = !!user;
-  const getToken = () => null;
+  const getToken = useCallback(() => null, []);
   const [clientId, setClientId] = useState<string | null>(null);
   const [subscribedRegulations, setSubscribedRegulations] = useState<string[]>([]);
   const queryClient = useQueryClient();

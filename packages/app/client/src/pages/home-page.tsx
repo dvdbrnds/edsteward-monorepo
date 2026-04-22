@@ -119,11 +119,12 @@ function AnalyticsTabWidgets() {
                     <div
                       key={notification.id}
                       className={`p-3 border rounded-lg hover:bg-muted transition-colors ${notification.regulation ? 'cursor-pointer hover:border-blue-300' : ''}`}
-                      onClick={() => {
-                        if (notification.regulation) {
-                          window.location.href = `/regulations/${notification.regulation.id}`;
-                        }
-                      }}
+                      {...(notification.regulation ? {
+                        role: "button",
+                        tabIndex: 0,
+                        onClick: () => { window.location.href = `/regulations/${notification.regulation!.id}`; },
+                        onKeyDown: (e: React.KeyboardEvent) => { if (e.key === 'Enter' || e.key === ' ') window.location.href = `/regulations/${notification.regulation!.id}`; },
+                      } : {})}
                     >
                       <div className="flex items-start gap-3">
                         <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />

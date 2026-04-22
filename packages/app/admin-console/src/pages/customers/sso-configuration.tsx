@@ -100,6 +100,7 @@ const SSOConfiguration: React.FC<SSOConfigurationProps> = ({
   // Load existing config
   useEffect(() => {
     loadSSOConfig();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tenantId]);
 
   const loadSSOConfig = async () => {
@@ -374,7 +375,10 @@ const SSOConfiguration: React.FC<SSOConfigurationProps> = ({
             ].map((p) => (
               <div
                 key={p.id}
+                role="button"
+                tabIndex={0}
                 onClick={() => setProvider(p.id as SSOProvider)}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setProvider(p.id as SSOProvider); }}
                 className={`p-4 border-2 rounded-lg cursor-pointer transition-colors ${
                   provider === p.id 
                     ? 'border-blue-500 bg-blue-50' 

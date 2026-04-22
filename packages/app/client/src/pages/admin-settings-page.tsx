@@ -642,8 +642,9 @@ export default function SystemSettingsPage() {
                       </p>
                       <div className="flex gap-3 items-end">
                         <div className="flex-1">
-                          <label className="text-sm font-medium mb-1 block">Send Test To</label>
+                          <label htmlFor="test-email-address" className="text-sm font-medium mb-1 block">Send Test To</label>
                           <Input 
+                            id="test-email-address"
                             type="email"
                             placeholder="test@example.com"
                             value={testEmailAddress}
@@ -801,16 +802,18 @@ export default function SystemSettingsPage() {
                         <div className="grid gap-4 py-4">
                           <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
-                              <label className="text-sm font-medium">First Name *</label>
+                              <label htmlFor="new-user-first-name" className="text-sm font-medium">First Name *</label>
                               <Input
+                                id="new-user-first-name"
                                 value={newUser.firstName}
                                 onChange={(e) => setNewUser({ ...newUser, firstName: e.target.value })}
                                 placeholder="John"
                               />
                             </div>
                             <div className="space-y-2">
-                              <label className="text-sm font-medium">Last Name *</label>
+                              <label htmlFor="new-user-last-name" className="text-sm font-medium">Last Name *</label>
                               <Input
+                                id="new-user-last-name"
                                 value={newUser.lastName}
                                 onChange={(e) => setNewUser({ ...newUser, lastName: e.target.value })}
                                 placeholder="Smith"
@@ -818,8 +821,9 @@ export default function SystemSettingsPage() {
                             </div>
                           </div>
                           <div className="space-y-2">
-                            <label className="text-sm font-medium">Email *</label>
+                            <label htmlFor="new-user-email" className="text-sm font-medium">Email *</label>
                             <Input
+                              id="new-user-email"
                               type="email"
                               value={newUser.email}
                               onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
@@ -827,8 +831,9 @@ export default function SystemSettingsPage() {
                             />
                           </div>
                           <div className="space-y-2">
-                            <label className="text-sm font-medium">Username *</label>
+                            <label htmlFor="new-user-username" className="text-sm font-medium">Username *</label>
                             <Input
+                              id="new-user-username"
                               value={newUser.username}
                               onChange={(e) => setNewUser({ ...newUser, username: e.target.value })}
                               placeholder="jsmith"
@@ -836,7 +841,7 @@ export default function SystemSettingsPage() {
                           </div>
                           <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
-                              <label className="text-sm font-medium">Role *</label>
+                              <label htmlFor="new-user-role" className="text-sm font-medium">Role *</label>
                               <Select
                                 value={newUser.role}
                                 onValueChange={(role) => setNewUser({ ...newUser, role })}
@@ -854,8 +859,9 @@ export default function SystemSettingsPage() {
                               </Select>
                             </div>
                             <div className="space-y-2">
-                              <label className="text-sm font-medium">Department</label>
+                              <label htmlFor="new-user-department" className="text-sm font-medium">Department</label>
                               <Input
+                                id="new-user-department"
                                 value={newUser.department}
                                 onChange={(e) => setNewUser({ ...newUser, department: e.target.value })}
                                 placeholder="Campus Police"
@@ -863,8 +869,9 @@ export default function SystemSettingsPage() {
                             </div>
                           </div>
                           <div className="space-y-2">
-                            <label className="text-sm font-medium">Password (optional for SSO)</label>
+                            <label htmlFor="new-user-password" className="text-sm font-medium">Password (optional for SSO)</label>
                             <Input
+                              id="new-user-password"
                               type="password"
                               value={newUser.password}
                               onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
@@ -1057,9 +1064,10 @@ export default function SystemSettingsPage() {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                       <div className="space-y-2">
-                        <label className="text-sm font-medium">Search</label>
+                        <label htmlFor="log-search" className="text-sm font-medium">Search</label>
                         <div className="flex space-x-2">
                           <Input
+                            id="log-search"
                             placeholder="Search logs..."
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
@@ -1076,7 +1084,7 @@ export default function SystemSettingsPage() {
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-sm font-medium">Log Level</label>
+                        <label htmlFor="log-level-select" className="text-sm font-medium">Log Level</label>
                         <Select value={level} onValueChange={setLevel}>
                           <SelectTrigger>
                             <SelectValue placeholder="Select level" />
@@ -1093,7 +1101,7 @@ export default function SystemSettingsPage() {
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-sm font-medium">Facility</label>
+                        <label htmlFor="log-facility-select" className="text-sm font-medium">Facility</label>
                         <Select value={facility} onValueChange={setFacility}>
                           <SelectTrigger>
                             <SelectValue placeholder="Select facility" />

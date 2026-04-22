@@ -45,7 +45,10 @@ export default function RegulationContextStrip({
     queryKey: ["/api/dashboard-analytics"],
   });
 
-  const allRegs = Array.isArray(regulations) ? regulations : [];
+  const allRegs = useMemo(
+    () => (Array.isArray(regulations) ? regulations : []),
+    [regulations],
+  );
 
   const regulationIds = useMemo(
     () => allRegs.map((r) => r.id).sort().join(","),

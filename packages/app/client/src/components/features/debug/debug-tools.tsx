@@ -135,24 +135,27 @@ export function NoteDebugger() {
       </CardHeader>
       <CardContent className="space-y-4">
         <div>
-          <label className="block text-sm font-medium mb-1">Regulation ID</label>
+          <label htmlFor="debug-regulation-id" className="block text-sm font-medium mb-1">Regulation ID</label>
           <Input
+            id="debug-regulation-id"
             value={regulationId}
             onChange={(e) => setRegulationId(e.target.value)}
             placeholder="Regulation ID"
           />
         </div>
         <div>
-          <label className="block text-sm font-medium mb-1">Title</label>
+          <label htmlFor="debug-note-title" className="block text-sm font-medium mb-1">Title</label>
           <Input
+            id="debug-note-title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Note title"
           />
         </div>
         <div>
-          <label className="block text-sm font-medium mb-1">Content</label>
+          <label htmlFor="debug-note-content" className="block text-sm font-medium mb-1">Content</label>
           <Textarea
+            id="debug-note-content"
             value={content}
             onChange={(e) => setContent(e.target.value)}
             placeholder="Note content"
@@ -521,8 +524,9 @@ export function RegulationImportDebugger() {
 
         <div className="flex items-center gap-4 mb-4">
           <div className="flex-1">
-            <label className="block text-sm font-medium mb-1">Regulation IDs</label>
+            <label htmlFor="debug-regulation-ids" className="block text-sm font-medium mb-1">Regulation IDs</label>
             <Input
+              id="debug-regulation-ids"
               value={regulationIds.join(', ')}
               onChange={(e) => setRegulationIds(e.target.value.split(',').map(id => id.trim()))}
               placeholder="Enter regulation IDs (e.g., REG1001, REG1002)"
@@ -560,7 +564,7 @@ export function RegulationImportDebugger() {
 
         <div>
           <div className="flex items-center justify-between mb-2">
-            <label className="block text-sm font-medium">Analysis Status</label>
+            <span className="block text-sm font-medium">Analysis Status</span>
             <Badge
               variant={
                 importStatus === 'completed' ? 'default' :

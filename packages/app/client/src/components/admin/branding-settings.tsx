@@ -143,6 +143,7 @@ const FileUploadField: React.FC<{
       
       setPreviewUrl(currentUrl);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUrl, type]);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -228,6 +229,8 @@ const FileUploadField: React.FC<{
               ? 'border-blue-400 bg-blue-50' 
               : 'border-border hover:border-gray-400'
           }`}
+          role="button"
+          tabIndex={0}
           onClick={() => {
             
             if (!isProcessing) {
@@ -235,6 +238,7 @@ const FileUploadField: React.FC<{
               fileInputRef.current?.click();
             }
           }}
+          onKeyDown={(e) => { if ((e.key === 'Enter' || e.key === ' ') && !isProcessing) fileInputRef.current?.click(); }}
         >
           {isProcessing ? (
             <div className="flex flex-col items-center">

@@ -303,7 +303,10 @@ export function CustomerManagementPage() {
           <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
             <div 
               className="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75"
+              role="button"
+              tabIndex={0}
               onClick={() => setConfiguringSSO(null)}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setConfiguringSSO(null); }}
             />
             <div className="relative inline-block w-full max-w-4xl p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-gray-100 shadow-xl rounded-lg">
               <SSOConfiguration

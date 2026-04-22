@@ -203,8 +203,9 @@ export default function AuditTrailPage() {
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
                 <div>
-                  <label className="text-sm font-medium">Search</label>
+                  <label htmlFor="audit-search" className="text-sm font-medium">Search</label>
                   <Input
+                    id="audit-search"
                     placeholder="Search logs..."
                     value={queryParams.search || ''}
                     onChange={(e) => setQueryParams({ ...queryParams, search: e.target.value })}
@@ -212,7 +213,7 @@ export default function AuditTrailPage() {
                 </div>
                 
                 <div>
-                  <label className="text-sm font-medium">Entity Type</label>
+                  <label htmlFor="audit-entity-type" className="text-sm font-medium">Entity Type</label>
                   <Select
                     value={queryParams.entityType || 'all'}
                     onValueChange={(value) => setQueryParams({ ...queryParams, entityType: value === 'all' ? undefined : value })}
@@ -231,7 +232,7 @@ export default function AuditTrailPage() {
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium">Action</label>
+                  <label htmlFor="audit-action" className="text-sm font-medium">Action</label>
                   <Select
                     value={queryParams.action || 'all'}
                     onValueChange={(value) => setQueryParams({ ...queryParams, action: value === 'all' ? undefined : value })}
@@ -250,7 +251,7 @@ export default function AuditTrailPage() {
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium">Risk Level</label>
+                  <label htmlFor="audit-risk-level" className="text-sm font-medium">Risk Level</label>
                   <Select
                     value={queryParams.riskLevel || 'all'}
                     onValueChange={(value) => setQueryParams({ ...queryParams, riskLevel: value === 'all' ? undefined : value })}
@@ -269,8 +270,9 @@ export default function AuditTrailPage() {
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium">Regulation ID</label>
+                  <label htmlFor="audit-regulation-id" className="text-sm font-medium">Regulation ID</label>
                   <Input
+                    id="audit-regulation-id"
                     placeholder="Regulation ID"
                     value={queryParams.regulationId || ''}
                     onChange={(e) => setQueryParams({ ...queryParams, regulationId: e.target.value })}
@@ -319,7 +321,10 @@ export default function AuditTrailPage() {
                     <div
                       key={log.id}
                       className="border rounded-lg p-4 hover:bg-background cursor-pointer"
+                      role="button"
+                      tabIndex={0}
                       onClick={() => setSelectedLog(log)}
+                      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setSelectedLog(log); }}
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex-1">

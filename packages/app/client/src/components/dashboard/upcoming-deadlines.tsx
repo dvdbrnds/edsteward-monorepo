@@ -120,8 +120,15 @@ export default function UpcomingDeadlines({ categoryFilter, limit }: UpcomingDea
               return (
                 <div key={deadline.id} className="w-full">
                   <div
+                    role="button"
+                    tabIndex={0}
                     onClick={() => {
                       if (regulation) {
+                        setLocation(`/regulations/${regulation.id}`);
+                      }
+                    }}
+                    onKeyDown={(e) => {
+                      if ((e.key === 'Enter' || e.key === ' ') && regulation) {
                         setLocation(`/regulations/${regulation.id}`);
                       }
                     }}

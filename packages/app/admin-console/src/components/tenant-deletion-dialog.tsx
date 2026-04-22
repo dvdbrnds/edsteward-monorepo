@@ -66,6 +66,7 @@ export function TenantDeletionDialog({
       setError(null);
       setDeletionType('soft');
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, tenantId]);
 
   const checkCanDelete = async () => {
@@ -146,7 +147,10 @@ export function TenantDeletionDialog({
         {/* Backdrop */}
         <div 
           className="fixed inset-0 bg-black/50 transition-opacity" 
+          role="button"
+          tabIndex={0}
           onClick={onClose}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onClose(); }}
         />
 
         {/* Dialog */}
@@ -212,7 +216,7 @@ export function TenantDeletionDialog({
 
               {/* Deletion Type Selection */}
               <div className="space-y-3">
-                <label className="block text-sm font-medium text-gray-700">Deletion Type</label>
+                <span className="block text-sm font-medium text-gray-700">Deletion Type</span>
                 <div className="grid grid-cols-2 gap-3">
                   <button
                     onClick={() => setDeletionType('soft')}
@@ -249,10 +253,11 @@ export function TenantDeletionDialog({
 
               {/* Confirmation Phrase */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="confirmation-phrase" className="block text-sm font-medium text-gray-700 mb-1">
                   Type <span className="font-mono bg-gray-100 px-2 py-0.5 rounded">{expectedPhrase}</span> to confirm
                 </label>
                 <input
+                  id="confirmation-phrase"
                   type="text"
                   value={confirmationPhrase}
                   onChange={(e) => setConfirmationPhrase(e.target.value)}
@@ -267,10 +272,11 @@ export function TenantDeletionDialog({
 
               {/* Reason */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="deletion-reason" className="block text-sm font-medium text-gray-700 mb-1">
                   Reason for deletion <span className="text-red-500">*</span>
                 </label>
                 <textarea
+                  id="deletion-reason"
                   value={reason}
                   onChange={(e) => setReason(e.target.value)}
                   placeholder="Please explain why this tenant is being deleted..."
@@ -284,10 +290,11 @@ export function TenantDeletionDialog({
 
               {/* Admin Password */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="admin-password-confirm" className="block text-sm font-medium text-gray-700 mb-1">
                   Re-enter your admin password <span className="text-red-500">*</span>
                 </label>
                 <input
+                  id="admin-password-confirm"
                   type="password"
                   value={adminPassword}
                   onChange={(e) => setAdminPassword(e.target.value)}
@@ -297,8 +304,9 @@ export function TenantDeletionDialog({
               </div>
 
               {/* Acknowledgment */}
-              <label className="flex items-start gap-3 p-4 bg-yellow-50 border border-yellow-200 rounded-lg cursor-pointer">
+              <label htmlFor="acknowledge-data-loss" aria-label="I understand the consequences" className="flex items-start gap-3 p-4 bg-yellow-50 border border-yellow-200 rounded-lg cursor-pointer">
                 <input
+                  id="acknowledge-data-loss"
                   type="checkbox"
                   checked={acknowledgeDataLoss}
                   onChange={(e) => setAcknowledgeDataLoss(e.target.checked)}

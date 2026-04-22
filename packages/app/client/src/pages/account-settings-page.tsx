@@ -126,28 +126,28 @@ export default function AccountSettingsPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-4">
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground">Username</label>
+                  <span className="text-sm font-medium text-muted-foreground">Username</span>
                   <p className="text-lg font-semibold">{user.username}</p>
                 </div>
                 
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground flex items-center gap-1">
+                  <span className="text-sm font-medium text-muted-foreground flex items-center gap-1">
                     <Mail className="h-4 w-4" />
                     Email
-                  </label>
+                  </span>
                   <p className="text-lg">{user.email || "Not provided"}</p>
                 </div>
 
                 {user.firstName && (
                   <div>
-                    <label className="text-sm font-medium text-muted-foreground">First Name</label>
+                    <span className="text-sm font-medium text-muted-foreground">First Name</span>
                     <p className="text-lg">{user.firstName}</p>
                   </div>
                 )}
 
                 {user.lastName && (
                   <div>
-                    <label className="text-sm font-medium text-muted-foreground">Last Name</label>
+                    <span className="text-sm font-medium text-muted-foreground">Last Name</span>
                     <p className="text-lg">{user.lastName}</p>
                   </div>
                 )}
@@ -155,7 +155,7 @@ export default function AccountSettingsPage() {
 
               <div className="space-y-4">
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground">Role</label>
+                  <span className="text-sm font-medium text-muted-foreground">Role</span>
                   <div className="flex items-center gap-2">
                     <Badge variant={user.role === 'admin' ? 'default' : 'secondary'}>
                       {user.role}
@@ -168,16 +168,16 @@ export default function AccountSettingsPage() {
 
                 {user.department && (
                   <div>
-                    <label className="text-sm font-medium text-muted-foreground flex items-center gap-1">
+                    <span className="text-sm font-medium text-muted-foreground flex items-center gap-1">
                       <Building className="h-4 w-4" />
                       Department
-                    </label>
+                    </span>
                     <p className="text-lg">{user.department}</p>
                   </div>
                 )}
 
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground">Account Type</label>
+                  <span className="text-sm font-medium text-muted-foreground">Account Type</span>
                   <div className="flex items-center gap-2">
                     {user.identityProvider === 'saml' ? (
                       <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
@@ -197,10 +197,10 @@ export default function AccountSettingsPage() {
 
                 {user.lastLogin && (
                   <div>
-                    <label className="text-sm font-medium text-muted-foreground flex items-center gap-1">
+                    <span className="text-sm font-medium text-muted-foreground flex items-center gap-1">
                       <Calendar className="h-4 w-4" />
                       Last Login
-                    </label>
+                    </span>
                     <p className="text-lg">{new Date(user.lastLogin).toLocaleString()}</p>
                   </div>
                 )}

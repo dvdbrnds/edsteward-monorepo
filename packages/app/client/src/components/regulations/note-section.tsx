@@ -425,7 +425,10 @@ export function NoteSection({ regulationId, initialData }: NoteSectionProps) {
                   <div
                     className="text-sm line-clamp-3"
                     dangerouslySetInnerHTML={{ __html: note.content }}
+                    role="button"
+                    tabIndex={0}
                     onClick={() => setViewingNote(note)}
+                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setViewingNote(note); }}
                   />
                 </CardContent>
               </Card>

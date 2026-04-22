@@ -244,7 +244,10 @@ export function EvidenceFiles({ regulationId, isAdmin = false }: EvidenceFilesPr
                   onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
                 />
                 <div
+                  role="button"
+                  tabIndex={0}
                   onClick={() => fileInputRef.current?.click()}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') fileInputRef.current?.click(); }}
                   onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }}
                   onDragLeave={() => setIsDragOver(false)}
                   onDrop={(e) => {

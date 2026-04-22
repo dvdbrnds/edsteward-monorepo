@@ -286,7 +286,10 @@ export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionW
                     flex items-center gap-2 p-2 rounded-md cursor-pointer
                     ${currentStep === step.id ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'}
                   `}
+                  role="button"
+                  tabIndex={0}
                   onClick={() => handleStepChange(step.id)}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleStepChange(step.id); }}
                 >
                   <div className="h-2 w-2 rounded-full bg-current" />
                   <span className="text-sm font-medium">{step.title}</span>
@@ -398,7 +401,10 @@ export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionW
 
                       <div
                         className="border-2 border-dashed rounded-md p-6 text-center transition-colors cursor-pointer hover:border-primary"
+                        role="button"
+                        tabIndex={0}
                         onClick={handleFileSelect}
+                        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleFileSelect(e as unknown as React.MouseEvent); }}
                       >
                         <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
                         <p className="text-sm text-muted-foreground">

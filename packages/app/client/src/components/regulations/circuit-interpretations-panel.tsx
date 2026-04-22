@@ -343,9 +343,9 @@ export function CircuitInterpretationsPanel({ regulationId, isAdmin }: CircuitIn
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium">Review Status</label>
+                <label htmlFor="ci-review-status" className="text-sm font-medium">Review Status</label>
                 <Select value={reviewStatus} onValueChange={setReviewStatus}>
-                  <SelectTrigger>
+                  <SelectTrigger id="ci-review-status">
                     <SelectValue placeholder="Select status..." />
                   </SelectTrigger>
                   <SelectContent>
@@ -357,8 +357,9 @@ export function CircuitInterpretationsPanel({ regulationId, isAdmin }: CircuitIn
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium">Notes (optional)</label>
+                <label htmlFor="ci-review-notes" className="text-sm font-medium">Notes (optional)</label>
                 <Textarea
+                  id="ci-review-notes"
                   value={reviewNotes}
                   onChange={(e) => setReviewNotes(e.target.value)}
                   placeholder="Add any notes about this review..."

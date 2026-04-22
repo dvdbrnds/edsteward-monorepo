@@ -202,7 +202,7 @@ export function ProductTour() {
       )}
 
       {/* Click blocker (covers everything except the spotlight area) */}
-      <div className="absolute inset-0" onClick={(e) => e.stopPropagation()} />
+      <div className="absolute inset-0" role="button" tabIndex={0} onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()} />
 
       {/* Tooltip */}
       <div

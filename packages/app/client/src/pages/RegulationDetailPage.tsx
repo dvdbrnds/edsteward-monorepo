@@ -289,7 +289,7 @@ function RegulationDetailPage() {
   });
   
   // Extract tasks array for backward compatibility
-  const complianceTasks = complianceTasksData?.tasks || [];
+  const complianceTasks = React.useMemo(() => complianceTasksData?.tasks || [], [complianceTasksData]);
 
   // Extract task citations for the statutory framework view
   const taskCitations = React.useMemo(() => {

@@ -105,7 +105,10 @@ export default function TemplateSyncDialog({ isOpen, onClose, onSyncComplete }: 
       <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
         <div 
           className="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75"
+          role="button"
+          tabIndex={0}
           onClick={onClose}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onClose(); }}
         />
         
         <div className="relative inline-block w-full max-w-2xl p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-lg">
@@ -239,10 +242,11 @@ export default function TemplateSyncDialog({ isOpen, onClose, onSyncComplete }: 
               </p>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="sync-admin-password" className="block text-sm font-medium text-gray-700 mb-2">
                   Admin Password
                 </label>
                 <input
+                  id="sync-admin-password"
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}

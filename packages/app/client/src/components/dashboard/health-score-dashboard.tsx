@@ -169,7 +169,10 @@ export default function HealthScoreDashboard() {
     <Card className="transition-all duration-300 ease-in-out">
       <div 
         className="cursor-pointer hover:bg-background/50 transition-colors"
+        role="button"
+        tabIndex={0}
         onClick={() => setIsExpanded(!isExpanded)}
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setIsExpanded(!isExpanded); }}
       >
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
@@ -228,9 +231,12 @@ export default function HealthScoreDashboard() {
                   "bg-background rounded-lg p-4 cursor-pointer transition-colors",
                   selectedCategory === category.category && "ring-2 ring-[#00267A] bg-gray-100"
                 )}
+                role="button"
+                tabIndex={0}
                 onClick={() => setSelectedCategory(
                   selectedCategory === category.category ? null : category.category
                 )}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setSelectedCategory(selectedCategory === category.category ? null : category.category); }}
               >
                 <h4 className="font-medium text-foreground mb-3">{category.category}</h4>
                 <div className="flex items-center gap-4">

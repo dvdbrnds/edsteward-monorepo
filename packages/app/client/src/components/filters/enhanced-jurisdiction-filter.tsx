@@ -67,11 +67,11 @@ export function EnhancedJurisdictionFilter({
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Jurisdiction Source Filter - WHERE the regulation comes from */}
           <div>
-            <label className="block text-sm font-medium text-foreground mb-2">
+            <label htmlFor="jurisdiction-source-filter" className="block text-sm font-medium text-foreground mb-2">
               Regulation Source
             </label>
             <Select value={jurisdictionSourceFilter} onValueChange={setJurisdictionSourceFilter}>
-              <SelectTrigger>
+              <SelectTrigger id="jurisdiction-source-filter">
                 <SelectValue placeholder="Where regulation comes from" />
               </SelectTrigger>
               <SelectContent>
@@ -90,11 +90,11 @@ export function EnhancedJurisdictionFilter({
 
           {/* Institution Type Filter - WHO the regulation applies to */}
           <div>
-            <label className="block text-sm font-medium text-foreground mb-2">
+            <label htmlFor="institution-type-filter" className="block text-sm font-medium text-foreground mb-2">
               Applies To
             </label>
             <Select value={institutionTypeFilter} onValueChange={setInstitutionTypeFilter}>
-              <SelectTrigger>
+              <SelectTrigger id="institution-type-filter">
                 <SelectValue placeholder="Who regulation applies to" />
               </SelectTrigger>
               <SelectContent>
