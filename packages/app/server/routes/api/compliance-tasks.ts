@@ -510,13 +510,70 @@ router.post('/:taskId/nudge', requireAuth, requireAdmin, async (req: Request, re
       content: message || 'Reminder sent to complete this task',
     });
 
-    // Send email nudge
     const senderName = req.user?.firstName && req.user?.lastName 
       ? `${req.user.firstName} ${req.user.lastName}`
       : req.user?.username || 'Chief Compliance Officer';
 
+    // Create or reuse attestation token for the DRI
+    let attestationBlock = '';
+    if (taskData.task.attestationStatus !== 'attested' && taskData.assignedUser.email) {
+      const existing = await db.select()
+        .from(taskAttestationTokens)
+        .where(and(
+          eq(taskAttestationTokens.taskId, taskId),
+          eq(taskAttestationTokens.email, taskData.assignedUser.email),
+          gt(taskAttestationTokens.expiresAt, new Date()),
+        ))
+        .limit(1);
+
+      let attestationUrl: string;
+      const baseUrl = process.env.APP_URL || `http://${req.headers.host}`;
+
+      if (existing.length > 0 && !existing[0].usedAt) {
+        attestationUrl = `${baseUrl}/attest/${existing[0].token}`;
+      } else {
+        const token = crypto.randomBytes(32).toString('hex');
+        const expiresAt = new Date();
+        expiresAt.setDate(expiresAt.getDate() + 14);
+        await db.insert(taskAttestationTokens).values({
+          taskId,
+          token,
+          email: taskData.assignedUser.email,
+          recipientName: taskData.assignedUser.firstName
+            ? `${taskData.assignedUser.firstName} ${taskData.assignedUser.lastName || ''}`.trim()
+            : null,
+          expiresAt,
+          canUploadEvidence: taskData.task.evidenceRequired || false,
+          canAttest: true,
+          createdBy: req.user!.id,
+          personalMessage: null,
+        });
+        attestationUrl = `${baseUrl}/attest/${token}`;
+
+        if (!taskData.task.attestationStatus || taskData.task.attestationStatus === 'not_required') {
+          await db.update(complianceTasks)
+            .set({ attestationStatus: 'pending', updatedAt: new Date() })
+            .where(eq(complianceTasks.id, taskId));
+        }
+      }
+
+      attestationBlock = `
+        <div style="background: #ecfdf5; border: 2px solid #059669; border-radius: 8px; padding: 20px; margin: 20px 0; text-align: center;">
+          <h3 style="margin: 0 0 8px 0; color: #065f46;">Attestation Required</h3>
+          <p style="margin: 0 0 12px 0; color: #047857;">
+            ${taskData.task.evidenceRequired
+              ? 'Please upload your evidence and confirm compliance using the secure link below.'
+              : 'Please confirm compliance for this task using the secure link below.'}
+          </p>
+          <a href="${attestationUrl}" style="display: inline-block; background: #059669; color: white; padding: 12px 28px; text-decoration: none; border-radius: 8px; font-weight: 600;">
+            ${taskData.task.evidenceRequired ? 'Upload Evidence & Attest' : 'Review & Attest Now'}
+          </a>
+        </div>
+      `;
+    }
+
     const nudgeTracking: EmailTrackingContext = {
-      emailType: 'task_reminder',
+      emailType: attestationBlock ? 'attestation_request' : 'task_reminder',
       relatedEntityType: 'compliance_task',
       relatedEntityId: taskId,
       recipientUserId: taskData.assignedUser.id,
@@ -534,6 +591,7 @@ router.post('/:taskId/nudge', requireAuth, requireAdmin, async (req: Request, re
           ${taskData.task.dueDate ? `<p style="margin: 5px 0;"><strong>Due Date:</strong> ${new Date(taskData.task.dueDate).toLocaleDateString()}</p>` : ''}
           ${message ? `<p style="margin: 15px 0; padding: 10px; background: #fff; border-left: 3px solid #0066cc;">${message}</p>` : ''}
         </div>
+        ${attestationBlock}
         <p>Please log in to EdSteward to complete this task.</p>
       `,
     }, undefined, undefined, undefined, nudgeTracking);
@@ -584,7 +642,6 @@ router.post('/:taskId/escalate', requireAuth, requireAdmin, async (req: Request,
       content: `Escalated to ${escalationEmail}${message ? `: ${message}` : ''}`,
     });
 
-    // Send escalation email
     const senderName = req.user?.firstName && req.user?.lastName 
       ? `${req.user.firstName} ${req.user.lastName}`
       : req.user?.username || 'Chief Compliance Officer';
@@ -594,6 +651,9 @@ router.post('/:taskId/escalate', requireAuth, requireAdmin, async (req: Request,
           ? `${taskData.assignedUser.firstName} ${taskData.assignedUser.lastName}`
           : taskData.assignedUser.username)
       : 'Unassigned';
+
+    const baseUrl = process.env.APP_URL || `http://${req.headers.host}`;
+    const regulationUrl = `${baseUrl}/regulations/${taskData.task.regulationId}`;
 
     const escalationTracking: EmailTrackingContext = {
       emailType: 'escalation',
@@ -610,14 +670,94 @@ router.post('/:taskId/escalate', requireAuth, requireAdmin, async (req: Request,
         <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #cc0000;">
           <h3 style="margin: 0 0 10px 0;">${taskData.task.title}</h3>
           <p style="margin: 5px 0;"><strong>Regulation:</strong> ${taskData.regulation?.name || 'Unknown'}</p>
-          <p style="margin: 5px 0;"><strong>Assigned To:</strong> ${driName}</p>
+          <p style="margin: 5px 0;"><strong>Currently Assigned To:</strong> ${driName}</p>
           <p style="margin: 5px 0;"><strong>Status:</strong> ${taskData.task.status}</p>
           ${taskData.task.dueDate ? `<p style="margin: 5px 0;"><strong>Due Date:</strong> ${new Date(taskData.task.dueDate).toLocaleDateString()}</p>` : ''}
         </div>
         ${message ? `<div style="margin: 20px 0;"><strong>Message from ${senderName}:</strong><p style="padding: 10px; background: #f5f5f5; border-radius: 4px;">${message}</p></div>` : ''}
-        <p>Please ensure this compliance requirement is addressed promptly.</p>
+        <div style="background: #eff6ff; border-left: 4px solid #2563eb; padding: 15px; margin: 20px 0; border-radius: 0 8px 8px 0;">
+          <p style="margin: 0;"><strong>Action needed:</strong> Please ensure this compliance requirement is addressed promptly. If the current DRI is unable to complete this task, you may be reassigned as the Directly Responsible Individual. Contact ${senderName} or your compliance office to discuss reassignment.</p>
+        </div>
+        <a href="${regulationUrl}" style="display: inline-block; background: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: 600;">View Regulation in EdSteward</a>
       `,
     }, undefined, undefined, undefined, escalationTracking);
+
+    // If DRI is CC'd and task isn't attested, also send a separate attestation email to the DRI
+    if (ccDri && taskData.assignedUser?.email && taskData.task.attestationStatus !== 'attested') {
+      try {
+        const existing = await db.select()
+          .from(taskAttestationTokens)
+          .where(and(
+            eq(taskAttestationTokens.taskId, taskId),
+            eq(taskAttestationTokens.email, taskData.assignedUser.email),
+            gt(taskAttestationTokens.expiresAt, new Date()),
+          ))
+          .limit(1);
+
+        let attestationUrl: string;
+        if (existing.length > 0 && !existing[0].usedAt) {
+          attestationUrl = `${baseUrl}/attest/${existing[0].token}`;
+        } else {
+          const token = crypto.randomBytes(32).toString('hex');
+          const expiresAt = new Date();
+          expiresAt.setDate(expiresAt.getDate() + 14);
+          await db.insert(taskAttestationTokens).values({
+            taskId,
+            token,
+            email: taskData.assignedUser.email,
+            recipientName: taskData.assignedUser.firstName
+              ? `${taskData.assignedUser.firstName} ${taskData.assignedUser.lastName || ''}`.trim()
+              : null,
+            expiresAt,
+            canUploadEvidence: taskData.task.evidenceRequired || false,
+            canAttest: true,
+            createdBy: req.user!.id,
+            personalMessage: null,
+          });
+          attestationUrl = `${baseUrl}/attest/${token}`;
+
+          if (!taskData.task.attestationStatus || taskData.task.attestationStatus === 'not_required') {
+            await db.update(complianceTasks)
+              .set({ attestationStatus: 'pending', updatedAt: new Date() })
+              .where(eq(complianceTasks.id, taskId));
+          }
+        }
+
+        const driTracking: EmailTrackingContext = {
+          emailType: 'attestation_request',
+          relatedEntityType: 'compliance_task',
+          relatedEntityId: taskId,
+          recipientUserId: taskData.assignedUser.id,
+        };
+        await emailService.sendEmailTracked({
+          to: taskData.assignedUser.email,
+          subject: `Action Required: ${taskData.task.title} - This task has been escalated`,
+          html: `
+            <h2 style="color: #cc0000;">Your Task Has Been Escalated</h2>
+            <p>Hello ${taskData.assignedUser.firstName || taskData.assignedUser.username},</p>
+            <p>${senderName} has escalated this compliance task. Please take immediate action to complete it.</p>
+            <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #cc0000;">
+              <h3 style="margin: 0 0 10px 0;">${taskData.task.title}</h3>
+              <p style="margin: 5px 0;"><strong>Regulation:</strong> ${taskData.regulation?.name || 'Unknown'}</p>
+              ${taskData.task.dueDate ? `<p style="margin: 5px 0;"><strong>Due Date:</strong> ${new Date(taskData.task.dueDate).toLocaleDateString()}</p>` : ''}
+            </div>
+            <div style="background: #ecfdf5; border: 2px solid #059669; border-radius: 8px; padding: 20px; margin: 20px 0; text-align: center;">
+              <h3 style="margin: 0 0 8px 0; color: #065f46;">Attestation Required</h3>
+              <p style="margin: 0 0 12px 0; color: #047857;">
+                ${taskData.task.evidenceRequired
+                  ? 'Please upload your evidence and confirm compliance using the secure link below.'
+                  : 'Please confirm compliance for this task using the secure link below.'}
+              </p>
+              <a href="${attestationUrl}" style="display: inline-block; background: #059669; color: white; padding: 12px 28px; text-decoration: none; border-radius: 8px; font-weight: 600;">
+                ${taskData.task.evidenceRequired ? 'Upload Evidence & Attest' : 'Review & Attest Now'}
+              </a>
+            </div>
+          `,
+        }, undefined, undefined, undefined, driTracking);
+      } catch (driEmailError) {
+        console.error('[Escalation] Failed to send attestation email to DRI:', driEmailError);
+      }
+    }
 
     res.json({ success: true, message: 'Task escalated successfully' });
   } catch (error) {
