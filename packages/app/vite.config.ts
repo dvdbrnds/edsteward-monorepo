@@ -8,7 +8,7 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 export default defineConfig({
-  plugins: [react(), runtimeErrorOverlay(), themePlugin()],
+  plugins: [react() as any, runtimeErrorOverlay() as any, themePlugin() as any],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "client", "src"),
