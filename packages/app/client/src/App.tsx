@@ -29,7 +29,6 @@ import SetupWizardPage from "@/pages/setup-wizard-page";
 import UpdatesListPage from "@/pages/updates-list-page";
 import DifferentialViewPage from "@/pages/differential-view-page";
 import DiffTestPage from "@/pages/diff-test-page";
-import TrusteesDashboard from "@/pages/trustees-dashboard";
 import AttestationPage from "@/pages/attestation-page";
 import TaskPage from "@/pages/task-page";
 import TaskAnalyticsPage from "@/pages/task-analytics-page";
@@ -54,12 +53,6 @@ function AppContent() {
               {/* Authentication Route - Exact match only, don't intercept SAML routes */}
               <Route path="/auth" component={AuthPage} />
               <Route path="/setup" component={SetupWizardPage} />
-              
-              {/* Public Dashboard - No authentication required */}
-              <Route path="/public-dashboard" component={TrusteesDashboard} />
-              
-              {/* Legacy public dashboard route - redirect to new trustees dashboard */}
-              <Route path="/trustees-dashboard" component={TrusteesDashboard} />
               
               {/* Email Attestation - No authentication required (token is auth) */}
               <Route path="/attest/:token" component={AttestationPage} />

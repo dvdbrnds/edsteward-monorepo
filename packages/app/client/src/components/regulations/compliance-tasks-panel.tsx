@@ -747,7 +747,7 @@ function TaskItem({
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => onRequestAttestation(task)} className="text-emerald-600">
                 <Shield className="h-4 w-4 mr-2" />
-                Request Attestation
+                Send Attestation (Manual)
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => onNudge(task)}>
                 <Send className="h-4 w-4 mr-2" />
@@ -1537,10 +1537,10 @@ export function ComplianceTasksPanel({ regulationId, regulationName: _regulation
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-emerald-600">
               <Shield className="h-5 w-5" />
-              Request Attestation
+              Send Attestation Request (Manual)
             </DialogTitle>
             <DialogDescription>
-              Send an attestation request email. The recipient will receive a secure link to confirm compliance.
+              Attestation requests are automatically included in scheduled task notifications. Use this to send a one-off request to a specific person.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">

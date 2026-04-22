@@ -1,6 +1,6 @@
 import { useAuth } from "@/hooks/use-auth";
 import { useQuery } from "@tanstack/react-query";
-import { Link, useLocation } from "wouter";
+import { useLocation } from "wouter";
 import Navigation from "@/components/layout/navigation";
 import ExecutiveDashboard from "@/components/dashboard/executive-dashboard";
 import MyTasks from "@/components/dashboard/my-tasks";
@@ -15,7 +15,7 @@ import { DraggableWidget } from "@/components/dashboard/draggable-widget";
 import { DashboardWidgetsProvider, useDashboardWidgets, type WidgetId } from "@/hooks/use-dashboard-widgets";
 import { useState, useEffect, ReactNode } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Bell, CheckCircle, Users, ExternalLink, BarChart3, FileText } from "lucide-react";
+import { Bell, CheckCircle, BarChart3, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -45,7 +45,6 @@ const ANALYTICS_WIDGET_SIZES: Record<string, WidgetSize> = {
   upcomingDeadlines: 'half',
   deadlineCalendar: 'half',
   notifications: 'half',
-  trusteesCard: 'full',
 };
 
 function AnalyticsTabWidgets() {
@@ -88,7 +87,7 @@ function AnalyticsTabWidgets() {
     }
   };
 
-  const analyticsWidgetIds: WidgetId[] = ['myTasks', 'pendingAttestations', 'upcomingDeadlines', 'deadlineCalendar', 'notifications', 'trusteesCard'];
+  const analyticsWidgetIds: WidgetId[] = ['myTasks', 'pendingAttestations', 'upcomingDeadlines', 'deadlineCalendar', 'notifications'];
   const visibleWidgets = widgetOrder.filter(id => analyticsWidgetIds.includes(id) && isWidgetVisible(id));
 
   const renderWidget = (widgetId: WidgetId): ReactNode => {
@@ -180,33 +179,6 @@ function AnalyticsTabWidgets() {
                     No recent notifications
                   </p>
                 )}
-              </div>
-            </CardContent>
-          </Card>
-        );
-      case 'trusteesCard':
-        return (
-          <Card className="bg-gradient-to-r from-muted to-blue-500/10 border-blue-500/20">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5 text-blue-600" />
-                Board of Trustees Dashboard
-              </CardTitle>
-              <CardDescription>
-                A public dashboard with compliance insights for trustees
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <p className="text-sm text-muted-foreground max-w-xl">
-                  Access the view-only dashboard providing an overview of our regulatory compliance status.
-                </p>
-                <Button asChild className="gap-2 w-full sm:w-auto flex-shrink-0">
-                  <Link href="/public-dashboard">
-                    <span>Open Trustees Dashboard</span>
-                    <ExternalLink className="h-4 w-4" />
-                  </Link>
-                </Button>
               </div>
             </CardContent>
           </Card>

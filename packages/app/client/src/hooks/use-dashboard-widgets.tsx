@@ -5,8 +5,7 @@ export type WidgetId =
   | 'pendingAttestations'
   | 'upcomingDeadlines'
   | 'notifications'
-  | 'deadlineCalendar'
-  | 'trusteesCard';
+  | 'deadlineCalendar';
 
 export interface Widget {
   id: WidgetId;
@@ -49,13 +48,6 @@ export const DASHBOARD_WIDGETS: Widget[] = [
     id: 'deadlineCalendar',
     name: 'Deadline Calendar',
     description: 'Calendar view of deadlines',
-    defaultVisible: true,
-    canHide: true,
-  },
-  {
-    id: 'trusteesCard',
-    name: 'Board of Trustees Link',
-    description: 'Quick access to trustees dashboard',
     defaultVisible: true,
     canHide: true,
   },

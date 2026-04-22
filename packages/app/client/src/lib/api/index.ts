@@ -7,7 +7,6 @@ export { regulationsApi } from './regulations';
 export type { 
   RegulationFilters, 
   RegulationListResponse, 
-  PublicRegulation 
 } from './regulations';
 
 export { authApi } from './auth';

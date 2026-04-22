@@ -2,27 +2,34 @@
  * Task Notification Service
  * 
  * Sends notifications for:
- * - Tasks approaching their due date
- * - Overdue tasks
+ * - Tasks approaching their due date (with attestation magic links)
+ * - Overdue tasks (escalated to VP for pillar)
  * - Task assignments
  * - Nudge/escalation reminders
+ *
+ * Attestation requests are sent through this notification system as the primary
+ * delivery mechanism. The manual "Request Attestation" in the UI is a backup.
  */
 
 import { emailService } from './email';
 import type { EmailTrackingContext } from './email';
 import { differenceInDays, format, addDays } from 'date-fns';
 import { getDatabaseStorage } from './database';
-import { sql } from 'drizzle-orm';
+import { sql, eq, and, gt } from 'drizzle-orm';
+import { taskAttestationTokens, complianceTasks } from '@shared/schema';
 import type { User } from '@shared/schema';
+import crypto from 'crypto';
 
 // Notification schedules for tasks
 const TASK_NOTIFICATION_CONFIG = {
-  // Days before due date to send reminders
-  reminderDays: [14, 7, 3, 1, 0],
-  // Include manager/admin after this many days overdue
+  // Days before due date to send reminders (90, 60, 30 days out, then 7, 3, 1, day-of)
+  reminderDays: [90, 60, 30, 7, 3, 1, 0],
+  // Include VP / escalation contact after this many days overdue
   escalationThreshold: 3,
   // Maximum days overdue to keep sending notifications
   maxOverdueDays: 30,
+  // Attestation token validity in days
+  attestationTokenExpiryDays: 14,
 } as const;
 
 interface TaskNotificationContext {
@@ -37,10 +44,16 @@ interface TaskNotificationContext {
     status: string;
     evidenceRequired: boolean;
     regulationId: number;
+    attestationStatus: string | null;
+    escalationEmail: string | null;
+    escalationName: string | null;
+    responsibleOfficeEmail: string | null;
   };
   regulation: {
     id: number;
     name: string;
+    escalationEmail: string | null;
+    escalationTarget: string | null;
   };
   assignedUser: User | null;
   daysUntilDue: number;
@@ -59,22 +72,21 @@ async function getTasksNeedingNotification(tenantId?: string): Promise<TaskNotif
     return [];
   }
 
-  // Get tasks with due dates that are:
-  // 1. Coming up in the next 14 days
-  // 2. Overdue but less than 30 days overdue
-  // 3. Not completed
   const today = new Date();
-  const futureDate = addDays(today, 14);
+  const futureDate = addDays(today, 90); // 90 days out to catch earliest reminder
   const pastDate = addDays(today, -TASK_NOTIFICATION_CONFIG.maxOverdueDays);
 
   try {
-    // Raw query to get tasks with due dates in notification window
     const result = await db.execute(sql`
       SELECT 
         ct.id, ct.title, ct.description, ct.due_date, 
         ct.assigned_role, ct.assigned_to, ct.priority, 
         ct.status, ct.evidence_required, ct.regulation_id,
-        r.name as regulation_name
+        ct.attestation_status, ct.escalation_email, ct.escalation_name,
+        ct.responsible_office_email,
+        r.name as regulation_name,
+        r.escalation_email as reg_escalation_email,
+        r.escalation_target as reg_escalation_target
       FROM compliance_tasks ct
       JOIN regulations r ON ct.regulation_id = r.id
       WHERE ct.status != 'completed'
@@ -90,7 +102,6 @@ async function getTasksNeedingNotification(tenantId?: string): Promise<TaskNotif
       const daysUntilDue = differenceInDays(dueDate, today);
       const isOverdue = daysUntilDue < 0;
 
-      // Get assigned user if available
       let assignedUser: User | null = null;
       if (row.assigned_to) {
         assignedUser = (await storage.getUser(row.assigned_to)) ?? null;
@@ -108,10 +119,16 @@ async function getTasksNeedingNotification(tenantId?: string): Promise<TaskNotif
           status: row.status,
           evidenceRequired: row.evidence_required,
           regulationId: row.regulation_id,
+          attestationStatus: row.attestation_status,
+          escalationEmail: row.escalation_email,
+          escalationName: row.escalation_name,
+          responsibleOfficeEmail: row.responsible_office_email,
         },
         regulation: {
           id: row.regulation_id,
           name: row.regulation_name,
+          escalationEmail: row.reg_escalation_email,
+          escalationTarget: row.reg_escalation_target,
         },
         assignedUser,
         daysUntilDue,
@@ -144,24 +161,133 @@ function shouldSendNotification(daysUntilDue: number): boolean {
 }
 
 /**
- * Get notification recipients based on task assignment and escalation status
+ * Get or create an attestation token for a task + recipient email.
+ * Reuses a valid (non-expired, unused) token if one exists; otherwise creates a new one.
+ * Returns null if the task is already attested.
+ */
+async function getOrCreateAttestationToken(
+  taskId: number,
+  recipientEmail: string,
+  context: TaskNotificationContext,
+  tenantId?: string,
+): Promise<{ attestationUrl: string; expiresAt: Date } | null> {
+  if (context.task.attestationStatus === 'attested') {
+    return null;
+  }
+
+  const storage = getDatabaseStorage(tenantId);
+  const db = storage.getDb();
+  if (!db) return null;
+
+  try {
+    // Check for an existing valid token for this task + email
+    const existing = await db.select()
+      .from(taskAttestationTokens)
+      .where(and(
+        eq(taskAttestationTokens.taskId, taskId),
+        eq(taskAttestationTokens.email, recipientEmail),
+        gt(taskAttestationTokens.expiresAt, new Date()),
+      ))
+      .limit(1);
+
+    const baseUrl = process.env.APP_URL || process.env.PUBLIC_URL || 'https://moravian.edsteward.ai';
+
+    if (existing.length > 0 && !existing[0].usedAt) {
+      return {
+        attestationUrl: `${baseUrl}/attest/${existing[0].token}`,
+        expiresAt: existing[0].expiresAt,
+      };
+    }
+
+    // Create a new token
+    const token = crypto.randomBytes(32).toString('hex');
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + TASK_NOTIFICATION_CONFIG.attestationTokenExpiryDays);
+
+    await db.insert(taskAttestationTokens).values({
+      taskId,
+      token,
+      email: recipientEmail,
+      recipientName: context.assignedUser
+        ? `${context.assignedUser.firstName || ''} ${context.assignedUser.lastName || ''}`.trim() || null
+        : null,
+      expiresAt,
+      canUploadEvidence: context.task.evidenceRequired || false,
+      canAttest: true,
+      personalMessage: null,
+    });
+
+    // Mark task attestation as pending if it was not_required
+    if (!context.task.attestationStatus || context.task.attestationStatus === 'not_required') {
+      await db.update(complianceTasks)
+        .set({ attestationStatus: 'pending', updatedAt: new Date() })
+        .where(eq(complianceTasks.id, taskId));
+      context.task.attestationStatus = 'pending';
+    }
+
+    console.log(`[TaskNotifications] Created attestation token for task ${taskId} → ${recipientEmail}`);
+
+    return {
+      attestationUrl: `${baseUrl}/attest/${token}`,
+      expiresAt,
+    };
+  } catch (error) {
+    console.error(`[TaskNotifications] Failed to create attestation token for task ${taskId}:`, error);
+    return null;
+  }
+}
+
+interface EscalationRecipient {
+  email: string;
+  name: string;
+}
+
+/**
+ * Get notification recipients based on task assignment and escalation status.
+ * Escalation uses the task/regulation escalationEmail (VP for pillar) first,
+ * falling back to admin/CCO users.
  */
 async function getTaskNotificationRecipients(
   context: TaskNotificationContext,
   tenantId?: string
-): Promise<User[]> {
+): Promise<{ users: User[]; escalationRecipients: EscalationRecipient[] }> {
   const storage = getDatabaseStorage(tenantId);
-  const recipients: User[] = [];
+  const users: User[] = [];
+  const escalationRecipients: EscalationRecipient[] = [];
 
   // Always include assigned user if available
   if (context.assignedUser && context.assignedUser.email) {
-    recipients.push(context.assignedUser);
+    users.push(context.assignedUser);
   }
 
-  // If overdue past threshold, escalate to admins and CCO
+  // If overdue past threshold, escalate to VP for pillar then admins/CCO
   if (context.isOverdue && Math.abs(context.daysUntilDue) >= TASK_NOTIFICATION_CONFIG.escalationThreshold) {
+    const seenEmails = new Set(users.map(u => u.email?.toLowerCase()));
+
+    // Prefer task-level escalation contact (VP for pillar)
+    const taskEsc = context.task.escalationEmail;
+    const regEsc = context.regulation.escalationEmail;
+
+    if (taskEsc && !seenEmails.has(taskEsc.toLowerCase())) {
+      escalationRecipients.push({
+        email: taskEsc,
+        name: context.task.escalationName || 'Escalation Contact',
+      });
+      seenEmails.add(taskEsc.toLowerCase());
+    }
+
+    // Fall back to regulation-level escalation
+    if (regEsc && !seenEmails.has(regEsc.toLowerCase())) {
+      escalationRecipients.push({
+        email: regEsc,
+        name: context.regulation.escalationTarget || 'Escalation Contact',
+      });
+      seenEmails.add(regEsc.toLowerCase());
+    }
+
+    // Also include admins/CCO as before
     const allUsers = await storage.getAllUsers();
-    const escalationRecipients = allUsers.filter(user => {
+    const ccoUsers = allUsers.filter(user => {
       const userRoles = Array.isArray(user.roles) ? user.roles : 
                        typeof user.roles === 'string' ? JSON.parse(user.roles || '[]') : [];
       
@@ -171,20 +297,25 @@ async function getTaskNotificationRecipients(
              user.role === 'admin';
     });
 
-    for (const user of escalationRecipients) {
-      if (user.email && !recipients.find(r => r.id === user.id)) {
-        recipients.push(user);
+    for (const user of ccoUsers) {
+      if (user.email && !seenEmails.has(user.email.toLowerCase())) {
+        users.push(user);
+        seenEmails.add(user.email.toLowerCase());
       }
     }
   }
 
-  return recipients;
+  return { users, escalationRecipients };
 }
 
 /**
- * Generate email content for task notification
+ * Generate email content for task notification.
+ * When attestationUrl is provided, the email includes a prominent attestation CTA.
  */
-function generateTaskNotificationEmail(context: TaskNotificationContext): {
+function generateTaskNotificationEmail(
+  context: TaskNotificationContext,
+  attestation?: { attestationUrl: string; expiresAt: Date } | null,
+): {
   subject: string;
   html: string;
   text: string;
@@ -193,6 +324,8 @@ function generateTaskNotificationEmail(context: TaskNotificationContext): {
   const formattedDueDate = task.dueDate ? format(task.dueDate, 'MMMM d, yyyy') : 'Not set';
   const baseUrl = process.env.PUBLIC_URL || 'https://moravian.edsteward.ai';
   const taskUrl = `${baseUrl}/regulations/${regulation.id}`;
+  const hasAttestation = !!attestation;
+  const expiresFormatted = attestation ? format(attestation.expiresAt, 'MMMM d, yyyy') : '';
 
   let subject: string;
   let urgencyClass: string;
@@ -212,10 +345,28 @@ function generateTaskNotificationEmail(context: TaskNotificationContext): {
     urgencyClass = 'warning';
     urgencyMessage = `This task is due in ${daysUntilDue} day${daysUntilDue > 1 ? 's' : ''}.`;
   } else {
-    subject = `📋 Task Reminder: ${task.title} - Due ${formattedDueDate}`;
+    subject = hasAttestation
+      ? `📋 Attestation Required: ${task.title} - Due ${formattedDueDate}`
+      : `📋 Task Reminder: ${task.title} - Due ${formattedDueDate}`;
     urgencyClass = 'info';
     urgencyMessage = `This task is due in ${daysUntilDue} days.`;
   }
+
+  const attestationSection = hasAttestation ? `
+    <div style="background: #ecfdf5; border: 2px solid #059669; border-radius: 8px; padding: 20px; margin: 20px 0; text-align: center;">
+      <h3 style="margin: 0 0 8px 0; color: #065f46;">Attestation Required</h3>
+      <p style="margin: 0 0 4px 0; color: #047857;">
+        ${task.evidenceRequired 
+          ? 'Please upload your evidence and confirm compliance using the secure link below.'
+          : 'Please confirm compliance for this task using the secure link below.'}
+      </p>
+      ${task.evidenceRequired ? '<p style="margin: 0 0 12px 0; color: #b45309; font-weight: 600;">📎 Evidence upload required</p>' : ''}
+      <a href="${attestation!.attestationUrl}" style="display: inline-block; background: #059669; color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px;">
+        ${task.evidenceRequired ? 'Upload Evidence & Attest' : 'Review & Attest Now'}
+      </a>
+      <p style="margin: 12px 0 0 0; font-size: 12px; color: #6b7280;">This secure link expires on ${expiresFormatted}.</p>
+    </div>
+  ` : '';
 
   const html = `
 <!DOCTYPE html>
@@ -243,7 +394,7 @@ function generateTaskNotificationEmail(context: TaskNotificationContext): {
 </head>
 <body>
   <div class="header">
-    <h1 style="margin: 0; font-size: 24px;">Task Notification</h1>
+    <h1 style="margin: 0; font-size: 24px;">${hasAttestation ? 'Compliance Attestation Required' : 'Task Notification'}</h1>
     <p style="margin: 8px 0 0 0; opacity: 0.9;">${regulation.name}</p>
   </div>
   
@@ -253,6 +404,8 @@ function generateTaskNotificationEmail(context: TaskNotificationContext): {
     </div>
     
     <h2 style="margin-top: 0;">${task.title}</h2>
+
+    ${attestationSection}
     
     <dl class="task-details">
       <dt>Regulation</dt>
@@ -274,7 +427,7 @@ function generateTaskNotificationEmail(context: TaskNotificationContext): {
       <dd>${assignedUser.firstName || ''} ${assignedUser.lastName || ''} (${assignedUser.email})</dd>
       ` : ''}
       
-      ${task.evidenceRequired ? `
+      ${task.evidenceRequired && !hasAttestation ? `
       <dt>Evidence Required</dt>
       <dd>Yes - Please upload supporting documentation</dd>
       ` : ''}
@@ -296,11 +449,15 @@ function generateTaskNotificationEmail(context: TaskNotificationContext): {
 </html>
   `.trim();
 
+  const attestationTextBlock = hasAttestation
+    ? `\n--- ATTESTATION REQUIRED ---\n${task.evidenceRequired ? 'Please upload evidence and confirm compliance:' : 'Please confirm compliance:'}\n${attestation!.attestationUrl}\nThis link expires on ${expiresFormatted}.\n---\n`
+    : '';
+
   const text = `
 Task Notification: ${task.title}
 
 ${urgencyMessage}
-
+${attestationTextBlock}
 Regulation: ${regulation.name}
 Due Date: ${formattedDueDate}
 Priority: ${(task.priority || 'medium').toUpperCase()}
@@ -320,24 +477,30 @@ This is an automated notification from EdSteward Compliance Management.
 }
 
 /**
- * Send notification for a single task
+ * Send notification for a single task.
+ * Creates attestation tokens and includes magic links in the emails.
  */
 async function sendTaskNotification(context: TaskNotificationContext, tenantId?: string): Promise<boolean> {
-  const recipients = await getTaskNotificationRecipients(context, tenantId);
+  const { users, escalationRecipients } = await getTaskNotificationRecipients(context, tenantId);
   
-  if (recipients.length === 0) {
+  if (users.length === 0 && escalationRecipients.length === 0) {
     return false;
   }
 
-  const { subject, html, text } = generateTaskNotificationEmail(context);
-
   let success = false;
-  for (const recipient of recipients) {
+
+  // Send to registered users (with attestation magic link)
+  for (const recipient of users) {
     if (!recipient.email) continue;
     
     try {
+      const attestation = await getOrCreateAttestationToken(
+        context.task.id, recipient.email, context, tenantId,
+      );
+      const { subject, html, text } = generateTaskNotificationEmail(context, attestation);
+
       const tracking: EmailTrackingContext = {
-        emailType: 'task_reminder',
+        emailType: attestation ? 'attestation_request' : 'task_reminder',
         relatedEntityType: 'compliance_task',
         relatedEntityId: context.task.id,
         recipientUserId: recipient.id,
@@ -350,6 +513,28 @@ async function sendTaskNotification(context: TaskNotificationContext, tenantId?:
       success = true;
     } catch (error) {
       console.error(`[TaskNotifications] Failed to send to ${recipient.email}:`, error);
+    }
+  }
+
+  // Send to escalation contacts (VP for pillar, etc.) — no attestation link,
+  // they get an awareness/escalation notice
+  for (const esc of escalationRecipients) {
+    try {
+      const { subject, html, text } = generateTaskNotificationEmail(context, null);
+      const tracking: EmailTrackingContext = {
+        emailType: 'task_reminder',
+        relatedEntityType: 'compliance_task',
+        relatedEntityId: context.task.id,
+      };
+      await emailService.sendEmailTracked(
+        { to: esc.email, subject, html, text },
+        undefined, undefined, undefined,
+        tracking
+      );
+      success = true;
+      console.log(`[TaskNotifications] Escalation sent to ${esc.name} (${esc.email}) for task ${context.task.id}`);
+    } catch (error) {
+      console.error(`[TaskNotifications] Failed to send escalation to ${esc.email}:`, error);
     }
   }
 
@@ -424,7 +609,11 @@ export async function sendImmediateTaskNotification(
         ct.id, ct.title, ct.description, ct.due_date, 
         ct.assigned_role, ct.assigned_to, ct.priority, 
         ct.status, ct.evidence_required, ct.regulation_id,
-        r.name as regulation_name
+        ct.attestation_status, ct.escalation_email, ct.escalation_name,
+        ct.responsible_office_email,
+        r.name as regulation_name,
+        r.escalation_email as reg_escalation_email,
+        r.escalation_target as reg_escalation_target
       FROM compliance_tasks ct
       JOIN regulations r ON ct.regulation_id = r.id
       WHERE ct.id = ${taskId}
@@ -456,10 +645,16 @@ export async function sendImmediateTaskNotification(
         status: row.status,
         evidenceRequired: row.evidence_required,
         regulationId: row.regulation_id,
+        attestationStatus: row.attestation_status,
+        escalationEmail: row.escalation_email,
+        escalationName: row.escalation_name,
+        responsibleOfficeEmail: row.responsible_office_email,
       },
       regulation: {
         id: row.regulation_id,
         name: row.regulation_name,
+        escalationEmail: row.reg_escalation_email,
+        escalationTarget: row.reg_escalation_target,
       },
       assignedUser,
       daysUntilDue,

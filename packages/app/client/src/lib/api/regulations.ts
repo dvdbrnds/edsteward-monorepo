@@ -15,8 +15,6 @@ export interface RegulationListResponse {
   limit: number;
 }
 
-export type PublicRegulation = Pick<Regulation, 'id' | 'name' | 'category' | 'summary' | 'statute' | 'jurisdictionSource'>;
-
 class RegulationsApi {
   // Get all regulations with filtering (authenticated)
   async getRegulations(filters?: RegulationFilters): Promise<Regulation[]> {
