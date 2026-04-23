@@ -2508,7 +2508,7 @@ export class DatabaseStorage implements IStorage {
 
       if (result.rows.length > 0) {
         const dbConfig = result.rows[0].config_data;
-        const primaryColor = dbConfig.primaryColor || '#3d1a5a';
+        const primaryColor = dbConfig.primaryColor || '#2e1b68';
         
         // Helper to darken a color for hero/secondary colors
         const darkenColor = (hex: string, percent: number): string => {
@@ -2572,13 +2572,13 @@ export class DatabaseStorage implements IStorage {
           title: envBrandingConfig.title || "EdSteward Compliance Portal",
           logoUrl: envBrandingConfig.logoUrl || "/assets/es-white-on-purple-logo.png",
           faviconUrl: envBrandingConfig.faviconUrl || "/favicon.ico",
-          primaryColor: envBrandingConfig.primaryColor || "#3d1a5a",
+          primaryColor: envBrandingConfig.primaryColor || "#2e1b68",
           secondaryColor: envBrandingConfig.secondaryColor || "#1e40af",
           accentColor: envBrandingConfig.accentColor || "#3b82f6",
           loginScreenBackgroundColor: envBrandingConfig.loginScreenBackgroundColor || "#f8fafc",
-          loginScreenAccentColor: envBrandingConfig.loginScreenAccentColor || "#3d1a5a",
+          loginScreenAccentColor: envBrandingConfig.loginScreenAccentColor || "#2e1b68",
           loginScreenTextColor: envBrandingConfig.loginScreenTextColor || "#1f2937",
-          loginScreenHeroColor: envBrandingConfig.loginScreenHeroColor || "#3d1a5a",
+          loginScreenHeroColor: envBrandingConfig.loginScreenHeroColor || "#2e1b68",
         };
 
         return config;
@@ -2590,13 +2590,13 @@ export class DatabaseStorage implements IStorage {
         title: "EdSteward Compliance Portal",
         logoUrl: "/assets/es-white-on-purple-logo.png",
         faviconUrl: "/favicon.ico",
-        primaryColor: "#3d1a5a",
+        primaryColor: "#2e1b68",
         secondaryColor: "#1e40af",
         accentColor: "#3b82f6",
         loginScreenBackgroundColor: "#f8fafc",
-        loginScreenAccentColor: "#3d1a5a",
+        loginScreenAccentColor: "#2e1b68",
         loginScreenTextColor: "#1f2937",
-        loginScreenHeroColor: "#3d1a5a",
+        loginScreenHeroColor: "#2e1b68",
       };
 
       return defaultConfig;

@@ -7,32 +7,37 @@ import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import { 
   AlertCircle, CheckCircle, Database, ArrowLeft, ArrowRight,
-  Loader2, Building2, User, Palette, Server, Rocket, Check, Landmark
+  Loader2, Building2, User, Server, Rocket, Check, KeyRound, Copy, RefreshCw
 } from 'lucide-react';
 
-// API base URL
+const PASSPHRASE_WORDS = [
+  'apple','arrow','badge','beach','bell','bird','bloom','board','bonus','brave',
+  'brick','bridge','bright','brook','cabin','camel','candy','cedar','chain','chair',
+  'chalk','charm','chase','chess','chief','claim','clash','clean','cliff','climb',
+  'clock','cloud','coach','coral','crane','creek','crest','crown','crush','dance',
+  'delta','dream','drift','eagle','earth','ember','fence','field','flame','flash',
+  'fleet','flint','flora','forge','frost','giant','glade','gleam','globe','grace',
+  'grain','grape','grass','green','grove','guard','haven','hazel','heart','heron',
+  'honey','ivory','jewel','knoll','larch','lemon','light','lilac','linen','lunar',
+  'maple','marsh','mason','melon','mirth','moose','noble','north','ocean','olive',
+  'onyx','orbit','otter','pansy','patch','peach','pearl','petal','pilot','plume',
+  'polar','poppy','prism','quail','quart','quest','raven','ridge','river','robin',
+  'royal','sable','sage','scout','shade','shell','shore','sigma','slate','solar',
+  'spark','spire','stag','steam','steel','stone','storm','stove','swamp','swift',
+  'thorn','tiger','torch','tower','trace','trail','tulip','umbra','unity','valor',
+  'velvet','vigor','viola','vivid','waltz','watch','wheat','willow','wren','zenith',
+];
+
+function generatePassphrase(): string {
+  const words: string[] = [];
+  for (let i = 0; i < 4; i++) {
+    const idx = Math.floor(Math.random() * PASSPHRASE_WORDS.length);
+    words.push(PASSPHRASE_WORDS[idx]);
+  }
+  return words.join('');
+}
+
 const API_BASE = import.meta.env.DEV ? 'http://localhost:4000' : '';
-
-// ===== TYPES =====
-
-const INSTITUTION_PRIMARY_TYPES = [
-  { value: 'public-4year', label: 'Public 4-Year University' },
-  { value: 'private-nonprofit-4year', label: 'Private Nonprofit 4-Year University' },
-  { value: 'public-2year', label: 'Public 2-Year College' },
-  { value: 'private-nonprofit-2year', label: 'Private Nonprofit 2-Year College' },
-  { value: 'private-for-profit', label: 'Private For-Profit Institution' },
-];
-
-const INSTITUTION_CHARACTERISTICS = [
-  { value: 'religious-affiliation', label: 'Religious Affiliation' },
-  { value: 'research-intensive', label: 'Research Intensive' },
-  { value: 'graduate-professional', label: 'Graduate/Professional Programs' },
-  { value: 'intercollegiate-athletics', label: 'Intercollegiate Athletics' },
-  { value: 'online-distance-ed', label: 'Online/Distance Education' },
-  { value: 'medical-health-programs', label: 'Medical/Health Programs' },
-  { value: 'residential-campus', label: 'Residential Campus' },
-  { value: 'title-iv-participant', label: 'Title IV Participant' },
-];
 
 const RESERVED_SUBDOMAINS = [
   'www', 'api', 'admin', 'staging', 'template', 'test', 'dev',
@@ -40,36 +45,14 @@ const RESERVED_SUBDOMAINS = [
   'static', 'docs', 'help', 'support', 'status', 'blog',
 ];
 
-const US_STATES = [
-  'AL','AK','AZ','AR','CA','CO','CT','DC','DE','FL','GA','HI','ID','IL','IN',
-  'IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH',
-  'NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT',
-  'VT','VA','WA','WV','WI','WY',
-];
-
 interface TenantFormData {
-  // Step 1: Organization Info
   name: string;
   subdomain: string;
   contactEmail: string;
   contactName: string;
   plan: 'starter' | 'professional' | 'enterprise';
-  
-  // Step 2: Admin User
   adminUsername: string;
-  adminEmail: string;
   adminPassword: string;
-  adminFirstName: string;
-  adminLastName: string;
-  
-  // Step 3: Branding
-  primaryColor: string;
-  logoUrl: string;
-
-  // Step 4: Institution
-  institutionType: string;
-  institutionCharacteristics: string[];
-  stateCode: string;
 }
 
 interface ProvisioningStep {
@@ -80,19 +63,15 @@ interface ProvisioningStep {
   data?: any;
 }
 
-type WizardStep = 'organization' | 'admin-user' | 'branding' | 'institution' | 'review' | 'provisioning' | 'complete';
+type WizardStep = 'organization' | 'admin-user' | 'review' | 'provisioning' | 'complete';
 
 const WIZARD_STEPS: { id: WizardStep; label: string; icon: React.ReactNode }[] = [
   { id: 'organization', label: 'Organization', icon: <Building2 className="h-4 w-4" /> },
-  { id: 'admin-user', label: 'Admin User', icon: <User className="h-4 w-4" /> },
-  { id: 'branding', label: 'Branding', icon: <Palette className="h-4 w-4" /> },
-  { id: 'institution', label: 'Institution', icon: <Landmark className="h-4 w-4" /> },
+  { id: 'admin-user', label: 'Admin Credentials', icon: <KeyRound className="h-4 w-4" /> },
   { id: 'review', label: 'Review', icon: <Check className="h-4 w-4" /> },
   { id: 'provisioning', label: 'Setup', icon: <Server className="h-4 w-4" /> },
   { id: 'complete', label: 'Complete', icon: <Rocket className="h-4 w-4" /> },
 ];
-
-// ===== COMPONENT =====
 
 const TenantCreationWizard: React.FC = () => {
   const navigate = useNavigate();
@@ -102,37 +81,19 @@ const TenantCreationWizard: React.FC = () => {
   const [provisioningSteps, setProvisioningSteps] = useState<ProvisioningStep[]>([]);
   const [_createdTenant, setCreatedTenant] = useState<any>(null);
 
-  const [formData, setFormData] = useState<TenantFormData>({
+  const [formData, setFormData] = useState<TenantFormData>(() => ({
     name: '',
     subdomain: '',
     contactEmail: '',
     contactName: '',
     plan: 'professional',
-    adminUsername: '',
-    adminEmail: '',
-    adminPassword: '',
-    adminFirstName: '',
-    adminLastName: '',
-    primaryColor: '#1e40af',
-    logoUrl: '',
-    institutionType: '',
-    institutionCharacteristics: ['title-iv-participant'],
-    stateCode: '',
-  });
+    adminUsername: 'admin',
+    adminPassword: generatePassphrase(),
+  }));
 
-  // Auto-generate subdomain from name
   const handleNameChange = (name: string) => {
     const subdomain = name.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
     setFormData(prev => ({ ...prev, name, subdomain }));
-  };
-
-  // Auto-fill admin email from contact email
-  const handleContactEmailChange = (email: string) => {
-    setFormData(prev => ({
-      ...prev,
-      contactEmail: email,
-      adminEmail: prev.adminEmail || email,
-    }));
   };
 
   const handleChange = (field: keyof TenantFormData, value: string) => {
@@ -150,20 +111,15 @@ const TenantCreationWizard: React.FC = () => {
     if (!/^[a-z0-9-]+$/.test(formData.subdomain)) return 'Subdomain must be lowercase letters, numbers, and hyphens only';
     if (formData.subdomain.length < 3) return 'Subdomain must be at least 3 characters';
     if (RESERVED_SUBDOMAINS.includes(formData.subdomain)) return `"${formData.subdomain}" is a reserved subdomain and cannot be used`;
-    // Contact email is optional - only validate format if provided
     if (formData.contactEmail.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.contactEmail)) return 'Invalid email format';
     return null;
   };
 
   const validateAdminUser = (): string | null => {
-    if (!formData.adminUsername.trim()) return 'Admin username is required';
+    if (!formData.adminUsername.trim()) return 'Username is required';
     if (formData.adminUsername.length < 3) return 'Username must be at least 3 characters';
-    if (!formData.adminEmail.trim()) return 'Admin email is required';
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.adminEmail)) return 'Invalid email format';
-    if (!formData.adminPassword) return 'Password is required';
+    if (!formData.adminPassword) return 'Temporary password is required';
     if (formData.adminPassword.length < 12) return 'Password must be at least 12 characters';
-    if (!formData.adminFirstName.trim()) return 'First name is required';
-    if (!formData.adminLastName.trim()) return 'Last name is required';
     return null;
   };
 
@@ -179,10 +135,6 @@ const TenantCreationWizard: React.FC = () => {
     } else if (currentStep === 'admin-user') {
       const err = validateAdminUser();
       if (err) { setError(err); return; }
-      setCurrentStep('branding');
-    } else if (currentStep === 'branding') {
-      setCurrentStep('institution');
-    } else if (currentStep === 'institution') {
       setCurrentStep('review');
     } else if (currentStep === 'review') {
       startProvisioning();
@@ -192,9 +144,7 @@ const TenantCreationWizard: React.FC = () => {
   const prevStep = () => {
     setError(null);
     if (currentStep === 'admin-user') setCurrentStep('organization');
-    else if (currentStep === 'branding') setCurrentStep('admin-user');
-    else if (currentStep === 'institution') setCurrentStep('branding');
-    else if (currentStep === 'review') setCurrentStep('institution');
+    else if (currentStep === 'review') setCurrentStep('admin-user');
   };
 
   // ===== PROVISIONING =====
@@ -204,15 +154,13 @@ const TenantCreationWizard: React.FC = () => {
     setIsSubmitting(true);
     setError(null);
 
-    // Initialize steps
     setProvisioningSteps([
       { step: 1, name: 'Create Neon Database', status: 'pending' },
       { step: 2, name: 'Clone Schema', status: 'pending' },
       { step: 3, name: 'Copy Regulations & Tasks', status: 'pending' },
       { step: 4, name: 'Create Admin User', status: 'pending' },
-      { step: 5, name: 'Configure Branding', status: 'pending' },
-      { step: 6, name: 'Register Tenant', status: 'pending' },
-      { step: 7, name: 'Finalize', status: 'pending' },
+      { step: 5, name: 'Register Tenant', status: 'pending' },
+      { step: 6, name: 'Finalize', status: 'pending' },
     ]);
 
     try {
@@ -227,24 +175,12 @@ const TenantCreationWizard: React.FC = () => {
         body: JSON.stringify({
           name: formData.name,
           subdomain: formData.subdomain,
-          contactEmail: formData.contactEmail,
-          contactName: formData.contactName,
+          contactEmail: formData.contactEmail || undefined,
+          contactName: formData.contactName || undefined,
           plan: formData.plan,
           adminUser: {
             username: formData.adminUsername,
-            email: formData.adminEmail,
             password: formData.adminPassword,
-            firstName: formData.adminFirstName,
-            lastName: formData.adminLastName,
-          },
-          branding: {
-            primaryColor: formData.primaryColor,
-            logoUrl: formData.logoUrl || undefined,
-          },
-          institution: {
-            primaryType: formData.institutionType || undefined,
-            characteristics: formData.institutionCharacteristics,
-            stateCode: formData.stateCode || undefined,
           },
         }),
       });
@@ -265,6 +201,10 @@ const TenantCreationWizard: React.FC = () => {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text).catch(() => {});
   };
 
   // ===== RENDER FUNCTIONS =====
@@ -345,13 +285,13 @@ const TenantCreationWizard: React.FC = () => {
             id="contactEmail"
             type="email"
             value={formData.contactEmail}
-            onChange={(e) => handleContactEmailChange(e.target.value)}
+            onChange={(e) => handleChange('contactEmail', e.target.value)}
             placeholder="admin@acme.edu"
             className="bg-white"
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="contactName">Contact Name</Label>
+          <Label htmlFor="contactName">Contact Name (optional)</Label>
           <Input
             id="contactName"
             value={formData.contactName}
@@ -368,195 +308,50 @@ const TenantCreationWizard: React.FC = () => {
     <div className="space-y-6">
       <div className="bg-blue-50 p-4 rounded-lg">
         <p className="text-sm text-blue-800">
-          <strong>Admin User:</strong> This will be the first administrator account for {formData.name || 'this organization'}.
-          They will have full access to manage the tenant.
+          <strong>Admin Credentials:</strong> This creates the initial login for {formData.name || 'this organization'}.
+          The admin will be <strong>required to change their password</strong> on first login.
+          They can then configure branding, institution profile, and add other users from inside the app.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="adminFirstName">First Name *</Label>
-          <Input
-            id="adminFirstName"
-            value={formData.adminFirstName}
-            onChange={(e) => handleChange('adminFirstName', e.target.value)}
-            placeholder="John"
-            className="bg-white"
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="adminLastName">Last Name *</Label>
-          <Input
-            id="adminLastName"
-            value={formData.adminLastName}
-            onChange={(e) => handleChange('adminLastName', e.target.value)}
-            placeholder="Smith"
-            className="bg-white"
-          />
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="adminUsername">Username *</Label>
-          <Input
-            id="adminUsername"
-            value={formData.adminUsername}
-            onChange={(e) => handleChange('adminUsername', e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
-            placeholder="jsmith"
-            className="bg-white"
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="adminEmail">Email *</Label>
-          <Input
-            id="adminEmail"
-            type="email"
-            value={formData.adminEmail}
-            onChange={(e) => handleChange('adminEmail', e.target.value)}
-            placeholder="jsmith@acme.edu"
-            className="bg-white"
-          />
-        </div>
-      </div>
-
       <div className="space-y-2">
-        <Label htmlFor="adminPassword">Initial Password *</Label>
+        <Label htmlFor="adminUsername">Username *</Label>
         <Input
-          id="adminPassword"
-          type="password"
-          value={formData.adminPassword}
-          onChange={(e) => handleChange('adminPassword', e.target.value)}
-          placeholder="Minimum 12 characters"
-          className="bg-white"
+          id="adminUsername"
+          value={formData.adminUsername}
+          onChange={(e) => handleChange('adminUsername', e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
+          placeholder="admin"
+          className="bg-white max-w-sm"
         />
-        <p className="text-xs text-gray-500">The admin should change this password after first login</p>
-      </div>
-    </div>
-  );
-
-  const renderBrandingStep = () => (
-    <div className="space-y-6">
-      <div className="space-y-2">
-        <Label htmlFor="primaryColor">Primary Brand Color</Label>
-        <div className="flex items-center gap-4">
-          <input
-            type="color"
-            id="primaryColor"
-            value={formData.primaryColor}
-            onChange={(e) => handleChange('primaryColor', e.target.value)}
-            className="w-16 h-10 rounded border cursor-pointer"
-          />
-          <Input
-            value={formData.primaryColor}
-            onChange={(e) => handleChange('primaryColor', e.target.value)}
-            placeholder="#1e40af"
-            className="max-w-[150px] bg-white font-mono"
-          />
-          <div 
-            className="px-4 py-2 rounded text-white text-sm font-medium"
-            style={{ backgroundColor: formData.primaryColor }}
-          >
-            Preview
-          </div>
-        </div>
+        <p className="text-xs text-gray-500">Lowercase letters, numbers, and underscores only</p>
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="logoUrl">Logo URL (optional)</Label>
-        <Input
-          id="logoUrl"
-          value={formData.logoUrl}
-          onChange={(e) => handleChange('logoUrl', e.target.value)}
-          placeholder="https://example.com/logo.png"
-          className="bg-white"
-        />
-        <p className="text-xs text-gray-500">Leave blank to use default EdSteward branding. Can be changed later.</p>
-      </div>
-
-      {formData.logoUrl && (
-        <div className="p-4 bg-gray-50 rounded-lg">
-          <p className="text-sm text-gray-600 mb-2">Logo Preview:</p>
-          <img 
-            src={formData.logoUrl} 
-            alt="Logo preview" 
-            className="max-h-16 object-contain"
-            onError={(e) => {
-              (e.target as HTMLImageElement).style.display = 'none';
-            }}
-          />
-        </div>
-      )}
-    </div>
-  );
-
-  const toggleCharacteristic = (value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      institutionCharacteristics: prev.institutionCharacteristics.includes(value)
-        ? prev.institutionCharacteristics.filter(c => c !== value)
-        : [...prev.institutionCharacteristics, value],
-    }));
-  };
-
-  const renderInstitutionStep = () => (
-    <div className="space-y-6">
-      <div className="bg-blue-50 p-4 rounded-lg">
-        <p className="text-sm text-blue-800">
-          <strong>Institution Profile:</strong> This determines which regulations are shown as applicable.
-          The state code determines the federal circuit court jurisdiction. These can be adjusted later in System Settings.
-        </p>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="institutionType">Institution Type</Label>
-          <select
-            id="institutionType"
-            value={formData.institutionType}
-            onChange={(e) => handleChange('institutionType', e.target.value)}
-            className="w-full h-10 px-3 rounded-md border border-gray-300 bg-white"
+        <Label>Temporary Password</Label>
+        <div className="flex items-center gap-2 max-w-sm">
+          <code className="flex-1 bg-gray-100 border rounded-md px-3 py-2 text-sm font-mono tracking-wide select-all">
+            {formData.adminPassword}
+          </code>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => handleChange('adminPassword', generatePassphrase())}
+            title="Generate new passphrase"
           >
-            <option value="">Select type...</option>
-            {INSTITUTION_PRIMARY_TYPES.map(t => (
-              <option key={t.value} value={t.value}>{t.label}</option>
-            ))}
-          </select>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="stateCode">State</Label>
-          <select
-            id="stateCode"
-            value={formData.stateCode}
-            onChange={(e) => handleChange('stateCode', e.target.value)}
-            className="w-full h-10 px-3 rounded-md border border-gray-300 bg-white"
+            <RefreshCw className="h-4 w-4" />
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => copyToClipboard(formData.adminPassword)}
+            title="Copy to clipboard"
           >
-            <option value="">Select state...</option>
-            {US_STATES.map(s => (
-              <option key={s} value={s}>{s}</option>
-            ))}
-          </select>
-          <p className="text-xs text-gray-500">Determines federal circuit court jurisdiction</p>
+            <Copy className="h-4 w-4" />
+          </Button>
         </div>
-      </div>
-
-      <div className="space-y-2">
-        <Label>Institutional Characteristics</Label>
-        <p className="text-xs text-gray-500 mb-2">Select all that apply — these activate additional regulatory requirements</p>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-          {INSTITUTION_CHARACTERISTICS.map(c => (
-            <label key={c.value} className="flex items-center gap-2 p-2 rounded hover:bg-gray-50 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={formData.institutionCharacteristics.includes(c.value)}
-                onChange={() => toggleCharacteristic(c.value)}
-                className="rounded border-gray-300"
-              />
-              <span className="text-sm">{c.label}</span>
-            </label>
-          ))}
-        </div>
+        <p className="text-xs text-gray-500">Auto-generated passphrase. The admin will be forced to change this on first login.</p>
       </div>
     </div>
   );
@@ -580,50 +375,29 @@ const TenantCreationWizard: React.FC = () => {
 
       <div className="bg-gray-50 rounded-lg p-6 space-y-4">
         <h3 className="font-semibold text-lg flex items-center gap-2">
-          <User className="h-5 w-5 text-green-600" />
-          Admin User
+          <KeyRound className="h-5 w-5 text-green-600" />
+          Admin Credentials
         </h3>
         <div className="grid grid-cols-2 gap-4 text-sm">
-          <div><span className="text-gray-500">Name:</span> <strong>{formData.adminFirstName} {formData.adminLastName}</strong></div>
           <div><span className="text-gray-500">Username:</span> <strong>{formData.adminUsername}</strong></div>
-          <div><span className="text-gray-500">Email:</span> <strong>{formData.adminEmail}</strong></div>
+          <div><span className="text-gray-500">Password reset:</span> <strong>Required on first login</strong></div>
         </div>
       </div>
 
-      <div className="bg-gray-50 rounded-lg p-6 space-y-4">
-        <h3 className="font-semibold text-lg flex items-center gap-2">
-          <Palette className="h-5 w-5 text-purple-600" />
-          Branding
-        </h3>
-        <div className="flex items-center gap-4 text-sm">
-          <span className="text-gray-500">Primary Color:</span>
-          <div 
-            className="w-6 h-6 rounded border"
-            style={{ backgroundColor: formData.primaryColor }}
-          />
-          <strong>{formData.primaryColor}</strong>
-        </div>
-      </div>
-
-      <div className="bg-gray-50 rounded-lg p-6 space-y-4">
-        <h3 className="font-semibold text-lg flex items-center gap-2">
-          <Landmark className="h-5 w-5 text-amber-600" />
-          Institution Profile
-        </h3>
-        <div className="grid grid-cols-2 gap-4 text-sm">
-          <div><span className="text-gray-500">Type:</span> <strong>{INSTITUTION_PRIMARY_TYPES.find(t => t.value === formData.institutionType)?.label || 'Not set'}</strong></div>
-          <div><span className="text-gray-500">State:</span> <strong>{formData.stateCode || 'Not set'}</strong></div>
-          {formData.institutionCharacteristics.length > 0 && (
-            <div className="col-span-2"><span className="text-gray-500">Characteristics:</span> <strong>{formData.institutionCharacteristics.map(c => INSTITUTION_CHARACTERISTICS.find(ic => ic.value === c)?.label).join(', ')}</strong></div>
-          )}
-        </div>
+      <div className="bg-blue-50 rounded-lg p-6 space-y-2">
+        <h3 className="font-semibold text-blue-900">What happens next</h3>
+        <ul className="text-sm text-blue-800 space-y-1 list-disc list-inside">
+          <li>A new isolated Neon database will be created</li>
+          <li>All regulations and compliance tasks will be copied from the template</li>
+          <li>The admin user will be created with a forced password reset</li>
+          <li>EdSteward default branding will be applied (the admin can customize later)</li>
+        </ul>
       </div>
 
       <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
         <p className="text-sm text-yellow-800">
-          <strong>Ready to provision?</strong> This will create a new Neon database, 
-          copy all regulations and compliance tasks from the template, 
-          and set up the admin user. This process takes about 1-2 minutes.
+          <strong>Ready to provision?</strong> This process takes about 1-2 minutes. 
+          The tenant admin will configure branding, institution profile, and other settings themselves.
         </p>
       </div>
     </div>
@@ -631,11 +405,13 @@ const TenantCreationWizard: React.FC = () => {
 
   const renderProvisioningStep = () => (
     <div className="space-y-6">
-      <div className="text-center mb-8">
-        <Loader2 className="h-12 w-12 mx-auto mb-4 animate-spin text-blue-500" />
-        <h3 className="text-lg font-semibold">Provisioning {formData.name}...</h3>
-        <p className="text-gray-500">Please wait while we set up your tenant</p>
-      </div>
+      {!error && (
+        <div className="text-center mb-8">
+          <Loader2 className="h-12 w-12 mx-auto mb-4 animate-spin text-blue-500" />
+          <h3 className="text-lg font-semibold">Provisioning {formData.name}...</h3>
+          <p className="text-gray-500">Please wait while we set up the tenant</p>
+        </div>
+      )}
 
       <div className="space-y-3">
         {provisioningSteps.map((step) => (
@@ -700,69 +476,74 @@ const TenantCreationWizard: React.FC = () => {
         href={`https://${formData.subdomain}.edsteward.ai`}
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-block px-8 py-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-lg font-semibold mb-8"
+        className="inline-block px-8 py-4 bg-[#2e1b68] text-white rounded-lg hover:opacity-90 transition-opacity text-lg font-semibold mb-8"
       >
         Open https://{formData.subdomain}.edsteward.ai
       </a>
 
       <div className="bg-gray-50 rounded-lg p-6 text-left max-w-lg mx-auto">
-        <h4 className="font-semibold mb-3">Login Credentials (break-glass account):</h4>
-        <div className="space-y-2 text-sm">
-          <div className="flex justify-between">
+        <h4 className="font-semibold mb-3 flex items-center gap-2">
+          <KeyRound className="h-4 w-4" />
+          Login Credentials (share with tenant admin)
+        </h4>
+        <div className="space-y-3 text-sm">
+          <div className="flex justify-between items-center">
+            <span className="text-gray-500">URL:</span>
+            <div className="flex items-center gap-2">
+              <code className="bg-white px-2 py-1 rounded">https://{formData.subdomain}.edsteward.ai</code>
+              <button onClick={() => copyToClipboard(`https://${formData.subdomain}.edsteward.ai`)} className="text-gray-400 hover:text-gray-600">
+                <Copy className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          </div>
+          <div className="flex justify-between items-center">
             <span className="text-gray-500">Username:</span>
-            <code className="bg-white px-2 py-1 rounded">{formData.adminUsername}</code>
+            <div className="flex items-center gap-2">
+              <code className="bg-white px-2 py-1 rounded">{formData.adminUsername}</code>
+              <button onClick={() => copyToClipboard(formData.adminUsername)} className="text-gray-400 hover:text-gray-600">
+                <Copy className="h-3.5 w-3.5" />
+              </button>
+            </div>
           </div>
-          <div className="flex justify-between">
-            <span className="text-gray-500">Password:</span>
-            <code className="bg-white px-2 py-1 rounded">{formData.adminPassword}</code>
+          <div className="flex justify-between items-center">
+            <span className="text-gray-500">Temp Password:</span>
+            <div className="flex items-center gap-2">
+              <code className="bg-white px-2 py-1 rounded">{formData.adminPassword}</code>
+              <button onClick={() => copyToClipboard(formData.adminPassword)} className="text-gray-400 hover:text-gray-600">
+                <Copy className="h-3.5 w-3.5" />
+              </button>
+            </div>
           </div>
+        </div>
+        <div className="mt-3 p-2 bg-amber-50 rounded text-xs text-amber-700">
+          The admin will be required to set a new password on first login.
         </div>
       </div>
 
       <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-6 text-left max-w-lg mx-auto">
-        <h4 className="font-semibold text-blue-900 mb-3">SSO Setup Info (share with IT):</h4>
-        <div className="space-y-2 text-sm font-mono">
-          <div>
-            <span className="text-blue-600 font-sans text-xs block">SP Entity ID:</span>
-            <code className="bg-white px-2 py-1 rounded block mt-0.5">urn:edsteward:sp:{formData.subdomain}</code>
-          </div>
-          <div>
-            <span className="text-blue-600 font-sans text-xs block">ACS / Callback URL:</span>
-            <code className="bg-white px-2 py-1 rounded block mt-0.5">https://{formData.subdomain}.edsteward.ai/auth/saml/callback</code>
-          </div>
-          <div>
-            <span className="text-blue-600 font-sans text-xs block">Name ID Format:</span>
-            <code className="bg-white px-2 py-1 rounded block mt-0.5 text-xs">urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</code>
-          </div>
-        </div>
-        <p className="text-xs text-blue-700 mt-3">
-          Send this info to the institution's IT department to configure their IdP. 
-          Once they provide the IdP metadata, configure SSO from the Customers page.
-        </p>
+        <h4 className="font-semibold text-blue-900 mb-3">What the tenant admin should do after first login:</h4>
+        <ol className="space-y-2 text-sm text-blue-800 list-decimal list-inside">
+          <li>Change their password (forced on first login)</li>
+          <li>Go to <strong>System Settings</strong> to configure institution type and state</li>
+          <li>Go to <strong>System Settings &gt; Branding</strong> to set their logo and colors</li>
+          <li>Go to <strong>User Management</strong> to add other users</li>
+        </ol>
       </div>
 
-      <div className="mt-6 bg-amber-50 border border-amber-200 rounded-lg p-6 text-left max-w-lg mx-auto">
-        <h4 className="font-semibold text-amber-900 mb-3">Post-Provisioning Checklist:</h4>
-        <ul className="space-y-2 text-sm text-amber-800">
+      <div className="mt-6 bg-gray-50 border border-gray-200 rounded-lg p-6 text-left max-w-lg mx-auto">
+        <h4 className="font-semibold text-gray-900 mb-3">EdSteward Admin Checklist:</h4>
+        <ul className="space-y-2 text-sm text-gray-700">
           <li className="flex items-start gap-2">
             <input type="checkbox" className="mt-1 rounded" />
-            <span><strong>DNS CNAME:</strong> Create <code>{formData.subdomain}.edsteward.ai</code> CNAME pointing to the ALB (run <code>scripts/add-new-tenant.sh {formData.subdomain}</code>)</span>
+            <span><strong>DNS CNAME:</strong> Run <code className="bg-white px-1 rounded text-xs">scripts/add-new-tenant.sh {formData.subdomain}</code></span>
           </li>
           <li className="flex items-start gap-2">
             <input type="checkbox" className="mt-1 rounded" />
-            <span><strong>Verify site:</strong> Open <code>https://{formData.subdomain}.edsteward.ai</code> and log in</span>
+            <span><strong>Verify site:</strong> Open the URL above and confirm it loads</span>
           </li>
           <li className="flex items-start gap-2">
             <input type="checkbox" className="mt-1 rounded" />
-            <span><strong>Engine config:</strong> Enable tenant in <code>engine/config/customers.json</code> and push regulation updates</span>
-          </li>
-          <li className="flex items-start gap-2">
-            <input type="checkbox" className="mt-1 rounded" />
-            <span><strong>SSO:</strong> When IT responds with IdP metadata, configure via Customers → SSO</span>
-          </li>
-          <li className="flex items-start gap-2">
-            <input type="checkbox" className="mt-1 rounded" />
-            <span><strong>Password change:</strong> Ensure the admin changes their initial password</span>
+            <span><strong>Send credentials:</strong> Share the login details with the tenant admin</span>
           </li>
         </ul>
       </div>
@@ -775,9 +556,7 @@ const TenantCreationWizard: React.FC = () => {
           setCurrentStep('organization');
           setFormData({
             name: '', subdomain: '', contactEmail: '', contactName: '', plan: 'professional',
-            adminUsername: '', adminEmail: '', adminPassword: '', adminFirstName: '', adminLastName: '',
-            primaryColor: '#1e40af', logoUrl: '',
-            institutionType: '', institutionCharacteristics: ['title-iv-participant'], stateCode: '',
+            adminUsername: 'admin', adminPassword: generatePassphrase(),
           });
           setCreatedTenant(null);
           setProvisioningSteps([]);
@@ -819,8 +598,6 @@ const TenantCreationWizard: React.FC = () => {
 
           {currentStep === 'organization' && renderOrganizationStep()}
           {currentStep === 'admin-user' && renderAdminUserStep()}
-          {currentStep === 'branding' && renderBrandingStep()}
-          {currentStep === 'institution' && renderInstitutionStep()}
           {currentStep === 'review' && renderReviewStep()}
           {currentStep === 'provisioning' && renderProvisioningStep()}
           {currentStep === 'complete' && renderCompleteStep()}

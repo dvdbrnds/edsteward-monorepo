@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/api';
 
 // Generic EdSteward logo for default branding
-const edstewardLogo = '/assets/es-white-on-purple-logo.png';
+const edstewardLogo = '/assets/es-logo-pdf.png';
 
 export interface BrandingConfig {
   institutionName: string;
@@ -25,11 +25,11 @@ const DEFAULT_BRANDING: BrandingConfig = {
   title: 'Compliance Portal',
   logoUrl: edstewardLogo,
   faviconUrl: '/favicon.ico',
-  primaryColor: '#3d1a5a', // EdSteward purple
-  secondaryColor: '#2d1345',
+  primaryColor: '#2e1b68', // EdSteward purple
+  secondaryColor: '#1a0f3d',
   accentColor: '#6b3fa0',
-  loginScreenBackgroundColor: '#f8fafc',
-  loginScreenAccentColor: '#3d1a5a',
+  loginScreenBackgroundColor: '#ffffff',
+  loginScreenAccentColor: '#2e1b68',
   loginScreenTextColor: '#1f2937',
   loginScreenHeroColor: '#2d1345',
 };

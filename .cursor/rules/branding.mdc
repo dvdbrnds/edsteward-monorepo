@@ -1,0 +1,29 @@
+---
+description: EdSteward brand colors, logos, and visual identity
+alwaysApply: true
+---
+
+# EdSteward Branding
+
+## Brand Colors
+
+| Name | Hex | RGB | Usage |
+|------|-----|-----|-------|
+| EdSteward Purple (primary) | `#2e1b68` | `46, 27, 104` | Primary brand color, buttons, headers, hero sections |
+| Dark Purple (secondary) | `#1a0f3d` | `26, 15, 61` | Gradients, dark accents |
+| Accent Purple | `#6b3fa0` | `107, 63, 160` | Accent lines, highlights |
+| White | `#ffffff` | `255, 255, 255` | Backgrounds, text on purple |
+
+## Logo
+
+The current EdSteward logo is the **ES lettermark** (no shield): `/assets/es-logo-pdf.png`
+
+Use this logo for:
+- Login page
+- PDF reports (HECVAT, compliance docs)
+- Default tenant branding fallback
+
+## Login Page
+
+- **Form side**: white background (`#ffffff`)
+- **Hero side**: EdSteward purple gradient (`#2e1b68` to `#1a0f3d`)

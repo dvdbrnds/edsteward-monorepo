@@ -52,18 +52,40 @@ interface HecvatReport {
   };
 }
 
-// Color palette
+// EdSteward brand color palette
 const COLORS = {
-  primary: [15, 82, 186] as [number, number, number],       // EdSteward blue
-  primaryLight: [230, 240, 255] as [number, number, number], // Light blue
-  dark: [30, 30, 30] as [number, number, number],            // Near black
-  gray: [100, 100, 100] as [number, number, number],         // Dark gray
-  lightGray: [200, 200, 200] as [number, number, number],    // Light gray
-  bgGray: [245, 245, 245] as [number, number, number],       // Background gray
-  success: [22, 163, 74] as [number, number, number],        // Green
-  warning: [217, 119, 6] as [number, number, number],        // Amber
+  primary: [46, 27, 104] as [number, number, number],         // EdSteward purple #2e1b68
+  primaryDark: [26, 15, 61] as [number, number, number],     // Darker purple #1a0f3d
+  primaryAccent: [107, 63, 160] as [number, number, number], // Accent purple #6b3fa0
+  primaryLight: [240, 235, 245] as [number, number, number], // Light purple tint
+  dark: [30, 30, 30] as [number, number, number],
+  gray: [100, 100, 100] as [number, number, number],
+  lightGray: [200, 200, 200] as [number, number, number],
+  bgGray: [245, 245, 245] as [number, number, number],
+  success: [22, 163, 74] as [number, number, number],
+  warning: [217, 119, 6] as [number, number, number],
   white: [255, 255, 255] as [number, number, number],
 };
+
+const LOGO_PATH = '/assets/es-logo-pdf.png';
+
+async function loadImageAsDataUrl(src: string): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = img.naturalWidth;
+      canvas.height = img.naturalHeight;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return reject(new Error('Canvas context unavailable'));
+      ctx.drawImage(img, 0, 0);
+      resolve(canvas.toDataURL('image/png'));
+    };
+    img.onerror = () => reject(new Error(`Failed to load image: ${src}`));
+    img.src = src;
+  });
+}
 
 const PAGE_MARGIN = 20;
 const PAGE_WIDTH = 210; // A4 width in mm
@@ -90,28 +112,38 @@ function getStatusColor(status: string): [number, number, number] {
 
 function addPageFooter(doc: jsPDF, pageNum: number, totalPages: number) {
   const y = 285;
-  doc.setFontSize(8);
-  doc.setTextColor(...COLORS.lightGray);
+  doc.setDrawColor(...COLORS.primaryAccent);
   doc.line(PAGE_MARGIN, y - 3, PAGE_WIDTH - PAGE_MARGIN, y - 3);
-  doc.text('EdSteward HECVAT Compliance Report', PAGE_MARGIN, y);
-  doc.text('CONFIDENTIAL', PAGE_WIDTH / 2, y, { align: 'center' });
+  doc.setFontSize(8);
+  doc.setTextColor(...COLORS.primary);
+  doc.setFont('helvetica', 'bold');
+  doc.text('EdSteward', PAGE_MARGIN, y);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(...COLORS.gray);
+  doc.text('HECVAT Compliance Report  |  CONFIDENTIAL', PAGE_WIDTH / 2, y, { align: 'center' });
   doc.text(`Page ${pageNum} of ${totalPages}`, PAGE_WIDTH - PAGE_MARGIN, y, { align: 'right' });
 }
 
-function addPageHeader(doc: jsPDF, title: string) {
+function addPageHeader(doc: jsPDF, title: string, logoDataUrl?: string) {
+  if (logoDataUrl) {
+    doc.addImage(logoDataUrl, 'PNG', PAGE_MARGIN, 4, 8, 8);
+  }
   doc.setFontSize(8);
+  doc.setTextColor(...COLORS.primary);
+  doc.setFont('helvetica', 'bold');
+  doc.text('EdSteward', PAGE_MARGIN + (logoDataUrl ? 10 : 0), 10);
+  doc.setFont('helvetica', 'normal');
   doc.setTextColor(...COLORS.gray);
-  doc.text('EdSteward', PAGE_MARGIN, 10);
   doc.text(title, PAGE_WIDTH - PAGE_MARGIN, 10, { align: 'right' });
-  doc.setDrawColor(...COLORS.primaryLight);
-  doc.line(PAGE_MARGIN, 12, PAGE_WIDTH - PAGE_MARGIN, 12);
+  doc.setDrawColor(...COLORS.primaryAccent);
+  doc.line(PAGE_MARGIN, 13, PAGE_WIDTH - PAGE_MARGIN, 13);
 }
 
-function checkPageBreak(doc: jsPDF, currentY: number, neededSpace: number): number {
+function checkPageBreak(doc: jsPDF, currentY: number, neededSpace: number, logoDataUrl?: string): number {
   if (currentY + neededSpace > 270) {
     doc.addPage();
-    addPageHeader(doc, 'HECVAT Compliance Report');
-    return 20;
+    addPageHeader(doc, 'HECVAT Compliance Report', logoDataUrl);
+    return 22;
   }
   return currentY;
 }
@@ -119,17 +151,24 @@ function checkPageBreak(doc: jsPDF, currentY: number, neededSpace: number): numb
 /**
  * Generate a HECVAT Full Compliance Report PDF
  */
-export function generateHecvatFullPDF(report: HecvatReport): void {
+export async function generateHecvatFullPDF(report: HecvatReport): Promise<void> {
   const doc = new jsPDF('portrait', 'mm', 'a4');
   let _currentPage = 1;
+
+  const logoDataUrl = await loadImageAsDataUrl(LOGO_PATH).catch(() => '');
 
   // =========================================================================
   // COVER PAGE
   // =========================================================================
   
-  // Blue header bar
+  // Purple header bar
   doc.setFillColor(...COLORS.primary);
   doc.rect(0, 0, PAGE_WIDTH, 80, 'F');
+
+  // Logo on cover
+  if (logoDataUrl) {
+    doc.addImage(logoDataUrl, 'PNG', PAGE_WIDTH - PAGE_MARGIN - 30, 12, 26, 26);
+  }
   
   // Title
   doc.setTextColor(...COLORS.white);
@@ -173,7 +212,7 @@ export function generateHecvatFullPDF(report: HecvatReport): void {
   ];
 
   for (const [label, value] of infoItems) {
-    y = checkPageBreak(doc, y, 12);
+    y = checkPageBreak(doc, y, 12, logoDataUrl);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(...COLORS.dark);
     doc.text(label, PAGE_MARGIN, y);
@@ -208,7 +247,7 @@ export function generateHecvatFullPDF(report: HecvatReport): void {
   // =========================================================================
   doc.addPage();
   _currentPage++;
-  addPageHeader(doc, 'HECVAT Compliance Report');
+  addPageHeader(doc, 'HECVAT Compliance Report', logoDataUrl);
 
   y = 25;
   doc.setTextColor(...COLORS.dark);
@@ -248,7 +287,7 @@ export function generateHecvatFullPDF(report: HecvatReport): void {
   // =========================================================================
   doc.addPage();
   _currentPage++;
-  addPageHeader(doc, 'HECVAT Compliance Report');
+  addPageHeader(doc, 'HECVAT Compliance Report', logoDataUrl);
 
   y = 25;
   doc.setTextColor(...COLORS.dark);
@@ -274,7 +313,7 @@ EdSteward maintains compliance with FERPA, supports GDPR (where applicable), and
   y += summaryLines.length * 4.5 + 10;
 
   // Key highlights
-  y = checkPageBreak(doc, y, 60);
+  y = checkPageBreak(doc, y, 60, logoDataUrl);
   doc.setFontSize(12);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(...COLORS.dark);
@@ -295,7 +334,7 @@ EdSteward maintains compliance with FERPA, supports GDPR (where applicable), and
   doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');
   for (const hl of highlights) {
-    y = checkPageBreak(doc, y, 7);
+    y = checkPageBreak(doc, y, 7, logoDataUrl);
     doc.setTextColor(...COLORS.success);
     doc.text('\u2713', PAGE_MARGIN + 2, y);
     doc.setTextColor(...COLORS.gray);
@@ -307,7 +346,7 @@ EdSteward maintains compliance with FERPA, supports GDPR (where applicable), and
   // COMPLIANCE OVERVIEW TABLE
   // =========================================================================
   y += 10;
-  y = checkPageBreak(doc, y, 80);
+  y = checkPageBreak(doc, y, 80, logoDataUrl);
   doc.setFontSize(18);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(...COLORS.dark);
@@ -372,7 +411,7 @@ EdSteward maintains compliance with FERPA, supports GDPR (where applicable), and
     
     doc.addPage();
     _currentPage++;
-    addPageHeader(doc, 'HECVAT Compliance Report');
+    addPageHeader(doc, 'HECVAT Compliance Report', logoDataUrl);
 
     y = 25;
     
@@ -408,7 +447,7 @@ EdSteward maintains compliance with FERPA, supports GDPR (where applicable), and
       const notesLines = question.notes ? doc.splitTextToSize(`Note: ${question.notes}`, CONTENT_WIDTH - 10) : [];
       const neededSpace = 15 + responseLines.length * 4 + evidenceLines.length * 3.5 + notesLines.length * 3.5 + 10;
       
-      y = checkPageBreak(doc, y, Math.min(neededSpace, 80));
+      y = checkPageBreak(doc, y, Math.min(neededSpace, 80), logoDataUrl);
 
       // Question ID and status
       doc.setFontSize(10);
@@ -443,7 +482,7 @@ EdSteward maintains compliance with FERPA, supports GDPR (where applicable), and
 
       // Evidence reference
       if (question.evidence) {
-        y = checkPageBreak(doc, y, 8);
+        y = checkPageBreak(doc, y, 8, logoDataUrl);
         doc.setFontSize(8);
         doc.setFont('helvetica', 'italic');
         doc.setTextColor(...COLORS.primary);
@@ -453,7 +492,7 @@ EdSteward maintains compliance with FERPA, supports GDPR (where applicable), and
 
       // Notes
       if (question.notes) {
-        y = checkPageBreak(doc, y, 8);
+        y = checkPageBreak(doc, y, 8, logoDataUrl);
         doc.setFontSize(8);
         doc.setFont('helvetica', 'italic');
         doc.setTextColor(...COLORS.warning);
@@ -474,7 +513,7 @@ EdSteward maintains compliance with FERPA, supports GDPR (where applicable), and
   // =========================================================================
   doc.addPage();
   _currentPage++;
-  addPageHeader(doc, 'HECVAT Compliance Report');
+  addPageHeader(doc, 'HECVAT Compliance Report', logoDataUrl);
 
   y = 25;
   doc.setFontSize(18);
@@ -522,7 +561,7 @@ EdSteward maintains compliance with FERPA, supports GDPR (where applicable), and
   // =========================================================================
   // POLICY DOCUMENT REFERENCES
   // =========================================================================
-  y = checkPageBreak(doc, y, 80);
+  y = checkPageBreak(doc, y, 80, logoDataUrl);
   doc.setFontSize(18);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(...COLORS.dark);
@@ -569,7 +608,7 @@ EdSteward maintains compliance with FERPA, supports GDPR (where applicable), and
   y = (doc as any).lastAutoTable.finalY + 15;
 
   // Contact information
-  y = checkPageBreak(doc, y, 40);
+  y = checkPageBreak(doc, y, 40, logoDataUrl);
   doc.setFillColor(...COLORS.primaryLight);
   doc.roundedRect(PAGE_MARGIN, y, CONTENT_WIDTH, 30, 2, 2, 'F');
   doc.setFontSize(10);
@@ -599,14 +638,20 @@ EdSteward maintains compliance with FERPA, supports GDPR (where applicable), and
 /**
  * Generate a HECVAT Lite Summary PDF (condensed version)
  */
-export function generateHecvatLitePDF(report: HecvatReport): void {
+export async function generateHecvatLitePDF(report: HecvatReport): Promise<void> {
   const doc = new jsPDF('portrait', 'mm', 'a4');
+
+  const logoDataUrl = await loadImageAsDataUrl(LOGO_PATH).catch(() => '');
 
   // =========================================================================
   // COVER / HEADER
   // =========================================================================
   doc.setFillColor(...COLORS.primary);
   doc.rect(0, 0, PAGE_WIDTH, 50, 'F');
+
+  if (logoDataUrl) {
+    doc.addImage(logoDataUrl, 'PNG', PAGE_WIDTH - PAGE_MARGIN - 22, 8, 20, 20);
+  }
   
   doc.setTextColor(...COLORS.white);
   doc.setFontSize(24);
@@ -704,7 +749,7 @@ export function generateHecvatLitePDF(report: HecvatReport): void {
     const liteQuestions = section.questions.filter(q => q.liteIncluded);
     if (liteQuestions.length === 0) continue;
 
-    y = checkPageBreak(doc, y, 25);
+    y = checkPageBreak(doc, y, 25, logoDataUrl);
 
     // Section header
     doc.setFillColor(...COLORS.primaryLight);
@@ -718,7 +763,7 @@ export function generateHecvatLitePDF(report: HecvatReport): void {
     for (const question of liteQuestions) {
       const responseLines = doc.splitTextToSize(question.response, CONTENT_WIDTH - 5);
       const neededSpace = 10 + responseLines.length * 3.8 + 5;
-      y = checkPageBreak(doc, y, Math.min(neededSpace, 60));
+      y = checkPageBreak(doc, y, Math.min(neededSpace, 60), logoDataUrl);
 
       // Question
       doc.setFontSize(9);
@@ -751,7 +796,7 @@ export function generateHecvatLitePDF(report: HecvatReport): void {
   // =========================================================================
   // THIRD-PARTY CERTIFICATIONS (compact)
   // =========================================================================
-  y = checkPageBreak(doc, y, 50);
+  y = checkPageBreak(doc, y, 50, logoDataUrl);
   y += 5;
   doc.setFontSize(12);
   doc.setFont('helvetica', 'bold');
@@ -784,7 +829,7 @@ export function generateHecvatLitePDF(report: HecvatReport): void {
   y = (doc as any).lastAutoTable.finalY + 10;
 
   // Contact footer
-  y = checkPageBreak(doc, y, 20);
+  y = checkPageBreak(doc, y, 20, logoDataUrl);
   doc.setFillColor(...COLORS.primaryLight);
   doc.roundedRect(PAGE_MARGIN, y, CONTENT_WIDTH, 15, 2, 2, 'F');
   doc.setFontSize(8);

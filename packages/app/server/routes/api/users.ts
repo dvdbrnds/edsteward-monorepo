@@ -1,7 +1,8 @@
 import express from 'express';
-import { hashPassword } from '../../auth';
+import { hashPassword, verifyPassword } from '../../auth';
 import { getDatabaseStorage } from '../../services/database';
 import { syslog, LogLevel, LogFacility } from '../../services/syslog';
+import { strongPasswordSchema } from '@shared/schema';
 
 // Simple auth middleware
 const requireAuth = (req: express.Request, res: express.Response, next: express.NextFunction) => {
@@ -160,7 +161,6 @@ router.post("/", requireAuth, async (req, res) => {
     // Hash password if provided (optional for SSO users)
     const hashedPassword = password ? await hashPassword(password) : await hashPassword(Math.random().toString(36));
 
-    // Create user
     const newUser = await tenantStorage.createUser({
       username,
       email,
@@ -169,6 +169,7 @@ router.post("/", requireAuth, async (req, res) => {
       lastName,
       role: role || 'user',
       department: department || null,
+      mustResetPassword: true,
     } as any);
 
     syslog.log(LogFacility.LOCAL0, LogLevel.INFO, 
@@ -258,6 +259,57 @@ router.delete("/:id", requireAuth, async (req, res) => {
     syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, 
       `Failed to delete user: ${error instanceof Error ? error.message : String(error)}`);
     res.status(500).json({ error: "Failed to delete user" });
+  }
+});
+
+// POST /api/users/change-password - Change own password (any authenticated user)
+router.post("/change-password", requireAuth, async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    const userId = req.user?.id;
+
+    if (!userId) {
+      return res.status(401).json({ error: "Authentication required" });
+    }
+
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ error: "Current password and new password are required" });
+    }
+
+    const validation = strongPasswordSchema.safeParse(newPassword);
+    if (!validation.success) {
+      return res.status(400).json({ error: validation.error.errors[0].message });
+    }
+
+    const tenantStorage = getDatabaseStorage(req.tenantId);
+    const user = await tenantStorage.getUser(userId);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const isValid = await verifyPassword(currentPassword, user.password);
+    if (!isValid) {
+      return res.status(403).json({ error: "Current password is incorrect" });
+    }
+
+    if (currentPassword === newPassword) {
+      return res.status(400).json({ error: "New password must be different from current password" });
+    }
+
+    const hashedNew = await hashPassword(newPassword);
+    await tenantStorage.updateUser(userId, {
+      password: hashedNew,
+      mustResetPassword: false,
+    } as any);
+
+    syslog.log(LogFacility.LOCAL0, LogLevel.INFO,
+      `User ${user.email} changed their password`);
+
+    res.json({ success: true, message: "Password changed successfully" });
+  } catch (error) {
+    syslog.log(LogFacility.LOCAL0, LogLevel.ERROR,
+      `Failed to change password: ${error instanceof Error ? error.message : String(error)}`);
+    res.status(500).json({ error: "Failed to change password" });
   }
 });
 

@@ -154,7 +154,7 @@ export function ComplianceDocuments() {
     try {
       // Small delay to allow UI to update
       await new Promise(resolve => setTimeout(resolve, 100));
-      generateHecvatFullPDF(reportData);
+      await generateHecvatFullPDF(reportData);
     } catch (error) {
       console.error('Failed to generate full PDF:', error);
     } finally {
@@ -167,7 +167,7 @@ export function ComplianceDocuments() {
     setIsGeneratingLite(true);
     try {
       await new Promise(resolve => setTimeout(resolve, 100));
-      generateHecvatLitePDF(reportData);
+      await generateHecvatLitePDF(reportData);
     } catch (error) {
       console.error('Failed to generate lite PDF:', error);
     } finally {

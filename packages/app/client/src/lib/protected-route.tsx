@@ -3,6 +3,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { Loader2 } from "lucide-react";
 import { Redirect, Route } from "wouter";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
+import { ForcePasswordReset } from "@/components/auth/force-password-reset";
 
 export function ProtectedRoute({
   path,
@@ -13,16 +14,7 @@ export function ProtectedRoute({
 }) {
   const { user, isLoading } = useAuth();
 
-  console.log(`🔐 ProtectedRoute ${path}:`, { 
-    user: !!user, 
-    isLoading, 
-    userEmail: user?.email,
-    currentPath: window.location.pathname,
-    timestamp: new Date().toISOString()
-  });
-
   if (isLoading) {
-    
     return (
       <Route path={path}>
         <div className="flex items-center justify-center min-h-screen">
@@ -34,7 +26,6 @@ export function ProtectedRoute({
   }
 
   if (!user) {
-    
     return (
       <Route path={path}>
         <Redirect to="/auth" />
@@ -42,7 +33,10 @@ export function ProtectedRoute({
     );
   }
 
-  
+  if ((user as any).mustResetPassword) {
+    return <ForcePasswordReset />;
+  }
+
   return (
     <ErrorBoundary>
       <Component />

@@ -12,7 +12,7 @@ import { Loader2 } from "lucide-react";
 import { useBranding } from "@/hooks/use-branding";
 
 // Generic fallback logo
-const genericLogo = '/assets/es-white-on-purple-logo.png';
+const genericLogo = '/assets/es-logo-pdf.png';
 
 export default function AuthPage() {
   const { user, loginMutation } = useAuth();
@@ -42,7 +42,7 @@ export default function AuthPage() {
 
   // Force light mode CSS variables for auth page
   const lightModeStyle = {
-    backgroundColor: branding.loginScreenBackgroundColor,
+    backgroundColor: '#ffffff',
     '--background': '0 0% 100%',
     '--foreground': '222.2 84% 4.9%',
     '--card': '0 0% 100%',
@@ -141,8 +141,8 @@ export default function AuthPage() {
                       type="submit" 
                       className="w-full hover:opacity-90 transition-opacity" 
                       style={{ 
-                        backgroundColor: branding.loginScreenAccentColor, 
-                        borderColor: branding.loginScreenAccentColor 
+                        backgroundColor: '#2e1b68', 
+                        borderColor: '#2e1b68' 
                       }}
                       disabled={loginMutation.isPending}
                     >
@@ -194,8 +194,8 @@ export default function AuthPage() {
                         disabled={mfaCode.length !== 6 || loginMutation.isPending}
                         className="flex-1"
                         style={{ 
-                          backgroundColor: branding.loginScreenAccentColor, 
-                          borderColor: branding.loginScreenAccentColor 
+                          backgroundColor: '#2e1b68', 
+                          borderColor: '#2e1b68' 
                         }}
                       >
                         {loginMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -244,11 +244,11 @@ export default function AuthPage() {
       </div>
 
       {/* Hero Section */}
-      <div className="hidden lg:block relative w-0 flex-1" style={{ backgroundColor: branding.loginScreenHeroColor }}>
+      <div className="hidden lg:block relative w-0 flex-1" style={{ backgroundColor: '#2e1b68' }}>
         <div 
           className="absolute inset-0 bg-gradient-to-br opacity-90" 
           style={{ 
-            background: `linear-gradient(to bottom right, ${branding.loginScreenHeroColor}, ${branding.loginScreenHeroColor}dd)` 
+            background: 'linear-gradient(to bottom right, #2e1b68, #1a0f3d)' 
           }} 
         />
         <div className="absolute inset-0 flex items-center justify-center p-12">

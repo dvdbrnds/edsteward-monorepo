@@ -122,13 +122,16 @@ fi
 
 # Update task definition with new image
 log "Registering new task definition..."
-NEW_TASK_DEF=$(echo "$CURRENT_TASK_DEF" | \
+TMPFILE=$(mktemp /tmp/ecs-task-def.XXXXXX.json)
+echo "$CURRENT_TASK_DEF" | \
     jq --arg IMAGE "${ADMIN_ECR_URI}:${VERSION}" \
-    '.containerDefinitions[0].image = $IMAGE | del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy)')
+    '.containerDefinitions[0].image = $IMAGE | del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy)' \
+    > "$TMPFILE"
 
-NEW_TASK_ARN=$(echo "$NEW_TASK_DEF" | \
-    aws ecs register-task-definition --cli-input-json file:///dev/stdin \
+NEW_TASK_ARN=$(aws ecs register-task-definition \
+    --cli-input-json "file://$TMPFILE" \
     --query 'taskDefinition.taskDefinitionArn' --output text)
+rm -f "$TMPFILE"
 
 log "New task definition: $NEW_TASK_ARN"
 

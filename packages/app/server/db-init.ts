@@ -70,22 +70,22 @@ export async function initializeDatabase() {
       const dvdbrndSPassword = await hashPassword('gabadhgabadh');
       const userPassword = await hashPassword('password');
 
-      // Create admin user
+      // Create admin user (must reset password on first login)
       await db.execute(sql`
-        INSERT INTO users (username, password, email, role, "firstName", "lastName", department)
-        VALUES ('admin', ${adminPassword}, 'admin@edsteward.ai', 'admin', 'Admin', 'User', 'IT')
+        INSERT INTO users (username, password, email, role, "firstName", "lastName", department, must_reset_password)
+        VALUES ('admin', ${adminPassword}, 'admin@edsteward.ai', 'admin', 'Admin', 'User', 'IT', true)
       `);
 
       // Create your user account
       await db.execute(sql`
-        INSERT INTO users (username, password, email, role, "firstName", "lastName", department)
-        VALUES ('dvdbrnds', ${dvdbrndSPassword}, 'dvdbrnds@moravian.edu', 'admin', 'David', 'Brandes', 'IT')
+        INSERT INTO users (username, password, email, role, "firstName", "lastName", department, must_reset_password)
+        VALUES ('dvdbrnds', ${dvdbrndSPassword}, 'dvdbrnds@moravian.edu', 'admin', 'David', 'Brandes', 'IT', false)
       `);
 
-      // Create test user from your exports
+      // Create test user from your exports (must reset password on first login)
       await db.execute(sql`
-        INSERT INTO users (username, password, email, role, "firstName", "lastName", department)
-        VALUES ('nasol', ${userPassword}, 'nasol@moravian.edu', 'user', 'Nick', 'Asol', 'Compliance')
+        INSERT INTO users (username, password, email, role, "firstName", "lastName", department, must_reset_password)
+        VALUES ('nasol', ${userPassword}, 'nasol@moravian.edu', 'user', 'Nick', 'Asol', 'Compliance', true)
       `);
 
     }

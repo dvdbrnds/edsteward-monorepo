@@ -44,10 +44,10 @@ export interface TenantProvisioningRequest {
   plan: 'starter' | 'professional' | 'enterprise';
   adminUser: {
     username: string;
-    email: string;
     password: string;
-    firstName: string;
-    lastName: string;
+    email?: string;
+    firstName?: string;
+    lastName?: string;
   };
   branding?: {
     primaryColor?: string;
@@ -244,59 +244,44 @@ export async function copyDataFromTemplate(targetDatabaseUrl: string): Promise<{
     ssl: { rejectUnauthorized: false },
   });
 
-  // Helper to properly serialize values for PostgreSQL (handles JSON/JSONB columns)
-  const serializeValue = (value: any): any => {
-    if (value === null || value === undefined) return null;
-    if (typeof value === 'object' && !(value instanceof Date)) {
-      return JSON.stringify(value);  // Stringify objects/arrays for JSON columns
+  // Query which columns are json/jsonb so we can JSON.stringify ALL values for those columns.
+  // node-postgres deserializes jsonb into native JS types (objects, arrays, strings, numbers, booleans).
+  // ALL of these must be re-serialized via JSON.stringify before reinserting, because PostgreSQL
+  // expects valid JSON text for jsonb parameters (e.g. a JS string "Annual" must become '"Annual"').
+  async function getJsonCols(pool: Pool, table: string): Promise<Set<string>> {
+    const res = await pool.query(
+      `SELECT column_name FROM information_schema.columns WHERE table_name = $1 AND data_type IN ('json', 'jsonb')`,
+      [table]
+    );
+    return new Set(res.rows.map((r: any) => r.column_name));
+  }
+
+  async function copyRows(sourcePool: Pool, targetPool: Pool, table: string, query: string) {
+    const jsonCols = await getJsonCols(sourcePool, table);
+    const result = await sourcePool.query(query);
+    console.log(`  Found ${result.rows.length} ${table} rows to copy`);
+
+    for (const row of result.rows) {
+      const columns = Object.keys(row).filter(k => row[k] !== null && row[k] !== undefined);
+      const values = columns.map(k => jsonCols.has(k) ? JSON.stringify(row[k]) : row[k]);
+      const placeholders = columns.map((_, i) => `$${i + 1}`).join(', ');
+      const columnList = columns.map(c => `"${c}"`).join(', ');
+
+      await targetPool.query(
+        `INSERT INTO ${table} (${columnList}) VALUES (${placeholders}) ON CONFLICT DO NOTHING`,
+        values
+      );
     }
-    return value;
-  };
+
+    if (result.rows.length > 0) {
+      await targetPool.query(`SELECT setval('${table}_id_seq', (SELECT COALESCE(MAX(id), 0) + 1 FROM ${table}), false)`);
+    }
+    return result.rows.length;
+  }
 
   try {
-    // Copy regulations
-    const regsResult = await templatePool.query('SELECT * FROM regulations');
-    console.log(`  Found ${regsResult.rows.length} regulations to copy`);
-
-    if (regsResult.rows.length > 0) {
-      const columns = Object.keys(regsResult.rows[0]);
-      
-      for (const row of regsResult.rows) {
-        const values = columns.map(col => serializeValue(row[col]));
-        const placeholders = columns.map((_, i) => `$${i + 1}`).join(', ');
-        const columnList = columns.map(c => `"${c}"`).join(', ');
-        
-        await targetPool.query(
-          `INSERT INTO regulations (${columnList}) VALUES (${placeholders}) ON CONFLICT DO NOTHING`,
-          values
-        );
-      }
-      
-      // Reset sequence
-      await targetPool.query(`SELECT setval('regulations_id_seq', (SELECT COALESCE(MAX(id), 0) + 1 FROM regulations), false)`);
-    }
-
-    // Copy compliance_tasks
-    const tasksResult = await templatePool.query('SELECT * FROM compliance_tasks');
-    console.log(`  Found ${tasksResult.rows.length} compliance tasks to copy`);
-
-    if (tasksResult.rows.length > 0) {
-      const columns = Object.keys(tasksResult.rows[0]);
-      
-      for (const row of tasksResult.rows) {
-        const values = columns.map(col => serializeValue(row[col]));
-        const placeholders = columns.map((_, i) => `$${i + 1}`).join(', ');
-        const columnList = columns.map(c => `"${c}"`).join(', ');
-        
-        await targetPool.query(
-          `INSERT INTO compliance_tasks (${columnList}) VALUES (${placeholders}) ON CONFLICT DO NOTHING`,
-          values
-        );
-      }
-      
-      // Reset sequence
-      await targetPool.query(`SELECT setval('compliance_tasks_id_seq', (SELECT COALESCE(MAX(id), 0) + 1 FROM compliance_tasks), false)`);
-    }
+    const regsCount = await copyRows(templatePool, targetPool, 'regulations', 'SELECT * FROM regulations');
+    const tasksCount = await copyRows(templatePool, targetPool, 'compliance_tasks', 'SELECT * FROM compliance_tasks');
 
     // CRITICAL: Clean up ALL tenant-specific data - new tenants should start completely fresh!
     // Reset ALL actions to clean defaults - no inherited required flags or completion data
@@ -338,8 +323,8 @@ export async function copyDataFromTemplate(targetDatabaseUrl: string): Promise<{
     console.log('✅ Data copied and cleaned successfully');
 
     return {
-      regulationsCount: regsResult.rows.length,
-      tasksCount: tasksResult.rows.length,
+      regulationsCount: regsCount,
+      tasksCount: tasksCount,
     };
   } finally {
     await templatePool.end();
@@ -368,13 +353,22 @@ export async function createAdminUser(
     const hash = crypto.scryptSync(user.password, saltBuffer, 32).toString('hex');
     const passwordHash = `${salt}:${hash}`;
 
-    const result = await pool.query(`
-      INSERT INTO users (username, email, password, role, "firstName", "lastName", department, created_at)
-      VALUES ($1, $2, $3, 'admin', $4, $5, 'Administration', NOW())
-      RETURNING id
-    `, [user.username, user.email, passwordHash, user.firstName, user.lastName]);
+    const firstName = user.firstName || 'Admin';
+    const lastName = user.lastName || 'User';
+    const email = user.email || '';
 
-    console.log('✅ Admin user created');
+    // Ensure must_reset_password column exists (template schema may not have it yet)
+    await pool.query(`
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS must_reset_password boolean NOT NULL DEFAULT false
+    `).catch(() => {});
+
+    const result = await pool.query(`
+      INSERT INTO users (username, email, password, role, "firstName", "lastName", department, must_reset_password, created_at)
+      VALUES ($1, $2, $3, 'admin', $4, $5, 'Administration', false, NOW())
+      RETURNING id
+    `, [user.username, email, passwordHash, firstName, lastName]);
+
+    console.log('✅ Admin user created (must_reset_password=true)');
     return { userId: result.rows[0].id };
   } finally {
     await pool.end();
@@ -415,7 +409,7 @@ export async function configureBranding(
   });
 
   try {
-    const primaryColor = branding?.primaryColor || '#3d1a5a';
+    const primaryColor = branding?.primaryColor || '#2e1b68';
     
     // Build complete branding config with all derived colors
     const configData = {
@@ -521,7 +515,8 @@ export async function addTenantToOwnDatabase(
     contactEmail?: string;
   }
 ): Promise<void> {
-  console.log('📝 Adding tenant record to database...');
+  const contactEmail = (tenant.contactEmail && typeof tenant.contactEmail === 'string') ? tenant.contactEmail : '';
+  console.log(`📝 Adding tenant record to database... (contact_email="${contactEmail}", type=${typeof contactEmail})`);
 
   const pool = new Pool({
     connectionString: databaseUrl,
@@ -530,15 +525,15 @@ export async function addTenantToOwnDatabase(
 
   try {
     await pool.query(`
-      INSERT INTO tenants (id, name, subdomain, status, database_url, contact_email, plan, deployment_type, health_check_url)
-      VALUES ($1, $2, $3, 'active', $4, $5, 'professional', 'cloud', $6)
+      INSERT INTO tenants (id, name, subdomain, status, database_url, contact_email, plan, deployment_type, health_check_url, domain, database_name)
+      VALUES ($1, $2, $3, 'active', $4, COALESCE($5, ''), 'professional', 'cloud', $6, '', '')
       ON CONFLICT (id) DO UPDATE SET status = 'active'
     `, [
       tenant.id,
       tenant.name,
       tenant.subdomain,
       databaseUrl,
-      tenant.contactEmail || null,  // Allow null contact email
+      contactEmail,
       `https://${tenant.subdomain}.edsteward.ai/api/health`
     ]);
 
@@ -554,14 +549,15 @@ export async function provisionTenant(
   request: TenantProvisioningRequest,
   adminPool: Pool // Connection to admin database
 ): Promise<ProvisioningResult> {
+  const hasBrandingOrInstitution = !!(request.branding?.primaryColor || request.branding?.logoUrl || request.institution?.primaryType || request.institution?.stateCode);
   const steps: ProvisioningStep[] = [
     { step: 1, name: 'Create Neon Database', status: 'pending' },
     { step: 2, name: 'Clone Schema', status: 'pending' },
     { step: 3, name: 'Copy Regulations & Tasks', status: 'pending' },
     { step: 4, name: 'Create Admin User', status: 'pending' },
-    { step: 5, name: 'Configure Branding & Institution', status: 'pending' },
-    { step: 6, name: 'Register Tenant', status: 'pending' },
-    { step: 7, name: 'Finalize', status: 'pending' },
+    ...(hasBrandingOrInstitution ? [{ step: 5, name: 'Configure Branding & Institution', status: 'pending' as const }] : []),
+    { step: hasBrandingOrInstitution ? 6 : 5, name: 'Register Tenant', status: 'pending' },
+    { step: hasBrandingOrInstitution ? 7 : 6, name: 'Finalize', status: 'pending' },
   ];
 
   const tenantId = request.subdomain.toLowerCase().replace(/[^a-z0-9-]/g, '-');
@@ -600,14 +596,17 @@ export async function provisionTenant(
     const userResult = await createAdminUser(databaseUrl, request.adminUser);
     updateStep(4, 'completed', `Admin user created (ID: ${userResult.userId})`, userResult);
 
-    // Step 5: Configure Branding & Institution
-    updateStep(5, 'in_progress', 'Configuring branding and institution...');
-    await configureBranding(databaseUrl, tenantId, request.branding, request.name);
-    await configureInstitution(databaseUrl, tenantId, request.institution);
-    updateStep(5, 'completed', 'Branding and institution configured');
+    // Step 5 (conditional): Configure Branding & Institution
+    if (hasBrandingOrInstitution) {
+      updateStep(5, 'in_progress', 'Configuring branding and institution...');
+      await configureBranding(databaseUrl, tenantId, request.branding, request.name);
+      await configureInstitution(databaseUrl, tenantId, request.institution);
+      updateStep(5, 'completed', 'Branding and institution configured');
+    }
 
-    // Step 6: Register Tenant in Admin Database
-    updateStep(6, 'in_progress', 'Registering tenant...');
+    // Register Tenant in Admin Database
+    const registerStep = hasBrandingOrInstitution ? 6 : 5;
+    updateStep(registerStep, 'in_progress', 'Registering tenant...');
     
     // Add to admin database
     await adminPool.query(`
@@ -623,7 +622,7 @@ export async function provisionTenant(
       request.name,
       request.subdomain,
       databaseUrl,
-      request.contactEmail || null,  // Allow null contact email
+      request.contactEmail || '',  // Default to empty string (column is NOT NULL)
       request.contactName || null,
       request.plan,
       `https://${request.subdomain}.edsteward.ai/api/health`,
@@ -636,13 +635,14 @@ export async function provisionTenant(
       id: tenantId,
       name: request.name,
       subdomain: request.subdomain,
-      contactEmail: request.contactEmail || undefined,
+      contactEmail: request.contactEmail || '',
     });
     
-    updateStep(6, 'completed', 'Tenant registered');
+    updateStep(registerStep, 'completed', 'Tenant registered');
 
-    // Step 7: Update ECS and Finalize
-    updateStep(7, 'in_progress', 'Updating ECS configuration...');
+    // Finalize: Update ECS and activate
+    const finalizeStep = hasBrandingOrInstitution ? 7 : 6;
+    updateStep(finalizeStep, 'in_progress', 'Updating ECS configuration...');
     
     // Update ECS task definition with new database URL
     try {
@@ -678,7 +678,7 @@ export async function provisionTenant(
       console.warn('⚠️ Could not reach main app to refresh tenant registry:', refreshError);
     }
 
-    updateStep(7, 'completed', 'Tenant provisioning complete!');
+    updateStep(finalizeStep, 'completed', 'Tenant provisioning complete!');
 
     console.log(`\n✅ Tenant ${request.name} (${request.subdomain}) provisioned successfully!`);
     console.log(`   URL: https://${request.subdomain}.edsteward.ai`);

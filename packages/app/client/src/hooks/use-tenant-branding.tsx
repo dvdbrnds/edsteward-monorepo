@@ -17,10 +17,10 @@ const TENANT_BRANDING: Record<string, TenantBranding> = {
     id: 'admin',
     name: 'EdSteward Admin',
     title: 'EdSteward Admin Console',
-    logo: '/assets/es-white-on-purple-logo.png',
+    logo: '/assets/es-logo-pdf.png',
     favicon: '/favicon.ico',
-    primaryColor: '#3d1a5a', // EdSteward purple
-    secondaryColor: '#2d1345',
+    primaryColor: '#2e1b68', // EdSteward purple
+    secondaryColor: '#1a0f3d',
     accentColor: '#6b3fa0'
   },
   // Default/generic branding for all tenants - API overrides this
@@ -28,10 +28,10 @@ const TENANT_BRANDING: Record<string, TenantBranding> = {
     id: 'default',
     name: 'Compliance Portal',
     title: 'Compliance Portal',
-    logo: '/assets/es-white-on-purple-logo.png',
+    logo: '/assets/es-logo-pdf.png',
     favicon: '/favicon.ico',
-    primaryColor: '#3d1a5a', // EdSteward purple
-    secondaryColor: '#2d1345',
+    primaryColor: '#2e1b68', // EdSteward purple
+    secondaryColor: '#1a0f3d',
     accentColor: '#6b3fa0'
   }
 };

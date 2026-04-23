@@ -211,6 +211,7 @@ export const users = pgTable("users", {
   mfaSetupAt: timestamp("mfa_setup_at"),
   // Email deliverability status — set to 'bounced' when SMTP rejects delivery
   emailStatus: text("email_status").notNull().default("valid"), // 'valid', 'bounced', 'unverified'
+  mustResetPassword: boolean("must_reset_password").notNull().default(false),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });

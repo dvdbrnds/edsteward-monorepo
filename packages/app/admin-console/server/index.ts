@@ -1065,11 +1065,10 @@ app.post('/api/provisioning/full', requireAuth, async (req, res) => {
   try {
     const request: TenantProvisioningRequest = req.body;
 
-    // Validate required fields (contactEmail is now optional)
-    if (!request.name || !request.subdomain || !request.adminUser) {
+    if (!request.name || !request.subdomain || !request.adminUser?.username || !request.adminUser?.password) {
       return res.status(400).json({
         error: 'Missing required fields',
-        required: ['name', 'subdomain', 'adminUser']
+        required: ['name', 'subdomain', 'adminUser.username', 'adminUser.password']
       });
     }
 
@@ -1911,87 +1910,89 @@ app.post('/api/sync/dev-to-template', requireAuth, async (req, res) => {
       errors: [],
     };
 
-    try {
-      // SYNC REGULATIONS
-      console.log('📋 Syncing regulations...');
-      try {
-        // Get all regulations from source
-        const sourceRegs = await sourcePool.query('SELECT * FROM regulations');
-        
-        // Clear and insert into template (within transaction)
-        await templatePool.query('BEGIN');
-        await templatePool.query('DELETE FROM regulations');
-        
-        for (const reg of sourceRegs.rows) {
-          const columns = Object.keys(reg).filter(k => reg[k] !== null);
-          const values = columns.map(k => reg[k]);
-          const placeholders = columns.map((_, i) => `$${i + 1}`);
-          
-          await templatePool.query(
-            `INSERT INTO regulations (${columns.join(', ')}) VALUES (${placeholders.join(', ')}) ON CONFLICT (id) DO NOTHING`,
-            values
-          );
-        }
-        await templatePool.query('COMMIT');
-        
-        results.tables.regulations = { synced: sourceRegs.rows.length, status: 'success' };
-        console.log(`   ✅ Synced ${sourceRegs.rows.length} regulations`);
-      } catch (err) {
-        await templatePool.query('ROLLBACK');
-        results.tables.regulations = { error: err instanceof Error ? err.message : 'Unknown error', status: 'failed' };
-        results.errors.push(`regulations: ${err instanceof Error ? err.message : 'Unknown error'}`);
-        console.log(`   ❌ Failed to sync regulations: ${err}`);
-      }
+    // Helper: get jsonb/json column names for a table so we can properly serialize them
+    async function getJsonColumns(pool: any, tableName: string): Promise<Set<string>> {
+      const res = await pool.query(
+        `SELECT column_name FROM information_schema.columns WHERE table_name = $1 AND data_type IN ('json', 'jsonb')`,
+        [tableName]
+      );
+      return new Set(res.rows.map((r: any) => r.column_name));
+    }
 
-      // SYNC COMPLIANCE TASKS (templates only - where assigned_to IS NULL)
-      console.log('📝 Syncing compliance task templates...');
-      try {
-        const sourceTasks = await sourcePool.query('SELECT * FROM compliance_tasks WHERE assigned_to IS NULL');
-        
-        await templatePool.query('BEGIN');
-        await templatePool.query('DELETE FROM compliance_tasks WHERE assigned_to IS NULL');
-        
-        for (const task of sourceTasks.rows) {
-          const columns = Object.keys(task).filter(k => task[k] !== null);
-          const values = columns.map(k => task[k]);
-          const placeholders = columns.map((_, i) => `$${i + 1}`);
-          
-          await templatePool.query(
-            `INSERT INTO compliance_tasks (${columns.join(', ')}) VALUES (${placeholders.join(', ')}) ON CONFLICT (id) DO NOTHING`,
+    // Helper: insert rows into a target table, properly serializing jsonb columns.
+    // node-postgres deserializes jsonb into native JS types; we must JSON.stringify ALL
+    // jsonb values (including strings/numbers/booleans) so PostgreSQL receives valid JSON text.
+    async function insertRows(pool: any, tableName: string, rows: any[], jsonCols: Set<string>) {
+      for (let i = 0; i < rows.length; i++) {
+        const row = rows[i];
+        const columns = Object.keys(row).filter(k => row[k] !== null && row[k] !== undefined);
+        const values = columns.map(k => {
+          const v = row[k];
+          if (jsonCols.has(k)) return JSON.stringify(v);
+          return v;
+        });
+        const placeholders = columns.map((_, i) => `$${i + 1}`);
+        try {
+          await pool.query(
+            `INSERT INTO ${tableName} (${columns.join(', ')}) VALUES (${placeholders.join(', ')}) ON CONFLICT (id) DO NOTHING`,
             values
           );
+        } catch (insertErr: any) {
+          console.error(`   ❌ INSERT ${tableName} row ${i} (id=${row.id}) failed:`, insertErr.message);
+          console.error(`      detail: ${insertErr.detail || 'none'}, hint: ${insertErr.hint || 'none'}, where: ${insertErr.where || 'none'}`);
+          const badCols = columns.filter(k => jsonCols.has(k));
+          if (badCols.length > 0) {
+            console.error(`      jsonb cols: ${badCols.join(', ')}`);
+            for (const c of badCols) {
+              const raw = row[c];
+              console.error(`        ${c}: jsType=${typeof raw}, sample=${String(raw).substring(0, 100)}`);
+            }
+          }
+          throw insertErr;
         }
+      }
+    }
+
+    try {
+      // SYNC REGULATIONS + COMPLIANCE TASKS
+      console.log('📋 Syncing regulations and compliance tasks...');
+      try {
+        const sourceRegs = await sourcePool.query('SELECT * FROM regulations');
+        const sourceTasks = await sourcePool.query('SELECT * FROM compliance_tasks WHERE assigned_to IS NULL');
+        const regJsonCols = await getJsonColumns(sourcePool, 'regulations');
+        const taskJsonCols = await getJsonColumns(sourcePool, 'compliance_tasks');
+
+        await templatePool.query('BEGIN');
+        await templatePool.query('TRUNCATE TABLE regulations CASCADE');
+
+        await insertRows(templatePool, 'regulations', sourceRegs.rows, regJsonCols);
+        await insertRows(templatePool, 'compliance_tasks', sourceTasks.rows, taskJsonCols);
+
         await templatePool.query('COMMIT');
-        
+
+        results.tables.regulations = { synced: sourceRegs.rows.length, status: 'success' };
         results.tables.complianceTasks = { synced: sourceTasks.rows.length, status: 'success' };
-        console.log(`   ✅ Synced ${sourceTasks.rows.length} compliance task templates`);
+        console.log(`   ✅ Synced ${sourceRegs.rows.length} regulations + ${sourceTasks.rows.length} compliance task templates`);
       } catch (err) {
-        await templatePool.query('ROLLBACK');
-        results.tables.complianceTasks = { error: err instanceof Error ? err.message : 'Unknown error', status: 'failed' };
-        results.errors.push(`complianceTasks: ${err instanceof Error ? err.message : 'Unknown error'}`);
-        console.log(`   ❌ Failed to sync compliance tasks: ${err}`);
+        await templatePool.query('ROLLBACK').catch(() => {});
+        const errMsg = err instanceof Error ? err.message : 'Unknown error';
+        results.tables.regulations = { error: errMsg, status: 'failed' };
+        results.tables.complianceTasks = { error: errMsg, status: 'failed' };
+        results.errors.push(`regulations+complianceTasks: ${errMsg}`);
+        console.log(`   ❌ Failed to sync regulations + tasks: ${err}`);
       }
 
       // SYNC GUIDES
       console.log('📚 Syncing guides...');
       try {
         const sourceGuides = await sourcePool.query('SELECT * FROM guides');
-        
+        const guideJsonCols = await getJsonColumns(sourcePool, 'guides');
+
         await templatePool.query('BEGIN');
         await templatePool.query('DELETE FROM guides');
-        
-        for (const guide of sourceGuides.rows) {
-          const columns = Object.keys(guide).filter(k => guide[k] !== null);
-          const values = columns.map(k => guide[k]);
-          const placeholders = columns.map((_, i) => `$${i + 1}`);
-          
-          await templatePool.query(
-            `INSERT INTO guides (${columns.join(', ')}) VALUES (${placeholders.join(', ')}) ON CONFLICT (id) DO NOTHING`,
-            values
-          );
-        }
+        await insertRows(templatePool, 'guides', sourceGuides.rows, guideJsonCols);
         await templatePool.query('COMMIT');
-        
+
         results.tables.guides = { synced: sourceGuides.rows.length, status: 'success' };
         console.log(`   ✅ Synced ${sourceGuides.rows.length} guides`);
       } catch (err) {
@@ -2005,22 +2006,13 @@ app.post('/api/sync/dev-to-template', requireAuth, async (req, res) => {
       console.log('📅 Syncing deadlines...');
       try {
         const sourceDeadlines = await sourcePool.query('SELECT * FROM deadlines');
-        
+        const deadlineJsonCols = await getJsonColumns(sourcePool, 'deadlines');
+
         await templatePool.query('BEGIN');
         await templatePool.query('DELETE FROM deadlines');
-        
-        for (const deadline of sourceDeadlines.rows) {
-          const columns = Object.keys(deadline).filter(k => deadline[k] !== null);
-          const values = columns.map(k => deadline[k]);
-          const placeholders = columns.map((_, i) => `$${i + 1}`);
-          
-          await templatePool.query(
-            `INSERT INTO deadlines (${columns.join(', ')}) VALUES (${placeholders.join(', ')}) ON CONFLICT (id) DO NOTHING`,
-            values
-          );
-        }
+        await insertRows(templatePool, 'deadlines', sourceDeadlines.rows, deadlineJsonCols);
         await templatePool.query('COMMIT');
-        
+
         results.tables.deadlines = { synced: sourceDeadlines.rows.length, status: 'success' };
         console.log(`   ✅ Synced ${sourceDeadlines.rows.length} deadlines`);
       } catch (err) {
