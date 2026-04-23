@@ -49,6 +49,10 @@ import {
   updateAndDeployEcs,
   checkEcsCredentials,
   getEcsTaskDefinition,
+  // Per-tenant deployment functions
+  getTenantDeploymentStatus,
+  deployImageToTenant,
+  listEcrImageTags,
   // Tenant deletion functions
   canDeleteTenant,
   validateDeletionRequest,
@@ -259,9 +263,11 @@ app.get('/api/customers', requireAuth, async (req, res) => {
           lastActivity: stats.lastActivity,
           healthCheckUrl: tenant.health_check_url,
           createdAt: tenant.created_at,
-          // SSO status
           ssoEnabled: tenant.sso_enabled || false,
           ssoProvider: tenant.sso_provider || null,
+          currentImageTag: tenant.current_image_tag || null,
+          lastDeployedAt: tenant.last_deployed_at || null,
+          lastDeployedBy: tenant.last_deployed_by || null,
           health: {
             overall: health.overall,
             database: health.database,
@@ -1364,6 +1370,134 @@ app.post('/api/ecs/update-and-deploy', requireAuth, async (req, res) => {
     });
   } catch (error: any) {
     console.error('ECS update and deploy error:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// =============================================================================
+// PER-TENANT DEPLOYMENT ROUTES
+// =============================================================================
+
+// List available ECR image tags (deployable versions)
+app.get('/api/ecr/images', requireAuth, async (req, res) => {
+  try {
+    const result = await listEcrImageTags();
+    if (!result.success) {
+      return res.status(500).json({ success: false, error: result.error });
+    }
+    res.json({ success: true, images: result.tags });
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Get deployment status for a specific tenant
+app.get('/api/customers/:id/deployment', requireAuth, async (req, res) => {
+  try {
+    const tenant = await getTenantById(req.params.id);
+    if (!tenant) {
+      return res.status(404).json({ error: 'Tenant not found' });
+    }
+
+    const cluster = tenant.ecs_cluster || process.env.ECS_CLUSTER || 'edsteward-cluster';
+    const service = tenant.ecs_service || process.env.ECS_SERVICE || 'edsteward-service';
+    const taskFamily = tenant.ecs_task_family || process.env.ECS_TASK_FAMILY || 'edsteward-saml-production';
+
+    const status = await getTenantDeploymentStatus(cluster, service, taskFamily);
+
+    res.json({
+      ...status,
+      tenant: {
+        id: tenant.id,
+        name: tenant.name,
+        subdomain: tenant.subdomain,
+      },
+      config: {
+        cluster,
+        service,
+        taskFamily,
+        hasOwnInfra: !!(tenant.ecs_service),
+      },
+      dbTracking: {
+        currentImageTag: tenant.current_image_tag,
+        lastDeployedAt: tenant.last_deployed_at,
+        lastDeployedBy: tenant.last_deployed_by,
+      },
+    });
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Deploy a specific image tag to a tenant
+app.post('/api/customers/:id/deploy', requireAuth, async (req, res) => {
+  try {
+    const { imageTag } = req.body;
+    if (!imageTag) {
+      return res.status(400).json({ error: 'imageTag is required' });
+    }
+
+    const tenant = await getTenantById(req.params.id);
+    if (!tenant) {
+      return res.status(404).json({ error: 'Tenant not found' });
+    }
+
+    const cluster = tenant.ecs_cluster || process.env.ECS_CLUSTER || 'edsteward-cluster';
+    const service = tenant.ecs_service || process.env.ECS_SERVICE || 'edsteward-service';
+    const taskFamily = tenant.ecs_task_family || process.env.ECS_TASK_FAMILY || 'edsteward-saml-production';
+    const adminEmail = (req as any).adminUser?.email || 'unknown';
+
+    console.log(`\n🚀 DEPLOY REQUEST: ${imageTag} -> ${tenant.name} (${service})`);
+    console.log(`   By: ${adminEmail}`);
+
+    const result = await deployImageToTenant(cluster, service, taskFamily, imageTag);
+
+    if (!result.success) {
+      return res.status(500).json({ success: false, error: result.message });
+    }
+
+    // Record deployment in database
+    const adminPool = getAdminPool();
+    await adminPool.query(
+      `UPDATE tenants SET current_image_tag = $1, last_deployed_at = NOW(), last_deployed_by = $2, updated_at = NOW() WHERE id = $3`,
+      [imageTag, adminEmail, tenant.id]
+    );
+
+    res.json({
+      success: true,
+      taskDefinitionArn: result.taskDefinitionArn,
+      revision: result.revision,
+      message: result.message,
+      deployment: {
+        tenant: tenant.name,
+        imageTag,
+        deployedBy: adminEmail,
+        deployedAt: new Date().toISOString(),
+      },
+    });
+  } catch (error: any) {
+    console.error('Per-tenant deploy error:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Update a tenant's ECS infrastructure configuration
+app.put('/api/customers/:id/deployment-config', requireAuth, async (req, res) => {
+  try {
+    const { ecsCluster, ecsService, ecsTaskFamily } = req.body;
+    const tenant = await getTenantById(req.params.id);
+    if (!tenant) {
+      return res.status(404).json({ error: 'Tenant not found' });
+    }
+
+    const updates: any = {};
+    if (ecsCluster !== undefined) updates.ecs_cluster = ecsCluster;
+    if (ecsService !== undefined) updates.ecs_service = ecsService;
+    if (ecsTaskFamily !== undefined) updates.ecs_task_family = ecsTaskFamily;
+
+    const updated = await updateTenant(req.params.id, updates);
+    res.json({ success: true, tenant: updated });
+  } catch (error: any) {
     res.status(500).json({ success: false, error: error.message });
   }
 });

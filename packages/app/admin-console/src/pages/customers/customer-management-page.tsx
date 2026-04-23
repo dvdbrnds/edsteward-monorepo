@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { apiGet } from '@/lib/api';
 import { TenantDeletionDialog } from '@/components/tenant-deletion-dialog';
+import { DeployDialog } from '@/components/deploy-dialog';
 import SSOConfiguration from './sso-configuration';
 import TemplateSyncDialog from './template-sync-dialog';
 
@@ -24,9 +25,11 @@ interface Customer {
     application: { status: string; responding: boolean; error?: string };
   };
   error?: string;
-  // SSO status
   ssoEnabled?: boolean;
   ssoProvider?: string;
+  currentImageTag?: string;
+  lastDeployedAt?: string;
+  lastDeployedBy?: string;
 }
 
 export function CustomerManagementPage() {
@@ -35,6 +38,7 @@ export function CustomerManagementPage() {
   const [error, setError] = useState<string | null>(null);
   const [deletingTenant, setDeletingTenant] = useState<{ id: string; name: string } | null>(null);
   const [configuringSSO, setConfiguringSSO] = useState<{ id: string; name: string; subdomain: string } | null>(null);
+  const [deployingTenant, setDeployingTenant] = useState<{ id: string; name: string; subdomain: string } | null>(null);
   const [showSyncDialog, setShowSyncDialog] = useState(false);
 
   useEffect(() => {
@@ -191,15 +195,25 @@ export function CustomerManagementPage() {
                           </span>
                           {customer.ssoEnabled && (
                             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                              🔐 SSO: {customer.ssoProvider?.toUpperCase() || 'Enabled'}
+                              SSO: {customer.ssoProvider?.toUpperCase() || 'Enabled'}
+                            </span>
+                          )}
+                          {customer.currentImageTag && (
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 font-mono">
+                              {customer.currentImageTag}
                             </span>
                           )}
                         </div>
                         <div className="mt-2 flex items-center text-sm text-gray-500 space-x-6">
-                          <span>🌐 {customer.subdomain}.edsteward.ai</span>
-                          <span>👥 {customer.userCount} users</span>
-                          <span>📋 {customer.regulationCount} regulations</span>
-                          <span>🕒 {formatLastActivity(customer.lastActivity)}</span>
+                          <span>{customer.subdomain}.edsteward.ai</span>
+                          <span>{customer.userCount} users</span>
+                          <span>{customer.regulationCount} regulations</span>
+                          <span>{formatLastActivity(customer.lastActivity)}</span>
+                          {customer.lastDeployedAt && (
+                            <span title={`Deployed by ${customer.lastDeployedBy || 'unknown'}`}>
+                              Deployed {formatLastActivity(customer.lastDeployedAt)}
+                            </span>
+                          )}
                         </div>
                         {customer.error && (
                           <div className="mt-2 text-sm text-red-600">
@@ -235,6 +249,17 @@ export function CustomerManagementPage() {
                     </div>
                     <div className="flex items-center space-x-2">
                       <button
+                        onClick={() => setDeployingTenant({
+                          id: customer.id,
+                          name: customer.name,
+                          subdomain: customer.subdomain,
+                        })}
+                        className="inline-flex items-center px-3 py-2 border border-orange-300 shadow-sm text-sm leading-4 font-medium rounded-md text-orange-700 bg-white hover:bg-orange-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
+                        title="Deploy a version to this tenant"
+                      >
+                        Deploy
+                      </button>
+                      <button
                         onClick={() => setConfiguringSSO({ 
                           id: customer.id, 
                           name: customer.name,
@@ -247,7 +272,7 @@ export function CustomerManagementPage() {
                         }`}
                         title="Configure SSO"
                       >
-                        🔐 SSO
+                        SSO
                       </button>
                       {customer.healthCheckUrl && (
                         <a
@@ -281,6 +306,21 @@ export function CustomerManagementPage() {
             ))}
           </ul>
         </div>
+      )}
+
+      {/* Deploy Dialog */}
+      {deployingTenant && (
+        <DeployDialog
+          tenantId={deployingTenant.id}
+          tenantName={deployingTenant.name}
+          subdomain={deployingTenant.subdomain}
+          isOpen={true}
+          onClose={() => setDeployingTenant(null)}
+          onDeployed={() => {
+            setDeployingTenant(null);
+            fetchCustomers();
+          }}
+        />
       )}
 
       {/* Tenant Deletion Dialog */}

@@ -1042,6 +1042,230 @@ export async function updateAndDeployEcs(
   };
 }
 
+// =============================================================================
+// PER-TENANT DEPLOYMENT FUNCTIONS
+// =============================================================================
+
+/**
+ * Get the deployment status for a specific tenant's ECS service
+ */
+export async function getTenantDeploymentStatus(
+  cluster: string,
+  service: string,
+  taskFamily: string
+): Promise<{
+  success: boolean;
+  status?: string;
+  runningCount?: number;
+  desiredCount?: number;
+  currentImageTag?: string;
+  taskDefinitionRevision?: number;
+  lastDeployment?: string;
+  error?: string;
+}> {
+  try {
+    const serviceResult = await makeAwsRequest('ecs', 'DescribeServices', {
+      cluster,
+      services: [service],
+    });
+
+    const svc = serviceResult.services?.[0];
+    if (!svc) {
+      return { success: false, error: `Service "${service}" not found in cluster "${cluster}"` };
+    }
+
+    // Extract image tag from the task definition
+    let currentImageTag: string | undefined;
+    let revision: number | undefined;
+    try {
+      const taskDefResult = await makeAwsRequest('ecs', 'DescribeTaskDefinition', {
+        taskDefinition: svc.taskDefinition,
+      });
+      const image = taskDefResult.taskDefinition?.containerDefinitions?.[0]?.image || '';
+      currentImageTag = image.split(':').pop() || undefined;
+      revision = taskDefResult.taskDefinition?.revision;
+    } catch {
+      // Non-critical
+    }
+
+    const latestDeployment = svc.deployments?.find((d: any) => d.status === 'PRIMARY');
+
+    return {
+      success: true,
+      status: svc.status,
+      runningCount: svc.runningCount,
+      desiredCount: svc.desiredCount,
+      currentImageTag,
+      taskDefinitionRevision: revision,
+      lastDeployment: latestDeployment?.updatedAt || latestDeployment?.createdAt,
+    };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * Deploy a specific image tag to a tenant's ECS service.
+ * Clones the current task definition, swaps the image tag, registers it, and updates the service.
+ */
+export async function deployImageToTenant(
+  cluster: string,
+  service: string,
+  taskFamily: string,
+  imageTag: string
+): Promise<{
+  success: boolean;
+  taskDefinitionArn?: string;
+  revision?: number;
+  message: string;
+}> {
+  try {
+    // 1. Get current task definition
+    const describeResult = await makeAwsRequest('ecs', 'DescribeTaskDefinition', {
+      taskDefinition: taskFamily,
+    });
+    const currentTaskDef = describeResult.taskDefinition;
+
+    // 2. Clone task def with new image tag
+    const ecrUri = currentTaskDef.containerDefinitions[0].image.split(':')[0];
+    const newImage = `${ecrUri}:${imageTag}`;
+
+    const newTaskDef: any = {
+      family: currentTaskDef.family,
+      networkMode: currentTaskDef.networkMode,
+      requiresCompatibilities: currentTaskDef.requiresCompatibilities,
+      cpu: currentTaskDef.cpu,
+      memory: currentTaskDef.memory,
+      executionRoleArn: currentTaskDef.executionRoleArn,
+      containerDefinitions: JSON.parse(JSON.stringify(currentTaskDef.containerDefinitions)),
+    };
+    if (currentTaskDef.taskRoleArn) {
+      newTaskDef.taskRoleArn = currentTaskDef.taskRoleArn;
+    }
+
+    newTaskDef.containerDefinitions[0].image = newImage;
+
+    // Update VERSION env var if it exists
+    const envVars = newTaskDef.containerDefinitions[0].environment || [];
+    const versionEnv = envVars.find((e: any) => e.name === 'VERSION');
+    if (versionEnv) {
+      versionEnv.value = imageTag;
+    }
+
+    // 3. Register new task definition revision
+    const registerResult = await makeAwsRequest('ecs', 'RegisterTaskDefinition', newTaskDef);
+    const newArn = registerResult.taskDefinition.taskDefinitionArn;
+    const revision = registerResult.taskDefinition.revision;
+
+    // 4. Update the service to use the new task definition
+    await makeAwsRequest('ecs', 'UpdateService', {
+      cluster,
+      service,
+      taskDefinition: newArn,
+      forceNewDeployment: true,
+    });
+
+    return {
+      success: true,
+      taskDefinitionArn: newArn,
+      revision,
+      message: `Deployed ${imageTag} to ${service}. New tasks will start within 2-3 minutes.`,
+    };
+  } catch (error: any) {
+    return { success: false, message: error.message };
+  }
+}
+
+/**
+ * List available image tags from ECR repository
+ */
+export async function listEcrImageTags(
+  repositoryName: string = 'edsteward-multi-tenant',
+  region: string = AWS_REGION
+): Promise<{
+  success: boolean;
+  tags?: Array<{ tag: string; pushedAt: string; sizeBytes: number }>;
+  error?: string;
+}> {
+  try {
+    const credentials = await getAwsCredentials();
+
+    const host = `api.ecr.${region}.amazonaws.com`;
+    const endpoint = `https://${host}`;
+    const timestamp = new Date().toISOString().replace(/[:-]|\.\d{3}/g, '');
+    const date = timestamp.substring(0, 8);
+
+    const body = JSON.stringify({
+      repositoryName,
+      filter: { tagStatus: 'TAGGED' },
+      maxResults: 50,
+    });
+    const bodyHash = crypto.createHash('sha256').update(body).digest('hex');
+
+    let canonicalHeaders =
+      `content-type:application/x-amz-json-1.1\n` +
+      `host:${host}\n` +
+      `x-amz-date:${timestamp}\n`;
+    let signedHeaders = 'content-type;host;x-amz-date';
+
+    if (credentials.sessionToken) {
+      canonicalHeaders += `x-amz-security-token:${credentials.sessionToken}\n`;
+      signedHeaders += ';x-amz-security-token';
+    }
+    canonicalHeaders += `x-amz-target:AmazonEC2ContainerRegistry_V20150921.DescribeImages\n`;
+    signedHeaders += ';x-amz-target';
+
+    const canonicalRequest =
+      `POST\n/\n\n${canonicalHeaders}\n${signedHeaders}\n${bodyHash}`;
+
+    const algorithm = 'AWS4-HMAC-SHA256';
+    const credentialScope = `${date}/${region}/ecr/aws4_request`;
+    const canonicalRequestHash = crypto.createHash('sha256').update(canonicalRequest).digest('hex');
+    const stringToSign = `${algorithm}\n${timestamp}\n${credentialScope}\n${canonicalRequestHash}`;
+
+    const kDate = crypto.createHmac('sha256', `AWS4${credentials.secretAccessKey}`).update(date).digest();
+    const kRegion = crypto.createHmac('sha256', kDate).update(region).digest();
+    const kService = crypto.createHmac('sha256', kRegion).update('ecr').digest();
+    const kSigning = crypto.createHmac('sha256', kService).update('aws4_request').digest();
+    const signature = crypto.createHmac('sha256', kSigning).update(stringToSign).digest('hex');
+
+    const authorizationHeader =
+      `${algorithm} Credential=${credentials.accessKeyId}/${credentialScope}, SignedHeaders=${signedHeaders}, Signature=${signature}`;
+
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Date': timestamp,
+      'X-Amz-Target': 'AmazonEC2ContainerRegistry_V20150921.DescribeImages',
+      'Authorization': authorizationHeader,
+    };
+    if (credentials.sessionToken) {
+      headers['X-Amz-Security-Token'] = credentials.sessionToken;
+    }
+
+    const response = await fetch(endpoint, { method: 'POST', headers, body });
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`ECR DescribeImages failed: ${response.status} ${errorText}`);
+    }
+
+    const data = await response.json();
+    const images = (data.imageDetails || [])
+      .filter((img: any) => img.imageTags?.length > 0)
+      .flatMap((img: any) =>
+        img.imageTags.map((tag: string) => ({
+          tag,
+          pushedAt: img.imagePushedAt ? new Date(img.imagePushedAt * 1000).toISOString() : '',
+          sizeBytes: img.imageSizeInBytes || 0,
+        }))
+      )
+      .sort((a: any, b: any) => new Date(b.pushedAt).getTime() - new Date(a.pushedAt).getTime());
+
+    return { success: true, tags: images };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+}
+
 /**
  * Check ECS credentials configuration
  */

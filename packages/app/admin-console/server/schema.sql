@@ -55,7 +55,15 @@ CREATE TABLE IF NOT EXISTS tenants (
     -- Cached stats (updated periodically)
     cached_user_count INTEGER DEFAULT 0,
     cached_regulation_count INTEGER DEFAULT 0,
-    cached_last_activity TIMESTAMP WITH TIME ZONE
+    cached_last_activity TIMESTAMP WITH TIME ZONE,
+    
+    -- Per-tenant deployment tracking
+    ecs_cluster VARCHAR(100) DEFAULT 'edsteward-cluster',
+    ecs_service VARCHAR(100),
+    ecs_task_family VARCHAR(100),
+    current_image_tag VARCHAR(100),
+    last_deployed_at TIMESTAMP WITH TIME ZONE,
+    last_deployed_by VARCHAR(100)
 );
 
 -- Create index for common queries
@@ -83,6 +91,37 @@ END $$;
 
 -- Make contact_email nullable if it was NOT NULL
 ALTER TABLE tenants ALTER COLUMN contact_email DROP NOT NULL;
+
+-- Add per-tenant deployment tracking columns
+DO $$ BEGIN
+    ALTER TABLE tenants ADD COLUMN ecs_cluster VARCHAR(100) DEFAULT 'edsteward-cluster';
+EXCEPTION WHEN duplicate_column THEN NULL;
+END $$;
+
+DO $$ BEGIN
+    ALTER TABLE tenants ADD COLUMN ecs_service VARCHAR(100);
+EXCEPTION WHEN duplicate_column THEN NULL;
+END $$;
+
+DO $$ BEGIN
+    ALTER TABLE tenants ADD COLUMN ecs_task_family VARCHAR(100);
+EXCEPTION WHEN duplicate_column THEN NULL;
+END $$;
+
+DO $$ BEGIN
+    ALTER TABLE tenants ADD COLUMN current_image_tag VARCHAR(100);
+EXCEPTION WHEN duplicate_column THEN NULL;
+END $$;
+
+DO $$ BEGIN
+    ALTER TABLE tenants ADD COLUMN last_deployed_at TIMESTAMP WITH TIME ZONE;
+EXCEPTION WHEN duplicate_column THEN NULL;
+END $$;
+
+DO $$ BEGIN
+    ALTER TABLE tenants ADD COLUMN last_deployed_by VARCHAR(100);
+EXCEPTION WHEN duplicate_column THEN NULL;
+END $$;
 
 -- Update status CHECK constraint to include 'deleted'
 -- (DROP + re-ADD is the only way to modify a CHECK constraint)

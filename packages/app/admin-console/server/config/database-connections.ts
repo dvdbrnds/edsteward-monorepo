@@ -94,6 +94,13 @@ export interface Tenant {
   cached_user_count: number;
   cached_regulation_count: number;
   cached_last_activity?: Date;
+  // Per-tenant deployment tracking
+  ecs_cluster?: string;
+  ecs_service?: string;
+  ecs_task_family?: string;
+  current_image_tag?: string;
+  last_deployed_at?: Date;
+  last_deployed_by?: string;
 }
 
 // Admin database connection (where tenants table lives)
@@ -151,7 +158,13 @@ export async function initializeAdminDatabase(): Promise<void> {
         last_health_check TIMESTAMP WITH TIME ZONE,
         cached_user_count INTEGER DEFAULT 0,
         cached_regulation_count INTEGER DEFAULT 0,
-        cached_last_activity TIMESTAMP WITH TIME ZONE
+        cached_last_activity TIMESTAMP WITH TIME ZONE,
+        ecs_cluster VARCHAR(100) DEFAULT 'edsteward-cluster',
+        ecs_service VARCHAR(100),
+        ecs_task_family VARCHAR(100),
+        current_image_tag VARCHAR(100),
+        last_deployed_at TIMESTAMP WITH TIME ZONE,
+        last_deployed_by VARCHAR(100)
       )
     `);
 
@@ -170,6 +183,24 @@ export async function initializeAdminDatabase(): Promise<void> {
           WHERE table_name = 'tenants' AND column_name = 'sso_config'
         ) THEN
           ALTER TABLE tenants ADD COLUMN sso_config JSONB DEFAULT '{}';
+        END IF;
+      END $$;
+    `);
+
+    // Migration: Add per-tenant deployment tracking columns
+    await client.query(`
+      DO $$
+      BEGIN
+        IF NOT EXISTS (
+          SELECT 1 FROM information_schema.columns 
+          WHERE table_name = 'tenants' AND column_name = 'ecs_cluster'
+        ) THEN
+          ALTER TABLE tenants ADD COLUMN ecs_cluster VARCHAR(100) DEFAULT 'edsteward-cluster';
+          ALTER TABLE tenants ADD COLUMN ecs_service VARCHAR(100);
+          ALTER TABLE tenants ADD COLUMN ecs_task_family VARCHAR(100);
+          ALTER TABLE tenants ADD COLUMN current_image_tag VARCHAR(100);
+          ALTER TABLE tenants ADD COLUMN last_deployed_at TIMESTAMP WITH TIME ZONE;
+          ALTER TABLE tenants ADD COLUMN last_deployed_by VARCHAR(100);
         END IF;
       END $$;
     `);
@@ -271,7 +302,9 @@ export async function updateTenant(tenantId: string, updates: Partial<Tenant>): 
     'name', 'status', 'database_url', 'contact_email', 'contact_name',
     'organization_url', 'plan', 'max_users', 'max_regulations', 'deployment_type',
     'aws_region', 'health_check_url', 'sso_enabled', 'sso_provider', 'sso_config',
-    'sso_entity_id', 'sso_sso_url', 'sso_certificate', 'primary_color', 'logo_url'
+    'sso_entity_id', 'sso_sso_url', 'sso_certificate', 'primary_color', 'logo_url',
+    'ecs_cluster', 'ecs_service', 'ecs_task_family', 'current_image_tag',
+    'last_deployed_at', 'last_deployed_by'
   ];
 
   for (const field of updateableFields) {
