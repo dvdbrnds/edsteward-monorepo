@@ -28,10 +28,10 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 source "$SCRIPT_DIR/lib/deploy-common.sh"
 
-# Configuration
-CLUSTER_NAME="${ADMIN_CLUSTER:-edsteward-staging-cluster}"
-SERVICE_NAME="${ADMIN_SERVICE:-edsteward-admin-service}"
-TASK_FAMILY="${ADMIN_TASK_FAMILY:-edsteward-admin-task}"
+# Configuration -- must match actual AWS resource names
+CLUSTER_NAME="${ADMIN_CLUSTER:-edsteward-cluster}"
+SERVICE_NAME="${ADMIN_SERVICE:-admin-console-service}"
+TASK_FAMILY="${ADMIN_TASK_FAMILY:-edsteward-admin-console}"
 ECR_REPO_NAME="edsteward-admin-console"
 ADMIN_ECR_URI="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}"
 ADMIN_CONSOLE_DIR="$SCRIPT_DIR/../admin-console"
@@ -85,9 +85,10 @@ log "Logging in to ECR..."
 aws ecr get-login-password --region "$AWS_REGION" | \
     docker login --username AWS --password-stdin "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
 
-# Build the image
-log "Building admin console Docker image (${VERSION})..."
+# Build the image (linux/amd64 for Fargate)
+log "Building admin console Docker image (${VERSION}) for linux/amd64..."
 docker build \
+    --platform linux/amd64 \
     -f "$ADMIN_CONSOLE_DIR/Dockerfile.production" \
     -t "${ADMIN_ECR_URI}:${VERSION}" \
     -t "${ADMIN_ECR_URI}:latest" \
@@ -142,24 +143,38 @@ aws ecs update-service \
     --output table
 
 # Wait for deployment to stabilize
-log "Waiting for deployment to stabilize (this may take 2-5 minutes)..."
-aws ecs wait services-stable \
+log "Waiting for ECS service to stabilize (up to 10 minutes)..."
+WAIT_START=$SECONDS
+if aws ecs wait services-stable \
     --cluster "$CLUSTER_NAME" \
-    --services "$SERVICE_NAME" 2>/dev/null || true
-
-# Health check
-log "Checking admin console health..."
-sleep 10
-HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "${ADMIN_URL}/api/health" 2>/dev/null || echo "000")
-
-if [[ "$HTTP_STATUS" == "200" ]]; then
-    echo -e "\n${GREEN}✅ Admin console deployed successfully!${NC}"
-    echo -e "   URL: ${CYAN}${ADMIN_URL}${NC}"
-    echo -e "   Version: ${VERSION}"
+    --services "$SERVICE_NAME" 2>/dev/null; then
+    WAIT_ELAPSED=$(( SECONDS - WAIT_START ))
+    success "ECS service stable in ${WAIT_ELAPSED}s"
 else
-    warn "Health check returned HTTP ${HTTP_STATUS}."
-    warn "The service may still be starting up. Check ECS console for details."
+    WAIT_ELAPSED=$(( SECONDS - WAIT_START ))
+    warn "ECS wait timed out after ${WAIT_ELAPSED}s. Checking service events..."
+    aws ecs describe-services \
+        --cluster "$CLUSTER_NAME" \
+        --services "$SERVICE_NAME" \
+        --region "$AWS_REGION" \
+        --query 'services[0].events[0:3].message' \
+        --output text
 fi
 
-echo ""
-log "Deployment complete."
+# Health check with retry
+log "Verifying health at ${ADMIN_URL}/api/health..."
+for i in 1 2 3 4 5; do
+    HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "${ADMIN_URL}/api/health" 2>/dev/null || echo "000")
+    if [[ "$HTTP_STATUS" == "200" ]]; then
+        TOTAL_ELAPSED=$(( SECONDS ))
+        echo -e "\n${GREEN}✅ Admin console deployed successfully! (${TOTAL_ELAPSED}s total)${NC}"
+        echo -e "   URL: ${CYAN}${ADMIN_URL}${NC}"
+        echo -e "   Version: ${VERSION}"
+        echo -e "   Task Def: ${NEW_TASK_ARN}"
+        exit 0
+    fi
+    [[ $i -lt 5 ]] && sleep 5
+done
+
+warn "Health check returned HTTP ${HTTP_STATUS} after 5 attempts."
+warn "Service may still be starting. Check: aws ecs describe-services --cluster $CLUSTER_NAME --services $SERVICE_NAME"
