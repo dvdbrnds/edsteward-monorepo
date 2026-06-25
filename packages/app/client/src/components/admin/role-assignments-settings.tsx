@@ -1,11 +1,12 @@
 /**
  * Role Assignments Settings
  * 
- * Allows admins to map suggested roles (from MCP Engine) to default DRIs.
+ * Allows admins to map canonical compliance roles to default DRIs.
  * Tasks with these roles will auto-assign to the configured person.
+ * Includes role explanations (group, aliases) inline.
  */
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -40,6 +41,12 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
+import {
   Users,
   Edit2,
   Trash2,
@@ -49,7 +56,68 @@ import {
   AlertCircle,
   Plus,
   Download,
+  Info,
 } from 'lucide-react';
+
+const CANONICAL_ROLE_ALIASES: Record<string, string[]> = {
+  "Compliance Officer": ["compliance", "institutional compliance officer", "director of compliance", "compliance reporting manager"],
+  "General Counsel": ["legal counsel", "legal", "university counsel"],
+  "CFO": ["chief financial officer", "controller", "accounting manager"],
+  "HR Director": ["human resources director", "hr", "benefits manager", "payroll manager"],
+  "Title IX Coordinator": ["title ix coordinator / general counsel", "hr/title ix"],
+  "Clery Compliance Officer": [],
+  "Financial Aid Director": ["financial aid officer", "student financial services director", "student accounts manager"],
+  "IT Security Officer": ["ciso", "chief information security officer", "data protection officer", "it security manager"],
+  "Campus Police Chief": ["campus safety director", "public safety director", "security director"],
+  "Registrar": ["records manager"],
+  "VP Academic Affairs": ["provost", "chief academic officer", "academic affairs dean"],
+  "VP Student Affairs": ["chief student affairs officer", "vice president for student affairs"],
+  "Dean of Students": ["student life director", "student conduct officer", "housing director"],
+  "Privacy Officer": ["chief privacy officer"],
+  "President": ["president/chancellor", "senior administration"],
+  "Disability Services Coordinator": ["disability services director", "ada coordinator", "section 504 coordinator"],
+  "Emergency Management Director": ["emergency response coordinator"],
+  "Facilities Director": ["facilities", "ehs director", "environmental health and safety director"],
+  "Environmental Compliance Officer": ["environmental compliance manager"],
+  "Fire Safety Officer": ["safety officer"],
+  "Export Control Officer": ["ofac compliance officer"],
+  "Research Compliance Officer": ["research integrity officer", "vice president for research"],
+  "Training Coordinator": ["training director"],
+  "Procurement Director": ["procurement manager", "procurement officer"],
+  "Internal Auditor": ["quality assurance manager", "risk management officer"],
+  "International Programs Director": [],
+  "Institutional Research Director": ["institutional research", "assessment coordinator"],
+  "Library Director": [],
+  "Ethics Officer": [],
+  "Communications Director": ["communications", "web services"],
+  "Government Relations": [],
+  "Board Compensation Committee": [],
+  "Technology Transfer Officer": ["patent attorney", "grants administrator"],
+  "Title VI Coordinator": ["chief diversity officer"],
+  "Admissions Director": [],
+  "Curriculum Coordinator": ["teacher preparation program director"],
+};
+
+const GROUP_COLORS: Record<string, string> = {
+  "Compliance": "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400",
+  "Legal": "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400",
+  "Finance": "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400",
+  "Human Resources": "bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-400",
+  "Civil Rights": "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
+  "Campus Safety": "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400",
+  "Enrollment & Financial Aid": "bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-400",
+  "Information Technology": "bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-400",
+  "Academic Records": "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400",
+  "Academic Affairs": "bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-400",
+  "Student Affairs": "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400",
+  "Student Services": "bg-lime-100 text-lime-800 dark:bg-lime-900/30 dark:text-lime-400",
+  "Executive": "bg-slate-100 text-slate-800 dark:bg-slate-900/30 dark:text-slate-400",
+  "Operations": "bg-stone-100 text-stone-800 dark:bg-stone-900/30 dark:text-stone-400",
+  "Research & Compliance": "bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-400",
+  "Communications": "bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-400",
+  "External Affairs": "bg-fuchsia-100 text-fuchsia-800 dark:bg-fuchsia-900/30 dark:text-fuchsia-400",
+  "Governance": "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400",
+};
 
 interface RoleAssignment {
   id: number;
@@ -95,6 +163,7 @@ export function RoleAssignmentsSettings() {
   const [editingRole, setEditingRole] = useState<RoleAssignment | null>(null);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [filterCategory, setFilterCategory] = useState<string>('all');
+  const [searchQuery, setSearchQuery] = useState('');
   
   // Form state for editing
   const [formData, setFormData] = useState({
@@ -292,10 +361,22 @@ export function RoleAssignmentsSettings() {
   // Get unique categories
   const categories = Array.from(new Set(assignments?.map(a => a.category).filter(Boolean) || []));
 
-  // Filter assignments
-  const filteredAssignments = filterCategory === 'all' 
-    ? assignments 
-    : assignments?.filter(a => a.category === filterCategory);
+  // Filter assignments by category and search
+  const filteredAssignments = useMemo(() => {
+    let result = assignments || [];
+    if (filterCategory !== 'all') {
+      result = result.filter(a => a.category === filterCategory);
+    }
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      result = result.filter(a =>
+        a.roleName.toLowerCase().includes(q) ||
+        (a.category || '').toLowerCase().includes(q) ||
+        (CANONICAL_ROLE_ALIASES[a.roleName] || []).some(alias => alias.toLowerCase().includes(q))
+      );
+    }
+    return result;
+  }, [assignments, filterCategory, searchQuery]);
 
   // Get user display name
   const getUserName = (user: SystemUser | null) => {
@@ -331,7 +412,8 @@ export function RoleAssignmentsSettings() {
               Role Assignments
             </CardTitle>
             <CardDescription>
-              Map suggested roles to default assignees. Tasks with these roles will auto-assign to the configured person.
+              {assignments?.length || 0} canonical roles map statutory responsibilities to real people at your institution.
+              Assign a DRI to each role and tasks auto-route to the right person.
             </CardDescription>
           </div>
           <Button onClick={() => setShowAddDialog(true)}>
@@ -341,9 +423,25 @@ export function RoleAssignmentsSettings() {
         </div>
       </CardHeader>
       <CardContent>
+        {/* Explanation */}
+        <div className="rounded-lg border-l-4 border-primary bg-primary/5 p-4 mb-6">
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            Regulations use hundreds of different titles for the same person (e.g. "CISO", "IT Security Manager",
+            "Chief Information Security Officer"). EdSteward normalizes these into <strong>{assignments?.length || 36} canonical roles</strong>.
+            Assign each role once below, and every compliance task referencing any variant of that title automatically
+            routes to the correct DRI. Hover the <Info className="h-3 w-3 inline" /> icon to see which titles map to each role.
+          </p>
+        </div>
+
         {/* Filter */}
         <div className="flex items-center gap-4 mb-4">
-          <Label>Filter by Category:</Label>
+          <div className="relative flex-1 max-w-sm">
+            <Input
+              placeholder="Search roles or aliases..."
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+            />
+          </div>
           <Select value={filterCategory} onValueChange={setFilterCategory}>
             <SelectTrigger className="w-48">
               <SelectValue placeholder="All categories" />
@@ -379,41 +477,47 @@ export function RoleAssignmentsSettings() {
 
         {/* Table */}
         <div className="border rounded-lg overflow-hidden">
+          <TooltipProvider>
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Role</TableHead>
-                <TableHead>Canonical Office</TableHead>
-                <TableHead>Category</TableHead>
+                <TableHead>Group</TableHead>
                 <TableHead>DRI (Attestation Signer)</TableHead>
                 <TableHead className="text-center">Auto-Assign</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredAssignments?.map(role => (
+              {filteredAssignments?.map(role => {
+                const aliases = CANONICAL_ROLE_ALIASES[role.roleName] || [];
+                const colorClass = GROUP_COLORS[role.category || ''] || 'bg-gray-100 text-gray-800';
+                return (
                 <TableRow key={role.id}>
                   <TableCell>
-                    <div>
-                      <div className="font-medium">{role.roleName}</div>
-                      {role.displayName && role.displayName !== role.roleName && (
-                        <div className="text-sm text-muted-foreground">{role.displayName}</div>
+                    <div className="flex items-center gap-2">
+                      <div>
+                        <div className="font-medium">{role.roleName}</div>
+                        {role.officeName && (
+                          <div className="text-xs text-muted-foreground">{role.officeName}</div>
+                        )}
+                      </div>
+                      {aliases.length > 0 && (
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Info className="h-3.5 w-3.5 text-muted-foreground/60 cursor-help flex-shrink-0" />
+                          </TooltipTrigger>
+                          <TooltipContent side="right" className="max-w-xs">
+                            <p className="font-medium text-xs mb-1">Also known as:</p>
+                            <p className="text-xs text-muted-foreground">{aliases.join(', ')}</p>
+                          </TooltipContent>
+                        </Tooltip>
                       )}
                     </div>
                   </TableCell>
                   <TableCell>
-                    {(role.officeName || role.officeEmail) ? (
-                      <div>
-                        {role.officeName && <div className="font-medium text-sm">{role.officeName}</div>}
-                        {role.officeEmail && <div className="text-xs text-muted-foreground">{role.officeEmail}</div>}
-                      </div>
-                    ) : (
-                      <span className="text-xs text-muted-foreground">Not set</span>
-                    )}
-                  </TableCell>
-                  <TableCell>
                     {role.category && (
-                      <Badge variant="outline">{role.category}</Badge>
+                      <Badge variant="outline" className={colorClass + ' text-[11px]'}>{role.category}</Badge>
                     )}
                   </TableCell>
                   <TableCell>
@@ -478,16 +582,18 @@ export function RoleAssignmentsSettings() {
                     </div>
                   </TableCell>
                 </TableRow>
-              ))}
+                );
+              })}
               {(!filteredAssignments || filteredAssignments.length === 0) && (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
                     No role assignments found
                   </TableCell>
                 </TableRow>
               )}
             </TableBody>
           </Table>
+          </TooltipProvider>
         </div>
       </CardContent>
 

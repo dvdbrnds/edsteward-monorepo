@@ -29,7 +29,7 @@ import { BrandingSettingsV2 } from "@/components/admin/branding-settings";
 import { BackupManagement } from "@/components/admin/backup-management";
 import { NotificationSchedulerSettings } from "@/components/admin/notification-scheduler-settings";
 import { RoleAssignmentsSettings } from "@/components/admin/role-assignments-settings";
-import { RoleMappingReference } from "@/components/admin/role-mapping-reference";
+
 import { ComplianceDocuments } from "@/components/admin/compliance-documents";
 import { EmailDeliveryIssues } from "@/components/admin/email-delivery-issues";
 import {
@@ -1010,10 +1010,7 @@ export default function SystemSettingsPage() {
             </TabsContent>
 
             <TabsContent value="roles">
-              <div className="space-y-6">
-                <RoleMappingReference />
-                <RoleAssignmentsSettings />
-              </div>
+              <RoleAssignmentsSettings />
             </TabsContent>
 
             <TabsContent value="compliance">
