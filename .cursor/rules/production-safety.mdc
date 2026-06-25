@@ -34,6 +34,45 @@ alwaysApply: true
 2. **Backfill scripts must be idempotent** — safe to re-run without corrupting existing data
 3. **Accept target DB as a parameter** — never hardcode connection strings
 
+### CRITICAL: Destructive Database Operations
+
+**NEVER use `TRUNCATE ... CASCADE` on any production table.** CASCADE follows FK chains and will destroy structural data (regulations, tasks) that takes significant effort to restore.
+
+For any production database operation that deletes or resets data:
+
+1. **Before running**: List every table that will be affected (including CASCADE targets) and confirm the full blast radius with the user
+2. **Use DELETE, not TRUNCATE**: Targeted `DELETE FROM` statements respect FK constraints without propagating. Process tables in leaf-to-root order.
+3. **NULL out FK references first**: For columns like `owner_id`, `completed_by`, `attested_by` that reference users, run `UPDATE ... SET col = NULL` before deleting users
+4. **Never reset regulations or compliance_tasks structure**: Only reset *state* columns (status, attestation_status, timestamps). The task/regulation definitions are product content, not user data.
+5. **Take a Neon branch before any destructive operation**: `neon branches create --project-id <id>` gives an instant snapshot to restore from if anything goes wrong
+
+Safe reset order (when explicitly requested):
+```
+-- 1. Clear leaf tables (no inbound FKs)
+DELETE FROM task_attestation_tokens;
+DELETE FROM task_evidence;
+DELETE FROM task_activity;
+DELETE FROM attestation_tokens;
+DELETE FROM evidence_files;
+DELETE FROM notes; DELETE FROM note_history;
+DELETE FROM notifications; DELETE FROM notification_queue;
+DELETE FROM audit_logs; DELETE FROM login_attempts;
+DELETE FROM email_delivery_log; DELETE FROM regulation_feedback;
+
+-- 2. NULL out user references on structural tables
+UPDATE regulations SET owner_id = NULL, notifications_disabled_by = NULL;
+UPDATE compliance_tasks SET completed_by = NULL, attested_by = NULL;
+
+-- 3. Reset task state (keep definitions)
+UPDATE compliance_tasks SET status = 'pending', attestation_status = 'not_started',
+  completed_at = NULL, attested_at = NULL;
+
+-- 4. Clear user tables last
+DELETE FROM role_assignments;
+DELETE FROM session;
+DELETE FROM users;
+```
+
 ## Code Change Rules
 
 1. **Backward-compatible changes only** — don't break existing endpoints or workflows

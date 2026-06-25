@@ -985,9 +985,33 @@ export function setupMCPIntegrationApi(app: express.Application) {
           return { officeName: null, officeEmail: null };
         };
         
+        // Category-to-role fallback for tasks arriving without an assignedRole
+        const createCategoryRoleDefaults: Record<string, string> = {
+          'Campus Safety': 'Clery Compliance Officer',
+          'Civil Rights': 'Title IX Coordinator',
+          'Environmental Health & Safety': 'Environmental Compliance Officer',
+          'Ethics & Governance': 'Ethics Officer',
+          'Finance': 'CFO',
+          'Financial Aid': 'Financial Aid Director',
+          'Human Resources': 'HR Director',
+          'Information Technology': 'IT Security Officer',
+          'Intellectual Property': 'Technology Transfer Officer',
+          'Research': 'Research Compliance Officer',
+          'Student Services': 'Dean of Students',
+          'Academic Programs': 'VP Academic Affairs',
+          'Fundraising & Development': 'Communications Director',
+          'Contracts & Procurement': 'Procurement Director',
+        };
+        const createCategoryFallback = createCategoryRoleDefaults[data.category || ''] || 'Compliance Officer';
+        let createRolesEnforced = 0;
+        
         // parentRole cascades the parent's assignedRole to subtasks that don't have their own
         const buildTaskValues = (task: typeof data.complianceTasks[0], parentId?: number, parentRole?: string | null) => {
-          const effectiveRole = task.assignedRole || parentRole || null;
+          let effectiveRole = task.assignedRole || parentRole || null;
+          if (!effectiveRole) {
+            effectiveRole = createCategoryFallback;
+            createRolesEnforced++;
+          }
           const office = createResolveOffice(effectiveRole);
           return {
             regulationId: newRegulation.id,
@@ -1069,6 +1093,9 @@ export function setupMCPIntegrationApi(app: express.Application) {
         }
         
         console.log(`✅ Created ${createdTasks.length} compliance tasks`);
+        if (createRolesEnforced > 0) {
+          console.log(`   ⚠️  Role enforcement: ${createRolesEnforced} tasks arrived without assignedRole, defaulted to "${createCategoryFallback}"`);
+        }
       }
       
       // Handle topic mappings if provided
@@ -1604,6 +1631,26 @@ export function setupMCPIntegrationApi(app: express.Application) {
           return null;
         };
 
+        // Category-to-role fallback map for tasks arriving without an assignedRole
+        const categoryRoleDefaults: Record<string, string> = {
+          'Campus Safety': 'Clery Compliance Officer',
+          'Civil Rights': 'Title IX Coordinator',
+          'Environmental Health & Safety': 'Environmental Compliance Officer',
+          'Ethics & Governance': 'Ethics Officer',
+          'Finance': 'CFO',
+          'Financial Aid': 'Financial Aid Director',
+          'Human Resources': 'HR Director',
+          'Information Technology': 'IT Security Officer',
+          'Intellectual Property': 'Technology Transfer Officer',
+          'Research': 'Research Compliance Officer',
+          'Student Services': 'Dean of Students',
+          'Academic Programs': 'VP Academic Affairs',
+          'Fundraising & Development': 'Communications Director',
+          'Contracts & Procurement': 'Procurement Director',
+        };
+        const regulationCategory = regulationRecord?.category || data.category || '';
+        const categoryFallbackRole = categoryRoleDefaults[regulationCategory] || 'Compliance Officer';
+
         // Preload role_assignments for office field resolution
         const roleAssignmentRows = await db.select({
           roleName: roleAssignments.roleName,
@@ -1626,9 +1673,14 @@ export function setupMCPIntegrationApi(app: express.Application) {
         };
 
         // parentRole cascades the parent's assignedRole to subtasks that don't have their own
+        let rolesEnforced = 0;
         const buildSyncTaskValues = (task: any, parentId?: number, parentRole?: string | null) => {
           const ev = resolveEvidence(task);
-          const effectiveRole = task.assignedRole || parentRole || null;
+          let effectiveRole = task.assignedRole || parentRole || null;
+          if (!effectiveRole) {
+            effectiveRole = categoryFallbackRole;
+            rolesEnforced++;
+          }
           const office = resolveOffice(effectiveRole);
           return {
             regulationId,
@@ -1666,7 +1718,11 @@ export function setupMCPIntegrationApi(app: express.Application) {
         
         const buildUpdateFields = (task: any, parentRole?: string | null) => {
           const ev = resolveEvidence(task);
-          const effectiveRole = task.assignedRole || parentRole || null;
+          let effectiveRole = task.assignedRole || parentRole || null;
+          if (!effectiveRole) {
+            effectiveRole = categoryFallbackRole;
+            rolesEnforced++;
+          }
           const office = resolveOffice(effectiveRole);
           return {
             description: task.description || null,
@@ -1864,6 +1920,9 @@ export function setupMCPIntegrationApi(app: express.Application) {
         const newInserts = createdTasks.length - tasksUpdated - tasksSkipped;
         const taskAction = preserveTasks ? 'Merged' : (isUpdate ? 'Replaced with' : 'Created');
         console.log(`✅ ${taskAction} ${createdTasks.length} compliance tasks`);
+        if (rolesEnforced > 0) {
+          console.log(`   ⚠️  Role enforcement: ${rolesEnforced} tasks arrived without assignedRole, defaulted to "${categoryFallbackRole}"`);
+        }
         if (preserveTasks) {
           console.log(`   📊 Dedup: ${tasksUpdated} updated, ${newInserts} new, ${tasksSkipped} skipped (completed/attested)`);
         }

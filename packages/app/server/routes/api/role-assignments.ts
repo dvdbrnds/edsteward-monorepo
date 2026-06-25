@@ -7,8 +7,8 @@
 
 import { Router, Request, Response } from 'express';
 import { getDbForRequest } from '../../services/database';
-import { roleAssignments, users } from '@shared/schema';
-import { eq, asc, ilike } from 'drizzle-orm';
+import { roleAssignments, users, complianceTasks, regulations } from '@shared/schema';
+import { eq, asc, ilike, sql } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
 import { requireAuth, requireAdmin } from '../../middleware/role-based-auth';
 
@@ -439,6 +439,84 @@ router.post('/bulk-resolve', requireAuth, async (req: Request, res: Response) =>
   } catch (error) {
     console.error('Error bulk resolving roles:', error);
     res.status(500).json({ error: 'Failed to bulk resolve roles' });
+  }
+});
+
+/**
+ * GET /api/role-assignments/:roleName/export-tasks
+ * Export all tasks and subtasks assigned to a canonical role as CSV
+ */
+router.get('/:roleName/export-tasks', requireAuth, async (req: Request, res: Response) => {
+  try {
+    const db = getDbForRequest(req);
+    const { roleName } = req.params;
+
+    const tasks = await db.select({
+      taskId: complianceTasks.taskId,
+      title: complianceTasks.title,
+      description: complianceTasks.description,
+      category: complianceTasks.category,
+      priority: complianceTasks.priority,
+      status: complianceTasks.status,
+      requirementType: complianceTasks.requirementType,
+      assignedRole: complianceTasks.assignedRole,
+      statutoryCitation: complianceTasks.statutoryCitation,
+      evidenceRequired: complianceTasks.evidenceRequired,
+      recurringSchedule: complianceTasks.recurringSchedule,
+      parentTaskId: complianceTasks.parentTaskId,
+      regulationId: complianceTasks.regulationId,
+      regulationName: regulations.name,
+      regKey: regulations.regKey,
+      statute: regulations.statute,
+    })
+      .from(complianceTasks)
+      .leftJoin(regulations, eq(complianceTasks.regulationId, regulations.id))
+      .where(ilike(complianceTasks.assignedRole, roleName))
+      .orderBy(asc(regulations.regKey), asc(complianceTasks.parentTaskId), asc(complianceTasks.title));
+
+    const escapeCSV = (val: string | null | undefined | boolean | number): string => {
+      if (val == null) return '';
+      const str = String(val);
+      if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+        return `"${str.replace(/"/g, '""')}"`;
+      }
+      return str;
+    };
+
+    const headers = [
+      'Reg Key', 'Regulation', 'Statute', 'Task ID', 'Title',
+      'Type', 'Is Subtask', 'Category', 'Priority', 'Status',
+      'Assigned Role', 'Statutory Citation', 'Evidence Required',
+      'Recurring Schedule', 'Description',
+    ];
+
+    const rows = tasks.map(t => [
+      escapeCSV(t.regKey),
+      escapeCSV(t.regulationName),
+      escapeCSV(t.statute),
+      escapeCSV(t.taskId),
+      escapeCSV(t.title),
+      escapeCSV(t.requirementType),
+      t.parentTaskId ? 'Yes' : 'No',
+      escapeCSV(t.category),
+      escapeCSV(t.priority),
+      escapeCSV(t.status),
+      escapeCSV(t.assignedRole),
+      escapeCSV(t.statutoryCitation),
+      t.evidenceRequired ? 'Yes' : 'No',
+      escapeCSV(t.recurringSchedule),
+      escapeCSV(t.description),
+    ].join(','));
+
+    const csv = [headers.join(','), ...rows].join('\n');
+    const filename = `${roleName.toLowerCase().replace(/\s+/g, '-')}-tasks.csv`;
+
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.send(csv);
+  } catch (error) {
+    console.error('Error exporting role tasks:', error);
+    res.status(500).json({ error: 'Failed to export role tasks' });
   }
 });
 

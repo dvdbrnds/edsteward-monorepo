@@ -48,6 +48,7 @@ import {
   User as UserIcon,
   AlertCircle,
   Plus,
+  Download,
 } from 'lucide-react';
 
 interface RoleAssignment {
@@ -266,6 +267,28 @@ export function RoleAssignmentsSettings() {
     });
   };
 
+  // Export tasks for a role as CSV download
+  const exportRoleTasks = async (roleName: string) => {
+    try {
+      const response = await fetch(`/api/role-assignments/${encodeURIComponent(roleName)}/export-tasks`, {
+        credentials: 'include',
+      });
+      if (!response.ok) throw new Error('Export failed');
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${roleName.toLowerCase().replace(/\s+/g, '-')}-tasks.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      toast({ title: 'Export complete', description: `Downloaded tasks for ${roleName}.` });
+    } catch (error) {
+      toast({ title: 'Export failed', description: String(error), variant: 'destructive' });
+    }
+  };
+
   // Get unique categories
   const categories = Array.from(new Set(assignments?.map(a => a.category).filter(Boolean) || []));
 
@@ -426,6 +449,15 @@ export function RoleAssignmentsSettings() {
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        aria-label={`Export tasks for ${role.roleName}`}
+                        title="Export tasks spreadsheet"
+                        onClick={() => exportRoleTasks(role.roleName)}
+                      >
+                        <Download className="h-4 w-4 text-indigo-500" />
+                      </Button>
                       <Button
                         variant="ghost"
                         size="sm"

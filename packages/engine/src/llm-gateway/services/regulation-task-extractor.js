@@ -620,10 +620,31 @@ async function extractTasksWithAI(regulationSlug, regulationText, regulationMeta
   const regName = regulationMetadata.name || regulationSlug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
   const statute = regulationMetadata.statute || '';
   const cfr = regulationMetadata.cfr || '';
-  
+  const category = regulationMetadata.category || '';
+
+  const categoryRoleDefaults = {
+    'Campus Safety': 'Clery Compliance Officer',
+    'Civil Rights': 'Title IX Coordinator',
+    'Environmental Health & Safety': 'Environmental Compliance Officer',
+    'Ethics & Governance': 'Ethics Officer',
+    'Finance': 'CFO',
+    'Financial Aid': 'Financial Aid Director',
+    'Human Resources': 'HR Director',
+    'Information Technology': 'IT Security Officer',
+    'Intellectual Property': 'Technology Transfer Officer',
+    'Research': 'Research Compliance Officer',
+    'Student Services': 'Dean of Students',
+    'Academic Programs': 'VP Academic Affairs',
+    'Fundraising & Development': 'Communications Director',
+    'Contracts & Procurement': 'Procurement Director',
+  };
+  const categoryDefaultRole = categoryRoleDefaults[category] || 'Compliance Officer';
+
   const prompt = `You are a higher education compliance expert. Analyze the regulation below and extract ONLY the compliance tasks that come DIRECTLY from THIS SPECIFIC regulation.
 
 REGULATION: ${regName}
+CATEGORY: ${category}
+DEFAULT RESPONSIBLE ROLE: ${categoryDefaultRole}
 ${statute ? `STATUTE: ${statute}` : ''}
 ${cfr ? `CFR: ${cfr}` : ''}
 
@@ -638,7 +659,7 @@ Return a JSON object with this EXACT structure (no markdown, no code fences):
       "description": "What this compliance area covers under ${regName}",
       "category": "One of: Reporting, Documentation, Training, Monitoring, Policy Development, Risk Management, Governance, Partnerships, Student Services, Employee Compliance, Financial Compliance, Data Management, Safety & Security",
       "priority": "critical|high|medium",
-      "assignedRole": "MUST be one of: Compliance Officer, General Counsel, CFO, HR Director, Title IX Coordinator, Clery Compliance Officer, Financial Aid Director, IT Security Officer, Campus Police Chief, Registrar, VP Academic Affairs, VP Student Affairs, Dean of Students, Privacy Officer, President, Disability Services Coordinator, Emergency Management Director, Facilities Director, Environmental Compliance Officer, Fire Safety Officer, Export Control Officer, Research Compliance Officer, Training Coordinator, Procurement Director, Internal Auditor, International Programs Director, Institutional Research Director, Library Director, Ethics Officer, Communications Director, Government Relations, Board Compensation Committee, Technology Transfer Officer, Title VI Coordinator, Admissions Director, Curriculum Coordinator",
+      "assignedRole": "MUST be one of the canonical roles listed below. This regulation is in the ${category} category — the default role is ${categoryDefaultRole}. Use the default unless the task clearly belongs to another domain. NEVER use 'Compliance Officer' as a catch-all. Canonical roles: Compliance Officer, General Counsel, CFO, HR Director, Title IX Coordinator, Clery Compliance Officer, Financial Aid Director, IT Security Officer, Campus Police Chief, Registrar, VP Academic Affairs, VP Student Affairs, Dean of Students, Privacy Officer, President, Disability Services Coordinator, Emergency Management Director, Facilities Director, Environmental Compliance Officer, Fire Safety Officer, Export Control Officer, Research Compliance Officer, Training Coordinator, Procurement Director, Internal Auditor, International Programs Director, Institutional Research Director, Library Director, Ethics Officer, Communications Director, Government Relations, Board Compensation Committee, Technology Transfer Officer, Title VI Coordinator, Admissions Director, Curriculum Coordinator",
       "statutoryCitation": "The specific section of ${statute || 'the statute'} that requires this (e.g., '20 U.S.C. § 1092(f)(1)', '34 CFR 106.8(a)')",
       "isConfidential": false,
       "confidentialDataTypes": [],
@@ -946,6 +967,39 @@ export async function extractComplianceRequirements(regulationSlug, regulationTe
   console.log(`  🎯 Confidence: ${result.analysis.confidence}%`);
   console.log(`${'═'.repeat(70)}\n`);
   
+  // Enforce: every task must have an assigned canonical role
+  const categoryRoleMap = {
+    'Campus Safety': 'Clery Compliance Officer',
+    'Civil Rights': 'Title IX Coordinator',
+    'Environmental Health & Safety': 'Environmental Compliance Officer',
+    'Ethics & Governance': 'Ethics Officer',
+    'Finance': 'CFO',
+    'Financial Aid': 'Financial Aid Director',
+    'Human Resources': 'HR Director',
+    'Information Technology': 'IT Security Officer',
+    'Intellectual Property': 'Technology Transfer Officer',
+    'Research': 'Research Compliance Officer',
+    'Student Services': 'Dean of Students',
+    'Academic Programs': 'VP Academic Affairs',
+    'Fundraising & Development': 'Communications Director',
+    'Contracts & Procurement': 'Procurement Director',
+  };
+
+  let rolesBackfilled = 0;
+  const regCategory = regulationMetadata.category || '';
+  const categoryDefault = categoryRoleMap[regCategory] || null;
+
+  for (const task of result.tasks) {
+    if (!task.assignedRole || task.assignedRole.trim() === '') {
+      task.assignedRole = categoryDefault || normalizeRole('Compliance Officer');
+      rolesBackfilled++;
+    }
+  }
+
+  if (rolesBackfilled > 0) {
+    console.log(`  🔧 Role enforcement: assigned default role to ${rolesBackfilled} tasks missing assignedRole`);
+  }
+
   return result;
 }
 

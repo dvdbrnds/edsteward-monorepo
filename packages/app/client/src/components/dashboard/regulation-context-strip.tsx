@@ -83,6 +83,7 @@ export default function RegulationContextStrip({
 
   const rootCount = taskCounts?.rootCount ?? 0;
   const rootCompleted = taskCounts?.rootCompleted ?? 0;
+  const subtaskCount = taskCounts?.subtaskCount ?? 0;
   const taskCompletionPct = rootCount > 0 ? Math.round((rootCompleted / rootCount) * 100) : 0;
 
   const complianceScore = analytics?.overview?.complianceScore ?? 0;
@@ -107,6 +108,7 @@ export default function RegulationContextStrip({
           icon={<ListChecks className="h-4 w-4 text-emerald-600" />}
           label="Tasks"
           value={String(rootCount)}
+          subtitle={subtaskCount > 0 ? `${subtaskCount} subtasks` : undefined}
           progress={taskCompletionPct}
         />
         <MetricCard
@@ -161,11 +163,13 @@ function MetricCard({
   icon,
   label,
   value,
+  subtitle,
   progress,
 }: {
   icon: React.ReactNode;
   label: string;
   value: string;
+  subtitle?: string;
   progress?: number;
 }) {
   const hasProgress = progress !== undefined;
@@ -191,6 +195,9 @@ function MetricCard({
           <p className="text-xs text-muted-foreground">{label}</p>
           <div className="flex items-baseline gap-2">
             <p className="text-lg font-semibold leading-tight">{value}</p>
+            {subtitle && (
+              <span className="text-xs text-muted-foreground">{subtitle}</span>
+            )}
             {hasProgress && (
               <span
                 className="text-xs font-medium"
