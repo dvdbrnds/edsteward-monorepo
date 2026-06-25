@@ -33,7 +33,7 @@ export function AdminLayout({ children, user }: AdminLayoutProps) {
           {/* Navigation */}
           <nav className="flex-1 space-y-1 px-2 py-4">
             {navigationItems.map((item) => {
-              const isActive = location.pathname === item.href;
+              const isActive = location.pathname === item.href || location.pathname.startsWith(item.href + '/');
               return (
                 <Link
                   key={item.name}

@@ -212,12 +212,49 @@ router.get("/", async (req: any, res) => {
     const offset = (pageNum - 1) * limitNum;
     
     const paginatedRegulations = regulations.slice(offset, offset + limitNum);
-    
+
+    // Attach primaryRole (dominant canonical role from compliance tasks) to each regulation
+    let regulationsWithRoles = paginatedRegulations;
+    try {
+      const db = getDbForRequest(req);
+      const regIds = paginatedRegulations.map((r: Regulation) => r.id);
+      if (regIds.length > 0) {
+        const roleData = await db.select({
+          regulationId: complianceTasks.regulationId,
+          role: complianceTasks.assignedRole,
+          count: sql<number>`count(*)`.as('count'),
+        })
+          .from(complianceTasks)
+          .where(and(
+            inArray(complianceTasks.regulationId, regIds),
+            sql`${complianceTasks.parentTaskId} IS NULL`,
+            sql`${complianceTasks.assignedRole} IS NOT NULL AND ${complianceTasks.assignedRole} != ''`,
+          ))
+          .groupBy(complianceTasks.regulationId, complianceTasks.assignedRole)
+          .orderBy(complianceTasks.regulationId, desc(sql`count(*)`));
+
+        // Build map: regulationId → most common role (first row per regulation wins)
+        const roleMap = new Map<number, string>();
+        for (const row of roleData) {
+          if (row.regulationId && !roleMap.has(row.regulationId)) {
+            roleMap.set(row.regulationId, row.role!);
+          }
+        }
+
+        regulationsWithRoles = paginatedRegulations.map((reg: Regulation) => ({
+          ...reg,
+          primaryRole: roleMap.get(reg.id) || null,
+        }));
+      }
+    } catch {
+      // Non-critical — return regulations without role data
+    }
+
     const totalTime = Date.now() - startTime;
-    syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Fetched ${paginatedRegulations.length} regulations in ${totalTime}ms`);
+    syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Fetched ${regulationsWithRoles.length} regulations in ${totalTime}ms`);
 
     // For compatibility with frontend expecting array directly
-    res.json(paginatedRegulations);
+    res.json(regulationsWithRoles);
   } catch (error) {
     syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, `Failed to fetch regulations: ${error instanceof Error ? error.message : String(error)}`);
     res.status(500).json({ 

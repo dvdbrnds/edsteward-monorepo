@@ -20,6 +20,7 @@ import { IntegrationsPage } from '@/pages/integrations/integrations-page';
 import { AlertsPage } from '@/pages/alerts/alerts-page';
 import { CustomerManagementPage } from '@/pages/customers/customer-management-page';
 import TenantCreationWizard from '@/pages/customers/tenant-creation-wizard';
+import TenantCredentialsPage from '@/pages/customers/tenant-credentials-page';
 import { FeatureFlagsPage } from '@/pages/features/feature-flags-page';
 import { SystemHealthPage } from '@/pages/system/system-health-page';
 import { InstitutionAssessmentPage } from '@/pages/assessment/institution-assessment-page';
@@ -101,6 +102,9 @@ function App() {
 
                                         {/* Tenant Creation Wizard */}
                                         <Route path="/customers/new" element={<TenantCreationWizard />} />
+
+                                        {/* Tenant Admin Credentials */}
+                                        <Route path="/customers/:id/credentials" element={<TenantCredentialsPage />} />
 
                                         {/* System Health */}
                                         <Route path="/system" element={<SystemHealthPage />} />

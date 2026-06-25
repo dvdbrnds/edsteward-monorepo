@@ -248,6 +248,13 @@ export function CustomerManagementPage() {
                       </div>
                     </div>
                     <div className="flex items-center space-x-2">
+                      <Link
+                        to={`/customers/${customer.id}/credentials`}
+                        className="inline-flex items-center px-3 py-2 border border-indigo-300 shadow-sm text-sm leading-4 font-medium rounded-md text-indigo-700 bg-white hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                        title="Manage admin credentials"
+                      >
+                        Credentials
+                      </Link>
                       <button
                         onClick={() => setDeployingTenant({
                           id: customer.id,

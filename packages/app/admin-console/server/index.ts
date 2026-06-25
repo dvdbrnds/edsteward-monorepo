@@ -4,6 +4,7 @@
  */
 
 import dotenv from 'dotenv';
+import crypto from 'crypto';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 
@@ -380,6 +381,86 @@ app.delete('/api/customers/:id', requireAuth, async (req, res) => {
   } catch (error) {
     console.error('Delete tenant error:', error);
     res.status(500).json({ error: 'Failed to delete tenant' });
+  }
+});
+
+// Get tenant admin credentials info (list admin users)
+app.get('/api/customers/:id/credentials', requireAuth, async (req, res) => {
+  try {
+    const tenant = await getTenantById(req.params.id);
+    if (!tenant) {
+      return res.status(404).json({ error: 'Tenant not found' });
+    }
+
+    const pool = new Pool({
+      connectionString: tenant.database_url,
+      ssl: { rejectUnauthorized: false },
+    });
+
+    try {
+      const result = await pool.query(`
+        SELECT id, username, email, role, "firstName", "lastName", created_at
+        FROM users WHERE role = 'admin' ORDER BY created_at ASC
+      `);
+      res.json({
+        tenant: { id: tenant.id, name: tenant.name, subdomain: tenant.subdomain },
+        admins: result.rows,
+        loginUrl: `https://${tenant.subdomain}.edsteward.ai`,
+      });
+    } finally {
+      await pool.end();
+    }
+  } catch (error) {
+    console.error('Fetch credentials error:', error);
+    res.status(500).json({ error: 'Failed to fetch tenant credentials' });
+  }
+});
+
+// Reset tenant admin password
+app.post('/api/customers/:id/reset-password', requireAuth, async (req, res) => {
+  try {
+    const { username, newPassword } = req.body;
+    if (!username || !newPassword) {
+      return res.status(400).json({ error: 'username and newPassword are required' });
+    }
+
+    const tenant = await getTenantById(req.params.id);
+    if (!tenant) {
+      return res.status(404).json({ error: 'Tenant not found' });
+    }
+
+    const pool = new Pool({
+      connectionString: tenant.database_url,
+      ssl: { rejectUnauthorized: false },
+    });
+
+    try {
+      const saltBuffer = crypto.randomBytes(16);
+      const salt = saltBuffer.toString('hex');
+      const hash = crypto.scryptSync(newPassword, saltBuffer, 32).toString('hex');
+      const passwordHash = `${salt}:${hash}`;
+
+      const result = await pool.query(`
+        UPDATE users SET password = $1 WHERE username = $2 RETURNING id, username
+      `, [passwordHash, username]);
+
+      if (result.rowCount === 0) {
+        return res.status(404).json({ error: `User "${username}" not found in tenant database` });
+      }
+
+      console.log(`🔑 Reset password for ${username} on tenant ${tenant.name}`);
+      res.json({
+        success: true,
+        username: result.rows[0].username,
+        tenant: { name: tenant.name, subdomain: tenant.subdomain },
+        loginUrl: `https://${tenant.subdomain}.edsteward.ai`,
+      });
+    } finally {
+      await pool.end();
+    }
+  } catch (error) {
+    console.error('Reset password error:', error);
+    res.status(500).json({ error: 'Failed to reset password' });
   }
 });
 

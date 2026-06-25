@@ -2684,18 +2684,38 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
+  private fileStorageTableVerified = false;
+
   private async ensureFileStorageTable(): Promise<void> {
-    await this.pool.query(`
-      CREATE TABLE IF NOT EXISTS file_storage (
-        id SERIAL PRIMARY KEY,
-        file_key VARCHAR(255) NOT NULL UNIQUE,
-        data BYTEA NOT NULL,
-        mime_type VARCHAR(100) NOT NULL,
-        filename VARCHAR(255) NOT NULL,
-        size INTEGER,
-        created_at TIMESTAMP NOT NULL DEFAULT NOW()
-      )
-    `);
+    if (this.fileStorageTableVerified) return;
+    try {
+      await this.pool.query(`
+        CREATE TABLE IF NOT EXISTS file_storage (
+          id SERIAL PRIMARY KEY,
+          file_key VARCHAR(255) NOT NULL UNIQUE,
+          data BYTEA NOT NULL,
+          mime_type VARCHAR(100) NOT NULL,
+          filename VARCHAR(255) NOT NULL,
+          size INTEGER,
+          created_at TIMESTAMP NOT NULL DEFAULT NOW()
+        )
+      `);
+      // Ensure the unique constraint exists (handles tables created with old schema)
+      await this.pool.query(`
+        DO $$ BEGIN
+          ALTER TABLE file_storage ALTER COLUMN file_key SET NOT NULL;
+          IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'file_storage_file_key_unique' AND conrelid = 'file_storage'::regclass)
+             AND NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'file_storage_file_key_key' AND conrelid = 'file_storage'::regclass) THEN
+            ALTER TABLE file_storage ADD CONSTRAINT file_storage_file_key_unique UNIQUE (file_key);
+          END IF;
+        END $$;
+      `);
+      this.fileStorageTableVerified = true;
+    } catch (err) {
+      console.error('[FileStorage] ensureFileStorageTable failed:', err);
+      this.fileStorageTableVerified = false;
+      throw err;
+    }
   }
 
   async saveFile(fileKey: string, data: Buffer, mimeType: string, filename: string): Promise<{ url: string }> {

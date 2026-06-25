@@ -1,9 +1,10 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { Regulation, Deadline, RegulationAction } from "@shared/schema";
 import { useLocation } from "wouter";
-import { Search, CheckCircle, AlertCircle, Clock, Loader2, ArrowUpDown, ArrowUp, ArrowDown, Check, Globe, Mail, FileText, X, Filter, Eye, EyeOff, Columns, RotateCcw, MapPin } from "lucide-react";
+import { Search, CheckCircle, AlertCircle, Clock, Loader2, ArrowUpDown, ArrowUp, ArrowDown, Check, Globe, Mail, FileText, X, Filter, Eye, EyeOff, Columns, RotateCcw, MapPin, ChevronsUpDown, Shield } from "lucide-react";
 import { JURISDICTION_SOURCES } from "@/components/filters/enhanced-jurisdiction-filter";
 import { useInstitutionFilter } from "@/hooks/use-institution-filter";
+import { useAuth } from "@/hooks/use-auth";
 import { format } from "date-fns";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -31,13 +32,26 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { DeadlineTimelineBar } from "./deadline-timeline-bar";
 
 // Column definitions for visibility control
-type ColumnKey = 'id' | 'name' | 'riskScore' | 'category' | 'dro' | 'status' | 'nextDeadline' | 'lastUpdated' | 'jurisdiction' | 'appliesTo';
+type ColumnKey = 'id' | 'name' | 'riskScore' | 'category' | 'primaryRole' | 'dro' | 'status' | 'nextDeadline' | 'lastUpdated' | 'jurisdiction' | 'appliesTo';
 
 interface ColumnDef {
   key: ColumnKey;
@@ -50,6 +64,7 @@ const COLUMN_DEFINITIONS: ColumnDef[] = [
   { key: 'name', label: 'Name', required: true },
   { key: 'riskScore', label: 'Risk' },
   { key: 'category', label: 'Category' },
+  { key: 'primaryRole', label: 'Primary Role' },
   { key: 'dro', label: 'DRO' },
   { key: 'status', label: 'Status' },
   { key: 'nextDeadline', label: 'Next Deadline' },
@@ -115,6 +130,7 @@ const getDefaultVisibility = (): Record<ColumnKey, boolean> => ({
   name: true,
   riskScore: true,
   category: true,
+  primaryRole: true,
   dro: true,
   status: true,
   nextDeadline: true,
@@ -203,7 +219,40 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter }: R
     staleTime: 1000 * 60, // 1 minute
   });
 
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'admin';
+  const queryClient = useQueryClient();
 
+  const { data: roleAssignmentsList = [] } = useQuery<Array<{
+    id: number;
+    roleName: string;
+    displayName: string | null;
+    defaultUserId: number | null;
+    defaultUser: { id: number; firstName: string | null; lastName: string | null; email: string | null } | null;
+    category: string | null;
+  }>>({
+    queryKey: ["/api/role-assignments"],
+    enabled: isAdmin,
+  });
+
+  const [rolePopoverOpenFor, setRolePopoverOpenFor] = useState<number | null>(null);
+
+  const assignRoleMutation = useMutation({
+    mutationFn: async ({ regulationId, ownerRole }: { regulationId: number; ownerRole: string }) => {
+      const response = await fetch(`/api/regulations/${regulationId}/owner`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ ownerRole }),
+      });
+      if (!response.ok) throw new Error("Failed to assign role");
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: regulationsQueryKey });
+      setRolePopoverOpenFor(null);
+    },
+  });
 
   const handleRowClick = (regulation: Regulation) => {
     if (regulation && regulation.id) {
@@ -310,7 +359,8 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter }: R
         reg.topic?.toLowerCase().includes(searchLower) ||
         reg.category?.toLowerCase().includes(searchLower) ||
         reg.statute?.toLowerCase().includes(searchLower) ||
-        reg.dro?.toLowerCase().includes(searchLower)
+        reg.dro?.toLowerCase().includes(searchLower) ||
+        ((reg as any).primaryRole || '').toLowerCase().includes(searchLower)
       );
     }
     return true;
@@ -698,6 +748,20 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter }: R
                     />
                   </TableHead>
                 )}
+                {isColumnVisible('primaryRole') && (
+                  <TableHead>
+                    <ColumnHeader 
+                      columnKey="primaryRole" 
+                      label="Primary Role" 
+                      sortable 
+                      sortKey="primaryRole" 
+                      activeSortKey={(sortConfig?.key as string) ?? null}
+                      activeSortDirection={sortConfig?.direction ?? null}
+                      onSort={handleSort}
+                      onHide={toggleColumn}
+                    />
+                  </TableHead>
+                )}
                 {isColumnVisible('dro') && (
                   <TableHead>
                     <ColumnHeader 
@@ -821,6 +885,71 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter }: R
                     )}
                     {isColumnVisible('category') && (
                       <TableCell>{regulation.category || 'Uncategorized'}</TableCell>
+                    )}
+                    {isColumnVisible('primaryRole') && (
+                      <TableCell onClick={(e) => e.stopPropagation()}>
+                        {isAdmin ? (
+                          <Popover
+                            open={rolePopoverOpenFor === regulation.id}
+                            onOpenChange={(open) => setRolePopoverOpenFor(open ? regulation.id : null)}
+                          >
+                            <PopoverTrigger asChild>
+                              <button
+                                className={cn(
+                                  "inline-flex items-center gap-1 px-2 py-1 rounded text-sm max-w-[180px] transition-colors",
+                                  (regulation as any).primaryRole
+                                    ? "bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-100"
+                                    : "text-muted-foreground border border-dashed border-gray-300 hover:border-indigo-300 hover:bg-indigo-50"
+                                )}
+                              >
+                                {(regulation as any).primaryRole && (
+                                  <Shield className="h-3 w-3 shrink-0" />
+                                )}
+                                <span className="truncate">
+                                  {(regulation as any).primaryRole || 'Assign role…'}
+                                </span>
+                                <ChevronsUpDown className="h-3 w-3 shrink-0 opacity-50" />
+                              </button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-[260px] p-0" align="start">
+                              <Command>
+                                <CommandInput placeholder="Search roles..." />
+                                <CommandList>
+                                  <CommandEmpty>No roles found.</CommandEmpty>
+                                  <CommandGroup>
+                                    {roleAssignmentsList
+                                      .sort((a, b) => a.roleName.localeCompare(b.roleName))
+                                      .map((ra) => {
+                                        const isCurrent = ra.roleName === (regulation as any).primaryRole;
+                                        return (
+                                          <CommandItem
+                                            key={ra.id}
+                                            value={`${ra.roleName} ${ra.category || ''}`}
+                                            onSelect={() => {
+                                              assignRoleMutation.mutate({
+                                                regulationId: regulation.id,
+                                                ownerRole: ra.roleName,
+                                              });
+                                            }}
+                                          >
+                                            <Check className={cn("mr-2 h-4 w-4", isCurrent ? "opacity-100 text-indigo-600" : "opacity-0")} />
+                                            <span className={isCurrent ? "font-medium text-indigo-700" : ""}>
+                                              {ra.roleName}
+                                            </span>
+                                          </CommandItem>
+                                        );
+                                      })}
+                                  </CommandGroup>
+                                </CommandList>
+                              </Command>
+                            </PopoverContent>
+                          </Popover>
+                        ) : (
+                          <span className="text-sm text-muted-foreground">
+                            {(regulation as any).primaryRole || '—'}
+                          </span>
+                        )}
+                      </TableCell>
                     )}
                     {isColumnVisible('dro') && (
                       <TableCell>

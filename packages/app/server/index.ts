@@ -3,15 +3,22 @@
  * Simplified server without multi-tenant complexity
  */
 
-import * as Sentry from '@sentry/node';
+import { createRequire } from 'node:module';
+const _require = createRequire(import.meta.url);
 
-if (process.env.SENTRY_DSN) {
-  Sentry.init({
-    dsn: process.env.SENTRY_DSN,
-    environment: process.env.NODE_ENV || 'development',
-    release: `edsteward@${process.env.VERSION || '1.5.15'}`,
-    tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0,
-  });
+let Sentry: any = null;
+try {
+  Sentry = _require('@sentry/node');
+  if (process.env.SENTRY_DSN && Sentry?.init) {
+    Sentry.init({
+      dsn: process.env.SENTRY_DSN,
+      environment: process.env.NODE_ENV || 'development',
+      release: `edsteward@${process.env.VERSION || '1.5.15'}`,
+      tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0,
+    });
+  }
+} catch (err) {
+  console.warn('[SENTRY] Failed to load @sentry/node — error tracking disabled:', (err as Error).message);
 }
 
 import express from 'express';
@@ -502,7 +509,7 @@ import { jsonErrorHandler, deserializationErrorHandler, apiErrorHandler } from '
 app.use(jsonErrorHandler);
 app.use(deserializationErrorHandler);
 app.use(apiErrorHandler);
-if (process.env.SENTRY_DSN) {
+if (process.env.SENTRY_DSN && Sentry?.setupExpressErrorHandler) {
   Sentry.setupExpressErrorHandler(app);
 }
 
@@ -539,6 +546,16 @@ async function setupFrontend() {
 
 // Start server
 httpServer.listen(Number(PORT), '0.0.0.0', async () => {
+  // Log the database user for diagnostics (helps debug auth issues)
+  try {
+    const client = await sharedPool.connect();
+    const r = await client.query('SELECT current_user');
+    console.log(`[STARTUP] Database pool connected as: ${r.rows[0]?.current_user}`);
+    client.release();
+  } catch (e) {
+    console.error('[STARTUP] Database pool connection check failed:', (e as Error).message);
+  }
+
   const isMultiTenant = process.env.MULTI_TENANT === 'true';
 
   const startupTasks: Array<{ name: string; task: Promise<void> }> = [

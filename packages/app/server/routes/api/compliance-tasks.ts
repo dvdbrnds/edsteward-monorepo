@@ -1209,18 +1209,23 @@ router.post('/:taskId/evidence', uploadLimiter, requireAuth, async (req: Request
         });
 
         bb.on('close', async () => {
-          if (fileSavePromise) {
-            await fileSavePromise;
+          try {
+            if (fileSavePromise) {
+              await fileSavePromise;
+            }
+            resolve({
+              fileName: uploadedFileName || uploadedLinkTitle || 'Link',
+              fileType: uploadedFileType,
+              fileSize: uploadedFileSize,
+              fileUrl: uploadedFileUrl,
+              description: uploadedDescription,
+              linkUrl: uploadedLinkUrl,
+              linkTitle: uploadedLinkTitle,
+            });
+          } catch (err) {
+            console.error('[Evidence Upload] File save failed:', err);
+            reject(err);
           }
-          resolve({
-            fileName: uploadedFileName || uploadedLinkTitle || 'Link',
-            fileType: uploadedFileType,
-            fileSize: uploadedFileSize,
-            fileUrl: uploadedFileUrl,
-            description: uploadedDescription,
-            linkUrl: uploadedLinkUrl,
-            linkTitle: uploadedLinkTitle,
-          });
         });
 
         bb.on('error', reject);
@@ -2835,18 +2840,23 @@ router.post('/attestation/:token/evidence', uploadLimiter, async (req: Request, 
         });
 
         bb.on('close', async () => {
-          if (fileSavePromise) {
-            await fileSavePromise;
+          try {
+            if (fileSavePromise) {
+              await fileSavePromise;
+            }
+            resolve({
+              fileName: uploadedFileName || uploadedLinkTitle || 'Link',
+              fileType: uploadedFileType,
+              fileSize: uploadedFileSize,
+              fileUrl: uploadedFileUrl,
+              description: uploadedDescription,
+              linkUrl: uploadedLinkUrl,
+              linkTitle: uploadedLinkTitle,
+            });
+          } catch (err) {
+            console.error('[Attestation Evidence Upload] File save failed:', err);
+            reject(err);
           }
-          resolve({
-            fileName: uploadedFileName || uploadedLinkTitle || 'Link',
-            fileType: uploadedFileType,
-            fileSize: uploadedFileSize,
-            fileUrl: uploadedFileUrl,
-            description: uploadedDescription,
-            linkUrl: uploadedLinkUrl,
-            linkTitle: uploadedLinkTitle,
-          });
         });
 
         bb.on('error', reject);
