@@ -41,12 +41,6 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
-import {
   Users,
   Edit2,
   Trash2,
@@ -56,7 +50,8 @@ import {
   AlertCircle,
   Plus,
   Download,
-  Info,
+  ChevronRight,
+  ChevronDown,
 } from 'lucide-react';
 
 const CANONICAL_ROLE_ALIASES: Record<string, string[]> = {
@@ -164,6 +159,7 @@ export function RoleAssignmentsSettings() {
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [filterCategory, setFilterCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [expandedRoles, setExpandedRoles] = useState<Set<number>>(new Set());
   
   // Form state for editing
   const [formData, setFormData] = useState({
@@ -429,7 +425,7 @@ export function RoleAssignmentsSettings() {
             Regulations use hundreds of different titles for the same person (e.g. "CISO", "IT Security Manager",
             "Chief Information Security Officer"). EdSteward normalizes these into <strong>{assignments?.length || 36} canonical roles</strong>.
             Assign each role once below, and every compliance task referencing any variant of that title automatically
-            routes to the correct DRI. Hover the <Info className="h-3 w-3 inline" /> icon to see which titles map to each role.
+            routes to the correct DRI. Click the arrow next to any role to see which titles it consolidates.
           </p>
         </div>
 
@@ -477,10 +473,10 @@ export function RoleAssignmentsSettings() {
 
         {/* Table */}
         <div className="border rounded-lg overflow-hidden">
-          <TooltipProvider>
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead className="w-8"></TableHead>
                 <TableHead>Role</TableHead>
                 <TableHead>Group</TableHead>
                 <TableHead>DRI (Attestation Signer)</TableHead>
@@ -492,26 +488,39 @@ export function RoleAssignmentsSettings() {
               {filteredAssignments?.map(role => {
                 const aliases = CANONICAL_ROLE_ALIASES[role.roleName] || [];
                 const colorClass = GROUP_COLORS[role.category || ''] || 'bg-gray-100 text-gray-800';
+                const isExpanded = expandedRoles.has(role.id);
+                const toggleExpand = () => {
+                  setExpandedRoles(prev => {
+                    const next = new Set(prev);
+                    if (next.has(role.id)) next.delete(role.id);
+                    else next.add(role.id);
+                    return next;
+                  });
+                };
                 return (
-                <TableRow key={role.id}>
+                <React.Fragment key={role.id}>
+                <TableRow className={isExpanded ? 'border-b-0' : ''}>
+                  <TableCell className="w-8 pr-0">
+                    {aliases.length > 0 ? (
+                      <button
+                        onClick={toggleExpand}
+                        className="p-1 rounded hover:bg-muted transition-colors"
+                        aria-label={`${isExpanded ? 'Collapse' : 'Expand'} aliases for ${role.roleName}`}
+                      >
+                        {isExpanded
+                          ? <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                          : <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                        }
+                      </button>
+                    ) : (
+                      <span className="inline-block w-6" />
+                    )}
+                  </TableCell>
                   <TableCell>
-                    <div className="flex items-center gap-2">
-                      <div>
-                        <div className="font-medium">{role.roleName}</div>
-                        {role.officeName && (
-                          <div className="text-xs text-muted-foreground">{role.officeName}</div>
-                        )}
-                      </div>
-                      {aliases.length > 0 && (
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Info className="h-3.5 w-3.5 text-muted-foreground/60 cursor-help flex-shrink-0" />
-                          </TooltipTrigger>
-                          <TooltipContent side="right" className="max-w-xs">
-                            <p className="font-medium text-xs mb-1">Also known as:</p>
-                            <p className="text-xs text-muted-foreground">{aliases.join(', ')}</p>
-                          </TooltipContent>
-                        </Tooltip>
+                    <div>
+                      <div className="font-medium">{role.roleName}</div>
+                      {role.officeName && (
+                        <div className="text-xs text-muted-foreground">{role.officeName}</div>
                       )}
                     </div>
                   </TableCell>
@@ -582,18 +591,39 @@ export function RoleAssignmentsSettings() {
                     </div>
                   </TableCell>
                 </TableRow>
+                {isExpanded && aliases.length > 0 && (
+                  <TableRow className="bg-muted/30 hover:bg-muted/40">
+                    <TableCell colSpan={6} className="py-2 pl-12">
+                      <div className="space-y-1">
+                        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                          Consolidated titles ({aliases.length})
+                        </p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {aliases.map(alias => (
+                            <span
+                              key={alias}
+                              className="text-xs bg-background border px-2 py-0.5 rounded text-muted-foreground"
+                            >
+                              {alias}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                )}
+                </React.Fragment>
                 );
               })}
               {(!filteredAssignments || filteredAssignments.length === 0) && (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
                     No role assignments found
                   </TableCell>
                 </TableRow>
               )}
             </TableBody>
           </Table>
-          </TooltipProvider>
         </div>
       </CardContent>
 
