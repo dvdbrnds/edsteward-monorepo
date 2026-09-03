@@ -96,10 +96,13 @@ app.use(helmet({
         "wss://*.edsteward.ai", // WebSocket production secure
         "https://*.okta.com",  // Okta SSO
         "https://*.neon.tech", // Neon database (if direct connections needed)
+        ...(process.env.DEPLOYMENT_MODE === 'coolify' && process.env.BASE_URL
+          ? [`ws://${new URL(process.env.BASE_URL).host}`, `wss://${new URL(process.env.BASE_URL).host}`]
+          : []),
       ],
       frameSrc: ["'self'"],
       objectSrc: ["'none'"],
-      upgradeInsecureRequests: process.env.NODE_ENV === 'production' ? [] : null,
+      upgradeInsecureRequests: (process.env.NODE_ENV === 'production' && process.env.DEPLOYMENT_MODE !== 'coolify') ? [] : null,
     },
   },
   // Other helmet protections (all enabled by default)
@@ -161,10 +164,10 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: process.env.NODE_ENV === 'production',
+    secure: process.env.NODE_ENV === 'production' && process.env.DEPLOYMENT_MODE !== 'coolify',
     httpOnly: true,
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
-    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    sameSite: (process.env.NODE_ENV === 'production' && process.env.DEPLOYMENT_MODE !== 'coolify') ? 'none' : 'lax',
   },
 }));
 
