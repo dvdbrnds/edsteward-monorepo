@@ -27,7 +27,7 @@ services:
       # SESSION_SECRET=          (required)
       # REGISTRY_API_SECRET=     (required -- must match main app)
     ports:
-      - "4000:4000"
+      - "9400:4000"
     depends_on:
       admin-redis:
         condition: service_healthy
@@ -46,7 +46,7 @@ services:
     environment:
       - VITE_ADMIN_API_URL=http://admin-backend:4000
     ports:
-      - "3001:3001"
+      - "9001:3001"
     depends_on:
       - admin-backend
     healthcheck:

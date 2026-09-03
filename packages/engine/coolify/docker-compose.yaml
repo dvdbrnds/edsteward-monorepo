@@ -40,7 +40,7 @@ services:
       - REDIS_PORT=6379
       - REDIS_URL=redis://redis:6379
     ports:
-      - "3010:3010"
+      - "9010:3010"
     depends_on:
       postgres:
         condition: service_healthy
@@ -87,7 +87,7 @@ services:
       # REGULATIONS_GOV_API_KEY= (optional)
       # OPEN_STATES_API_KEY=     (optional)
     ports:
-      - "3004:3004"
+      - "9004:3004"
     depends_on:
       postgres:
         condition: service_healthy
@@ -119,11 +119,11 @@ services:
       - POSTGRES_USER=${ENGINE_DB_USER:-mcp_user}
       - POSTGRES_PASSWORD=${ENGINE_DB_PASSWORD:-mcp_secure_2026}
       # -- Set in Coolify UI --
-      # EDSTEWARD_URL=           (e.g., https://moravian.edsteward.ai)
+      # EDSTEWARD_URL=           (e.g., http://10.232.1.50:9000 or https://edsteward.moravian.edu)
       # EDSTEWARD_USERNAME=      (e.g., mcp-engine)
       # EDSTEWARD_PASSWORD=      (matches MCP_ENGINE_PASSWORD on EdSteward side)
     ports:
-      - "3003:3003"
+      - "9003:3003"
     depends_on:
       - registry-api
     volumes:
@@ -148,7 +148,7 @@ services:
       - REACT_APP_REGISTRY_URL=http://registry-api:3010
       - REACT_APP_DELIVERY_URL=http://delivery:3003
     ports:
-      - "3050:3050"
+      - "9050:3050"
     depends_on:
       - registry-api
       - llm-gateway
