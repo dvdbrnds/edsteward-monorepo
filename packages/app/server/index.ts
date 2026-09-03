@@ -28,6 +28,9 @@ import passport from 'passport';
 import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
+
+// Derive HTTPS mode from BASE_URL — works for both AWS and Coolify with SSL
+const isHttps = (process.env.BASE_URL || '').startsWith('https://');
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
@@ -102,7 +105,7 @@ app.use(helmet({
       ],
       frameSrc: ["'self'"],
       objectSrc: ["'none'"],
-      upgradeInsecureRequests: (process.env.NODE_ENV === 'production' && process.env.DEPLOYMENT_MODE !== 'coolify') ? [] : null,
+      upgradeInsecureRequests: isHttps ? [] : null,
     },
   },
   // Other helmet protections (all enabled by default)
@@ -115,7 +118,8 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [
   'http://localhost:3001', // Admin console
   'http://localhost:3002', // Admin console fallback port
   'https://moravian.edsteward.ai',
-  'https://edsteward.ai'
+  'https://edsteward.ai',
+  ...(process.env.BASE_URL ? [process.env.BASE_URL] : []),
 ];
 
 app.use(cors({
@@ -164,10 +168,10 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: process.env.NODE_ENV === 'production' && process.env.DEPLOYMENT_MODE !== 'coolify',
+    secure: isHttps,
     httpOnly: true,
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
-    sameSite: (process.env.NODE_ENV === 'production' && process.env.DEPLOYMENT_MODE !== 'coolify') ? 'none' : 'lax',
+    sameSite: isHttps ? 'none' : 'lax',
   },
 }));
 
