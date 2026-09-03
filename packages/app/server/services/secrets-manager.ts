@@ -55,10 +55,15 @@ const SECRET_MAPPINGS: Record<string, { awsSecretId: string; envVar: string; req
 };
 
 /**
- * Check if AWS Secrets Manager is available
- * Uses dynamic import to avoid requiring aws-sdk in development
+ * Check if AWS Secrets Manager is available.
+ * Disabled entirely when DEPLOYMENT_MODE=coolify (uses env vars only).
  */
 async function isAwsAvailable(): Promise<boolean> {
+  // Coolify deployments use env vars exclusively -- skip AWS
+  if (process.env.DEPLOYMENT_MODE === 'coolify') {
+    return false;
+  }
+  
   if (process.env.NODE_ENV !== 'production') {
     return false;
   }

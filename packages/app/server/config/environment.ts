@@ -25,6 +25,9 @@ const ENV_SCHEMA: Record<string, EnvVarConfig> = {
   PORT: { required: true, default: '3000' },
   INSTITUTION_NAME: { required: true, default: 'EdSteward Institution' },
   
+  // Deployment mode: 'aws' (ECS/Neon/SES) or 'coolify' (Docker Compose/local PG/SMTP)
+  DEPLOYMENT_MODE: { required: false, default: 'aws' },
+  
   // Optional
   MULTI_TENANT: { required: false, default: 'false' },
   BASE_URL: { required: false },
@@ -146,6 +149,9 @@ export const config = {
   DATABASE_URL: process.env.DATABASE_URL!,
   SESSION_SECRET: process.env.SESSION_SECRET!,
   
+  // Deployment mode: 'aws' = ECS/Neon/SES/SecretsManager, 'coolify' = Docker Compose/local PG/SMTP
+  DEPLOYMENT_MODE: getEnv('DEPLOYMENT_MODE', 'aws') as 'aws' | 'coolify',
+  
   // Multi-tenant
   MULTI_TENANT: getEnvBool('MULTI_TENANT'),
   BASE_URL: getEnv('BASE_URL'),
@@ -197,6 +203,8 @@ export const isDevelopment = config.NODE_ENV === 'development';
 export const isProduction = config.NODE_ENV === 'production';
 export const isStaging = config.NODE_ENV === 'staging';
 export const isTest = config.NODE_ENV === 'test';
+export const isCoolify = config.DEPLOYMENT_MODE === 'coolify';
+export const isAWS = config.DEPLOYMENT_MODE === 'aws';
 
 // Run validation on import
 validateEnvironment();

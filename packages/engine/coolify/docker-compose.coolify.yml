@@ -1,0 +1,200 @@
+# =============================================================================
+# MCP Engine - Coolify Docker Compose
+# =============================================================================
+# Deploy this as a Docker Compose resource in Coolify.
+#
+# Services:
+#   - registry-api  (port 3010) -- Regulation registry, PostgreSQL-backed
+#   - llm-gateway   (port 3004) -- LLM processing (Anthropic Claude)
+#   - delivery      (port 3003) -- Pushes regulation updates to EdSteward instances
+#   - frontend      (port 3050) -- Admin console UI (set FQDN here)
+#   - postgres      -- Engine's own PostgreSQL database
+#   - redis         -- Caching and job queues
+#
+# Coolify handles SSL, domain routing, networking, and backups.
+#
+# After deploying:
+#   1. Set FQDN on 'frontend' service (e.g., engine.edsteward.ai)
+#   2. Set secrets in Coolify UI (ANTHROPIC_API_KEY, etc.)
+#   3. Import engine database dump
+#   4. Update customers.json with Coolify EdSteward instance URLs
+# =============================================================================
+
+services:
+  registry-api:
+    build:
+      context: .
+      dockerfile: Dockerfile.phase4
+    restart: unless-stopped
+    command: ["node", "src/server/start-registry-postgres.js"]
+    environment:
+      - NODE_ENV=production
+      - PORT=3010
+      - LOG_LEVEL=info
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=${ENGINE_DB_NAME:-mcp_engine}
+      - POSTGRES_USER=${ENGINE_DB_USER:-mcp_user}
+      - POSTGRES_PASSWORD=${ENGINE_DB_PASSWORD:-mcp_secure_2026}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_URL=redis://redis:6379
+    ports:
+      - "3010:3010"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - engine_data:/app/data
+      - engine_logs:/app/logs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3010/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  llm-gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile.phase4
+    restart: unless-stopped
+    command: ["node", "src/llm-gateway/start-llm-gateway-phase4.js"]
+    environment:
+      - NODE_ENV=production
+      - LLM_GATEWAY_PORT=3004
+      - PORT=3004
+      - LOG_LEVEL=info
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_URL=redis://redis:6379
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=${ENGINE_DB_NAME:-mcp_engine}
+      - POSTGRES_USER=${ENGINE_DB_USER:-mcp_user}
+      - POSTGRES_PASSWORD=${ENGINE_DB_PASSWORD:-mcp_secure_2026}
+      - ENABLE_METRICS=true
+      - ENABLE_AUTH=true
+      - ENABLE_RATE_LIMITING=true
+      - CACHE_TTL=3600
+      # -- Set in Coolify UI --
+      # ANTHROPIC_API_KEY=       (required)
+      # ANTHROPIC_MODEL=         (default: claude-sonnet-4-20250514)
+      # OPENAI_API_KEY=          (optional)
+      # CONGRESS_API_KEY=        (optional -- for government API cross-references)
+      # REGULATIONS_GOV_API_KEY= (optional)
+      # OPEN_STATES_API_KEY=     (optional)
+    ports:
+      - "3004:3004"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - engine_logs:/app/logs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3004/api/llm/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  delivery:
+    build:
+      context: .
+      dockerfile: Dockerfile.phase4
+    restart: unless-stopped
+    command: ["node", "src/delivery-system/delivery-server.js"]
+    environment:
+      - NODE_ENV=production
+      - PORT=3003
+      - LOG_LEVEL=info
+      - REGISTRY_API_URL=http://registry-api:3010
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=${ENGINE_DB_NAME:-mcp_engine}
+      - POSTGRES_USER=${ENGINE_DB_USER:-mcp_user}
+      - POSTGRES_PASSWORD=${ENGINE_DB_PASSWORD:-mcp_secure_2026}
+      # -- Set in Coolify UI --
+      # EDSTEWARD_URL=           (e.g., https://moravian.edsteward.ai)
+      # EDSTEWARD_USERNAME=      (e.g., mcp-engine)
+      # EDSTEWARD_PASSWORD=      (matches MCP_ENGINE_PASSWORD on EdSteward side)
+    ports:
+      - "3003:3003"
+    depends_on:
+      - registry-api
+    volumes:
+      - engine_logs:/app/logs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3003/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.phase4
+    restart: unless-stopped
+    command: ["npx", "vite", "src/client", "--port", "3050", "--host", "0.0.0.0"]
+    environment:
+      - NODE_ENV=production
+      - PORT=3050
+      - REACT_APP_API_URL=http://llm-gateway:3004/api/llm
+      - REACT_APP_REGISTRY_URL=http://registry-api:3010
+      - REACT_APP_DELIVERY_URL=http://delivery:3003
+    ports:
+      - "3050:3050"
+    depends_on:
+      - registry-api
+      - llm-gateway
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3050/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  postgres:
+    image: postgres:14-alpine
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=${ENGINE_DB_NAME:-mcp_engine}
+      - POSTGRES_USER=${ENGINE_DB_USER:-mcp_user}
+      - POSTGRES_PASSWORD=${ENGINE_DB_PASSWORD:-mcp_secure_2026}
+    volumes:
+      - engine_postgres_data:/var/lib/postgresql/data
+    command:
+      - "postgres"
+      - "-c"
+      - "wal_level=logical"
+      - "-c"
+      - "max_connections=100"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${ENGINE_DB_USER:-mcp_user} -d ${ENGINE_DB_NAME:-mcp_engine}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - engine_redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  engine_postgres_data:
+  engine_redis_data:
+  engine_data:
+  engine_logs:

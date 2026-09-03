@@ -7,6 +7,7 @@
       "url": "http://localhost:3000",
       "apiEndpoint": "/api/regulation-updates",
       "type": "development",
+      "deployment": "local",
       "auth": {
         "method": "basic",
         "username": "dvdbrnds",
@@ -22,13 +23,32 @@
       "url": "https://moravian.edsteward.ai",
       "apiEndpoint": "/api/regulation-updates",
       "type": "production",
+      "deployment": "coolify",
       "auth": {
         "method": "basic",
         "username": "mcp-engine",
         "password": "SET_VIA_EDSTEWARD_PASSWORD_ENV"
       },
       "enabled": true,
-      "subscriptions": ["all"]
+      "subscriptions": ["all"],
+      "notes": "Migrated from AWS ECS to Coolify. Same domain, Traefik SSL."
+    },
+    {
+      "id": "staging",
+      "name": "EdSteward Staging",
+      "shortName": "Staging",
+      "url": "https://staging.edsteward.ai",
+      "apiEndpoint": "/api/regulation-updates",
+      "type": "staging",
+      "deployment": "coolify",
+      "auth": {
+        "method": "basic",
+        "username": "mcp-engine",
+        "password": "SET_VIA_EDSTEWARD_PASSWORD_ENV"
+      },
+      "enabled": true,
+      "subscriptions": ["all"],
+      "notes": "Migrated from AWS ECS to Coolify."
     },
     {
       "id": "desales-prod",
@@ -37,13 +57,15 @@
       "url": "https://desales.edsteward.ai",
       "apiEndpoint": "/api/regulation-updates",
       "type": "production",
+      "deployment": "aws",
       "auth": {
         "method": "basic",
         "username": "mcp-engine",
         "password": "SET_VIA_EDSTEWARD_PASSWORD_ENV"
       },
       "enabled": true,
-      "subscriptions": ["all"]
+      "subscriptions": ["all"],
+      "notes": "Remains on AWS ECS. Not migrating to Coolify."
     },
     {
       "id": "muhlenberg-prod",
@@ -52,6 +74,7 @@
       "url": "https://muhlenberg.edsteward.ai",
       "apiEndpoint": "/api/regulation-updates",
       "type": "production",
+      "deployment": "coolify",
       "auth": {
         "method": "basic",
         "username": "mcp-engine",
@@ -67,6 +90,7 @@
       "url": "https://lafayette.edsteward.ai",
       "apiEndpoint": "/api/regulation-updates",
       "type": "production",
+      "deployment": "coolify",
       "auth": {
         "method": "basic",
         "username": "mcp-engine",

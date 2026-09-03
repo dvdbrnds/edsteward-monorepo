@@ -1,0 +1,101 @@
+# =============================================================================
+# EdSteward Customer Template - Coolify Docker Compose
+# =============================================================================
+# Copy this into Coolify's Docker Compose editor when onboarding a new customer.
+#
+# Steps:
+#   1. In Coolify: Create a new Project (e.g., "EdSteward - <Customer Name>")
+#   2. Add Resource -> Docker Compose Empty
+#   3. Paste this file
+#   4. Set environment variables in Coolify UI:
+#      - SESSION_SECRET          (openssl rand -hex 32)
+#      - MFA_ENCRYPTION_KEY      (openssl rand -hex 32)
+#      - INSTITUTION_NAME        (e.g., "Acme University")
+#      - INSTITUTION_DOMAIN      (e.g., "acme.edu")
+#      - INSTITUTION_PRIMARY_COLOR   (e.g., "#003366")
+#      - INSTITUTION_SECONDARY_COLOR (e.g., "#336699")
+#      - INSTITUTION_LOGO_URL    (optional)
+#      - BASE_URL                (e.g., "https://acme.edsteward.ai")
+#      - MCP_ENGINE_USERNAME     (e.g., "mcp-engine")
+#      - MCP_ENGINE_PASSWORD     (unique per customer)
+#      - EMAIL_HOST / EMAIL_PORT / EMAIL_USER / EMAIL_PASS / EMAIL_FROM
+#      - AUTH_SAML_ENABLED       (true/false)
+#      - AUTH_SAML_ENTITY_ID     (if SAML)
+#      - AUTH_SAML_SSO_URL       (if SAML)
+#   5. Set FQDN on 'app' service (e.g., acme.edsteward.ai)
+#   6. Deploy
+#   7. Import regulation seed data (or wait for MCP Engine push)
+#   8. Create admin user via psql or API
+#
+# After deployment, add the customer to the MCP Engine's customers.json
+# so regulation updates get pushed to their instance.
+# =============================================================================
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - DEPLOYMENT_MODE=coolify
+      - DOCKER_CONTAINER=true
+      - HOSTNAME=0.0.0.0
+      - DATABASE_URL=postgresql://edsteward:edsteward_secure_2026@postgres:5432/edsteward?sslmode=disable
+      - REDIS_URL=redis://:redis_secure_2026@redis:6379
+      - MULTI_TENANT=false
+      - AUTH_USERNAME_PASSWORD_ENABLED=true
+      - AUTH_ALLOW_SELF_REGISTRATION=false
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - app_uploads:/app/uploads
+      - app_logs:/app/logs
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 5s
+      start_period: 60s
+      retries: 3
+
+  postgres:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=edsteward
+      - POSTGRES_USER=edsteward
+      - POSTGRES_PASSWORD=edsteward_secure_2026
+      - POSTGRES_HOST_AUTH_METHOD=md5
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U edsteward -d edsteward"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: redis-server --appendonly yes --requirepass redis_secure_2026
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "--no-auth-warning", "-a", "redis_secure_2026", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  postgres_data:
+  redis_data:
+  app_uploads:
+  app_logs:
