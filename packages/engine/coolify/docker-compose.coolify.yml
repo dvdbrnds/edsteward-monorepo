@@ -23,7 +23,7 @@
 services:
   registry-api:
     build:
-      context: .
+      context: ..
       dockerfile: Dockerfile.phase4
     restart: unless-stopped
     command: ["node", "src/server/start-registry-postgres.js"]
@@ -58,7 +58,7 @@ services:
 
   llm-gateway:
     build:
-      context: .
+      context: ..
       dockerfile: Dockerfile.phase4
     restart: unless-stopped
     command: ["node", "src/llm-gateway/start-llm-gateway-phase4.js"]
@@ -104,7 +104,7 @@ services:
 
   delivery:
     build:
-      context: .
+      context: ..
       dockerfile: Dockerfile.phase4
     restart: unless-stopped
     command: ["node", "src/delivery-system/delivery-server.js"]
@@ -137,7 +137,7 @@ services:
 
   frontend:
     build:
-      context: .
+      context: ..
       dockerfile: Dockerfile.phase4
     restart: unless-stopped
     command: ["npx", "vite", "src/client", "--port", "3050", "--host", "0.0.0.0"]

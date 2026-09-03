@@ -14,12 +14,44 @@ Coolify provides SSL (Let's Encrypt via Traefik), domain routing, environment va
 
 The MCP Engine runs as a separate Coolify project and pushes regulation updates to each customer's EdSteward instance via HTTPS.
 
+## GitHub Integration Setup
+
+Coolify deploys from the `coolify` branch of the GitHub repo. Each project points to the same repo but uses a different Docker Compose file path.
+
+### Connecting the Repo
+
+In Coolify:
+1. Go to **Sources** (or **Git** in settings) and connect your GitHub account
+2. Add the `dvdbrnds/edsteward-monorepo` repository
+
+### Creating a Deployment
+
+For each project (EdSteward app, MCP Engine, Admin Console):
+
+1. Create a **Project** (e.g., "EdSteward - Moravian")
+2. Add Resource -> **Private Repository (with GitHub App)**
+3. Select `dvdbrnds/edsteward-monorepo`, branch: `coolify`
+4. Build Pack: **Docker Compose**
+5. **Docker Compose Location** (critical -- this tells Coolify which compose file to use):
+   - EdSteward App: `packages/app/coolify/docker-compose.coolify.yml`
+   - MCP Engine: `packages/engine/coolify/docker-compose.coolify.yml`
+   - Admin Console: `packages/app/admin-console/coolify/docker-compose.coolify.yml`
+6. Deploy
+
+Build contexts in the compose files use `context: ..` to point up to the package directory where the Dockerfile and source code live. Coolify resolves these relative to the compose file location.
+
+### Auto-Deploy on Push
+
+Once connected, enable **Auto Deploy** in the resource settings. Any push to the `coolify` branch triggers a rebuild and redeploy automatically.
+
 ## Quick Start: New Customer
 
 1. In Coolify, create a new **Project** (e.g., "EdSteward - Acme University")
-2. Add Resource -> **Docker Compose Empty**
-3. Paste the contents of `docker-compose.customer-template.yml`
-4. Go to the **Environment Variables** tab and set:
+2. Add Resource -> **Private Repository (with GitHub App)**
+3. Select `dvdbrnds/edsteward-monorepo`, branch: `coolify`
+4. Build Pack: **Docker Compose**
+5. Docker Compose Location: `packages/app/coolify/docker-compose.customer-template.yml`
+6. Go to the **Environment Variables** tab and set:
 
 | Variable | Required | Description |
 |----------|----------|-------------|
@@ -42,11 +74,11 @@ The MCP Engine runs as a separate Coolify project and pushes regulation updates 
 | `EMAIL_PASS` | Recommended | SMTP password |
 | `EMAIL_FROM` | Recommended | From address |
 
-5. Click on the **app** service -> set **FQDN** to the customer's domain (e.g., `https://acme.edsteward.ai`)
-6. Deploy
-7. Configure **PostgreSQL backups**: Click on the **postgres** service -> Backups tab -> Add schedule (e.g., `0 3 * * *` for daily at 3 AM) -> optionally enable S3 storage
-8. Import regulation seed data or wait for MCP Engine to push
-9. Add the customer to `packages/engine/config/customers.json`
+7. Click on the **app** service -> set **FQDN** to the customer's domain (e.g., `https://acme.edsteward.ai`)
+8. Deploy
+9. Configure **PostgreSQL backups**: Click on the **postgres** service -> Backups tab -> Add schedule (e.g., `0 3 * * *` for daily at 3 AM) -> optionally enable S3 storage
+10. Import regulation seed data or wait for MCP Engine to push
+11. Add the customer to `packages/engine/config/customers.json`
 
 ## Migrating from AWS ECS (Neon)
 
