@@ -20,7 +20,7 @@
       "id": "moravian-prod",
       "name": "Moravian University (Production)",
       "shortName": "Moravian Prod",
-      "url": "https://moravian.edsteward.ai",
+      "url": "https://edsteward.moravian.edu",
       "apiEndpoint": "/api/regulation-updates",
       "type": "production",
       "deployment": "coolify",
@@ -31,7 +31,7 @@
       },
       "enabled": true,
       "subscriptions": ["all"],
-      "notes": "Migrated from AWS ECS to Coolify. Same domain, Traefik SSL."
+      "notes": "Migrated from AWS ECS to Coolify. Domain: edsteward.moravian.edu"
     },
     {
       "id": "staging",

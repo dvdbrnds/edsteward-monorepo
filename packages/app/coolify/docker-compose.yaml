@@ -11,7 +11,7 @@
 #   - Environment variable injection (secrets go in Coolify UI)
 #
 # After deploying:
-#   1. Set FQDN on 'app' service (e.g., moravian.edsteward.ai)
+#   1. Set FQDN on 'app' service (e.g., edsteward.moravian.edu)
 #   2. Set environment variables in Coolify UI (see env.coolify.example)
 #   3. Configure PostgreSQL backups in Coolify (Backups tab on 'postgres' resource)
 #   4. Import database dump if migrating from Neon
@@ -47,7 +47,7 @@ services:
       # AUTH_SAML_ENABLED=       (optional -- "true" or "false")
       # AUTH_SAML_ENTITY_ID=     (required if SAML enabled)
       # AUTH_SAML_SSO_URL=       (required if SAML enabled)
-      # BASE_URL=                (required if SAML enabled -- e.g., "https://moravian.edsteward.ai")
+      # BASE_URL=                (required if SAML enabled -- e.g., "https://edsteward.moravian.edu")
       # MCP_ENGINE_USERNAME=     (for engine push auth)
       # MCP_ENGINE_PASSWORD=     (for engine push auth)
       # EMAIL_HOST=              (SMTP host for notifications)

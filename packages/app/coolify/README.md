@@ -103,19 +103,19 @@ The Coolify PostgreSQL container fully replaces Neon:
 
 Coolify uses **Traefik + Let's Encrypt** for automatic SSL. To enable HTTPS:
 
-1. **Point DNS to your Coolify server** — create an A record for your domain:
+1. **Point DNS to your Coolify server** — have Moravian IT create an A record:
    ```
-   moravian.edsteward.ai → 10.232.1.50   (or your Coolify server's public IP)
+   edsteward.moravian.edu → 10.232.1.50   (or your Coolify server's public/external IP)
    ```
    Lower TTL to 60 seconds before cutover, raise back to 3600 after verifying.
 
 2. **Set the domain in Coolify** — click on the `app` service → **Domains**:
-   - Change from `http://10.232.1.50` to `https://moravian.edsteward.ai`
+   - Change from `http://10.232.1.50` to `https://edsteward.moravian.edu`
    - Coolify auto-provisions a Let's Encrypt certificate
 
 3. **Update `BASE_URL` env var** — in Coolify Environment Variables:
    ```
-   BASE_URL=https://moravian.edsteward.ai
+   BASE_URL=https://edsteward.moravian.edu
    ```
    This controls SAML callback URLs, CSP, secure cookies, and CORS.
 
@@ -130,20 +130,25 @@ When the domain or protocol changes, Okta's SAML integration must be updated to 
 
 ### What Changes in Okta
 
+The domain is changing from `moravian.edsteward.ai` → `edsteward.moravian.edu`, so the SAML ACS URL must be updated.
+
 | Okta Setting | Old Value (AWS) | New Value (Coolify) |
 |---|---|---|
-| Single Sign-On URL (ACS) | `https://moravian.edsteward.ai/auth/saml/callback/okta` | Same if keeping domain, or update to new domain |
-| Audience URI (SP Entity ID) | `urn:edsteward:sp` | Same (no change needed) |
+| Single Sign-On URL (ACS) | `https://moravian.edsteward.ai/auth/saml/callback/okta` | `https://edsteward.moravian.edu/auth/saml/callback/okta` |
+| Audience URI (SP Entity ID) | `urn:edsteward:sp` | `urn:edsteward:sp` (no change) |
 | Default Relay State | _(empty or `/dashboard`)_ | Same |
 | Name ID format | `EmailAddress` | Same |
+| Recipient URL | `https://moravian.edsteward.ai/auth/saml/callback/okta` | `https://edsteward.moravian.edu/auth/saml/callback/okta` |
+| Destination URL | `https://moravian.edsteward.ai/auth/saml/callback/okta` | `https://edsteward.moravian.edu/auth/saml/callback/okta` |
 
-**If keeping the same domain** (`moravian.edsteward.ai`), you only need to re-point DNS. No Okta changes required — the ACS URL stays the same.
+### Steps in Okta Admin Console
 
-**If using a new domain**, update in Okta Admin Console:
 1. Go to **Applications** → **EdSteward** → **General** → **SAML Settings** → **Edit**
-2. Update **Single Sign-On URL** to: `https://NEW-DOMAIN/auth/saml/callback/okta`
-3. Update **Recipient URL** and **Destination URL** if shown (same as SSO URL)
-4. Click **Save**
+2. Click **Next** to get to the SAML settings
+3. Update **Single Sign-On URL** to: `https://edsteward.moravian.edu/auth/saml/callback/okta`
+4. Update **Recipient URL** and **Destination URL** to match (same URL)
+5. **Audience URI** stays `urn:edsteward:sp` — no change needed
+6. Click **Next** → **Finish**
 
 ### Environment Variables for SAML
 
@@ -151,7 +156,7 @@ Set these in Coolify's Environment Variables for the `app` service:
 
 ```
 AUTH_SAML_ENABLED=true
-BASE_URL=https://moravian.edsteward.ai
+BASE_URL=https://edsteward.moravian.edu
 SAML_SP_ENTITY_ID=urn:edsteward:sp
 OKTA_SSO_URL=https://your-okta-domain.okta.com/app/your-app-id/sso/saml
 OKTA_SLO_URL=https://your-okta-domain.okta.com/app/your-app-id/slo/saml

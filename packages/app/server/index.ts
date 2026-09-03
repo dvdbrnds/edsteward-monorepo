@@ -118,6 +118,7 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [
   'http://localhost:3001', // Admin console
   'http://localhost:3002', // Admin console fallback port
   'https://moravian.edsteward.ai',
+  'https://edsteward.moravian.edu',
   'https://edsteward.ai',
   ...(process.env.BASE_URL ? [process.env.BASE_URL] : []),
 ];
