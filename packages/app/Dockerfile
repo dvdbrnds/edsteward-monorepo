@@ -97,4 +97,5 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1
 
 # Push Drizzle schema on startup (ensures all tables/columns exist), then start the app
-CMD ["sh", "-c", "npx drizzle-kit push --force && npm start"] 
+# 'yes ""' auto-answers any interactive prompts (drizzle-kit push can prompt even with --force)
+CMD ["sh", "-c", "yes '' | npx drizzle-kit push --force 2>&1; npm start"] 
