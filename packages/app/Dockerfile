@@ -59,6 +59,7 @@ COPY --from=builder /app/sql_dump ./sql_dump
 COPY --from=builder /app/certs ./certs
 COPY --from=builder /app/docs ./docs
 COPY --from=builder /app/public ./public
+COPY --from=builder /app/migrations ./migrations
 # COPY --from=builder /app/scripts ./scripts (directory doesn't exist)
 
 # REMOVED: npm rebuild bcrypt --build-from-source (this was causing the architecture conflict)
@@ -96,6 +97,5 @@ ENV DOCKER_CONTAINER=true
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1
 
-# Push Drizzle schema on startup (ensures all tables/columns exist), then start the app
-# 'yes ""' auto-answers any interactive prompts (drizzle-kit push can prompt even with --force)
-CMD ["sh", "-c", "yes '' | npx drizzle-kit push --force 2>&1; npm start"] 
+# Apply schema migration on startup if tables don't exist yet
+CMD ["sh", "-c", "echo 'Checking database schema...' && TABLE_EXISTS=$(psql \"$DATABASE_URL\" -tAc \"SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='public' AND table_name='users'\" 2>/dev/null || echo '0') && if [ \"$TABLE_EXISTS\" = '0' ]; then echo 'No schema found, applying migration...' && psql \"$DATABASE_URL\" -f /app/migrations/0000_dusty_komodo.sql 2>&1 && echo 'Schema applied successfully'; else echo 'Schema already exists, skipping migration'; fi; exec npm start"] 
