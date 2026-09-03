@@ -54,6 +54,7 @@ COPY --from=builder /app/tsconfig.json ./tsconfig.json
 COPY --from=builder /app/vite.config.ts ./vite.config.ts
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/shared ./shared
+COPY --from=builder /app/drizzle.config.ts ./drizzle.config.ts
 COPY --from=builder /app/sql_dump ./sql_dump
 COPY --from=builder /app/certs ./certs
 COPY --from=builder /app/docs ./docs
@@ -95,5 +96,5 @@ ENV DOCKER_CONTAINER=true
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1
 
-# Start the application directly
-CMD ["npm", "start"] 
+# Push Drizzle schema on startup (ensures all tables/columns exist), then start the app
+CMD ["sh", "-c", "npx drizzle-kit push --force && npm start"] 
