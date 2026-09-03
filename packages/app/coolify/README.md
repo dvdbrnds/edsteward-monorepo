@@ -18,19 +18,14 @@ The MCP Engine runs as a separate Coolify project and pushes regulation updates 
 
 Coolify deploys from the `coolify` branch of the GitHub repo. Each project points to the same repo but uses a different Docker Compose file path.
 
-### Connecting the Repo
-
-In Coolify:
-1. Go to **Sources** (or **Git** in settings) and connect your GitHub account
-2. Add the `dvdbrnds/edsteward-monorepo` repository
-
 ### Creating a Deployment
 
 For each project (EdSteward app, MCP Engine, Admin Console):
 
 1. Create a **Project** (e.g., "EdSteward - Moravian")
-2. Add Resource -> **Private Repository (with GitHub App)**
-3. Select `dvdbrnds/edsteward-monorepo`, branch: `coolify`
+2. Add Resource -> **Public Repository**
+3. Repository URL: `https://github.com/dvdbrnds/edsteward-monorepo`
+4. Branch: `coolify`
 4. Build Pack: **Docker Compose**
 5. **Base Directory** -- set to the `coolify/` folder for the project:
    - EdSteward App: `packages/app/coolify`
@@ -48,8 +43,8 @@ Once connected, enable **Auto Deploy** in the resource settings. Any push to the
 ## Quick Start: New Customer
 
 1. In Coolify, create a new **Project** (e.g., "EdSteward - Acme University")
-2. Add Resource -> **Private Repository (with GitHub App)**
-3. Select `dvdbrnds/edsteward-monorepo`, branch: `coolify`
+2. Add Resource -> **Public Repository**
+3. Repository URL: `https://github.com/dvdbrnds/edsteward-monorepo`, branch: `coolify`
 4. Build Pack: **Docker Compose**
 5. Base Directory: `packages/app/coolify` (uses `docker-compose.yaml` automatically)
 6. Go to the **Environment Variables** tab and set:
