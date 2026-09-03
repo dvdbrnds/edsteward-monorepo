@@ -32,10 +32,11 @@ For each project (EdSteward app, MCP Engine, Admin Console):
 2. Add Resource -> **Private Repository (with GitHub App)**
 3. Select `dvdbrnds/edsteward-monorepo`, branch: `coolify`
 4. Build Pack: **Docker Compose**
-5. **Docker Compose Location** (critical -- this tells Coolify which compose file to use):
-   - EdSteward App: `packages/app/coolify/docker-compose.coolify.yml`
-   - MCP Engine: `packages/engine/coolify/docker-compose.coolify.yml`
-   - Admin Console: `packages/app/admin-console/coolify/docker-compose.coolify.yml`
+5. **Base Directory** -- set to the `coolify/` folder for the project:
+   - EdSteward App: `packages/app/coolify`
+   - MCP Engine: `packages/engine/coolify`
+   - Admin Console: `packages/app/admin-console/coolify`
+   Coolify auto-discovers `docker-compose.yaml` in the base directory.
 6. Deploy
 
 Build contexts in the compose files use `context: ..` to point up to the package directory where the Dockerfile and source code live. Coolify resolves these relative to the compose file location.
@@ -50,7 +51,7 @@ Once connected, enable **Auto Deploy** in the resource settings. Any push to the
 2. Add Resource -> **Private Repository (with GitHub App)**
 3. Select `dvdbrnds/edsteward-monorepo`, branch: `coolify`
 4. Build Pack: **Docker Compose**
-5. Docker Compose Location: `packages/app/coolify/docker-compose.customer-template.yml`
+5. Base Directory: `packages/app/coolify` (uses `docker-compose.yaml` automatically)
 6. Go to the **Environment Variables** tab and set:
 
 | Variable | Required | Description |
@@ -219,8 +220,8 @@ Recommended schedule:
 
 | File | Purpose |
 |------|---------|
-| `coolify/docker-compose.coolify.yml` | Main EdSteward compose for Coolify |
-| `coolify/docker-compose.customer-template.yml` | Template for new customers |
+| `coolify/docker-compose.yaml` | Main EdSteward compose for Coolify |
+| `coolify/docker-compose.customer-template.yaml` | Template for new customers |
 | `scripts/migrate-to-coolify.sh` | Database migration script (Neon -> Coolify PG) |
 | `scripts/deploy-coolify.sh` | Deployment script (git push or API) |
 | `server/config/environment.ts` | `DEPLOYMENT_MODE` configuration |
