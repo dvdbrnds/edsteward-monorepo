@@ -57,6 +57,7 @@ COPY --from=builder /app/shared ./shared
 COPY --from=builder /app/sql_dump ./sql_dump
 COPY --from=builder /app/certs ./certs
 COPY --from=builder /app/docs ./docs
+COPY --from=builder /app/public ./public
 # COPY --from=builder /app/scripts ./scripts (directory doesn't exist)
 
 # REMOVED: npm rebuild bcrypt --build-from-source (this was causing the architecture conflict)
