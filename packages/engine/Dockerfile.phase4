@@ -15,10 +15,10 @@ RUN apk add --no-cache \
     git
 
 # Copy package files
-COPY package*.json ./
+COPY package.json ./
 
-# Install dependencies
-RUN npm ci --only=production && npm cache clean --force
+# Install production dependencies
+RUN npm install --omit=dev && npm cache clean --force
 
 # Copy source code
 COPY src/ ./src/
