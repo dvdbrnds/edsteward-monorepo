@@ -83,9 +83,9 @@ services:
       - POSTGRES_HOST_AUTH_METHOD=md5
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    # Expose PostgreSQL externally for migration/admin (remove after migration)
-    # ports:
-    #   - "9432:5432"
+    # Expose PostgreSQL externally for migration (re-comment after migration)
+    ports:
+      - "9432:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-edsteward} -d ${DB_NAME:-edsteward}"]
       interval: 10s
