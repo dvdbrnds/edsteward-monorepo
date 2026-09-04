@@ -30,7 +30,9 @@ services:
       - DATABASE_URL=postgresql://${DB_USER:-edsteward}:${DB_PASSWORD:-edsteward_secure_2026}@postgres:5432/${DB_NAME:-edsteward}?sslmode=disable
       - REDIS_URL=redis://:${REDIS_PASSWORD:-redis_secure_2026}@redis:6379
       - MULTI_TENANT=false
-      # -- Set in Coolify UI --
+      - ENABLE_TASK_SCHEDULER=false
+      # -- Set in Coolify UI (set to 'true' to enable email notifications) --
+      # ENABLE_TASK_SCHEDULER=true
       # SESSION_SECRET=
       # MFA_ENCRYPTION_KEY=
       # ATTESTATION_JWT_SECRET=
