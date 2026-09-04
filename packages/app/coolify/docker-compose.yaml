@@ -1,9 +1,8 @@
 # =============================================================================
-# EdSteward Full Stack - Coolify Docker Compose
+# EdSteward - Coolify Docker Compose
 # =============================================================================
-# All services in one project: App + MCP Engine + Admin Console
-#
-# Coolify handles: SSL, domain routing, networking, backups
+# Core app only. Engine + Admin services are commented out below.
+# Uncomment them once the app is stable and properly configured.
 #
 # After deploying:
 #   1. Set FQDN on 'app' service (e.g., edsteward.moravian.edu)
@@ -31,8 +30,7 @@ services:
       - REDIS_URL=redis://:${REDIS_PASSWORD:-redis_secure_2026}@redis:6379
       - MULTI_TENANT=false
       - ENABLE_TASK_SCHEDULER=false
-      # -- Set in Coolify UI (set to 'true' to enable email notifications) --
-      # ENABLE_TASK_SCHEDULER=true
+      # -- Set in Coolify UI --
       # SESSION_SECRET=
       # MFA_ENCRYPTION_KEY=
       # ATTESTATION_JWT_SECRET=
@@ -50,6 +48,7 @@ services:
       # EMAIL_PASS=
       # EMAIL_FROM=
       # OPENAI_API_KEY=
+      # ENABLE_TASK_SCHEDULER=true  (set to 'true' when email is configured)
     ports:
       - "9000:3000"
     depends_on:
@@ -105,259 +104,263 @@ services:
       timeout: 5s
       retries: 3
 
-  # ===========================================================================
-  # MCP Engine: Registry API (port 9010)
-  # ===========================================================================
-  engine-registry:
-    build:
-      context: ../../engine
-      dockerfile: Dockerfile.phase4
-    restart: unless-stopped
-    command: ["node", "src/server/start-registry-postgres.js"]
-    environment:
-      - NODE_ENV=production
-      - PORT=3010
-      - LOG_LEVEL=info
-      - POSTGRES_HOST=engine-postgres
-      - POSTGRES_PORT=5432
-      - POSTGRES_DB=${ENGINE_DB_NAME:-mcp_engine}
-      - POSTGRES_USER=${ENGINE_DB_USER:-mcp_user}
-      - POSTGRES_PASSWORD=${ENGINE_DB_PASSWORD:-mcp_secure_2026}
-      - REDIS_HOST=engine-redis
-      - REDIS_PORT=6379
-      - REDIS_URL=redis://engine-redis:6379
-    ports:
-      - "9010:3010"
-    depends_on:
-      engine-postgres:
-        condition: service_healthy
-      engine-redis:
-        condition: service_healthy
-    volumes:
-      - engine_data:/app/data
-      - engine_logs:/app/logs
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3010/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-
-  # ===========================================================================
-  # MCP Engine: LLM Gateway (port 9004)
-  # ===========================================================================
-  engine-llm:
-    build:
-      context: ../../engine
-      dockerfile: Dockerfile.phase4
-    restart: unless-stopped
-    command: ["node", "src/llm-gateway/start-llm-gateway-phase4.js"]
-    environment:
-      - NODE_ENV=production
-      - LLM_GATEWAY_PORT=3004
-      - PORT=3004
-      - LOG_LEVEL=info
-      - REDIS_HOST=engine-redis
-      - REDIS_PORT=6379
-      - REDIS_URL=redis://engine-redis:6379
-      - POSTGRES_HOST=engine-postgres
-      - POSTGRES_PORT=5432
-      - POSTGRES_DB=${ENGINE_DB_NAME:-mcp_engine}
-      - POSTGRES_USER=${ENGINE_DB_USER:-mcp_user}
-      - POSTGRES_PASSWORD=${ENGINE_DB_PASSWORD:-mcp_secure_2026}
-      - ENABLE_METRICS=true
-      - ENABLE_AUTH=true
-      - ENABLE_RATE_LIMITING=true
-      - CACHE_TTL=3600
-      # -- Set in Coolify UI --
-      # ANTHROPIC_API_KEY=
-      # OPENAI_API_KEY=
-      # CONGRESS_API_KEY=
-    ports:
-      - "9004:3004"
-    depends_on:
-      engine-postgres:
-        condition: service_healthy
-      engine-redis:
-        condition: service_healthy
-    volumes:
-      - engine_logs:/app/logs
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3004/api/llm/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 60s
-
-  # ===========================================================================
-  # MCP Engine: Delivery Server (port 9003)
-  # ===========================================================================
-  engine-delivery:
-    build:
-      context: ../../engine
-      dockerfile: Dockerfile.phase4
-    restart: unless-stopped
-    command: ["node", "src/delivery-system/delivery-server.js"]
-    environment:
-      - NODE_ENV=production
-      - PORT=3003
-      - LOG_LEVEL=info
-      - REGISTRY_API_URL=http://engine-registry:3010
-      - POSTGRES_HOST=engine-postgres
-      - POSTGRES_PORT=5432
-      - POSTGRES_DB=${ENGINE_DB_NAME:-mcp_engine}
-      - POSTGRES_USER=${ENGINE_DB_USER:-mcp_user}
-      - POSTGRES_PASSWORD=${ENGINE_DB_PASSWORD:-mcp_secure_2026}
-      # -- Set in Coolify UI --
-      # EDSTEWARD_URL=           (e.g., http://app:3000 for internal, or https://edsteward.moravian.edu)
-      # EDSTEWARD_USERNAME=      (e.g., mcp-engine)
-      # EDSTEWARD_PASSWORD=      (matches MCP_ENGINE_PASSWORD on app)
-    ports:
-      - "9003:3003"
-    depends_on:
-      - engine-registry
-    volumes:
-      - engine_logs:/app/logs
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3003/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-
-  # ===========================================================================
-  # MCP Engine: Frontend (port 9050)
-  # ===========================================================================
-  engine-frontend:
-    build:
-      context: ../../engine
-      dockerfile: Dockerfile.phase4
-    restart: unless-stopped
-    command: ["npx", "vite", "src/client", "--port", "3050", "--host", "0.0.0.0"]
-    environment:
-      - NODE_ENV=production
-      - PORT=3050
-      - REACT_APP_API_URL=http://engine-llm:3004/api/llm
-      - REACT_APP_REGISTRY_URL=http://engine-registry:3010
-      - REACT_APP_DELIVERY_URL=http://engine-delivery:3003
-    ports:
-      - "9050:3050"
-    depends_on:
-      - engine-registry
-      - engine-llm
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3050/"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 30s
-
-  # ===========================================================================
-  # Engine PostgreSQL
-  # ===========================================================================
-  engine-postgres:
-    image: postgres:14-alpine
-    restart: unless-stopped
-    environment:
-      - POSTGRES_DB=${ENGINE_DB_NAME:-mcp_engine}
-      - POSTGRES_USER=${ENGINE_DB_USER:-mcp_user}
-      - POSTGRES_PASSWORD=${ENGINE_DB_PASSWORD:-mcp_secure_2026}
-    volumes:
-      - engine_postgres_data:/var/lib/postgresql/data
-    command: ["postgres", "-c", "wal_level=logical", "-c", "max_connections=100"]
-    # Uncomment for migration
-    # ports:
-    #   - "9433:5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${ENGINE_DB_USER:-mcp_user} -d ${ENGINE_DB_NAME:-mcp_engine}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
-
-  # ===========================================================================
-  # Engine Redis
-  # ===========================================================================
-  engine-redis:
-    image: redis:7-alpine
-    restart: unless-stopped
-    command: redis-server --appendonly yes
-    volumes:
-      - engine_redis_data:/data
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-
-  # ===========================================================================
-  # Admin Console: Backend (port 9400)
-  # ===========================================================================
-  admin-backend:
-    build:
-      context: ../admin-console
-      dockerfile: Dockerfile.backend
-    restart: unless-stopped
-    environment:
-      - NODE_ENV=production
-      - ADMIN_PORT=4000
-      - DATABASE_URL=postgresql://${DB_USER:-edsteward}:${DB_PASSWORD:-edsteward_secure_2026}@postgres:5432/${DB_NAME:-edsteward}?sslmode=disable
-      # -- Set in Coolify UI --
-      # SESSION_SECRET=
-      # REGISTRY_API_SECRET=
-    ports:
-      - "9400:4000"
-    depends_on:
-      postgres:
-        condition: service_healthy
-      admin-redis:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:4000/api/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-
-  # ===========================================================================
-  # Admin Console: Frontend (port 9001)
-  # ===========================================================================
-  admin-frontend:
-    build:
-      context: ../admin-console
-      dockerfile: Dockerfile.frontend
-    restart: unless-stopped
-    environment:
-      - VITE_ADMIN_API_URL=http://admin-backend:4000
-    ports:
-      - "9001:3001"
-    depends_on:
-      - admin-backend
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3001/"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 30s
-
-  # ===========================================================================
-  # Admin Redis
-  # ===========================================================================
-  admin-redis:
-    image: redis:7-alpine
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
+# =============================================================================
+# ENGINE + ADMIN SERVICES (uncomment when ready)
+# =============================================================================
+# To enable: uncomment the services below AND their volumes at the bottom.
+# Each service needs its env vars configured in Coolify UI first.
+#
+#   # =========================================================================
+#   # MCP Engine: Registry API (port 9010)
+#   # =========================================================================
+#   engine-registry:
+#     build:
+#       context: ../../engine
+#       dockerfile: Dockerfile.phase4
+#     restart: unless-stopped
+#     command: ["node", "src/server/start-registry-postgres.js"]
+#     environment:
+#       - NODE_ENV=production
+#       - PORT=3010
+#       - LOG_LEVEL=info
+#       - POSTGRES_HOST=engine-postgres
+#       - POSTGRES_PORT=5432
+#       - POSTGRES_DB=${ENGINE_DB_NAME:-mcp_engine}
+#       - POSTGRES_USER=${ENGINE_DB_USER:-mcp_user}
+#       - POSTGRES_PASSWORD=${ENGINE_DB_PASSWORD:-mcp_secure_2026}
+#       - REDIS_HOST=engine-redis
+#       - REDIS_PORT=6379
+#       - REDIS_URL=redis://engine-redis:6379
+#     ports:
+#       - "9010:3010"
+#     depends_on:
+#       engine-postgres:
+#         condition: service_healthy
+#       engine-redis:
+#         condition: service_healthy
+#     volumes:
+#       - engine_data:/app/data
+#       - engine_logs:/app/logs
+#     healthcheck:
+#       test: ["CMD", "curl", "-f", "http://localhost:3010/health"]
+#       interval: 30s
+#       timeout: 10s
+#       retries: 3
+#       start_period: 40s
+#
+#   # =========================================================================
+#   # MCP Engine: LLM Gateway (port 9004)
+#   # =========================================================================
+#   engine-llm:
+#     build:
+#       context: ../../engine
+#       dockerfile: Dockerfile.phase4
+#     restart: unless-stopped
+#     command: ["node", "src/llm-gateway/start-llm-gateway-phase4.js"]
+#     environment:
+#       - NODE_ENV=production
+#       - LLM_GATEWAY_PORT=3004
+#       - PORT=3004
+#       - LOG_LEVEL=info
+#       - REDIS_HOST=engine-redis
+#       - REDIS_PORT=6379
+#       - REDIS_URL=redis://engine-redis:6379
+#       - POSTGRES_HOST=engine-postgres
+#       - POSTGRES_PORT=5432
+#       - POSTGRES_DB=${ENGINE_DB_NAME:-mcp_engine}
+#       - POSTGRES_USER=${ENGINE_DB_USER:-mcp_user}
+#       - POSTGRES_PASSWORD=${ENGINE_DB_PASSWORD:-mcp_secure_2026}
+#       - ENABLE_METRICS=true
+#       - ENABLE_AUTH=true
+#       - ENABLE_RATE_LIMITING=true
+#       - CACHE_TTL=3600
+#       # -- Set in Coolify UI --
+#       # ANTHROPIC_API_KEY=
+#       # OPENAI_API_KEY=
+#       # CONGRESS_API_KEY=
+#     ports:
+#       - "9004:3004"
+#     depends_on:
+#       engine-postgres:
+#         condition: service_healthy
+#       engine-redis:
+#         condition: service_healthy
+#     volumes:
+#       - engine_logs:/app/logs
+#     healthcheck:
+#       test: ["CMD", "curl", "-f", "http://localhost:3004/api/llm/health"]
+#       interval: 30s
+#       timeout: 10s
+#       retries: 3
+#       start_period: 60s
+#
+#   # =========================================================================
+#   # MCP Engine: Delivery Server (port 9003)
+#   # =========================================================================
+#   engine-delivery:
+#     build:
+#       context: ../../engine
+#       dockerfile: Dockerfile.phase4
+#     restart: unless-stopped
+#     command: ["node", "src/delivery-system/delivery-server.js"]
+#     environment:
+#       - NODE_ENV=production
+#       - PORT=3003
+#       - LOG_LEVEL=info
+#       - REGISTRY_API_URL=http://engine-registry:3010
+#       - POSTGRES_HOST=engine-postgres
+#       - POSTGRES_PORT=5432
+#       - POSTGRES_DB=${ENGINE_DB_NAME:-mcp_engine}
+#       - POSTGRES_USER=${ENGINE_DB_USER:-mcp_user}
+#       - POSTGRES_PASSWORD=${ENGINE_DB_PASSWORD:-mcp_secure_2026}
+#       # -- Set in Coolify UI --
+#       # EDSTEWARD_URL=           (e.g., http://app:3000 or https://edsteward.moravian.edu)
+#       # EDSTEWARD_USERNAME=      (e.g., mcp-engine)
+#       # EDSTEWARD_PASSWORD=      (matches MCP_ENGINE_PASSWORD on app)
+#     ports:
+#       - "9003:3003"
+#     depends_on:
+#       - engine-registry
+#     volumes:
+#       - engine_logs:/app/logs
+#     healthcheck:
+#       test: ["CMD", "curl", "-f", "http://localhost:3003/health"]
+#       interval: 30s
+#       timeout: 10s
+#       retries: 3
+#       start_period: 40s
+#
+#   # =========================================================================
+#   # MCP Engine: Frontend (port 9050)
+#   # =========================================================================
+#   engine-frontend:
+#     build:
+#       context: ../../engine
+#       dockerfile: Dockerfile.phase4
+#     restart: unless-stopped
+#     command: ["npx", "vite", "src/client", "--port", "3050", "--host", "0.0.0.0"]
+#     environment:
+#       - NODE_ENV=production
+#       - PORT=3050
+#       - REACT_APP_API_URL=http://engine-llm:3004/api/llm
+#       - REACT_APP_REGISTRY_URL=http://engine-registry:3010
+#       - REACT_APP_DELIVERY_URL=http://engine-delivery:3003
+#     ports:
+#       - "9050:3050"
+#     depends_on:
+#       - engine-registry
+#       - engine-llm
+#     healthcheck:
+#       test: ["CMD", "curl", "-f", "http://localhost:3050/"]
+#       interval: 30s
+#       timeout: 10s
+#       retries: 3
+#       start_period: 30s
+#
+#   # =========================================================================
+#   # Engine PostgreSQL
+#   # =========================================================================
+#   engine-postgres:
+#     image: postgres:14-alpine
+#     restart: unless-stopped
+#     environment:
+#       - POSTGRES_DB=${ENGINE_DB_NAME:-mcp_engine}
+#       - POSTGRES_USER=${ENGINE_DB_USER:-mcp_user}
+#       - POSTGRES_PASSWORD=${ENGINE_DB_PASSWORD:-mcp_secure_2026}
+#     volumes:
+#       - engine_postgres_data:/var/lib/postgresql/data
+#     command: ["postgres", "-c", "wal_level=logical", "-c", "max_connections=100"]
+#     healthcheck:
+#       test: ["CMD-SHELL", "pg_isready -U ${ENGINE_DB_USER:-mcp_user} -d ${ENGINE_DB_NAME:-mcp_engine}"]
+#       interval: 10s
+#       timeout: 5s
+#       retries: 5
+#       start_period: 30s
+#
+#   # =========================================================================
+#   # Engine Redis
+#   # =========================================================================
+#   engine-redis:
+#     image: redis:7-alpine
+#     restart: unless-stopped
+#     command: redis-server --appendonly yes
+#     volumes:
+#       - engine_redis_data:/data
+#     healthcheck:
+#       test: ["CMD", "redis-cli", "ping"]
+#       interval: 10s
+#       timeout: 5s
+#       retries: 3
+#
+#   # =========================================================================
+#   # Admin Console: Backend (port 9400)
+#   # =========================================================================
+#   admin-backend:
+#     build:
+#       context: ../admin-console
+#       dockerfile: Dockerfile.backend
+#     restart: unless-stopped
+#     environment:
+#       - NODE_ENV=production
+#       - ADMIN_PORT=4000
+#       - DATABASE_URL=postgresql://${DB_USER:-edsteward}:${DB_PASSWORD:-edsteward_secure_2026}@postgres:5432/${DB_NAME:-edsteward}?sslmode=disable
+#       # -- Set in Coolify UI --
+#       # SESSION_SECRET=
+#       # REGISTRY_API_SECRET=
+#     ports:
+#       - "9400:4000"
+#     depends_on:
+#       postgres:
+#         condition: service_healthy
+#       admin-redis:
+#         condition: service_healthy
+#     healthcheck:
+#       test: ["CMD", "curl", "-f", "http://localhost:4000/api/health"]
+#       interval: 30s
+#       timeout: 10s
+#       retries: 3
+#       start_period: 40s
+#
+#   # =========================================================================
+#   # Admin Console: Frontend (port 9001)
+#   # =========================================================================
+#   admin-frontend:
+#     build:
+#       context: ../admin-console
+#       dockerfile: Dockerfile.frontend
+#     restart: unless-stopped
+#     environment:
+#       - VITE_ADMIN_API_URL=http://admin-backend:4000
+#     ports:
+#       - "9001:3001"
+#     depends_on:
+#       - admin-backend
+#     healthcheck:
+#       test: ["CMD", "curl", "-f", "http://localhost:3001/"]
+#       interval: 30s
+#       timeout: 10s
+#       retries: 3
+#       start_period: 30s
+#
+#   # =========================================================================
+#   # Admin Redis
+#   # =========================================================================
+#   admin-redis:
+#     image: redis:7-alpine
+#     restart: unless-stopped
+#     healthcheck:
+#       test: ["CMD", "redis-cli", "ping"]
+#       interval: 10s
+#       timeout: 5s
+#       retries: 3
 
 volumes:
   postgres_data:
   redis_data:
   app_uploads:
   app_logs:
-  engine_postgres_data:
-  engine_redis_data:
-  engine_data:
-  engine_logs:
+  # Uncomment when enabling engine/admin services:
+  # engine_postgres_data:
+  # engine_redis_data:
+  # engine_data:
+  # engine_logs:
