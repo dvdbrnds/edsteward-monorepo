@@ -21,6 +21,10 @@ try {
   console.warn('[SENTRY] Failed to load @sentry/node — error tracking disabled:', (err as Error).message);
 }
 
+// Axiom OpenTelemetry — attach OTLP exporters after Sentry has set up its TracerProvider
+import { setupAxiomTelemetry, shutdownAxiomTelemetry } from './instrumentation.js';
+setupAxiomTelemetry();
+
 import express from 'express';
 import session from 'express-session';
 import connectPgSimple from 'connect-pg-simple';
@@ -651,6 +655,7 @@ async function gracefulShutdown(signal: string) {
 
   try {
     httpServer.close();
+    await shutdownAxiomTelemetry();
     const { closeDatabaseConnections } = await import('./services/database');
     await closeDatabaseConnections();
   } catch (err) {

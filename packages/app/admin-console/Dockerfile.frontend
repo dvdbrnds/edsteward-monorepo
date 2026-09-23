@@ -1,11 +1,12 @@
-FROM node:18-alpine
+# Multi-stage build: build static assets, then serve with lightweight HTTP server
+FROM node:18-alpine AS builder
 
 WORKDIR /app
 
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies
+# Install all dependencies (dev deps needed for build)
 RUN npm install
 
 # Copy source code
@@ -18,11 +19,27 @@ COPY tsconfig.node.json ./
 COPY tailwind.config.js ./
 COPY postcss.config.js ./
 
+# Build for production
+RUN npm run build
+
+# Production stage: serve static files
+FROM node:18-alpine AS production
+
+WORKDIR /app
+
+# Install a lightweight static file server
+RUN npm install -g serve@14
+
+# Copy built assets from builder
+COPY --from=builder /app/dist ./dist
+
+# Create non-root user
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nodejs -u 1001
+USER nodejs
+
 # Expose port
 EXPOSE 3001
 
-# Set environment
-ENV VITE_ADMIN_API_URL=http://localhost:4000
-
-# Start the development server
-CMD ["npm", "run", "dev"] 
+# Serve the built static files
+CMD ["serve", "-s", "dist", "-l", "3001"]
