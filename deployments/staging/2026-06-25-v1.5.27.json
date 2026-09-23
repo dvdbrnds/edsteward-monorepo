@@ -1,0 +1,11 @@
+{
+  "version": "v1.5.27",
+  "timestamp": "2026-06-25T17:47:17Z",
+  "deployer": "dvdbrnds",
+  "commitSha": "ac28b0cc",
+  "gitBranch": "main",
+  "taskDefinitionArn": "arn:aws:ecs:us-east-1:259661441422:task-definition/edsteward-multi-tenant-staging:28",
+  "previousVersion": "v1.5.26",
+  "status": "success",
+  "environment": "staging"
+}

@@ -101,7 +101,13 @@ export function registerRoutes(app: express.Application): Server {
           INSTITUTION_PRIMARY_COLOR: process.env.INSTITUTION_PRIMARY_COLOR,
           MULTI_TENANT: process.env.MULTI_TENANT,
           PORT: process.env.PORT,
-          DATABASE_URL: process.env.DATABASE_URL ? '[HIDDEN]' : undefined
+          DATABASE_URL: process.env.DATABASE_URL ? '[SET]' : undefined,
+          SENTRY_DSN: process.env.SENTRY_DSN ? '[SET]' : undefined,
+          AXIOM_API_TOKEN: process.env.AXIOM_API_TOKEN ? '[SET]' : undefined,
+          AXIOM_DATASET: process.env.AXIOM_DATASET || undefined,
+          OTEL_SERVICE_NAME: process.env.OTEL_SERVICE_NAME || undefined,
+          SESSION_SECRET: process.env.SESSION_SECRET ? '[SET]' : undefined,
+          BASE_URL: process.env.BASE_URL || undefined,
         },
         timestamp: new Date().toISOString()
       });

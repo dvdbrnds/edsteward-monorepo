@@ -1,0 +1,6792 @@
+[
+  {
+    "regKey": "CA-001",
+    "taskId": 2877,
+    "title": "Privacy Notice",
+    "oldRole": "IT Security Officer",
+    "newRole": "Privacy Officer"
+  },
+  {
+    "regKey": "CA-001",
+    "taskId": 2878,
+    "title": "Consumer Rights",
+    "oldRole": "IT Security Officer",
+    "newRole": "Privacy Officer"
+  },
+  {
+    "regKey": "CA-001",
+    "taskId": 2879,
+    "title": "Do Not Sell",
+    "oldRole": "IT Security Officer",
+    "newRole": "Privacy Officer"
+  },
+  {
+    "regKey": "NJ-001",
+    "taskId": 6035,
+    "title": "Institutions must provide access to on-campus and off-campus mental health counseling services at no...",
+    "oldRole": "Clery Compliance Officer",
+    "newRole": "Dean of Students"
+  },
+  {
+    "regKey": "NJ-001",
+    "taskId": 6036,
+    "title": "Institutions cannot compel victims to participate in criminal proceedings, though they must inform v...",
+    "oldRole": "Clery Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "NJ-001",
+    "taskId": 6037,
+    "title": "Institutions must establish clear timelines for resolving sexual assault complaints, typically withi...",
+    "oldRole": "Clery Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "NJ-002",
+    "taskId": 5963,
+    "title": "Institutional Eligibility and Operational Standards",
+    "oldRole": "President",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "NJ-002",
+    "taskId": 5964,
+    "title": "Demonstrate two years minimum operational stability",
+    "oldRole": "President",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "NJ-002",
+    "taskId": 5965,
+    "title": "Ensure 60% of faculty hold terminal degrees",
+    "oldRole": "President",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "NJ-002",
+    "taskId": 5966,
+    "title": "Establish adequate physical facilities",
+    "oldRole": "President",
+    "newRole": "Facilities Director"
+  },
+  {
+    "regKey": "NJ-002",
+    "taskId": 5967,
+    "title": "Demonstrate financial viability through audited statements",
+    "oldRole": "President",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "NJ-002",
+    "taskId": 5973,
+    "title": "Academic Program Standards",
+    "oldRole": "Registrar",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "NJ-002",
+    "taskId": 5976,
+    "title": "Define clear learning outcomes for all programs",
+    "oldRole": "Registrar",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "NJ-002",
+    "taskId": 5977,
+    "title": "Implement continuous improvement processes",
+    "oldRole": "Registrar",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "NJ-002",
+    "taskId": 5978,
+    "title": "Student Support Services",
+    "oldRole": "Dean of Students",
+    "newRole": "VP Student Affairs"
+  },
+  {
+    "regKey": "NJ-002",
+    "taskId": 5979,
+    "title": "Provide comprehensive academic advising services",
+    "oldRole": "Dean of Students",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "NJ-002",
+    "taskId": 5981,
+    "title": "Maintain compliant student records management",
+    "oldRole": "Dean of Students",
+    "newRole": "Registrar"
+  },
+  {
+    "regKey": "NJ-002",
+    "taskId": 5984,
+    "title": "Maintain transparent tuition refund policies",
+    "oldRole": "CFO",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "NJ-002",
+    "taskId": 5990,
+    "title": "Public Disclosure and Transparency",
+    "oldRole": "Registrar",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "NJ-002",
+    "taskId": 5991,
+    "title": "Publish institutional catalogs and outcome data",
+    "oldRole": "Registrar",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "NJ-002",
+    "taskId": 5992,
+    "title": "Disclose program costs and completion rates",
+    "oldRole": "Registrar",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "NJ-002",
+    "taskId": 5993,
+    "title": "Maintain current accreditation status disclosure",
+    "oldRole": "Registrar",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "NJ-003",
+    "taskId": 4559,
+    "title": "Anti-Hazing Policy Development and Distribution",
+    "oldRole": "Dean of Students",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "NJ-003",
+    "taskId": 4560,
+    "title": "Develop comprehensive anti-hazing policy",
+    "oldRole": "Dean of Students",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "NJ-003",
+    "taskId": 4561,
+    "title": "Define hazing activities and prohibited conduct",
+    "oldRole": "Dean of Students",
+    "newRole": "General Counsel"
+  },
+  {
+    "regKey": "NJ-003",
+    "taskId": 4563,
+    "title": "Distribute policies to all stakeholders",
+    "oldRole": "Dean of Students",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "NJ-003",
+    "taskId": 4564,
+    "title": "Hazing Prevention Education and Training Programs",
+    "oldRole": "Dean of Students",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "NJ-003",
+    "taskId": 4568,
+    "title": "Train faculty and staff on recognition and reporting",
+    "oldRole": "Dean of Students",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "NJ-003",
+    "taskId": 4569,
+    "title": "Incident Reporting and Investigation Procedures",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "NJ-003",
+    "taskId": 4570,
+    "title": "Establish anonymous reporting mechanisms",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "NJ-003",
+    "taskId": 4571,
+    "title": "Develop investigation protocols",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "NJ-003",
+    "taskId": 4572,
+    "title": "Implement immediate response procedures",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "Campus Police Chief"
+  },
+  {
+    "regKey": "NJ-003",
+    "taskId": 4573,
+    "title": "Coordinate with law enforcement",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "Campus Police Chief"
+  },
+  {
+    "regKey": "NJ-003",
+    "taskId": 4576,
+    "title": "Track disciplinary actions and sanctions",
+    "oldRole": "Clery Compliance Officer",
+    "newRole": "Dean of Students"
+  },
+  {
+    "regKey": "NJ-003",
+    "taskId": 4582,
+    "title": "Conduct regular compliance audits",
+    "oldRole": "Dean of Students",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "NJ-003",
+    "taskId": 4584,
+    "title": "Whistleblower Protection and Retaliation Prevention",
+    "oldRole": "HR Director",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "NJ-003",
+    "taskId": 4585,
+    "title": "Establish whistleblower protection policies",
+    "oldRole": "HR Director",
+    "newRole": "General Counsel"
+  },
+  {
+    "regKey": "NJ-003",
+    "taskId": 4586,
+    "title": "Monitor for retaliation against reporters",
+    "oldRole": "HR Director",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "NJ-003",
+    "taskId": 4587,
+    "title": "Educate community on reporting protections",
+    "oldRole": "HR Director",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "NJ-003",
+    "taskId": 4588,
+    "title": "Off-Campus Activity Monitoring and Enforcement",
+    "oldRole": "Dean of Students",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "NJ-003",
+    "taskId": 4589,
+    "title": "Extend policy coverage to off-campus events",
+    "oldRole": "Dean of Students",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "NJ-003",
+    "taskId": 4590,
+    "title": "Monitor social media and digital communications",
+    "oldRole": "Dean of Students",
+    "newRole": "Campus Police Chief"
+  },
+  {
+    "regKey": "NJ-003",
+    "taskId": 4591,
+    "title": "Coordinate with local law enforcement",
+    "oldRole": "Dean of Students",
+    "newRole": "Campus Police Chief"
+  },
+  {
+    "regKey": "NJ-003",
+    "taskId": 4593,
+    "title": "Policy Review and Legal Compliance Updates",
+    "oldRole": "General Counsel",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "NJ-003",
+    "taskId": 4594,
+    "title": "Conduct annual policy effectiveness review",
+    "oldRole": "General Counsel",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "NJ-003",
+    "taskId": 4596,
+    "title": "Benchmark against peer institutions",
+    "oldRole": "General Counsel",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "NJ-004",
+    "taskId": 4600,
+    "title": "Legal Review of ASR",
+    "oldRole": "Clery Compliance Officer",
+    "newRole": "General Counsel"
+  },
+  {
+    "regKey": "NJ-004",
+    "taskId": 4609,
+    "title": "Timely Warning Notifications",
+    "oldRole": "Emergency Management Director",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "NJ-004",
+    "taskId": 4610,
+    "title": "Assess Threat Level",
+    "oldRole": "Emergency Management Director",
+    "newRole": "Campus Police Chief"
+  },
+  {
+    "regKey": "NJ-004",
+    "taskId": 4611,
+    "title": "Draft Warning Content",
+    "oldRole": "Emergency Management Director",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "NJ-004",
+    "taskId": 4612,
+    "title": "Distribute Warning",
+    "oldRole": "Emergency Management Director",
+    "newRole": "Campus Police Chief"
+  },
+  {
+    "regKey": "NJ-004",
+    "taskId": 4617,
+    "title": "Missing Student Notification Policy",
+    "oldRole": "Dean of Students",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "NJ-004",
+    "taskId": 4619,
+    "title": "Establish Investigation Procedures",
+    "oldRole": "Dean of Students",
+    "newRole": "Campus Police Chief"
+  },
+  {
+    "regKey": "NJ-004",
+    "taskId": 4626,
+    "title": "Conduct CSA Training",
+    "oldRole": "Clery Compliance Officer",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "NJ-004",
+    "taskId": 4628,
+    "title": "VAWA Compliance (Violence Against Women Act)",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "NJ-004",
+    "taskId": 4629,
+    "title": "Establish Written Procedures",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "NJ-005",
+    "taskId": 5882,
+    "title": "Confirm enrollment in approved degree or certificate program",
+    "oldRole": "Financial Aid Director",
+    "newRole": "Registrar"
+  },
+  {
+    "regKey": "NJ-005",
+    "taskId": 5894,
+    "title": "Collect overpayments or report institutional liability",
+    "oldRole": "Financial Aid Director",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "NJ-005",
+    "taskId": 5895,
+    "title": "Record Retention and Documentation Management",
+    "oldRole": "Registrar",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "NJ-005",
+    "taskId": 5896,
+    "title": "Maintain TAG recipient records for five years",
+    "oldRole": "Registrar",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "NJ-005",
+    "taskId": 5897,
+    "title": "Store required documentation electronically with security measures",
+    "oldRole": "Registrar",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "NJ-005",
+    "taskId": 5898,
+    "title": "Ensure records accessibility for state audits",
+    "oldRole": "Registrar",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "NJ-005",
+    "taskId": 5899,
+    "title": "Document professional judgment decisions",
+    "oldRole": "Registrar",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "NJ-005",
+    "taskId": 5906,
+    "title": "Provide staff training on updated procedures",
+    "oldRole": "Financial Aid Director",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "NJ-005",
+    "taskId": 5913,
+    "title": "Maintain current state approval status",
+    "oldRole": "Financial Aid Director",
+    "newRole": "Admissions Director"
+  },
+  {
+    "regKey": "NJ-006",
+    "taskId": 5916,
+    "title": "These officials must complete required training programs and maintain current certification through ...",
+    "oldRole": "Financial Aid Director",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "NJ-006",
+    "taskId": 5922,
+    "title": "These procedures must provide due process protections, including written notification of adverse dec...",
+    "oldRole": "Financial Aid Director",
+    "newRole": "General Counsel"
+  },
+  {
+    "regKey": "NJ-006",
+    "taskId": 5923,
+    "title": "Institutions must participate in statewide data collection efforts and submit required reports to th...",
+    "oldRole": "Financial Aid Director",
+    "newRole": "Institutional Research Director"
+  },
+  {
+    "regKey": "PA-001",
+    "taskId": 3186,
+    "title": "assessment",
+    "oldRole": "VP Academic Affairs",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "PA-001",
+    "taskId": 3187,
+    "title": "curriculum",
+    "oldRole": "VP Academic Affairs",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "PA-001",
+    "taskId": 3188,
+    "title": "documentation",
+    "oldRole": "VP Academic Affairs",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "PA-001",
+    "taskId": 3189,
+    "title": "governance",
+    "oldRole": "VP Academic Affairs",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "PA-001",
+    "taskId": 3190,
+    "title": "notification",
+    "oldRole": "VP Academic Affairs",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "PA-001",
+    "taskId": 3191,
+    "title": "policy",
+    "oldRole": "VP Academic Affairs",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "PA-001",
+    "taskId": 3192,
+    "title": "response",
+    "oldRole": "VP Academic Affairs",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "PA-001",
+    "taskId": 3193,
+    "title": "training",
+    "oldRole": "VP Academic Affairs",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "PA-001",
+    "taskId": 3691,
+    "title": "Conduct Required Pennsylvania Sexual Violence Training",
+    "oldRole": "Training Coordinator",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "PA-001",
+    "taskId": 1866,
+    "title": "Define Curriculum Standards",
+    "oldRole": "VP Academic Affairs",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "PA-001",
+    "taskId": 1867,
+    "title": "Parent/Guardian Notification Policy",
+    "oldRole": "VP Student Affairs",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "PA-001",
+    "taskId": 1868,
+    "title": "Opt-Out Procedures",
+    "oldRole": "VP Student Affairs",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "PA-001",
+    "taskId": 1869,
+    "title": "Implement Evidence-Based Curriculum",
+    "oldRole": "VP Academic Affairs",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "PA-001",
+    "taskId": 1870,
+    "title": "Age-Appropriate Content Development",
+    "oldRole": "VP Academic Affairs",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "PA-001",
+    "taskId": 1871,
+    "title": "Consent Education Module",
+    "oldRole": "VP Academic Affairs",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "PA-001",
+    "taskId": 1872,
+    "title": "Bystander Intervention Training",
+    "oldRole": "VP Academic Affairs",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "PA-001",
+    "taskId": 1873,
+    "title": "Resource Information Integration",
+    "oldRole": "VP Academic Affairs",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "PA-001",
+    "taskId": 1874,
+    "title": "Train Prevention Educators",
+    "oldRole": "HR Director",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "PA-001",
+    "taskId": 1875,
+    "title": "Trauma-Informed Approach Training",
+    "oldRole": "HR Director",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "PA-001",
+    "taskId": 1876,
+    "title": "Annual Instructor Refresher",
+    "oldRole": "HR Director",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "PA-001",
+    "taskId": 1877,
+    "title": "New Student Orientation Integration",
+    "oldRole": "VP Student Affairs",
+    "newRole": "Dean of Students"
+  },
+  {
+    "regKey": "PA-001",
+    "taskId": 1878,
+    "title": "Annual Program Notice",
+    "oldRole": "VP Student Affairs",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "PA-001",
+    "taskId": 1880,
+    "title": "Curriculum Content Disclosure",
+    "oldRole": "VP Academic Affairs",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "PA-001",
+    "taskId": 1884,
+    "title": "Community Partner Collaboration",
+    "oldRole": "VP Student Affairs",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "PA-001",
+    "taskId": 1886,
+    "title": "Annual Program Review",
+    "oldRole": "VP Academic Affairs",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "PA-001",
+    "taskId": 1887,
+    "title": "Track Program Delivery",
+    "oldRole": "VP Academic Affairs",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "PA-001",
+    "taskId": 1888,
+    "title": "Maintain Training Records",
+    "oldRole": "HR Director",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "PA-001",
+    "taskId": 1889,
+    "title": "Opt-Out Request Records",
+    "oldRole": "VP Student Affairs",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "PA-001",
+    "taskId": 1890,
+    "title": "Program Effectiveness Evaluation",
+    "oldRole": "Institutional Research Director",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "PA-001",
+    "taskId": 1891,
+    "title": "Student Learning Assessment",
+    "oldRole": "VP Academic Affairs",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "PA-002",
+    "taskId": 4876,
+    "title": "Institutions must submit audited financial statements prepared by certified public accountants, main...",
+    "oldRole": "VP Academic Affairs",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "PA-002",
+    "taskId": 4878,
+    "title": "Institutions must maintain accurate transcripts, provide clear information about program requirement...",
+    "oldRole": "VP Academic Affairs",
+    "newRole": "Registrar"
+  },
+  {
+    "regKey": "PA-002",
+    "taskId": 4881,
+    "title": "Institutions must submit audited financial statements prepared by certified public accountants, main...",
+    "oldRole": "VP Academic Affairs",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "PA-002",
+    "taskId": 4883,
+    "title": "Institutions must maintain accurate transcripts, provide clear information about program requirement...",
+    "oldRole": "VP Academic Affairs",
+    "newRole": "Registrar"
+  },
+  {
+    "regKey": "PA-003",
+    "taskId": 4639,
+    "title": "Legal Review of ASR",
+    "oldRole": "Clery Compliance Officer",
+    "newRole": "General Counsel"
+  },
+  {
+    "regKey": "PA-003",
+    "taskId": 4648,
+    "title": "Timely Warning Notifications",
+    "oldRole": "Emergency Management Director",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "PA-003",
+    "taskId": 4649,
+    "title": "Assess Threat Level",
+    "oldRole": "Emergency Management Director",
+    "newRole": "Campus Police Chief"
+  },
+  {
+    "regKey": "PA-003",
+    "taskId": 4650,
+    "title": "Draft Warning Content",
+    "oldRole": "Emergency Management Director",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "PA-003",
+    "taskId": 4658,
+    "title": "Establish Investigation Procedures",
+    "oldRole": "Dean of Students",
+    "newRole": "Campus Police Chief"
+  },
+  {
+    "regKey": "PA-003",
+    "taskId": 4665,
+    "title": "Conduct CSA Training",
+    "oldRole": "Clery Compliance Officer",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "PA-004",
+    "taskId": 421,
+    "title": "Conduct Ethics Training",
+    "oldRole": "General Counsel",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "PA-004",
+    "taskId": 423,
+    "title": "Update Code of Conduct",
+    "oldRole": "HR Director",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "PA-005",
+    "taskId": 3591,
+    "title": "General",
+    "oldRole": "General Counsel",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "PA-005",
+    "taskId": 3858,
+    "title": "Establish Grievance/Complaint Procedures",
+    "oldRole": "General Counsel",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "PA-005",
+    "taskId": 2840,
+    "title": "English Fluency Policy",
+    "oldRole": "General Counsel",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "PA-005",
+    "taskId": 2841,
+    "title": "Complaint Process",
+    "oldRole": "General Counsel",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "PA-005",
+    "taskId": 2842,
+    "title": "Evaluation Process",
+    "oldRole": "General Counsel",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "PA-006",
+    "taskId": 3859,
+    "title": "Complete Annual Pennsylvania Graduation Rates Report",
+    "oldRole": "VP Academic Affairs",
+    "newRole": "Institutional Research Director"
+  },
+  {
+    "regKey": "PA-006",
+    "taskId": 2843,
+    "title": "Graduation Rate Calculation",
+    "oldRole": "VP Academic Affairs",
+    "newRole": "Institutional Research Director"
+  },
+  {
+    "regKey": "PA-006",
+    "taskId": 2844,
+    "title": "State Reporting",
+    "oldRole": "VP Academic Affairs",
+    "newRole": "Registrar"
+  },
+  {
+    "regKey": "PA-008",
+    "taskId": 3875,
+    "title": "Designate compliance officer",
+    "oldRole": "President",
+    "newRole": "Compliance Officer"
+  },
+  {
+    "regKey": "PA-008",
+    "taskId": 2895,
+    "title": "Refund Policy",
+    "oldRole": "Dean of Students",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "PA-055",
+    "taskId": 4225,
+    "title": "Evidence-Based Education Program (Section 2003-G)",
+    "oldRole": "Dean of Students",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "PA-055",
+    "taskId": 4226,
+    "title": "Consult with Local Rape Crisis Center",
+    "oldRole": "Dean of Students",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "PA-055",
+    "taskId": 4227,
+    "title": "Consult with Domestic Violence Program",
+    "oldRole": "Dean of Students",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "PA-055",
+    "taskId": 4228,
+    "title": "Cover All Required Topics",
+    "oldRole": "Dean of Students",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "PA-055",
+    "taskId": 4229,
+    "title": "Deliver to All Students",
+    "oldRole": "Dean of Students",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "PA-055",
+    "taskId": 4230,
+    "title": "Review PA DOE Clearinghouse Resources",
+    "oldRole": "Dean of Students",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "PA-055",
+    "taskId": 4233,
+    "title": "Incorporate into Code of Conduct",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "Dean of Students"
+  },
+  {
+    "regKey": "PA-055",
+    "taskId": 4235,
+    "title": "Follow-Up Programming (Section 2004-G)",
+    "oldRole": "Dean of Students",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "PA-055",
+    "taskId": 4236,
+    "title": "Schedule Follow-Up Program",
+    "oldRole": "Dean of Students",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "PA-055",
+    "taskId": 4237,
+    "title": "Document Attendance",
+    "oldRole": "Dean of Students",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "PA-055",
+    "taskId": 4244,
+    "title": "Negotiate MOU Terms",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "General Counsel"
+  },
+  {
+    "regKey": "PA-055",
+    "taskId": 4246,
+    "title": "Execute MOU for Each Campus",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "General Counsel"
+  },
+  {
+    "regKey": "PA-055",
+    "taskId": 4250,
+    "title": "Negotiate MOU Terms",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "General Counsel"
+  },
+  {
+    "regKey": "PA-055",
+    "taskId": 4251,
+    "title": "Execute MOU for Each Campus",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "General Counsel"
+  },
+  {
+    "regKey": "PA-HEA-DAP",
+    "taskId": 4532,
+    "title": "Drug and Alcohol Prevention Program Development",
+    "oldRole": "VP Student Affairs",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "PA-HEA-DAP",
+    "taskId": 4533,
+    "title": "Develop written standards of conduct prohibiting unlawful drug and alcohol possession, use, or distribution",
+    "oldRole": "VP Student Affairs",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "PA-HEA-DAP",
+    "taskId": 4534,
+    "title": "Establish disciplinary sanctions framework per 34 CFR § 86.300",
+    "oldRole": "VP Student Affairs",
+    "newRole": "Dean of Students"
+  },
+  {
+    "regKey": "PA-HEA-DAP",
+    "taskId": 4535,
+    "title": "Compile counseling, treatment, and rehabilitation program information",
+    "oldRole": "VP Student Affairs",
+    "newRole": "Dean of Students"
+  },
+  {
+    "regKey": "PA-HEA-DAP",
+    "taskId": 4536,
+    "title": "Ensure program coverage extends to all educational sites",
+    "oldRole": "VP Student Affairs",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "PA-HEA-DAP",
+    "taskId": 4541,
+    "title": "Specify institutional disciplinary sanctions and procedures",
+    "oldRole": "Financial Aid Director",
+    "newRole": "Dean of Students"
+  },
+  {
+    "regKey": "PA-HEA-DAP",
+    "taskId": 4542,
+    "title": "Biennial Program Review",
+    "oldRole": "Institutional Research Director",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "PA-HEA-DAP",
+    "taskId": 4543,
+    "title": "Document number of drug and alcohol-related violations on campus",
+    "oldRole": "Institutional Research Director",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "PA-HEA-DAP",
+    "taskId": 4544,
+    "title": "Record drug and alcohol-related fatalities",
+    "oldRole": "Institutional Research Director",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "PA-HEA-DAP",
+    "taskId": 4545,
+    "title": "Assess consistency of disciplinary sanction enforcement",
+    "oldRole": "Institutional Research Director",
+    "newRole": "Dean of Students"
+  },
+  {
+    "regKey": "PA-HEA-DAP",
+    "taskId": 4546,
+    "title": "Identify and implement necessary program modifications",
+    "oldRole": "Institutional Research Director",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "PA-HEA-DAP",
+    "taskId": 4550,
+    "title": "Track disciplinary actions and sanctions imposed",
+    "oldRole": "Financial Aid Director",
+    "newRole": "Dean of Students"
+  },
+  {
+    "regKey": "PA-HEA-DAP",
+    "taskId": 4551,
+    "title": "Disciplinary Enforcement Implementation",
+    "oldRole": "HR Director",
+    "newRole": "Dean of Students"
+  },
+  {
+    "regKey": "PA-HEA-DAP",
+    "taskId": 4552,
+    "title": "Implement student disciplinary procedures",
+    "oldRole": "HR Director",
+    "newRole": "Dean of Students"
+  },
+  {
+    "regKey": "PA-HEA-DAP",
+    "taskId": 4554,
+    "title": "Ensure consistent application of sanctions",
+    "oldRole": "HR Director",
+    "newRole": "Dean of Students"
+  },
+  {
+    "regKey": "PA-HEA-DAP",
+    "taskId": 4555,
+    "title": "Program Effectiveness Assessment",
+    "oldRole": "VP Student Affairs",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "PA-HEA-DAP",
+    "taskId": 4556,
+    "title": "Perform quantitative analysis of incident trends",
+    "oldRole": "VP Student Affairs",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "PA-HEA-DAP",
+    "taskId": 4557,
+    "title": "Conduct qualitative assessment of prevention program impact",
+    "oldRole": "VP Student Affairs",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "PA-HEA-DAP",
+    "taskId": 4558,
+    "title": "Review and update prevention strategies",
+    "oldRole": "VP Student Affairs",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-002",
+    "taskId": 6051,
+    "title": "Training on Anti-Retaliation Requirements",
+    "oldRole": "Training Coordinator",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-002",
+    "taskId": 6052,
+    "title": "Train Title IX personnel on retaliation identification",
+    "oldRole": "Training Coordinator",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-002",
+    "taskId": 6053,
+    "title": "Educate supervisors on retaliation prevention",
+    "oldRole": "Training Coordinator",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-002",
+    "taskId": 6054,
+    "title": "Provide campus-wide awareness training",
+    "oldRole": "Training Coordinator",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-004",
+    "taskId": 3686,
+    "title": "Establish Grievance/Complaint Procedures",
+    "oldRole": "General Counsel",
+    "newRole": "Registrar"
+  },
+  {
+    "regKey": "REG-004",
+    "taskId": 3687,
+    "title": "Provide Required Notifications ",
+    "oldRole": "IT Security Officer",
+    "newRole": "Registrar"
+  },
+  {
+    "regKey": "REG-004",
+    "taskId": 3016,
+    "title": "Disclosure Logging",
+    "oldRole": "Registrar",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-004",
+    "taskId": 3017,
+    "title": "Log All Disclosures",
+    "oldRole": "Registrar",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-004",
+    "taskId": 3019,
+    "title": "Staff Training on FERPA",
+    "oldRole": "HR Director",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-004",
+    "taskId": 3020,
+    "title": "Identify Staff Needing Training",
+    "oldRole": "HR Director",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-004",
+    "taskId": 3021,
+    "title": "Conduct FERPA Training",
+    "oldRole": "HR Director",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-004",
+    "taskId": 3022,
+    "title": "Document Training Completion",
+    "oldRole": "HR Director",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-007",
+    "taskId": 3194,
+    "title": "Communication",
+    "oldRole": "Campus Police Chief",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-007",
+    "taskId": 3195,
+    "title": "Coordination",
+    "oldRole": "Campus Police Chief",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-007",
+    "taskId": 3196,
+    "title": "Policy",
+    "oldRole": "Campus Police Chief",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-007",
+    "taskId": 3197,
+    "title": "Recordkeeping",
+    "oldRole": "Campus Police Chief",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-007",
+    "taskId": 3198,
+    "title": "Reporting",
+    "oldRole": "Campus Police Chief",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-007",
+    "taskId": 3199,
+    "title": "Verification",
+    "oldRole": "Campus Police Chief",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-007",
+    "taskId": 3692,
+    "title": "Complete Annual Campus Sex Crimes Report",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "REG-007",
+    "taskId": 1931,
+    "title": "Sex Offender Registry Policy Development",
+    "oldRole": "Campus Police Chief",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-007",
+    "taskId": 1939,
+    "title": "Student Notification of Registry Access",
+    "oldRole": "VP Student Affairs",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-007",
+    "taskId": 1947,
+    "title": "Sex Offender Information Records",
+    "oldRole": "Campus Police Chief",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "REG-007",
+    "taskId": 1932,
+    "title": "Community Notification Procedures",
+    "oldRole": "Campus Police Chief",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-007",
+    "taskId": 1936,
+    "title": "State Registry Link Publication",
+    "oldRole": "Clery Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-007",
+    "taskId": 1948,
+    "title": "Notification Records",
+    "oldRole": "Campus Police Chief",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "REG-007",
+    "taskId": 1933,
+    "title": "Information Disclosure Policy",
+    "oldRole": "General Counsel",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-007",
+    "taskId": 1941,
+    "title": "Website Publication of Registry Information",
+    "oldRole": "Communications Director",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-007",
+    "taskId": 1934,
+    "title": "FERPA Compliance Integration",
+    "oldRole": "Registrar",
+    "newRole": "Privacy Officer"
+  },
+  {
+    "regKey": "REG-007",
+    "taskId": 1938,
+    "title": "Documentation of Compliance Efforts",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "REG-007",
+    "taskId": 1942,
+    "title": "Emergency Notification Procedures",
+    "oldRole": "Campus Police Chief",
+    "newRole": "Emergency Management Director"
+  },
+  {
+    "regKey": "REG-007",
+    "taskId": 1946,
+    "title": "Multi-campus Coordination",
+    "oldRole": "Campus Police Chief",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-009",
+    "taskId": 3208,
+    "title": "Emergency Planning",
+    "oldRole": "Title VI Coordinator",
+    "newRole": "Emergency Management Director"
+  },
+  {
+    "regKey": "REG-009",
+    "taskId": 3695,
+    "title": "Conduct Required Title VI Training",
+    "oldRole": "Training Coordinator",
+    "newRole": "Title VI Coordinator"
+  },
+  {
+    "regKey": "REG-009",
+    "taskId": 3696,
+    "title": "Establish Grievance/Complaint Procedures",
+    "oldRole": "General Counsel",
+    "newRole": "Title VI Coordinator"
+  },
+  {
+    "regKey": "REG-009",
+    "taskId": 3697,
+    "title": "Conduct Title VI Self-Evaluation/Audit",
+    "oldRole": "Clery Compliance Officer",
+    "newRole": "Title VI Coordinator"
+  },
+  {
+    "regKey": "REG-009",
+    "taskId": 1957,
+    "title": "Translate Vital Documents",
+    "oldRole": "Communications Director",
+    "newRole": "Title VI Coordinator"
+  },
+  {
+    "regKey": "REG-009",
+    "taskId": 1968,
+    "title": "Staff LEP Awareness Training",
+    "oldRole": "HR Director",
+    "newRole": "Title VI Coordinator"
+  },
+  {
+    "regKey": "REG-009",
+    "taskId": 1954,
+    "title": "Identify LEP Populations Served",
+    "oldRole": "Institutional Research Director",
+    "newRole": "Title VI Coordinator"
+  },
+  {
+    "regKey": "REG-009",
+    "taskId": 1962,
+    "title": "Train Bilingual Staff",
+    "oldRole": "HR Director",
+    "newRole": "Title VI Coordinator"
+  },
+  {
+    "regKey": "REG-009",
+    "taskId": 1969,
+    "title": "Emergency Responder LEP Training",
+    "oldRole": "Campus Police Chief",
+    "newRole": "Emergency Management Director"
+  },
+  {
+    "regKey": "REG-009",
+    "taskId": 1959,
+    "title": "Website Multilingual Content",
+    "oldRole": "Communications Director",
+    "newRole": "Title VI Coordinator"
+  },
+  {
+    "regKey": "REG-009",
+    "taskId": 1966,
+    "title": "LEP Community Outreach",
+    "oldRole": "VP Student Affairs",
+    "newRole": "Title VI Coordinator"
+  },
+  {
+    "regKey": "REG-009",
+    "taskId": 1970,
+    "title": "Front-Line Staff Training",
+    "oldRole": "VP Student Affairs",
+    "newRole": "Title VI Coordinator"
+  },
+  {
+    "regKey": "REG-009",
+    "taskId": 1960,
+    "title": "Signage and Wayfinding",
+    "oldRole": "Facilities Director",
+    "newRole": "Title VI Coordinator"
+  },
+  {
+    "regKey": "REG-009",
+    "taskId": 1974,
+    "title": "Title VI Notice Posting",
+    "oldRole": "Communications Director",
+    "newRole": "Title VI Coordinator"
+  },
+  {
+    "regKey": "REG-010",
+    "taskId": 3219,
+    "title": "Training",
+    "oldRole": "HR Director",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-010",
+    "taskId": 3698,
+    "title": "Establish Grievance/Complaint Procedures",
+    "oldRole": "General Counsel",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-010",
+    "taskId": 3699,
+    "title": "Adopt Required Title VI Policy",
+    "oldRole": "General Counsel",
+    "newRole": "Title VI Coordinator"
+  },
+  {
+    "regKey": "REG-010",
+    "taskId": 3700,
+    "title": "Conduct Title VI Self-Evaluation/Audit",
+    "oldRole": "HR Director",
+    "newRole": "Title VI Coordinator"
+  },
+  {
+    "regKey": "REG-010",
+    "taskId": 2101,
+    "title": "Supervisor Anti-Discrimination Training",
+    "oldRole": "HR Director",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-010",
+    "taskId": 2102,
+    "title": "Employee Harassment Prevention Training",
+    "oldRole": "HR Director",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-010",
+    "taskId": 2103,
+    "title": "Hiring Manager Training",
+    "oldRole": "HR Director",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-010",
+    "taskId": 2111,
+    "title": "Training Records",
+    "oldRole": "HR Director",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-010",
+    "taskId": 2104,
+    "title": "Investigator Training",
+    "oldRole": "HR Director",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-011",
+    "taskId": 3222,
+    "title": "Whistleblower Protection",
+    "oldRole": "CFO",
+    "newRole": "General Counsel"
+  },
+  {
+    "regKey": "REG-011",
+    "taskId": 3701,
+    "title": "Conduct False Claims Act Self-Evaluation/Audit",
+    "oldRole": "CFO",
+    "newRole": "Internal Auditor"
+  },
+  {
+    "regKey": "REG-011",
+    "taskId": 2112,
+    "title": "Maintain Whistleblower Anti-Retaliation Policy",
+    "oldRole": "General Counsel",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-011",
+    "taskId": 2114,
+    "title": "False Claims Awareness Training",
+    "oldRole": "CFO",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-011",
+    "taskId": 2113,
+    "title": "Whistleblower Reporting Channel",
+    "oldRole": "CFO",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-017",
+    "taskId": 4449,
+    "title": "Provide auxiliary aids",
+    "oldRole": "Facilities Director",
+    "newRole": "Disability Services Coordinator"
+  },
+  {
+    "regKey": "REG-017",
+    "taskId": 4452,
+    "title": "Provide accessible course materials",
+    "oldRole": "Disability Services Coordinator",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "REG-017",
+    "taskId": 4453,
+    "title": "Train faculty on accommodations",
+    "oldRole": "Disability Services Coordinator",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-017",
+    "taskId": 4454,
+    "title": "Maintain confidentiality",
+    "oldRole": "Disability Services Coordinator",
+    "newRole": "Privacy Officer"
+  },
+  {
+    "regKey": "REG-017",
+    "taskId": 4455,
+    "title": "Digital Accessibility and Technology Compliance",
+    "oldRole": "IT Director",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-017",
+    "taskId": 4456,
+    "title": "Implement WCAG 2.1 standards",
+    "oldRole": "IT Director",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-017",
+    "taskId": 4457,
+    "title": "Procure accessible technology",
+    "oldRole": "IT Director",
+    "newRole": "Procurement Director"
+  },
+  {
+    "regKey": "REG-017",
+    "taskId": 4458,
+    "title": "Provide assistive technology",
+    "oldRole": "IT Director",
+    "newRole": "Disability Services Coordinator"
+  },
+  {
+    "regKey": "REG-017",
+    "taskId": 4459,
+    "title": "Test digital accessibility",
+    "oldRole": "IT Director",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-017",
+    "taskId": 4464,
+    "title": "Train supervisors",
+    "oldRole": "HR Director",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-017",
+    "taskId": 4465,
+    "title": "Public Notification and Policy Development",
+    "oldRole": "General Counsel",
+    "newRole": "Compliance Officer"
+  },
+  {
+    "regKey": "REG-017",
+    "taskId": 4466,
+    "title": "Publish nondiscrimination notice",
+    "oldRole": "General Counsel",
+    "newRole": "Communications Director"
+  },
+  {
+    "regKey": "REG-017",
+    "taskId": 4467,
+    "title": "Develop disability policies",
+    "oldRole": "General Counsel",
+    "newRole": "Compliance Officer"
+  },
+  {
+    "regKey": "REG-017",
+    "taskId": 4468,
+    "title": "Update emergency procedures",
+    "oldRole": "General Counsel",
+    "newRole": "Emergency Management Director"
+  },
+  {
+    "regKey": "REG-017",
+    "taskId": 4469,
+    "title": "Review policy compliance",
+    "oldRole": "General Counsel",
+    "newRole": "Compliance Officer"
+  },
+  {
+    "regKey": "REG-018",
+    "taskId": 4470,
+    "title": "Section 504 Compliance Program Development",
+    "oldRole": "Disability Services Coordinator",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-018",
+    "taskId": 4471,
+    "title": "Develop Section 504 nondiscrimination policy",
+    "oldRole": "Disability Services Coordinator",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-018",
+    "taskId": 4472,
+    "title": "Establish grievance procedures",
+    "oldRole": "Disability Services Coordinator",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-018",
+    "taskId": 4473,
+    "title": "Designate Section 504 Coordinator",
+    "oldRole": "Disability Services Coordinator",
+    "newRole": "President"
+  },
+  {
+    "regKey": "REG-018",
+    "taskId": 4474,
+    "title": "Conduct annual policy review",
+    "oldRole": "Disability Services Coordinator",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-018",
+    "taskId": 4475,
+    "title": "Accessibility Assessment and Remediation",
+    "oldRole": "Facilities Director",
+    "newRole": "Disability Services Coordinator"
+  },
+  {
+    "regKey": "REG-018",
+    "taskId": 4478,
+    "title": "Ensure program accessibility",
+    "oldRole": "Facilities Director",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-018",
+    "taskId": 4479,
+    "title": "Monitor ongoing compliance",
+    "oldRole": "Facilities Director",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-018",
+    "taskId": 4485,
+    "title": "Employee Training and Awareness",
+    "oldRole": "HR Director",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-018",
+    "taskId": 4486,
+    "title": "Conduct mandatory Section 504 training",
+    "oldRole": "HR Director",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-018",
+    "taskId": 4487,
+    "title": "Provide specialized training for key personnel",
+    "oldRole": "HR Director",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-018",
+    "taskId": 4488,
+    "title": "Develop training materials and resources",
+    "oldRole": "HR Director",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-018",
+    "taskId": 4489,
+    "title": "Document training completion",
+    "oldRole": "HR Director",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-018",
+    "taskId": 4490,
+    "title": "Complaint Investigation and Resolution",
+    "oldRole": "Disability Services Coordinator",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-018",
+    "taskId": 4491,
+    "title": "Investigate discrimination complaints",
+    "oldRole": "Disability Services Coordinator",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-018",
+    "taskId": 4492,
+    "title": "Implement corrective actions",
+    "oldRole": "Disability Services Coordinator",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-018",
+    "taskId": 4493,
+    "title": "Maintain complaint records",
+    "oldRole": "Disability Services Coordinator",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-018",
+    "taskId": 4494,
+    "title": "Report to federal agencies",
+    "oldRole": "Disability Services Coordinator",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-018",
+    "taskId": 4495,
+    "title": "Technology and Digital Accessibility",
+    "oldRole": "IT Director",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-018",
+    "taskId": 4496,
+    "title": "Conduct website accessibility audit",
+    "oldRole": "IT Director",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-018",
+    "taskId": 4497,
+    "title": "Implement accessible technology standards",
+    "oldRole": "IT Director",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-018",
+    "taskId": 4498,
+    "title": "Provide assistive technology support",
+    "oldRole": "IT Director",
+    "newRole": "Disability Services Coordinator"
+  },
+  {
+    "regKey": "REG-018",
+    "taskId": 4499,
+    "title": "Train IT staff on accessibility",
+    "oldRole": "IT Director",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-020",
+    "taskId": 6815,
+    "title": "Higher education institutions must ensure equal access to all programs, services, and activities",
+    "oldRole": "Compliance Officer",
+    "newRole": "Disability Services Coordinator"
+  },
+  {
+    "regKey": "REG-020",
+    "taskId": 6816,
+    "title": "Universities must provide auxiliary aids and services under 42 U",
+    "oldRole": "Compliance Officer",
+    "newRole": "Disability Services Coordinator"
+  },
+  {
+    "regKey": "REG-020",
+    "taskId": 6817,
+    "title": "130(b)(7)\n- Provide individualized assessments for accommodation requests within reasonable timefram...",
+    "oldRole": "Compliance Officer",
+    "newRole": "Disability Services Coordinator"
+  },
+  {
+    "regKey": "REG-022",
+    "taskId": 3247,
+    "title": "Contingency Planning",
+    "oldRole": "Privacy Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-022",
+    "taskId": 3250,
+    "title": "Physical Safeguards",
+    "oldRole": "Privacy Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-022",
+    "taskId": 3252,
+    "title": "Security Rule",
+    "oldRole": "Privacy Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-022",
+    "taskId": 3253,
+    "title": "Training & Awareness",
+    "oldRole": "Privacy Officer",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-022",
+    "taskId": 3711,
+    "title": "Designate Privacy Officer",
+    "oldRole": "President",
+    "newRole": "Privacy Officer"
+  },
+  {
+    "regKey": "REG-022",
+    "taskId": 2041,
+    "title": "Privacy Officer Designation",
+    "oldRole": "President",
+    "newRole": "Privacy Officer"
+  },
+  {
+    "regKey": "REG-022",
+    "taskId": 2047,
+    "title": "Security Officer Designation",
+    "oldRole": "President",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-022",
+    "taskId": 2062,
+    "title": "Workforce Training Program",
+    "oldRole": "Privacy Officer",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-022",
+    "taskId": 2071,
+    "title": "Facility Access Controls",
+    "oldRole": "Facilities Director",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-022",
+    "taskId": 2077,
+    "title": "Data Backup Plan",
+    "oldRole": "IT Director",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-022",
+    "taskId": 2048,
+    "title": "Risk Analysis",
+    "oldRole": "Campus Police Chief",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-022",
+    "taskId": 2063,
+    "title": "New Employee Training",
+    "oldRole": "HR Director",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-022",
+    "taskId": 2067,
+    "title": "Sanction Policy",
+    "oldRole": "HR Director",
+    "newRole": "Privacy Officer"
+  },
+  {
+    "regKey": "REG-022",
+    "taskId": 2072,
+    "title": "Device and Media Controls",
+    "oldRole": "IT Director",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-022",
+    "taskId": 2075,
+    "title": "Treatment Records Handling",
+    "oldRole": "Dean of Students",
+    "newRole": "Privacy Officer"
+  },
+  {
+    "regKey": "REG-022",
+    "taskId": 2078,
+    "title": "Disaster Recovery Plan",
+    "oldRole": "IT Director",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-022",
+    "taskId": 2049,
+    "title": "Risk Management Plan",
+    "oldRole": "Campus Police Chief",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-022",
+    "taskId": 2064,
+    "title": "Annual Refresher Training",
+    "oldRole": "Privacy Officer",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-022",
+    "taskId": 2073,
+    "title": "Workstation Physical Security",
+    "oldRole": "IT Director",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-022",
+    "taskId": 2079,
+    "title": "Emergency Mode Operations",
+    "oldRole": "IT Director",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-022",
+    "taskId": 2050,
+    "title": "Access Controls",
+    "oldRole": "IT Director",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-022",
+    "taskId": 2065,
+    "title": "Security Awareness Program",
+    "oldRole": "Campus Police Chief",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-022",
+    "taskId": 2045,
+    "title": "Patient Rights Procedures",
+    "oldRole": "Dean of Students",
+    "newRole": "Privacy Officer"
+  },
+  {
+    "regKey": "REG-022",
+    "taskId": 2051,
+    "title": "Audit Controls",
+    "oldRole": "IT Director",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-022",
+    "taskId": 2052,
+    "title": "Transmission Security",
+    "oldRole": "IT Director",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-022",
+    "taskId": 2053,
+    "title": "Workstation Security",
+    "oldRole": "IT Director",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-023",
+    "taskId": 2666,
+    "title": "Standards of Conduct",
+    "oldRole": "Clery Compliance Officer",
+    "newRole": "Dean of Students"
+  },
+  {
+    "regKey": "REG-023",
+    "taskId": 2667,
+    "title": "Legal Sanctions Description",
+    "oldRole": "Clery Compliance Officer",
+    "newRole": "General Counsel"
+  },
+  {
+    "regKey": "REG-023",
+    "taskId": 2668,
+    "title": "Health Risks Description",
+    "oldRole": "Clery Compliance Officer",
+    "newRole": "VP Student Affairs"
+  },
+  {
+    "regKey": "REG-023",
+    "taskId": 2669,
+    "title": "Available Programs",
+    "oldRole": "Clery Compliance Officer",
+    "newRole": "Dean of Students"
+  },
+  {
+    "regKey": "REG-027",
+    "taskId": 4675,
+    "title": "Privacy Notice Requirements",
+    "oldRole": "Privacy Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-027",
+    "taskId": 4684,
+    "title": "Respond to parental access requests",
+    "oldRole": "IT Security Officer",
+    "newRole": "Privacy Officer"
+  },
+  {
+    "regKey": "REG-027",
+    "taskId": 4694,
+    "title": "Coordinate with FERPA compliance",
+    "oldRole": "IT Security Officer",
+    "newRole": "Registrar"
+  },
+  {
+    "regKey": "REG-027",
+    "taskId": 4695,
+    "title": "Staff Training and Awareness",
+    "oldRole": "Training Coordinator",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-027",
+    "taskId": 4696,
+    "title": "Train IT and web development staff",
+    "oldRole": "Training Coordinator",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-027",
+    "taskId": 4699,
+    "title": "Legal and Policy Coordination",
+    "oldRole": "General Counsel",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-027",
+    "taskId": 4701,
+    "title": "Implement privacy-by-design principles",
+    "oldRole": "General Counsel",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-027",
+    "taskId": 4702,
+    "title": "Establish clear audience distinction policies",
+    "oldRole": "General Counsel",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-028",
+    "taskId": 4704,
+    "title": "Draft written policies governing email and network monitoring per 18 U.S.C. § 2511",
+    "oldRole": "IT Security Officer",
+    "newRole": "General Counsel"
+  },
+  {
+    "regKey": "REG-028",
+    "taskId": 4705,
+    "title": "Establish consent procedures for surveillance activities",
+    "oldRole": "IT Security Officer",
+    "newRole": "General Counsel"
+  },
+  {
+    "regKey": "REG-028",
+    "taskId": 4712,
+    "title": "Document SCA disclosure restrictions compliance",
+    "oldRole": "IT Security Officer",
+    "newRole": "General Counsel"
+  },
+  {
+    "regKey": "REG-028",
+    "taskId": 4715,
+    "title": "Implement warrant requirement verification for recent communications",
+    "oldRole": "General Counsel",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-028",
+    "taskId": 4717,
+    "title": "Maintain disclosure request records",
+    "oldRole": "General Counsel",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-028",
+    "taskId": 4718,
+    "title": "Staff Training and Awareness Program",
+    "oldRole": "HR Director",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-028",
+    "taskId": 4719,
+    "title": "Train IT staff on SCA disclosure restrictions",
+    "oldRole": "HR Director",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-028",
+    "taskId": 4720,
+    "title": "Educate administrators on consent exception requirements",
+    "oldRole": "HR Director",
+    "newRole": "General Counsel"
+  },
+  {
+    "regKey": "REG-028",
+    "taskId": 4721,
+    "title": "Conduct legal process recognition training",
+    "oldRole": "HR Director",
+    "newRole": "General Counsel"
+  },
+  {
+    "regKey": "REG-028",
+    "taskId": 4722,
+    "title": "Document training completion and competency",
+    "oldRole": "HR Director",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-028",
+    "taskId": 4725,
+    "title": "Update vendor contracts with ECPA requirements",
+    "oldRole": "IT Security Officer",
+    "newRole": "General Counsel"
+  },
+  {
+    "regKey": "REG-028",
+    "taskId": 4730,
+    "title": "Review law enforcement request handling",
+    "oldRole": "IT Security Officer",
+    "newRole": "General Counsel"
+  },
+  {
+    "regKey": "REG-028",
+    "taskId": 4732,
+    "title": "Risk Management and Violation Response",
+    "oldRole": "Internal Auditor",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-028",
+    "taskId": 4733,
+    "title": "Establish violation detection procedures",
+    "oldRole": "Internal Auditor",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-028",
+    "taskId": 4734,
+    "title": "Create incident response protocols",
+    "oldRole": "Internal Auditor",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-028",
+    "taskId": 4735,
+    "title": "Assess civil and criminal penalty exposure",
+    "oldRole": "Internal Auditor",
+    "newRole": "General Counsel"
+  },
+  {
+    "regKey": "REG-028",
+    "taskId": 4736,
+    "title": "Implement corrective action procedures",
+    "oldRole": "Internal Auditor",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-029",
+    "taskId": 3716,
+    "title": "Conduct Fair and Accurate Self-Evaluation/Audit",
+    "oldRole": "IT Security Officer",
+    "newRole": "Internal Auditor"
+  },
+  {
+    "regKey": "REG-029",
+    "taskId": 2191,
+    "title": "Program Board Approval",
+    "oldRole": "IT Security Officer",
+    "newRole": "President"
+  },
+  {
+    "regKey": "REG-029",
+    "taskId": 2193,
+    "title": "Receipt Truncation",
+    "oldRole": "IT Security Officer",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "REG-029",
+    "taskId": 2194,
+    "title": "Staff Training on Red Flags",
+    "oldRole": "IT Security Officer",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-030",
+    "taskId": 4740,
+    "title": "Designate Senior Agency Information Security Officer",
+    "oldRole": "IT Security Officer",
+    "newRole": "President"
+  },
+  {
+    "regKey": "REG-030",
+    "taskId": 4748,
+    "title": "Perform annual independent security assessments",
+    "oldRole": "IT Security Officer",
+    "newRole": "Internal Auditor"
+  },
+  {
+    "regKey": "REG-030",
+    "taskId": 4757,
+    "title": "Supply Chain Risk Management",
+    "oldRole": "Procurement Director",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-030",
+    "taskId": 4758,
+    "title": "Assess vendor security practices",
+    "oldRole": "Procurement Director",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-030",
+    "taskId": 4759,
+    "title": "Implement supply chain security controls",
+    "oldRole": "Procurement Director",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-030",
+    "taskId": 4760,
+    "title": "Monitor third-party security posture",
+    "oldRole": "Procurement Director",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-031",
+    "taskId": 4776,
+    "title": "Conduct Hearings if Needed",
+    "oldRole": "Registrar",
+    "newRole": "General Counsel"
+  },
+  {
+    "regKey": "REG-031",
+    "taskId": 4780,
+    "title": "Staff Training on FERPA",
+    "oldRole": "HR Director",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-031",
+    "taskId": 4781,
+    "title": "Identify Staff Needing Training",
+    "oldRole": "HR Director",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-031",
+    "taskId": 4782,
+    "title": "Conduct FERPA Training",
+    "oldRole": "HR Director",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-031",
+    "taskId": 4783,
+    "title": "Document Training Completion",
+    "oldRole": "HR Director",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-032",
+    "taskId": 4784,
+    "title": "Privacy Notice Requirements",
+    "oldRole": "Privacy Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-032",
+    "taskId": 4794,
+    "title": "Vendor Oversight and Third-Party Management",
+    "oldRole": "Procurement Director",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-032",
+    "taskId": 4796,
+    "title": "Monitor third-party security practices and compliance",
+    "oldRole": "Procurement Director",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-032",
+    "taskId": 4800,
+    "title": "Train staff on GLBA requirements and data handling procedures",
+    "oldRole": "IT Security Officer",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-032",
+    "taskId": 4803,
+    "title": "Customer Opt-Out Rights Management",
+    "oldRole": "Financial Aid Director",
+    "newRole": "Privacy Officer"
+  },
+  {
+    "regKey": "REG-032",
+    "taskId": 4804,
+    "title": "Implement opt-out procedures for non-essential sharing",
+    "oldRole": "Financial Aid Director",
+    "newRole": "Privacy Officer"
+  },
+  {
+    "regKey": "REG-032",
+    "taskId": 4805,
+    "title": "Process opt-out requests within required timeframes",
+    "oldRole": "Financial Aid Director",
+    "newRole": "Privacy Officer"
+  },
+  {
+    "regKey": "REG-032",
+    "taskId": 4806,
+    "title": "Maintain opt-out preference records",
+    "oldRole": "Financial Aid Director",
+    "newRole": "Privacy Officer"
+  },
+  {
+    "regKey": "REG-032",
+    "taskId": 4807,
+    "title": "FERPA Integration and Coordination",
+    "oldRole": "Registrar",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-032",
+    "taskId": 4809,
+    "title": "Establish data classification procedures",
+    "oldRole": "Registrar",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-032",
+    "taskId": 4810,
+    "title": "Train staff on integrated compliance requirements",
+    "oldRole": "Registrar",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-033",
+    "taskId": 4818,
+    "title": "Establish facility access controls",
+    "oldRole": "IT Security Officer",
+    "newRole": "Facilities Director"
+  },
+  {
+    "regKey": "REG-033",
+    "taskId": 4821,
+    "title": "Business Associate Agreement Management",
+    "oldRole": "General Counsel",
+    "newRole": "Privacy Officer"
+  },
+  {
+    "regKey": "REG-033",
+    "taskId": 4823,
+    "title": "Conduct due diligence assessments",
+    "oldRole": "General Counsel",
+    "newRole": "Privacy Officer"
+  },
+  {
+    "regKey": "REG-033",
+    "taskId": 4824,
+    "title": "Monitor business associate compliance",
+    "oldRole": "General Counsel",
+    "newRole": "Privacy Officer"
+  },
+  {
+    "regKey": "REG-033",
+    "taskId": 4826,
+    "title": "Breach Notification and Response Procedures",
+    "oldRole": "Privacy Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-033",
+    "taskId": 4827,
+    "title": "Establish incident response team",
+    "oldRole": "Privacy Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-033",
+    "taskId": 4829,
+    "title": "Implement HHS breach reporting system",
+    "oldRole": "Privacy Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-033",
+    "taskId": 4830,
+    "title": "Prepare media notification protocols",
+    "oldRole": "Privacy Officer",
+    "newRole": "Communications Director"
+  },
+  {
+    "regKey": "REG-033",
+    "taskId": 4836,
+    "title": "Student Health Services Compliance",
+    "oldRole": "Dean of Students",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-033",
+    "taskId": 4837,
+    "title": "Assess student health center PHI handling",
+    "oldRole": "Dean of Students",
+    "newRole": "Privacy Officer"
+  },
+  {
+    "regKey": "REG-033",
+    "taskId": 4838,
+    "title": "Implement counseling center safeguards",
+    "oldRole": "Dean of Students",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-033",
+    "taskId": 4839,
+    "title": "Review health research programs",
+    "oldRole": "Dean of Students",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-033",
+    "taskId": 4840,
+    "title": "Coordinate with state law requirements",
+    "oldRole": "Dean of Students",
+    "newRole": "General Counsel"
+  },
+  {
+    "regKey": "REG-033",
+    "taskId": 4841,
+    "title": "Annual Breach Reporting and Documentation",
+    "oldRole": "IT Security Officer",
+    "newRole": "Privacy Officer"
+  },
+  {
+    "regKey": "REG-033",
+    "taskId": 4842,
+    "title": "Maintain breach documentation system",
+    "oldRole": "IT Security Officer",
+    "newRole": "Privacy Officer"
+  },
+  {
+    "regKey": "REG-033",
+    "taskId": 4843,
+    "title": "Submit annual HHS summary reports",
+    "oldRole": "IT Security Officer",
+    "newRole": "Privacy Officer"
+  },
+  {
+    "regKey": "REG-033",
+    "taskId": 4844,
+    "title": "Document compliance efforts",
+    "oldRole": "IT Security Officer",
+    "newRole": "Privacy Officer"
+  },
+  {
+    "regKey": "REG-033",
+    "taskId": 4845,
+    "title": "Prepare for OCR audits",
+    "oldRole": "IT Security Officer",
+    "newRole": "Privacy Officer"
+  },
+  {
+    "regKey": "REG-034",
+    "taskId": 4846,
+    "title": "Universities must implement robust compliance programs addressing: registration requirements under 2...",
+    "oldRole": "Research Compliance Officer",
+    "newRole": "Export Control Officer"
+  },
+  {
+    "regKey": "REG-034",
+    "taskId": 4847,
+    "title": "Universities must maintain current awareness of USML modifications and categorical exemption updates...",
+    "oldRole": "Research Compliance Officer",
+    "newRole": "Export Control Officer"
+  },
+  {
+    "regKey": "REG-035",
+    "taskId": 4857,
+    "title": "Contract Documentation and Provisions",
+    "oldRole": "General Counsel",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-035",
+    "taskId": 4861,
+    "title": "Maintain current contract copies for Department review",
+    "oldRole": "General Counsel",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-035",
+    "taskId": 4867,
+    "title": "Institutional Liability Management",
+    "oldRole": "CFO",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-035",
+    "taskId": 4868,
+    "title": "Maintain ultimate Title IV compliance responsibility",
+    "oldRole": "CFO",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-035",
+    "taskId": 4870,
+    "title": "Develop compliance violation response protocols",
+    "oldRole": "CFO",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-035",
+    "taskId": 4871,
+    "title": "Record Keeping and Documentation Management",
+    "oldRole": "Registrar",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-035",
+    "taskId": 4872,
+    "title": "Maintain servicer eligibility verification records",
+    "oldRole": "Registrar",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-035",
+    "taskId": 4873,
+    "title": "Archive all Department notifications and responses",
+    "oldRole": "Registrar",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-035",
+    "taskId": 4874,
+    "title": "Document servicer performance evaluations",
+    "oldRole": "Registrar",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-035",
+    "taskId": 4875,
+    "title": "Ensure record accessibility for Department review",
+    "oldRole": "Registrar",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-036",
+    "taskId": 4913,
+    "title": "Joint Research Agreement Documentation",
+    "oldRole": "Technology Transfer Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-036",
+    "taskId": 4915,
+    "title": "Maintain comprehensive records of collaborative research activities",
+    "oldRole": "Technology Transfer Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-036",
+    "taskId": 4916,
+    "title": "Verify agreement execution dates precede invention disclosure",
+    "oldRole": "Technology Transfer Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-036",
+    "taskId": 4917,
+    "title": "Archive joint research agreement documentation",
+    "oldRole": "Technology Transfer Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-036",
+    "taskId": 4918,
+    "title": "Technology Transfer Policy Development",
+    "oldRole": "General Counsel",
+    "newRole": "Technology Transfer Officer"
+  },
+  {
+    "regKey": "REG-036",
+    "taskId": 4919,
+    "title": "Develop CREATE Act-compliant technology transfer policies",
+    "oldRole": "General Counsel",
+    "newRole": "Technology Transfer Officer"
+  },
+  {
+    "regKey": "REG-036",
+    "taskId": 4920,
+    "title": "Implement standardized joint research agreement templates",
+    "oldRole": "General Counsel",
+    "newRole": "Technology Transfer Officer"
+  },
+  {
+    "regKey": "REG-036",
+    "taskId": 4921,
+    "title": "Establish cross-departmental coordination protocols",
+    "oldRole": "General Counsel",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-036",
+    "taskId": 4922,
+    "title": "Review and update policies based on USPTO guidance",
+    "oldRole": "General Counsel",
+    "newRole": "Technology Transfer Officer"
+  },
+  {
+    "regKey": "REG-036",
+    "taskId": 4923,
+    "title": "Patent Application Compliance Procedures",
+    "oldRole": "Technology Transfer Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-036",
+    "taskId": 4926,
+    "title": "Maintain invention disclosure protocols for collaborative research",
+    "oldRole": "Technology Transfer Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-036",
+    "taskId": 4935,
+    "title": "Monitor partnership performance and compliance",
+    "oldRole": "Technology Transfer Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-036",
+    "taskId": 4936,
+    "title": "Intellectual Property Records Management",
+    "oldRole": "Registrar",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-036",
+    "taskId": 4937,
+    "title": "Establish centralized joint research agreement database",
+    "oldRole": "Registrar",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-036",
+    "taskId": 4938,
+    "title": "Implement document retention policies for research records",
+    "oldRole": "Registrar",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-036",
+    "taskId": 4939,
+    "title": "Conduct regular audits of research documentation",
+    "oldRole": "Registrar",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-036",
+    "taskId": 4940,
+    "title": "Coordinate records management with patent prosecution",
+    "oldRole": "Registrar",
+    "newRole": "Technology Transfer Officer"
+  },
+  {
+    "regKey": "REG-037",
+    "taskId": 3723,
+    "title": "Conduct Export Administration Act Self-Evaluation/Audit",
+    "oldRole": "Research Compliance Officer",
+    "newRole": "Export Control Officer"
+  },
+  {
+    "regKey": "REG-037",
+    "taskId": 435,
+    "title": "Update Export Control Training",
+    "oldRole": "Research Compliance Officer",
+    "newRole": "Export Control Officer"
+  },
+  {
+    "regKey": "REG-038",
+    "taskId": 4985,
+    "title": "Screen research sponsors against prohibited parties list",
+    "oldRole": "Research Compliance Officer",
+    "newRole": "Export Control Officer"
+  },
+  {
+    "regKey": "REG-038",
+    "taskId": 4986,
+    "title": "International Engagement Controls",
+    "oldRole": "International Programs Director",
+    "newRole": "Export Control Officer"
+  },
+  {
+    "regKey": "REG-038",
+    "taskId": 4987,
+    "title": "Screen foreign nationals for export license requirements",
+    "oldRole": "International Programs Director",
+    "newRole": "Export Control Officer"
+  },
+  {
+    "regKey": "REG-038",
+    "taskId": 4988,
+    "title": "Implement deemed export controls per 15 C.F.R. § 734.13",
+    "oldRole": "International Programs Director",
+    "newRole": "Export Control Officer"
+  },
+  {
+    "regKey": "REG-038",
+    "taskId": 4989,
+    "title": "Review international collaboration agreements",
+    "oldRole": "International Programs Director",
+    "newRole": "Export Control Officer"
+  },
+  {
+    "regKey": "REG-038",
+    "taskId": 4990,
+    "title": "Enhanced due diligence for emerging technology partnerships",
+    "oldRole": "International Programs Director",
+    "newRole": "Export Control Officer"
+  },
+  {
+    "regKey": "REG-038",
+    "taskId": 4999,
+    "title": "Develop role-specific training materials",
+    "oldRole": "Export Control Officer",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-038",
+    "taskId": 5001,
+    "title": "Compliance Monitoring and Auditing",
+    "oldRole": "Research Compliance Officer",
+    "newRole": "Export Control Officer"
+  },
+  {
+    "regKey": "REG-038",
+    "taskId": 5003,
+    "title": "Monitor regulatory updates from Bureau of Industry and Security",
+    "oldRole": "Research Compliance Officer",
+    "newRole": "Export Control Officer"
+  },
+  {
+    "regKey": "REG-038",
+    "taskId": 5004,
+    "title": "Review and update export control procedures",
+    "oldRole": "Research Compliance Officer",
+    "newRole": "Export Control Officer"
+  },
+  {
+    "regKey": "REG-038",
+    "taskId": 5005,
+    "title": "Maintain violation reporting procedures",
+    "oldRole": "Research Compliance Officer",
+    "newRole": "Export Control Officer"
+  },
+  {
+    "regKey": "REG-038",
+    "taskId": 5008,
+    "title": "Evaluate international research collaboration risks",
+    "oldRole": "Technology Transfer Officer",
+    "newRole": "Export Control Officer"
+  },
+  {
+    "regKey": "REG-038",
+    "taskId": 5009,
+    "title": "Implement controls for visiting researcher programs",
+    "oldRole": "Technology Transfer Officer",
+    "newRole": "Export Control Officer"
+  },
+  {
+    "regKey": "REG-038",
+    "taskId": 5010,
+    "title": "Monitor conference presentations and publications",
+    "oldRole": "Technology Transfer Officer",
+    "newRole": "Export Control Officer"
+  },
+  {
+    "regKey": "REG-039",
+    "taskId": 5039,
+    "title": "Implement automated screening systems for financial transactions",
+    "oldRole": "Export Control Officer",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "REG-039",
+    "taskId": 5041,
+    "title": "Screen research partners and collaborators",
+    "oldRole": "Export Control Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-039",
+    "taskId": 5042,
+    "title": "Asset Blocking and Reporting Obligations",
+    "oldRole": "CFO",
+    "newRole": "Export Control Officer"
+  },
+  {
+    "regKey": "REG-039",
+    "taskId": 5046,
+    "title": "Licensing and Authorization Management",
+    "oldRole": "International Programs Director",
+    "newRole": "Export Control Officer"
+  },
+  {
+    "regKey": "REG-039",
+    "taskId": 5047,
+    "title": "Obtain specific licenses for programs in sanctioned countries",
+    "oldRole": "International Programs Director",
+    "newRole": "Export Control Officer"
+  },
+  {
+    "regKey": "REG-039",
+    "taskId": 5048,
+    "title": "File license applications 60 days in advance",
+    "oldRole": "International Programs Director",
+    "newRole": "Export Control Officer"
+  },
+  {
+    "regKey": "REG-039",
+    "taskId": 5049,
+    "title": "Maintain general license documentation",
+    "oldRole": "International Programs Director",
+    "newRole": "Export Control Officer"
+  },
+  {
+    "regKey": "REG-039",
+    "taskId": 5050,
+    "title": "Process license renewal applications",
+    "oldRole": "International Programs Director",
+    "newRole": "Export Control Officer"
+  },
+  {
+    "regKey": "REG-039",
+    "taskId": 5055,
+    "title": "Staff Training and Education Requirements",
+    "oldRole": "HR Director",
+    "newRole": "Export Control Officer"
+  },
+  {
+    "regKey": "REG-039",
+    "taskId": 5056,
+    "title": "Provide annual OFAC training to finance staff",
+    "oldRole": "HR Director",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "REG-039",
+    "taskId": 5057,
+    "title": "Train admissions staff on screening requirements",
+    "oldRole": "HR Director",
+    "newRole": "Admissions Director"
+  },
+  {
+    "regKey": "REG-039",
+    "taskId": 5058,
+    "title": "Train international programs staff",
+    "oldRole": "HR Director",
+    "newRole": "International Programs Director"
+  },
+  {
+    "regKey": "REG-039",
+    "taskId": 5059,
+    "title": "International Program Compliance Monitoring",
+    "oldRole": "International Programs Director",
+    "newRole": "Export Control Officer"
+  },
+  {
+    "regKey": "REG-039",
+    "taskId": 5061,
+    "title": "Review international research collaborations",
+    "oldRole": "International Programs Director",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-039",
+    "taskId": 5062,
+    "title": "Audit donation and funding sources",
+    "oldRole": "International Programs Director",
+    "newRole": "Internal Auditor"
+  },
+  {
+    "regKey": "REG-040",
+    "taskId": 5108,
+    "title": "Train staff on fraud indicators",
+    "oldRole": "Financial Aid Director",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-040",
+    "taskId": 5109,
+    "title": "Record Retention and Documentation Management",
+    "oldRole": "Registrar",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-040",
+    "taskId": 5110,
+    "title": "Maintain verification records for three years",
+    "oldRole": "Registrar",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-040",
+    "taskId": 5111,
+    "title": "Organize documentation by award year",
+    "oldRole": "Registrar",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-040",
+    "taskId": 5112,
+    "title": "Implement secure storage procedures",
+    "oldRole": "Registrar",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-040",
+    "taskId": 5113,
+    "title": "Staff Training and Professional Development",
+    "oldRole": "Training Coordinator",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-040",
+    "taskId": 5114,
+    "title": "Conduct annual verification training",
+    "oldRole": "Training Coordinator",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-040",
+    "taskId": 5115,
+    "title": "Update training materials",
+    "oldRole": "Training Coordinator",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-040",
+    "taskId": 5116,
+    "title": "Document training completion",
+    "oldRole": "Training Coordinator",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-040",
+    "taskId": 5117,
+    "title": "Quality Assurance and Monitoring",
+    "oldRole": "Internal Auditor",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-040",
+    "taskId": 5119,
+    "title": "Monitor verification completion rates",
+    "oldRole": "Internal Auditor",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-040",
+    "taskId": 5120,
+    "title": "Review and update procedures",
+    "oldRole": "Internal Auditor",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-041",
+    "taskId": 5148,
+    "title": "Annual Independent Audit Mandate",
+    "oldRole": "CFO",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-041",
+    "taskId": 5149,
+    "title": "Engage independent certified public accountant or qualified government auditor",
+    "oldRole": "CFO",
+    "newRole": "Internal Auditor"
+  },
+  {
+    "regKey": "REG-041",
+    "taskId": 5150,
+    "title": "Ensure dual audit scope compliance",
+    "oldRole": "CFO",
+    "newRole": "Internal Auditor"
+  },
+  {
+    "regKey": "REG-041",
+    "taskId": 5152,
+    "title": "Coordinate audit timing and planning",
+    "oldRole": "CFO",
+    "newRole": "Internal Auditor"
+  },
+  {
+    "regKey": "REG-041",
+    "taskId": 5158,
+    "title": "Audit Report Submission Requirements",
+    "oldRole": "CFO",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-041",
+    "taskId": 5159,
+    "title": "Submit completed audit report to Department of Education",
+    "oldRole": "CFO",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-041",
+    "taskId": 5160,
+    "title": "Include all required audit components",
+    "oldRole": "CFO",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-041",
+    "taskId": 5161,
+    "title": "Maintain audit documentation for federal review",
+    "oldRole": "CFO",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-041",
+    "taskId": 5171,
+    "title": "Financial Security and Documentation Requirements",
+    "oldRole": "CFO",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-041",
+    "taskId": 5173,
+    "title": "Submit additional documentation as requested",
+    "oldRole": "CFO",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-041",
+    "taskId": 5174,
+    "title": "Prepare for potential increased audit frequency",
+    "oldRole": "CFO",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-042",
+    "taskId": 5206,
+    "title": "Document all enrollment representations and promises made to prospective students",
+    "oldRole": "Financial Aid Director",
+    "newRole": "Admissions Director"
+  },
+  {
+    "regKey": "REG-042",
+    "taskId": 5209,
+    "title": "Staff Training and Marketing Compliance",
+    "oldRole": "HR Director",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-042",
+    "taskId": 5210,
+    "title": "Implement staff training programs on permissible marketing practices",
+    "oldRole": "HR Director",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-042",
+    "taskId": 5211,
+    "title": "Provide training on disclosure requirements and borrower defense triggers",
+    "oldRole": "HR Director",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-042",
+    "taskId": 5212,
+    "title": "Conduct quarterly refresher training on compliance updates",
+    "oldRole": "HR Director",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-042",
+    "taskId": 5213,
+    "title": "Educational Service Documentation and Outcomes Tracking",
+    "oldRole": "VP Academic Affairs",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-042",
+    "taskId": 5215,
+    "title": "Track and document program outcomes data",
+    "oldRole": "VP Academic Affairs",
+    "newRole": "Institutional Research Director"
+  },
+  {
+    "regKey": "REG-042",
+    "taskId": 5216,
+    "title": "Maintain financial aid counseling records and loan origination documentation",
+    "oldRole": "VP Academic Affairs",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-042",
+    "taskId": 5217,
+    "title": "Document student complaint resolution processes",
+    "oldRole": "VP Academic Affairs",
+    "newRole": "Dean of Students"
+  },
+  {
+    "regKey": "REG-042",
+    "taskId": 5222,
+    "title": "Borrower Defense Response Procedures",
+    "oldRole": "General Counsel",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-042",
+    "taskId": 5224,
+    "title": "Designate responsible compliance officers for coordinating institutional responses",
+    "oldRole": "General Counsel",
+    "newRole": "Compliance Officer"
+  },
+  {
+    "regKey": "REG-043",
+    "taskId": 2249,
+    "title": "Federal Funds Account",
+    "oldRole": "Financial Aid Director",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "REG-043",
+    "taskId": 2252,
+    "title": "Excess Cash Return",
+    "oldRole": "Financial Aid Director",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "REG-044",
+    "taskId": 5275,
+    "title": "Borrower Data Management and Coordination",
+    "oldRole": "Registrar",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-044",
+    "taskId": 5277,
+    "title": "Coordinate with loan servicers on borrower status",
+    "oldRole": "Registrar",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-044",
+    "taskId": 5278,
+    "title": "Update borrower contact information regularly",
+    "oldRole": "Registrar",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-044",
+    "taskId": 5279,
+    "title": "Reconcile institutional records with NSLDS data",
+    "oldRole": "Registrar",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-044",
+    "taskId": 5284,
+    "title": "Prepare fiscal responsibility enhancement plans",
+    "oldRole": "Financial Aid Director",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "REG-045",
+    "taskId": 5320,
+    "title": "Initial Institutional Certification and Eligibility",
+    "oldRole": "CFO",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-045",
+    "taskId": 5321,
+    "title": "Obtain DOE certification as eligible institution under 20 U.S.C. § 1001",
+    "oldRole": "CFO",
+    "newRole": "President"
+  },
+  {
+    "regKey": "REG-045",
+    "taskId": 5322,
+    "title": "Maintain recognized accreditation by approved accrediting agency",
+    "oldRole": "CFO",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "REG-045",
+    "taskId": 5323,
+    "title": "Secure and maintain state authorization to operate",
+    "oldRole": "CFO",
+    "newRole": "President"
+  },
+  {
+    "regKey": "REG-045",
+    "taskId": 5324,
+    "title": "Demonstrate administrative capability under 34 CFR § 668.16",
+    "oldRole": "CFO",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-045",
+    "taskId": 5330,
+    "title": "Complete recertification process per 34 CFR § 600.31",
+    "oldRole": "President",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-045",
+    "taskId": 5332,
+    "title": "Financial aid administrator completes specialized training within 12 months",
+    "oldRole": "President",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-045",
+    "taskId": 5333,
+    "title": "Execute new program participation agreement",
+    "oldRole": "President",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-045",
+    "taskId": 5339,
+    "title": "Recertification Requirements",
+    "oldRole": "President",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-045",
+    "taskId": 5340,
+    "title": "Submit recertification applications every six years",
+    "oldRole": "President",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-045",
+    "taskId": 5341,
+    "title": "Document continued compliance with all eligibility criteria",
+    "oldRole": "President",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-045",
+    "taskId": 5342,
+    "title": "Update program participation agreements as required",
+    "oldRole": "President",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-045",
+    "taskId": 5343,
+    "title": "Staff Training and Qualification Requirements",
+    "oldRole": "HR Director",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-045",
+    "taskId": 5344,
+    "title": "Ensure financial aid staff complete required training",
+    "oldRole": "HR Director",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-045",
+    "taskId": 5345,
+    "title": "Maintain qualified personnel in key positions",
+    "oldRole": "HR Director",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-045",
+    "taskId": 5346,
+    "title": "Implement ongoing professional development programs",
+    "oldRole": "HR Director",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-047",
+    "taskId": 5435,
+    "title": "Establish separate accounting system for federal funds",
+    "oldRole": "Financial Aid Director",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "REG-047",
+    "taskId": 5436,
+    "title": "Implement dual-control disbursement system",
+    "oldRole": "Financial Aid Director",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "REG-047",
+    "taskId": 5437,
+    "title": "Fund Management and Matching Requirements",
+    "oldRole": "CFO",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-047",
+    "taskId": 5439,
+    "title": "Manage carry-forward and carry-back provisions",
+    "oldRole": "CFO",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-047",
+    "taskId": 5440,
+    "title": "Process authorized fund transfers to Federal Work-Study",
+    "oldRole": "CFO",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-047",
+    "taskId": 5449,
+    "title": "Document institutional matching contributions",
+    "oldRole": "Financial Aid Director",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "REG-047",
+    "taskId": 5456,
+    "title": "Record Retention and Documentation",
+    "oldRole": "Registrar",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-047",
+    "taskId": 5457,
+    "title": "Maintain student eligibility documentation",
+    "oldRole": "Registrar",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-047",
+    "taskId": 5458,
+    "title": "Document fund disbursement controls",
+    "oldRole": "Registrar",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-047",
+    "taskId": 5459,
+    "title": "Preserve institutional matching records",
+    "oldRole": "Registrar",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "REG-047",
+    "taskId": 5460,
+    "title": "Archive program correspondence",
+    "oldRole": "Registrar",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-048",
+    "taskId": 5494,
+    "title": "Maintain payroll documentation",
+    "oldRole": "Financial Aid Director",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "REG-048",
+    "taskId": 5495,
+    "title": "Community Service Allocation Requirements",
+    "oldRole": "Dean of Students",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-048",
+    "taskId": 5496,
+    "title": "Allocate minimum 7% of FWS funds for community service",
+    "oldRole": "Dean of Students",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-048",
+    "taskId": 5497,
+    "title": "Employ at least one reading tutor for children",
+    "oldRole": "Dean of Students",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-048",
+    "taskId": 5498,
+    "title": "Exclude private for-profit employers from community service",
+    "oldRole": "Dean of Students",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-048",
+    "taskId": 5499,
+    "title": "Promote community service awareness to students",
+    "oldRole": "Dean of Students",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-048",
+    "taskId": 5505,
+    "title": "Title III/V Designation and Waiver Process",
+    "oldRole": "Technology Transfer Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-048",
+    "taskId": 5506,
+    "title": "Submit annual Application for Designation as Eligible Institution",
+    "oldRole": "Technology Transfer Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-048",
+    "taskId": 5507,
+    "title": "Maintain qualifying institutional characteristics",
+    "oldRole": "Technology Transfer Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-048",
+    "taskId": 5508,
+    "title": "Document waiver eligibility for both FWS and FSEOG",
+    "oldRole": "Technology Transfer Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-048",
+    "taskId": 5510,
+    "title": "Maintain detailed payroll records",
+    "oldRole": "Financial Aid Director",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "REG-049",
+    "taskId": 5596,
+    "title": "Report ownership equity withdrawals exceeding 25%",
+    "oldRole": "Financial Aid Director",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "REG-049",
+    "taskId": 5597,
+    "title": "Report significant litigation exposure",
+    "oldRole": "Financial Aid Director",
+    "newRole": "General Counsel"
+  },
+  {
+    "regKey": "REG-049",
+    "taskId": 5599,
+    "title": "Report ownership changes exceeding 25%",
+    "oldRole": "Financial Aid Director",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "REG-049",
+    "taskId": 5605,
+    "title": "Enhanced Oversight Compliance (If Applicable)",
+    "oldRole": "CFO",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-049",
+    "taskId": 5608,
+    "title": "Participate in enhanced monitoring activities",
+    "oldRole": "CFO",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-049",
+    "taskId": 5612,
+    "title": "Document composite score calculations",
+    "oldRole": "Financial Aid Director",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "REG-049",
+    "taskId": 5613,
+    "title": "Preserve financial responsibility evidence",
+    "oldRole": "Financial Aid Director",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "REG-050",
+    "taskId": 5550,
+    "title": "Legal Review of ASR",
+    "oldRole": "Clery Compliance Officer",
+    "newRole": "General Counsel"
+  },
+  {
+    "regKey": "REG-050",
+    "taskId": 5559,
+    "title": "Timely Warning Notifications",
+    "oldRole": "Emergency Management Director",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "REG-050",
+    "taskId": 5560,
+    "title": "Assess Threat Level",
+    "oldRole": "Emergency Management Director",
+    "newRole": "Campus Police Chief"
+  },
+  {
+    "regKey": "REG-050",
+    "taskId": 5561,
+    "title": "Draft Warning Content",
+    "oldRole": "Emergency Management Director",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "REG-050",
+    "taskId": 5562,
+    "title": "Distribute Warning",
+    "oldRole": "Emergency Management Director",
+    "newRole": "Campus Police Chief"
+  },
+  {
+    "regKey": "REG-050",
+    "taskId": 5569,
+    "title": "Establish Investigation Procedures",
+    "oldRole": "Dean of Students",
+    "newRole": "Campus Police Chief"
+  },
+  {
+    "regKey": "REG-051",
+    "taskId": 5655,
+    "title": "High Cost Increase Reporting Requirements",
+    "oldRole": "CFO",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-051",
+    "taskId": 5656,
+    "title": "Submit detailed explanatory reports within 30 days if listed for high tuition increases",
+    "oldRole": "CFO",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-051",
+    "taskId": 5657,
+    "title": "Document specific reasons for cost increases with supporting data",
+    "oldRole": "CFO",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-051",
+    "taskId": 5658,
+    "title": "Develop concrete remediation strategies to control future price growth",
+    "oldRole": "CFO",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-051",
+    "taskId": 5659,
+    "title": "Consumer Information Disclosure Compliance",
+    "oldRole": "Registrar",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-051",
+    "taskId": 5660,
+    "title": "Maintain compliance with consumer information disclosure requirements under 34 CFR § 668.41",
+    "oldRole": "Registrar",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-051",
+    "taskId": 5661,
+    "title": "Incorporate all mandatory disclosures required by federal regulations into calculator interface",
+    "oldRole": "Registrar",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-051",
+    "taskId": 5662,
+    "title": "Verify calculator accessibility and prominence on institutional website",
+    "oldRole": "Registrar",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-051",
+    "taskId": 5667,
+    "title": "Data Quality Assurance and Validation",
+    "oldRole": "Institutional Research Director",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-051",
+    "taskId": 5668,
+    "title": "Validate accuracy of cost data used in net price calculator",
+    "oldRole": "Institutional Research Director",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-051",
+    "taskId": 5669,
+    "title": "Cross-reference calculator outputs with actual student billing and aid disbursement data",
+    "oldRole": "Institutional Research Director",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-051",
+    "taskId": 5670,
+    "title": "Implement quality control processes for annual data updates",
+    "oldRole": "Institutional Research Director",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-053",
+    "taskId": 5698,
+    "title": "Policy Development and Implementation",
+    "oldRole": "VP Student Affairs",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-053",
+    "taskId": 5699,
+    "title": "Develop comprehensive drug conviction policy",
+    "oldRole": "VP Student Affairs",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-053",
+    "taskId": 5700,
+    "title": "Establish staff training protocols",
+    "oldRole": "VP Student Affairs",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-053",
+    "taskId": 5701,
+    "title": "Create inter-departmental coordination procedures",
+    "oldRole": "VP Student Affairs",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-054",
+    "taskId": 5721,
+    "title": "Fund Management and Sustainability",
+    "oldRole": "CFO",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-054",
+    "taskId": 5722,
+    "title": "Operate program without federal appropriations",
+    "oldRole": "CFO",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-054",
+    "taskId": 5736,
+    "title": "Conduct internal compliance assessments",
+    "oldRole": "Financial Aid Director",
+    "newRole": "Internal Auditor"
+  },
+  {
+    "regKey": "REG-054",
+    "taskId": 5737,
+    "title": "Maintain federal capital contribution records",
+    "oldRole": "Financial Aid Director",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "REG-056",
+    "taskId": 5742,
+    "title": "Legal Review of ASR",
+    "oldRole": "Clery Compliance Officer",
+    "newRole": "General Counsel"
+  },
+  {
+    "regKey": "REG-056",
+    "taskId": 5751,
+    "title": "Timely Warning Notifications",
+    "oldRole": "Emergency Management Director",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "REG-056",
+    "taskId": 5752,
+    "title": "Assess Threat Level",
+    "oldRole": "Emergency Management Director",
+    "newRole": "Campus Police Chief"
+  },
+  {
+    "regKey": "REG-056",
+    "taskId": 5753,
+    "title": "Draft Warning Content",
+    "oldRole": "Emergency Management Director",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "REG-056",
+    "taskId": 5754,
+    "title": "Distribute Warning",
+    "oldRole": "Emergency Management Director",
+    "newRole": "Campus Police Chief"
+  },
+  {
+    "regKey": "REG-056",
+    "taskId": 5761,
+    "title": "Establish Investigation Procedures",
+    "oldRole": "Dean of Students",
+    "newRole": "Campus Police Chief"
+  },
+  {
+    "regKey": "REG-056",
+    "taskId": 5770,
+    "title": "VAWA Compliance (Violence Against Women Act)",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "REG-056",
+    "taskId": 5771,
+    "title": "Establish Written Procedures",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "REG-056",
+    "taskId": 5772,
+    "title": "Provide Prevention Programs",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "REG-056",
+    "taskId": 5773,
+    "title": "Train Adjudicators",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "REG-057",
+    "taskId": 5799,
+    "title": "Preserve financial responsibility standards documentation",
+    "oldRole": "Financial Aid Director",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "REG-057",
+    "taskId": 5810,
+    "title": "General Title IV Record Retention - Three Year Period",
+    "oldRole": "Registrar",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-057",
+    "taskId": 5811,
+    "title": "Retain Pell Grant records for three years after award year end",
+    "oldRole": "Registrar",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-057",
+    "taskId": 5812,
+    "title": "Maintain FSEOG records for three years after award year end",
+    "oldRole": "Registrar",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-057",
+    "taskId": 5813,
+    "title": "Keep Federal Work-Study records for three years after award year end",
+    "oldRole": "Registrar",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-057",
+    "taskId": 5814,
+    "title": "Preserve Perkins Loan records for three years after award year end",
+    "oldRole": "Registrar",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-057",
+    "taskId": 5815,
+    "title": "Loan Program Record Retention",
+    "oldRole": "Registrar",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-057",
+    "taskId": 5816,
+    "title": "Retain Direct Loan student records for three years after last attendance",
+    "oldRole": "Registrar",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-057",
+    "taskId": 5817,
+    "title": "Maintain FFEL student records for three years after last attendance",
+    "oldRole": "Registrar",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-057",
+    "taskId": 5818,
+    "title": "Keep loan program administrative records for three years after ED submission",
+    "oldRole": "Registrar",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-057",
+    "taskId": 5823,
+    "title": "Completion Rate Documentation",
+    "oldRole": "Institutional Research Director",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-059",
+    "taskId": 3299,
+    "title": "General",
+    "oldRole": "Research Compliance Officer",
+    "newRole": "Export Control Officer"
+  },
+  {
+    "regKey": "REG-059",
+    "taskId": 3737,
+    "title": "Conduct International Emergency Economic Self-Evaluation/Audit",
+    "oldRole": "Research Compliance Officer",
+    "newRole": "Export Control Officer"
+  },
+  {
+    "regKey": "REG-059",
+    "taskId": 2330,
+    "title": "Sanctions Screening",
+    "oldRole": "Research Compliance Officer",
+    "newRole": "Export Control Officer"
+  },
+  {
+    "regKey": "REG-059",
+    "taskId": 2331,
+    "title": "SDN List Compliance",
+    "oldRole": "Research Compliance Officer",
+    "newRole": "Export Control Officer"
+  },
+  {
+    "regKey": "REG-059",
+    "taskId": 2332,
+    "title": "Country Sanctions Compliance",
+    "oldRole": "Research Compliance Officer",
+    "newRole": "Export Control Officer"
+  },
+  {
+    "regKey": "REG-059",
+    "taskId": 2333,
+    "title": "License Applications",
+    "oldRole": "Research Compliance Officer",
+    "newRole": "Export Control Officer"
+  },
+  {
+    "regKey": "REG-059",
+    "taskId": 2334,
+    "title": "Sanctions Training",
+    "oldRole": "Research Compliance Officer",
+    "newRole": "Export Control Officer"
+  },
+  {
+    "regKey": "REG-060",
+    "taskId": 5841,
+    "title": "Export Control Program Implementation",
+    "oldRole": "Research Compliance Officer",
+    "newRole": "Export Control Officer"
+  },
+  {
+    "regKey": "REG-060",
+    "taskId": 5842,
+    "title": "Establish written export control policies",
+    "oldRole": "Research Compliance Officer",
+    "newRole": "Export Control Officer"
+  },
+  {
+    "regKey": "REG-060",
+    "taskId": 5843,
+    "title": "Implement deemed export protocols",
+    "oldRole": "Research Compliance Officer",
+    "newRole": "Export Control Officer"
+  },
+  {
+    "regKey": "REG-060",
+    "taskId": 5845,
+    "title": "Create foreign national screening protocols",
+    "oldRole": "Research Compliance Officer",
+    "newRole": "Export Control Officer"
+  },
+  {
+    "regKey": "REG-060",
+    "taskId": 5846,
+    "title": "Technical Data and Export Authorization",
+    "oldRole": "Research Compliance Officer",
+    "newRole": "Export Control Officer"
+  },
+  {
+    "regKey": "REG-060",
+    "taskId": 5847,
+    "title": "Conduct USML classification reviews",
+    "oldRole": "Research Compliance Officer",
+    "newRole": "Export Control Officer"
+  },
+  {
+    "regKey": "REG-060",
+    "taskId": 5848,
+    "title": "Obtain export licenses before disclosure",
+    "oldRole": "Research Compliance Officer",
+    "newRole": "Export Control Officer"
+  },
+  {
+    "regKey": "REG-060",
+    "taskId": 5849,
+    "title": "Review international collaboration agreements",
+    "oldRole": "Research Compliance Officer",
+    "newRole": "Export Control Officer"
+  },
+  {
+    "regKey": "REG-060",
+    "taskId": 5850,
+    "title": "Monitor oral and electronic disclosures",
+    "oldRole": "Research Compliance Officer",
+    "newRole": "Export Control Officer"
+  },
+  {
+    "regKey": "REG-060",
+    "taskId": 5851,
+    "title": "Record Keeping and Documentation",
+    "oldRole": "Registrar",
+    "newRole": "Export Control Officer"
+  },
+  {
+    "regKey": "REG-060",
+    "taskId": 5852,
+    "title": "Maintain transaction records per 22 CFR § 122.5",
+    "oldRole": "Registrar",
+    "newRole": "Export Control Officer"
+  },
+  {
+    "regKey": "REG-060",
+    "taskId": 5853,
+    "title": "Document export authorizations",
+    "oldRole": "Registrar",
+    "newRole": "Export Control Officer"
+  },
+  {
+    "regKey": "REG-060",
+    "taskId": 5854,
+    "title": "Track technical data transfers",
+    "oldRole": "Registrar",
+    "newRole": "Export Control Officer"
+  },
+  {
+    "regKey": "REG-060",
+    "taskId": 5855,
+    "title": "Archive compliance documentation",
+    "oldRole": "Registrar",
+    "newRole": "Export Control Officer"
+  },
+  {
+    "regKey": "REG-060",
+    "taskId": 5856,
+    "title": "Training and Personnel Management",
+    "oldRole": "Training Coordinator",
+    "newRole": "Export Control Officer"
+  },
+  {
+    "regKey": "REG-060",
+    "taskId": 5857,
+    "title": "Provide ITAR compliance training",
+    "oldRole": "Training Coordinator",
+    "newRole": "Export Control Officer"
+  },
+  {
+    "regKey": "REG-060",
+    "taskId": 5858,
+    "title": "Train on deemed export regulations",
+    "oldRole": "Training Coordinator",
+    "newRole": "Export Control Officer"
+  },
+  {
+    "regKey": "REG-060",
+    "taskId": 5859,
+    "title": "Update training for regulatory changes",
+    "oldRole": "Training Coordinator",
+    "newRole": "Export Control Officer"
+  },
+  {
+    "regKey": "REG-060",
+    "taskId": 5860,
+    "title": "Document training completion",
+    "oldRole": "Training Coordinator",
+    "newRole": "Export Control Officer"
+  },
+  {
+    "regKey": "REG-060",
+    "taskId": 5861,
+    "title": "Violation Reporting and Disclosure",
+    "oldRole": "Research Compliance Officer",
+    "newRole": "Export Control Officer"
+  },
+  {
+    "regKey": "REG-060",
+    "taskId": 5862,
+    "title": "Report violations to DDTC immediately",
+    "oldRole": "Research Compliance Officer",
+    "newRole": "Export Control Officer"
+  },
+  {
+    "regKey": "REG-060",
+    "taskId": 5863,
+    "title": "Conduct internal violation assessments",
+    "oldRole": "Research Compliance Officer",
+    "newRole": "Export Control Officer"
+  },
+  {
+    "regKey": "REG-060",
+    "taskId": 5864,
+    "title": "File annual activity reports",
+    "oldRole": "Research Compliance Officer",
+    "newRole": "Export Control Officer"
+  },
+  {
+    "regKey": "REG-060",
+    "taskId": 5865,
+    "title": "Coordinate with legal counsel",
+    "oldRole": "Research Compliance Officer",
+    "newRole": "General Counsel"
+  },
+  {
+    "regKey": "REG-064",
+    "taskId": 3740,
+    "title": "Conduct Outside Earned Income Self-Evaluation/Audit",
+    "oldRole": "Ethics Officer",
+    "newRole": "Internal Auditor"
+  },
+  {
+    "regKey": "REG-065",
+    "taskId": 5928,
+    "title": "Research Integrity Officer Appointment and Oversight",
+    "oldRole": "President",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-065",
+    "taskId": 5929,
+    "title": "Appoint qualified Research Integrity Officer",
+    "oldRole": "President",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-065",
+    "taskId": 5930,
+    "title": "Define RIO responsibilities and authority",
+    "oldRole": "President",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-065",
+    "taskId": 5931,
+    "title": "Ensure RIO training and qualifications",
+    "oldRole": "President",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-065",
+    "taskId": 5945,
+    "title": "Ensure confidentiality of records",
+    "oldRole": "Research Compliance Officer",
+    "newRole": "Privacy Officer"
+  },
+  {
+    "regKey": "REG-065",
+    "taskId": 5949,
+    "title": "Provide staff training on reporting procedures",
+    "oldRole": "Research Compliance Officer",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-065",
+    "taskId": 5952,
+    "title": "Document foreign researcher involvement",
+    "oldRole": "Research Compliance Officer",
+    "newRole": "Export Control Officer"
+  },
+  {
+    "regKey": "REG-068",
+    "taskId": 5995,
+    "title": "§ 1092(a), institutions must maintain qualified financial aid staff and make readily available throu...",
+    "oldRole": "Dean of Students",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-069",
+    "taskId": 5996,
+    "title": "Annual Institutional Report Card Submission",
+    "oldRole": "Curriculum Coordinator",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "REG-069",
+    "taskId": 5997,
+    "title": "Submit complete institutional report card via online portal",
+    "oldRole": "Curriculum Coordinator",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "REG-069",
+    "taskId": 5998,
+    "title": "Post report card on institution's public website",
+    "oldRole": "Curriculum Coordinator",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "REG-069",
+    "taskId": 5999,
+    "title": "Include achievement of annual goals for teacher shortage areas",
+    "oldRole": "Curriculum Coordinator",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "REG-069",
+    "taskId": 6000,
+    "title": "Document detailed improvement strategies",
+    "oldRole": "Curriculum Coordinator",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "REG-069",
+    "taskId": 6001,
+    "title": "Teacher Licensing Examination Performance Reporting",
+    "oldRole": "Institutional Research Director",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "REG-069",
+    "taskId": 6002,
+    "title": "Report state licensing exam pass rates",
+    "oldRole": "Institutional Research Director",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "REG-069",
+    "taskId": 6003,
+    "title": "Calculate and report average examination scores",
+    "oldRole": "Institutional Research Director",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "REG-069",
+    "taskId": 6004,
+    "title": "Compare institutional performance to state averages",
+    "oldRole": "Institutional Research Director",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "REG-069",
+    "taskId": 6005,
+    "title": "Provide three-year trend analysis",
+    "oldRole": "Institutional Research Director",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "REG-069",
+    "taskId": 6007,
+    "title": "Document admissions criteria and GPA requirements",
+    "oldRole": "VP Academic Affairs",
+    "newRole": "Admissions Director"
+  },
+  {
+    "regKey": "REG-069",
+    "taskId": 6011,
+    "title": "Technology Integration Training Documentation",
+    "oldRole": "Curriculum Coordinator",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "REG-069",
+    "taskId": 6012,
+    "title": "Document technology integration training activities",
+    "oldRole": "Curriculum Coordinator",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "REG-069",
+    "taskId": 6014,
+    "title": "Maintain technology training records",
+    "oldRole": "Curriculum Coordinator",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-069",
+    "taskId": 6015,
+    "title": "Special Education Preparation Requirements",
+    "oldRole": "Curriculum Coordinator",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "REG-069",
+    "taskId": 6016,
+    "title": "Document special education preparation components",
+    "oldRole": "Curriculum Coordinator",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "REG-069",
+    "taskId": 6017,
+    "title": "Maintain expanded disability preparation documentation",
+    "oldRole": "Curriculum Coordinator",
+    "newRole": "Disability Services Coordinator"
+  },
+  {
+    "regKey": "REG-069",
+    "taskId": 6018,
+    "title": "Report specialized training for disability instruction",
+    "oldRole": "Curriculum Coordinator",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "REG-069",
+    "taskId": 6023,
+    "title": "Record Retention and Data Management",
+    "oldRole": "Registrar",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "REG-069",
+    "taskId": 6026,
+    "title": "Ensure data accessibility for audits",
+    "oldRole": "Registrar",
+    "newRole": "Institutional Research Director"
+  },
+  {
+    "regKey": "REG-070",
+    "taskId": 6027,
+    "title": "Universities conducting research with dual-use technologies must ensure compliance with both TWEA re...",
+    "oldRole": "Research Compliance Officer",
+    "newRole": "Export Control Officer"
+  },
+  {
+    "regKey": "REG-070",
+    "taskId": 6028,
+    "title": "Universities must implement robust screening procedures for students, researchers, visiting scholars...",
+    "oldRole": "Research Compliance Officer",
+    "newRole": "Export Control Officer"
+  },
+  {
+    "regKey": "REG-070",
+    "taskId": 6030,
+    "title": "## Sanctions Screening Requirements\n- Screen all students, faculty, researchers, and institutional p...",
+    "oldRole": "Research Compliance Officer",
+    "newRole": "Export Control Officer"
+  },
+  {
+    "regKey": "REG-071",
+    "taskId": 2389,
+    "title": "Housing Assignment",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "VP Student Affairs"
+  },
+  {
+    "regKey": "REG-071",
+    "taskId": 2390,
+    "title": "Reasonable Accommodations",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "Disability Services Coordinator"
+  },
+  {
+    "regKey": "REG-071",
+    "taskId": 2392,
+    "title": "Housing Staff Training",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-072",
+    "taskId": 3312,
+    "title": "General",
+    "oldRole": "Disability Services Coordinator",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-072",
+    "taskId": 2393,
+    "title": "Non-Discrimination Notice",
+    "oldRole": "Disability Services Coordinator",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-072",
+    "taskId": 2394,
+    "title": "Grievance Procedure",
+    "oldRole": "Disability Services Coordinator",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-072",
+    "taskId": 2395,
+    "title": "Coordinator Designation",
+    "oldRole": "Disability Services Coordinator",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-072",
+    "taskId": 2396,
+    "title": "Language Access",
+    "oldRole": "Disability Services Coordinator",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-073",
+    "taskId": 3748,
+    "title": "Conduct Equal Employment Opportunity Self-Evaluation/Audit",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-073",
+    "taskId": 2398,
+    "title": "Affirmative Action Plan",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-073",
+    "taskId": 2399,
+    "title": "EEO Policy Statement",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-073",
+    "taskId": 2400,
+    "title": "Job Posting Requirements",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-073",
+    "taskId": 2401,
+    "title": "Applicant Tracking",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-073",
+    "taskId": 2402,
+    "title": "VETS-4212 Report",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-073",
+    "taskId": 2403,
+    "title": "EEO-1 Report",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-075",
+    "taskId": 3315,
+    "title": "General",
+    "oldRole": "HR Director",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-075",
+    "taskId": 2412,
+    "title": "No Retaliation",
+    "oldRole": "HR Director",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-075",
+    "taskId": 2414,
+    "title": "Supervisor Training",
+    "oldRole": "HR Director",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-076",
+    "taskId": 3749,
+    "title": "Conduct The Equal Pay Self-Evaluation/Audit",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-076",
+    "taskId": 2416,
+    "title": "Job Content Analysis",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-076",
+    "taskId": 2417,
+    "title": "Pay Records",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-076",
+    "taskId": 2418,
+    "title": "Pay Equity Audit",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-077",
+    "taskId": 3317,
+    "title": "General",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-077",
+    "taskId": 3750,
+    "title": "Conduct The Family and Self-Evaluation/Audit",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-077",
+    "taskId": 2419,
+    "title": "FMLA Notice Posting",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-077",
+    "taskId": 2420,
+    "title": "Eligibility Determination",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-077",
+    "taskId": 2421,
+    "title": "Leave Entitlement",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-077",
+    "taskId": 2422,
+    "title": "Job Restoration",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-077",
+    "taskId": 2423,
+    "title": "Benefits Continuation",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-077",
+    "taskId": 2424,
+    "title": "Leave Records",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-077",
+    "taskId": 2425,
+    "title": "Certification Process",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-079",
+    "taskId": 2434,
+    "title": "Personnel Training",
+    "oldRole": "Research Compliance Officer",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-082",
+    "taskId": 2443,
+    "title": "Credit Hour Policy",
+    "oldRole": "Financial Aid Director",
+    "newRole": "Registrar"
+  },
+  {
+    "regKey": "REG-082",
+    "taskId": 2444,
+    "title": "Accreditor Review",
+    "oldRole": "Financial Aid Director",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "REG-082",
+    "taskId": 2445,
+    "title": "Course-Level Documentation",
+    "oldRole": "Financial Aid Director",
+    "newRole": "Registrar"
+  },
+  {
+    "regKey": "REG-082",
+    "taskId": 2446,
+    "title": "Distance Education Equivalency",
+    "oldRole": "Financial Aid Director",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "REG-083",
+    "taskId": 2447,
+    "title": "Compensation Review",
+    "oldRole": "Financial Aid Director",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-083",
+    "taskId": 2449,
+    "title": "Contract Review",
+    "oldRole": "Financial Aid Director",
+    "newRole": "General Counsel"
+  },
+  {
+    "regKey": "REG-084",
+    "taskId": 2451,
+    "title": "Marketing Review",
+    "oldRole": "Financial Aid Director",
+    "newRole": "Communications Director"
+  },
+  {
+    "regKey": "REG-084",
+    "taskId": 2454,
+    "title": "Transfer Credit Accuracy",
+    "oldRole": "Financial Aid Director",
+    "newRole": "Registrar"
+  },
+  {
+    "regKey": "REG-084",
+    "taskId": 2455,
+    "title": "Staff Training",
+    "oldRole": "Financial Aid Director",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-085",
+    "taskId": 2456,
+    "title": "State Authorization Maintenance",
+    "oldRole": "Financial Aid Director",
+    "newRole": "General Counsel"
+  },
+  {
+    "regKey": "REG-085",
+    "taskId": 2460,
+    "title": "Authorization Documentation",
+    "oldRole": "Financial Aid Director",
+    "newRole": "General Counsel"
+  },
+  {
+    "regKey": "REG-088",
+    "taskId": 2475,
+    "title": "Building Survey",
+    "oldRole": "Environmental Compliance Officer",
+    "newRole": "Facilities Director"
+  },
+  {
+    "regKey": "REG-088",
+    "taskId": 2479,
+    "title": "Training",
+    "oldRole": "Environmental Compliance Officer",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-089",
+    "taskId": 2485,
+    "title": "Warning Signage",
+    "oldRole": "Environmental Compliance Officer",
+    "newRole": "Facilities Director"
+  },
+  {
+    "regKey": "REG-089",
+    "taskId": 2486,
+    "title": "Training",
+    "oldRole": "Environmental Compliance Officer",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-089",
+    "taskId": 2487,
+    "title": "Operations and Maintenance",
+    "oldRole": "Environmental Compliance Officer",
+    "newRole": "Facilities Director"
+  },
+  {
+    "regKey": "REG-090",
+    "taskId": 2491,
+    "title": "PPE Training",
+    "oldRole": "Environmental Compliance Officer",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-091",
+    "taskId": 2498,
+    "title": "Training",
+    "oldRole": "Environmental Compliance Officer",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-091",
+    "taskId": 2499,
+    "title": "Hygiene Facilities",
+    "oldRole": "Environmental Compliance Officer",
+    "newRole": "Facilities Director"
+  },
+  {
+    "regKey": "REG-093",
+    "taskId": 2506,
+    "title": "Fire Prevention",
+    "oldRole": "Environmental Compliance Officer",
+    "newRole": "Fire Safety Officer"
+  },
+  {
+    "regKey": "REG-094",
+    "taskId": 2515,
+    "title": "Hepatitis B Vaccination",
+    "oldRole": "Environmental Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-094",
+    "taskId": 2516,
+    "title": "Training",
+    "oldRole": "Environmental Compliance Officer",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-095",
+    "taskId": 2520,
+    "title": "Emergency Procedures",
+    "oldRole": "Environmental Compliance Officer",
+    "newRole": "Emergency Management Director"
+  },
+  {
+    "regKey": "REG-095",
+    "taskId": 2521,
+    "title": "Reporting Procedures",
+    "oldRole": "Environmental Compliance Officer",
+    "newRole": "Emergency Management Director"
+  },
+  {
+    "regKey": "REG-095",
+    "taskId": 2522,
+    "title": "Alarm System",
+    "oldRole": "Environmental Compliance Officer",
+    "newRole": "Fire Safety Officer"
+  },
+  {
+    "regKey": "REG-095",
+    "taskId": 2523,
+    "title": "Employee Training",
+    "oldRole": "Environmental Compliance Officer",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-096",
+    "taskId": 2529,
+    "title": "Training",
+    "oldRole": "Environmental Compliance Officer",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-097",
+    "taskId": 2533,
+    "title": "Employee Information",
+    "oldRole": "Environmental Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-097",
+    "taskId": 2534,
+    "title": "Training",
+    "oldRole": "Environmental Compliance Officer",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-098",
+    "taskId": 2167,
+    "title": "Emergency Action Plan",
+    "oldRole": "Clery Compliance Officer",
+    "newRole": "Emergency Management Director"
+  },
+  {
+    "regKey": "REG-098",
+    "taskId": 2168,
+    "title": "Fire Prevention Plan",
+    "oldRole": "Clery Compliance Officer",
+    "newRole": "Fire Safety Officer"
+  },
+  {
+    "regKey": "REG-098",
+    "taskId": 2169,
+    "title": "Employee Safety Training",
+    "oldRole": "Clery Compliance Officer",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-100",
+    "taskId": 3775,
+    "title": "Conduct Affirmative Action/Equal Employment Self-Evaluation/Audit",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-100",
+    "taskId": 2542,
+    "title": "Affirmative Action Plan",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-100",
+    "taskId": 2543,
+    "title": "Workforce Analysis",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-100",
+    "taskId": 2544,
+    "title": "Availability Analysis",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-100",
+    "taskId": 2545,
+    "title": "Goal Setting",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-100",
+    "taskId": 2546,
+    "title": "Action-Oriented Programs",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-100",
+    "taskId": 2547,
+    "title": "Annual Update",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-101",
+    "taskId": 2550,
+    "title": "Law Enforcement Interface",
+    "oldRole": "IT Security Officer",
+    "newRole": "Campus Police Chief"
+  },
+  {
+    "regKey": "REG-101",
+    "taskId": 2551,
+    "title": "Legal Counsel Coordination",
+    "oldRole": "IT Security Officer",
+    "newRole": "General Counsel"
+  },
+  {
+    "regKey": "REG-102",
+    "taskId": 2552,
+    "title": "DEA Registration",
+    "oldRole": "HR Director",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-102",
+    "taskId": 2553,
+    "title": "Storage Security",
+    "oldRole": "HR Director",
+    "newRole": "Facilities Director"
+  },
+  {
+    "regKey": "REG-102",
+    "taskId": 2554,
+    "title": "Inventory",
+    "oldRole": "HR Director",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-102",
+    "taskId": 2555,
+    "title": "Recordkeeping",
+    "oldRole": "HR Director",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-102",
+    "taskId": 2556,
+    "title": "Disposal",
+    "oldRole": "HR Director",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-102",
+    "taskId": 2557,
+    "title": "Loss Reporting",
+    "oldRole": "HR Director",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-104",
+    "taskId": 2565,
+    "title": "Financial Management",
+    "oldRole": "Research Compliance Officer",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "REG-104",
+    "taskId": 2567,
+    "title": "Procurement Standards",
+    "oldRole": "Research Compliance Officer",
+    "newRole": "Procurement Director"
+  },
+  {
+    "regKey": "REG-105",
+    "taskId": 2571,
+    "title": "Consent Documentation",
+    "oldRole": "IT Security Officer",
+    "newRole": "General Counsel"
+  },
+  {
+    "regKey": "REG-105",
+    "taskId": 2573,
+    "title": "Law Enforcement Response",
+    "oldRole": "IT Security Officer",
+    "newRole": "General Counsel"
+  },
+  {
+    "regKey": "REG-106",
+    "taskId": 3781,
+    "title": "Conduct Equal Employment of Self-Evaluation/Audit",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-106",
+    "taskId": 2574,
+    "title": "Veterans AAP",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-106",
+    "taskId": 2575,
+    "title": "Job Listing",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-106",
+    "taskId": 2576,
+    "title": "Data Collection",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-106",
+    "taskId": 2577,
+    "title": "Benchmark",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-106",
+    "taskId": 2578,
+    "title": "VETS-4212",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-110",
+    "taskId": 2589,
+    "title": "Construction Requirements",
+    "oldRole": "IT Security Officer",
+    "newRole": "Facilities Director"
+  },
+  {
+    "regKey": "REG-111",
+    "taskId": 2592,
+    "title": "SAM Registration",
+    "oldRole": "Research Compliance Officer",
+    "newRole": "Procurement Director"
+  },
+  {
+    "regKey": "REG-112",
+    "taskId": 2596,
+    "title": "Executive Compensation",
+    "oldRole": "Research Compliance Officer",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "REG-113",
+    "taskId": 3785,
+    "title": "Conduct Fraud Enforcement and Self-Evaluation/Audit",
+    "oldRole": "Research Compliance Officer",
+    "newRole": "Internal Auditor"
+  },
+  {
+    "regKey": "REG-113",
+    "taskId": 2600,
+    "title": "Accurate Billing",
+    "oldRole": "Research Compliance Officer",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "REG-114",
+    "taskId": 2603,
+    "title": "Acquisition Prohibition",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-114",
+    "taskId": 2604,
+    "title": "Confidentiality",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-114",
+    "taskId": 2605,
+    "title": "Safe Harbor Language",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-114",
+    "taskId": 2606,
+    "title": "Manager Training",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-116",
+    "taskId": 4275,
+    "title": "Conduct annual tabletop exercises",
+    "oldRole": "IT Security Officer",
+    "newRole": "Emergency Management Director"
+  },
+  {
+    "regKey": "REG-116",
+    "taskId": 4285,
+    "title": "Documentation and Record Keeping",
+    "oldRole": "Clery Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-116",
+    "taskId": 4286,
+    "title": "Maintain DHS information sharing records",
+    "oldRole": "Clery Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-116",
+    "taskId": 4287,
+    "title": "Document cybersecurity training completion",
+    "oldRole": "Clery Compliance Officer",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-116",
+    "taskId": 4288,
+    "title": "Maintain vulnerability assessment records",
+    "oldRole": "Clery Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-116",
+    "taskId": 4289,
+    "title": "Training and Personnel Requirements",
+    "oldRole": "HR Director",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-116",
+    "taskId": 4290,
+    "title": "Provide cybersecurity training",
+    "oldRole": "HR Director",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-116",
+    "taskId": 4291,
+    "title": "Maintain training documentation",
+    "oldRole": "HR Director",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-116",
+    "taskId": 4292,
+    "title": "Update training programs",
+    "oldRole": "HR Director",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-118",
+    "taskId": 3790,
+    "title": "Conduct Lilly Ledbetter Fair Self-Evaluation/Audit",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-118",
+    "taskId": 2618,
+    "title": "Pay Equity Awareness",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-118",
+    "taskId": 2619,
+    "title": "Compensation Records",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-118",
+    "taskId": 2620,
+    "title": "Pay Audits",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-119",
+    "taskId": 2621,
+    "title": "Copyright Policy",
+    "oldRole": "IT Security Officer",
+    "newRole": "Library Director"
+  },
+  {
+    "regKey": "REG-123",
+    "taskId": 3361,
+    "title": "General",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-123",
+    "taskId": 3794,
+    "title": "Conduct Veterans’ employment emphasis Self-Evaluation/Audit",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-123",
+    "taskId": 2636,
+    "title": "Veterans AAP",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-123",
+    "taskId": 2637,
+    "title": "Job Listings",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-123",
+    "taskId": 2638,
+    "title": "VETS-4212 Filing",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-123",
+    "taskId": 2639,
+    "title": "Hiring Benchmark",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-125",
+    "taskId": 2648,
+    "title": "Site Security Plan",
+    "oldRole": "Environmental Compliance Officer",
+    "newRole": "Emergency Management Director"
+  },
+  {
+    "regKey": "REG-125",
+    "taskId": 2649,
+    "title": "Personnel Surety",
+    "oldRole": "Environmental Compliance Officer",
+    "newRole": "Campus Police Chief"
+  },
+  {
+    "regKey": "REG-128",
+    "taskId": 2663,
+    "title": "Remediation",
+    "oldRole": "Environmental Compliance Officer",
+    "newRole": "Facilities Director"
+  },
+  {
+    "regKey": "REG-130",
+    "taskId": 3368,
+    "title": "General",
+    "oldRole": "Training Coordinator",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-130",
+    "taskId": 3800,
+    "title": "Conduct Drug Free Workplace Self-Evaluation/Audit",
+    "oldRole": "HR Director",
+    "newRole": "Internal Auditor"
+  },
+  {
+    "regKey": "REG-130",
+    "taskId": 2675,
+    "title": "Drug Free Policy Statement",
+    "oldRole": "Training Coordinator",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-130",
+    "taskId": 2676,
+    "title": "Drug Awareness Program",
+    "oldRole": "Training Coordinator",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-130",
+    "taskId": 2677,
+    "title": "Employee Notification",
+    "oldRole": "Training Coordinator",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-130",
+    "taskId": 2678,
+    "title": "Agency Notification",
+    "oldRole": "Training Coordinator",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-130",
+    "taskId": 2679,
+    "title": "Sanctions/Rehabilitation",
+    "oldRole": "Training Coordinator",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-130",
+    "taskId": 2680,
+    "title": "Good Faith Effort",
+    "oldRole": "Training Coordinator",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-131",
+    "taskId": 4505,
+    "title": "Emergency Planning Notification and Coordination",
+    "oldRole": "Facilities Director",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-131",
+    "taskId": 4506,
+    "title": "Notify SERC and LEPC of EHS storage above thresholds",
+    "oldRole": "Facilities Director",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-131",
+    "taskId": 4507,
+    "title": "Designate facility emergency coordinator",
+    "oldRole": "Facilities Director",
+    "newRole": "Emergency Management Director"
+  },
+  {
+    "regKey": "REG-131",
+    "taskId": 4508,
+    "title": "Provide emergency response procedures to LEPC",
+    "oldRole": "Facilities Director",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-131",
+    "taskId": 4509,
+    "title": "Maintain current contact with emergency planning entities",
+    "oldRole": "Facilities Director",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-131",
+    "taskId": 4520,
+    "title": "Emergency Release Notification",
+    "oldRole": "Emergency Management Director",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-131",
+    "taskId": 4522,
+    "title": "Train personnel on release reporting requirements",
+    "oldRole": "Emergency Management Director",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-131",
+    "taskId": 4524,
+    "title": "Public Information and Trade Secret Management",
+    "oldRole": "General Counsel",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-131",
+    "taskId": 4526,
+    "title": "Ensure report accuracy for public disclosure",
+    "oldRole": "General Counsel",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-132",
+    "taskId": 2682,
+    "title": "Fleet Requirements",
+    "oldRole": "Environmental Compliance Officer",
+    "newRole": "Facilities Director"
+  },
+  {
+    "regKey": "REG-133",
+    "taskId": 2685,
+    "title": "Whistleblower Protection",
+    "oldRole": "Environmental Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-135",
+    "taskId": 2691,
+    "title": "Tool Condition",
+    "oldRole": "Environmental Compliance Officer",
+    "newRole": "Facilities Director"
+  },
+  {
+    "regKey": "REG-135",
+    "taskId": 2692,
+    "title": "Guards",
+    "oldRole": "Environmental Compliance Officer",
+    "newRole": "Facilities Director"
+  },
+  {
+    "regKey": "REG-135",
+    "taskId": 2694,
+    "title": "Training",
+    "oldRole": "Environmental Compliance Officer",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-136",
+    "taskId": 2695,
+    "title": "Underground Tank Compliance",
+    "oldRole": "Environmental Compliance Officer",
+    "newRole": "Facilities Director"
+  },
+  {
+    "regKey": "REG-137",
+    "taskId": 2698,
+    "title": "Textbook Information",
+    "oldRole": "IT Security Officer",
+    "newRole": "Library Director"
+  },
+  {
+    "regKey": "REG-137",
+    "taskId": 2700,
+    "title": "Fire Safety Report",
+    "oldRole": "IT Security Officer",
+    "newRole": "Fire Safety Officer"
+  },
+  {
+    "regKey": "REG-137",
+    "taskId": 2701,
+    "title": "Missing Student Procedures",
+    "oldRole": "IT Security Officer",
+    "newRole": "Dean of Students"
+  },
+  {
+    "regKey": "REG-137",
+    "taskId": 2702,
+    "title": "Voter Registration",
+    "oldRole": "IT Security Officer",
+    "newRole": "Registrar"
+  },
+  {
+    "regKey": "REG-138",
+    "taskId": 3375,
+    "title": "General",
+    "oldRole": "Registrar",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "REG-138",
+    "taskId": 2703,
+    "title": "Copyright Policy",
+    "oldRole": "Registrar",
+    "newRole": "General Counsel"
+  },
+  {
+    "regKey": "REG-138",
+    "taskId": 2704,
+    "title": "Policy Disclosure",
+    "oldRole": "Registrar",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "REG-138",
+    "taskId": 2705,
+    "title": "P2P Plan",
+    "oldRole": "Registrar",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-138",
+    "taskId": 2706,
+    "title": "Legal Alternatives",
+    "oldRole": "Registrar",
+    "newRole": "Library Director"
+  },
+  {
+    "regKey": "REG-138",
+    "taskId": 2707,
+    "title": "Disciplinary Procedures",
+    "oldRole": "Registrar",
+    "newRole": "VP Student Affairs"
+  },
+  {
+    "regKey": "REG-139",
+    "taskId": 2710,
+    "title": "Acknowledgment",
+    "oldRole": "Environmental Compliance Officer",
+    "newRole": "Facilities Director"
+  },
+  {
+    "regKey": "REG-141",
+    "taskId": 2716,
+    "title": "Driver Qualifications",
+    "oldRole": "Environmental Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-141",
+    "taskId": 2717,
+    "title": "Hours of Service",
+    "oldRole": "Environmental Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-141",
+    "taskId": 2718,
+    "title": "Vehicle Inspection",
+    "oldRole": "Environmental Compliance Officer",
+    "newRole": "Facilities Director"
+  },
+  {
+    "regKey": "REG-141",
+    "taskId": 2719,
+    "title": "Driver Files",
+    "oldRole": "Environmental Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-143",
+    "taskId": 3380,
+    "title": "General",
+    "oldRole": "Training Coordinator",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-143",
+    "taskId": 2725,
+    "title": "SPCC Plan",
+    "oldRole": "Training Coordinator",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-143",
+    "taskId": 2726,
+    "title": "Secondary Containment",
+    "oldRole": "Training Coordinator",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-143",
+    "taskId": 2727,
+    "title": "Spill Response",
+    "oldRole": "Training Coordinator",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-143",
+    "taskId": 2728,
+    "title": "Inspection Program",
+    "oldRole": "Training Coordinator",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-143",
+    "taskId": 2729,
+    "title": "Training",
+    "oldRole": "Training Coordinator",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-144",
+    "taskId": 2730,
+    "title": "Pre-1978 Disclosure",
+    "oldRole": "Environmental Compliance Officer",
+    "newRole": "Facilities Director"
+  },
+  {
+    "regKey": "REG-144",
+    "taskId": 2731,
+    "title": "Renovation Rule",
+    "oldRole": "Environmental Compliance Officer",
+    "newRole": "Facilities Director"
+  },
+  {
+    "regKey": "REG-144",
+    "taskId": 2732,
+    "title": "Certified Renovators",
+    "oldRole": "Environmental Compliance Officer",
+    "newRole": "Facilities Director"
+  },
+  {
+    "regKey": "REG-144",
+    "taskId": 2733,
+    "title": "Work Practices",
+    "oldRole": "Environmental Compliance Officer",
+    "newRole": "Facilities Director"
+  },
+  {
+    "regKey": "REG-145",
+    "taskId": 2740,
+    "title": "Training",
+    "oldRole": "Environmental Compliance Officer",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-147",
+    "taskId": 2759,
+    "title": "Training",
+    "oldRole": "Environmental Compliance Officer",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-148",
+    "taskId": 2761,
+    "title": "Asbestos Requirements",
+    "oldRole": "Environmental Compliance Officer",
+    "newRole": "Facilities Director"
+  },
+  {
+    "regKey": "REG-148",
+    "taskId": 2762,
+    "title": "Lead Paint Requirements",
+    "oldRole": "Environmental Compliance Officer",
+    "newRole": "Facilities Director"
+  },
+  {
+    "regKey": "REG-149",
+    "taskId": 3810,
+    "title": "Conduct Bankruptcy Abuse Prevention Self-Evaluation/Audit",
+    "oldRole": "CFO",
+    "newRole": "Internal Auditor"
+  },
+  {
+    "regKey": "REG-150",
+    "taskId": 3811,
+    "title": "Conduct Clayton Antitrust Act Self-Evaluation/Audit",
+    "oldRole": "CFO",
+    "newRole": "General Counsel"
+  },
+  {
+    "regKey": "REG-151",
+    "taskId": 3812,
+    "title": "Conduct Federal Unemployment Tax Self-Evaluation/Audit",
+    "oldRole": "CFO",
+    "newRole": "Internal Auditor"
+  },
+  {
+    "regKey": "REG-153",
+    "taskId": 2764,
+    "title": "Readmission Policy",
+    "oldRole": "VP Academic Affairs",
+    "newRole": "Registrar"
+  },
+  {
+    "regKey": "REG-153",
+    "taskId": 2765,
+    "title": "Notification Procedures",
+    "oldRole": "VP Academic Affairs",
+    "newRole": "Registrar"
+  },
+  {
+    "regKey": "REG-153",
+    "taskId": 2766,
+    "title": "Readmission Timeline",
+    "oldRole": "VP Academic Affairs",
+    "newRole": "Registrar"
+  },
+  {
+    "regKey": "REG-153",
+    "taskId": 2767,
+    "title": "Same Status",
+    "oldRole": "VP Academic Affairs",
+    "newRole": "Registrar"
+  },
+  {
+    "regKey": "REG-153",
+    "taskId": 2768,
+    "title": "Tuition Rate",
+    "oldRole": "VP Academic Affairs",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "REG-154",
+    "taskId": 2773,
+    "title": "Visa Compliance",
+    "oldRole": "HR Director",
+    "newRole": "International Programs Director"
+  },
+  {
+    "regKey": "REG-155",
+    "taskId": 3815,
+    "title": "Conduct Regulation E: Electronic Self-Evaluation/Audit",
+    "oldRole": "CFO",
+    "newRole": "Internal Auditor"
+  },
+  {
+    "regKey": "REG-156",
+    "taskId": 3816,
+    "title": "Conduct Sarbanes Oxley Act Self-Evaluation/Audit",
+    "oldRole": "CFO",
+    "newRole": "Internal Auditor"
+  },
+  {
+    "regKey": "REG-157",
+    "taskId": 3817,
+    "title": "Conduct Sherman Antitrust Act Self-Evaluation/Audit",
+    "oldRole": "CFO",
+    "newRole": "General Counsel"
+  },
+  {
+    "regKey": "REG-158",
+    "taskId": 3818,
+    "title": "Conduct Social Security Act Self-Evaluation/Audit",
+    "oldRole": "CFO",
+    "newRole": "Internal Auditor"
+  },
+  {
+    "regKey": "REG-159",
+    "taskId": 3420,
+    "title": "General",
+    "oldRole": "HR Director",
+    "newRole": "International Programs Director"
+  },
+  {
+    "regKey": "REG-159",
+    "taskId": 3819,
+    "title": "Complete Annual Student Exchange and Report",
+    "oldRole": "HR Director",
+    "newRole": "International Programs Director"
+  },
+  {
+    "regKey": "REG-159",
+    "taskId": 2774,
+    "title": "SEVP Certification",
+    "oldRole": "HR Director",
+    "newRole": "International Programs Director"
+  },
+  {
+    "regKey": "REG-159",
+    "taskId": 2775,
+    "title": "DSO Designation",
+    "oldRole": "HR Director",
+    "newRole": "International Programs Director"
+  },
+  {
+    "regKey": "REG-159",
+    "taskId": 2776,
+    "title": "Student Registration",
+    "oldRole": "HR Director",
+    "newRole": "Registrar"
+  },
+  {
+    "regKey": "REG-159",
+    "taskId": 2777,
+    "title": "Status Updates",
+    "oldRole": "HR Director",
+    "newRole": "International Programs Director"
+  },
+  {
+    "regKey": "REG-159",
+    "taskId": 2778,
+    "title": "Address Updates",
+    "oldRole": "HR Director",
+    "newRole": "International Programs Director"
+  },
+  {
+    "regKey": "REG-159",
+    "taskId": 2780,
+    "title": "Recertification",
+    "oldRole": "HR Director",
+    "newRole": "International Programs Director"
+  },
+  {
+    "regKey": "REG-160",
+    "taskId": 3820,
+    "title": "Conduct Tax Cuts and Self-Evaluation/Audit",
+    "oldRole": "CFO",
+    "newRole": "Internal Auditor"
+  },
+  {
+    "regKey": "REG-161",
+    "taskId": 3821,
+    "title": "Conduct Truth in Lending Self-Evaluation/Audit",
+    "oldRole": "CFO",
+    "newRole": "Internal Auditor"
+  },
+  {
+    "regKey": "REG-164",
+    "taskId": 406,
+    "title": "Conduct Ethics Training",
+    "oldRole": "General Counsel",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-164",
+    "taskId": 408,
+    "title": "Update Code of Conduct",
+    "oldRole": "HR Director",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-165",
+    "taskId": 409,
+    "title": "Conduct Ethics Training",
+    "oldRole": "General Counsel",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-165",
+    "taskId": 411,
+    "title": "Update Code of Conduct",
+    "oldRole": "HR Director",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-167",
+    "taskId": 913,
+    "title": "Review Tax-Exempt Status Compliance",
+    "oldRole": "General Counsel",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "REG-168",
+    "taskId": 3454,
+    "title": "review",
+    "oldRole": "CFO",
+    "newRole": "General Counsel"
+  },
+  {
+    "regKey": "REG-168",
+    "taskId": 3825,
+    "title": "Conduct Charitable Gift Annuity Self-Evaluation/Audit",
+    "oldRole": "CFO",
+    "newRole": "Internal Auditor"
+  },
+  {
+    "regKey": "REG-169",
+    "taskId": 412,
+    "title": "Conduct Ethics Training",
+    "oldRole": "General Counsel",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-169",
+    "taskId": 3455,
+    "title": "policy",
+    "oldRole": "HR Director",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-169",
+    "taskId": 3456,
+    "title": "review",
+    "oldRole": "HR Director",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-169",
+    "taskId": 3457,
+    "title": "training",
+    "oldRole": "HR Director",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-169",
+    "taskId": 414,
+    "title": "Update Code of Conduct",
+    "oldRole": "HR Director",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-170",
+    "taskId": 3827,
+    "title": "Conduct Consumer Credit Protection Self-Evaluation/Audit",
+    "oldRole": "HR Director",
+    "newRole": "Internal Auditor"
+  },
+  {
+    "regKey": "REG-171",
+    "taskId": 3464,
+    "title": "review",
+    "oldRole": "CFO",
+    "newRole": "Board Compensation Committee"
+  },
+  {
+    "regKey": "REG-171",
+    "taskId": 921,
+    "title": "Review Tax-Exempt Status Compliance",
+    "oldRole": "General Counsel",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "REG-172",
+    "taskId": 925,
+    "title": "Review Tax-Exempt Status Compliance",
+    "oldRole": "General Counsel",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "REG-173",
+    "taskId": 415,
+    "title": "Conduct Ethics Training",
+    "oldRole": "General Counsel",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-173",
+    "taskId": 417,
+    "title": "Update Code of Conduct",
+    "oldRole": "HR Director",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-174",
+    "taskId": 3829,
+    "title": "Conduct Fair Labor Standards Self-Evaluation/Audit",
+    "oldRole": "HR Director",
+    "newRole": "Internal Auditor"
+  },
+  {
+    "regKey": "REG-176",
+    "taskId": 3831,
+    "title": "Conduct Federal Sentencing Guidelines Self-Evaluation/Audit",
+    "oldRole": "Ethics Officer",
+    "newRole": "Internal Auditor"
+  },
+  {
+    "regKey": "REG-176",
+    "taskId": 2783,
+    "title": "Training",
+    "oldRole": "Ethics Officer",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-177",
+    "taskId": 3832,
+    "title": "Conduct Federal Unemployment Tax Self-Evaluation/Audit",
+    "oldRole": "HR Director",
+    "newRole": "Internal Auditor"
+  },
+  {
+    "regKey": "REG-179",
+    "taskId": 933,
+    "title": "Review Tax-Exempt Status Compliance",
+    "oldRole": "General Counsel",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "REG-180",
+    "taskId": 725,
+    "title": "Review Lobbying Activities",
+    "oldRole": "Government Relations",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-180",
+    "taskId": 3490,
+    "title": "documentation",
+    "oldRole": "General Counsel",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-180",
+    "taskId": 3491,
+    "title": "review",
+    "oldRole": "General Counsel",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-180",
+    "taskId": 3492,
+    "title": "training",
+    "oldRole": "General Counsel",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-180",
+    "taskId": 726,
+    "title": "Document Lobbying Expenditures",
+    "oldRole": "CFO",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-180",
+    "taskId": 727,
+    "title": "Train Staff on Political Activity Restrictions",
+    "oldRole": "General Counsel",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-181",
+    "taskId": 3495,
+    "title": "training",
+    "oldRole": "Ethics Officer",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-181",
+    "taskId": 729,
+    "title": "Document Lobbying Expenditures",
+    "oldRole": "CFO",
+    "newRole": "Government Relations"
+  },
+  {
+    "regKey": "REG-181",
+    "taskId": 730,
+    "title": "Train Staff on Political Activity Restrictions",
+    "oldRole": "General Counsel",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-182",
+    "taskId": 937,
+    "title": "Review Tax-Exempt Status Compliance",
+    "oldRole": "General Counsel",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "REG-183",
+    "taskId": 941,
+    "title": "Review Tax-Exempt Status Compliance",
+    "oldRole": "General Counsel",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "REG-184",
+    "taskId": 2787,
+    "title": "Annual Filing",
+    "oldRole": "Ethics Officer",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "REG-184",
+    "taskId": 2789,
+    "title": "Compensation Reporting",
+    "oldRole": "Ethics Officer",
+    "newRole": "Board Compensation Committee"
+  },
+  {
+    "regKey": "REG-184",
+    "taskId": 2790,
+    "title": "Public Availability",
+    "oldRole": "Ethics Officer",
+    "newRole": "General Counsel"
+  },
+  {
+    "regKey": "REG-184",
+    "taskId": 2791,
+    "title": "Schedule A",
+    "oldRole": "Ethics Officer",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "REG-185",
+    "taskId": 3505,
+    "title": "documentation",
+    "oldRole": "General Counsel",
+    "newRole": "Government Relations"
+  },
+  {
+    "regKey": "REG-185",
+    "taskId": 3506,
+    "title": "review",
+    "oldRole": "General Counsel",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-185",
+    "taskId": 3507,
+    "title": "training",
+    "oldRole": "General Counsel",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-185",
+    "taskId": 733,
+    "title": "Train Staff on Political Activity Restrictions",
+    "oldRole": "General Counsel",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-186",
+    "taskId": 3511,
+    "title": "review",
+    "oldRole": "CFO",
+    "newRole": "Board Compensation Committee"
+  },
+  {
+    "regKey": "REG-186",
+    "taskId": 945,
+    "title": "Review Tax-Exempt Status Compliance",
+    "oldRole": "General Counsel",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "REG-188",
+    "taskId": 734,
+    "title": "Review Lobbying Activities",
+    "oldRole": "Government Relations",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-188",
+    "taskId": 3517,
+    "title": "training",
+    "oldRole": "Ethics Officer",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-188",
+    "taskId": 3836,
+    "title": "Conduct Political Activities Self-Evaluation/Audit",
+    "oldRole": "Ethics Officer",
+    "newRole": "Internal Auditor"
+  },
+  {
+    "regKey": "REG-188",
+    "taskId": 736,
+    "title": "Train Staff on Political Activity Restrictions",
+    "oldRole": "General Counsel",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-190",
+    "taskId": 953,
+    "title": "Review Tax-Exempt Status Compliance",
+    "oldRole": "General Counsel",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "REG-192",
+    "taskId": 957,
+    "title": "Review Tax-Exempt Status Compliance",
+    "oldRole": "General Counsel",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "REG-194",
+    "taskId": 424,
+    "title": "Conduct Ethics Training",
+    "oldRole": "General Counsel",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-194",
+    "taskId": 3537,
+    "title": "policy",
+    "oldRole": "HR Director",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-194",
+    "taskId": 3538,
+    "title": "review",
+    "oldRole": "HR Director",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-194",
+    "taskId": 3539,
+    "title": "training",
+    "oldRole": "HR Director",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-194",
+    "taskId": 426,
+    "title": "Update Code of Conduct",
+    "oldRole": "HR Director",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-195",
+    "taskId": 427,
+    "title": "Conduct Ethics Training",
+    "oldRole": "General Counsel",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-195",
+    "taskId": 3540,
+    "title": "policy",
+    "oldRole": "HR Director",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-195",
+    "taskId": 3541,
+    "title": "review",
+    "oldRole": "HR Director",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-195",
+    "taskId": 3542,
+    "title": "training",
+    "oldRole": "HR Director",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-195",
+    "taskId": 3840,
+    "title": "Conduct Salary of Government Self-Evaluation/Audit",
+    "oldRole": "Ethics Officer",
+    "newRole": "Internal Auditor"
+  },
+  {
+    "regKey": "REG-195",
+    "taskId": 429,
+    "title": "Update Code of Conduct",
+    "oldRole": "HR Director",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-196",
+    "taskId": 965,
+    "title": "Review Tax-Exempt Status Compliance",
+    "oldRole": "General Counsel",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "REG-197",
+    "taskId": 3841,
+    "title": "Conduct Unrelated Business Income Self-Evaluation/Audit",
+    "oldRole": "CFO",
+    "newRole": "Internal Auditor"
+  },
+  {
+    "regKey": "REG-198",
+    "taskId": 2792,
+    "title": "Tax Compliance",
+    "oldRole": "Technology Transfer Officer",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "REG-198",
+    "taskId": 2793,
+    "title": "Document Retention",
+    "oldRole": "Technology Transfer Officer",
+    "newRole": "General Counsel"
+  },
+  {
+    "regKey": "REG-198",
+    "taskId": 2794,
+    "title": "Donation Substantiation",
+    "oldRole": "Technology Transfer Officer",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "REG-199",
+    "taskId": 3842,
+    "title": "Conduct Anti-Kickback Act of Self-Evaluation/Audit",
+    "oldRole": "Procurement Director",
+    "newRole": "Internal Auditor"
+  },
+  {
+    "regKey": "REG-200",
+    "taskId": 3843,
+    "title": "Conduct Anti-discrimination laws for Self-Evaluation/Audit",
+    "oldRole": "Procurement Director",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-201",
+    "taskId": 3844,
+    "title": "Conduct Bayh-Dole Act of Self-Evaluation/Audit",
+    "oldRole": "Technology Transfer Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-203",
+    "taskId": 157,
+    "title": "Review DMCA Compliance",
+    "oldRole": "General Counsel",
+    "newRole": "Technology Transfer Officer"
+  },
+  {
+    "regKey": "REG-203",
+    "taskId": 3562,
+    "title": "compliance",
+    "oldRole": "General Counsel",
+    "newRole": "Technology Transfer Officer"
+  },
+  {
+    "regKey": "REG-203",
+    "taskId": 3563,
+    "title": "policy",
+    "oldRole": "General Counsel",
+    "newRole": "Technology Transfer Officer"
+  },
+  {
+    "regKey": "REG-203",
+    "taskId": 3564,
+    "title": "training",
+    "oldRole": "General Counsel",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-203",
+    "taskId": 158,
+    "title": "Update Copyright Policies",
+    "oldRole": "Library Director",
+    "newRole": "Technology Transfer Officer"
+  },
+  {
+    "regKey": "REG-203",
+    "taskId": 159,
+    "title": "Conduct Copyright Training",
+    "oldRole": "General Counsel",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-204",
+    "taskId": 160,
+    "title": "Review DMCA Compliance",
+    "oldRole": "General Counsel",
+    "newRole": "Technology Transfer Officer"
+  },
+  {
+    "regKey": "REG-204",
+    "taskId": 3565,
+    "title": "compliance",
+    "oldRole": "General Counsel",
+    "newRole": "Technology Transfer Officer"
+  },
+  {
+    "regKey": "REG-204",
+    "taskId": 3566,
+    "title": "policy",
+    "oldRole": "General Counsel",
+    "newRole": "Technology Transfer Officer"
+  },
+  {
+    "regKey": "REG-204",
+    "taskId": 3567,
+    "title": "training",
+    "oldRole": "General Counsel",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-204",
+    "taskId": 161,
+    "title": "Update Copyright Policies",
+    "oldRole": "Library Director",
+    "newRole": "Technology Transfer Officer"
+  },
+  {
+    "regKey": "REG-204",
+    "taskId": 162,
+    "title": "Conduct Copyright Training",
+    "oldRole": "General Counsel",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-205",
+    "taskId": 3847,
+    "title": "Conduct Davis-Bacon Act Self-Evaluation/Audit",
+    "oldRole": "Procurement Director",
+    "newRole": "Internal Auditor"
+  },
+  {
+    "regKey": "REG-206",
+    "taskId": 2801,
+    "title": "Designated Agent",
+    "oldRole": "IT Security Officer",
+    "newRole": "General Counsel"
+  },
+  {
+    "regKey": "REG-206",
+    "taskId": 2803,
+    "title": "Counter-Notice Process",
+    "oldRole": "IT Security Officer",
+    "newRole": "General Counsel"
+  },
+  {
+    "regKey": "REG-207",
+    "taskId": 3849,
+    "title": "Conduct Drug & Alcohol Self-Evaluation/Audit",
+    "oldRole": "HR Director",
+    "newRole": "Internal Auditor"
+  },
+  {
+    "regKey": "REG-208",
+    "taskId": 3850,
+    "title": "Conduct E-Verify Executive Order Self-Evaluation/Audit",
+    "oldRole": "Procurement Director",
+    "newRole": "Internal Auditor"
+  },
+  {
+    "regKey": "REG-212",
+    "taskId": 3579,
+    "title": "General",
+    "oldRole": "International Programs Director",
+    "newRole": "Dean of Students"
+  },
+  {
+    "regKey": "REG-212",
+    "taskId": 2824,
+    "title": "Registration Assessment",
+    "oldRole": "International Programs Director",
+    "newRole": "General Counsel"
+  },
+  {
+    "regKey": "REG-212",
+    "taskId": 2825,
+    "title": "Foreign Funding Review",
+    "oldRole": "International Programs Director",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "REG-212",
+    "taskId": 2826,
+    "title": "Disclosure",
+    "oldRole": "International Programs Director",
+    "newRole": "Government Relations"
+  },
+  {
+    "regKey": "REG-213",
+    "taskId": 3854,
+    "title": "Conduct Foreign Corrupt Practices Self-Evaluation/Audit",
+    "oldRole": "Dean of Students",
+    "newRole": "Internal Auditor"
+  },
+  {
+    "regKey": "REG-213",
+    "taskId": 2827,
+    "title": "Anti-Bribery Compliance",
+    "oldRole": "Dean of Students",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-213",
+    "taskId": 2828,
+    "title": "Third-Party Due Diligence",
+    "oldRole": "Dean of Students",
+    "newRole": "Procurement Director"
+  },
+  {
+    "regKey": "REG-213",
+    "taskId": 2829,
+    "title": "Accurate Books and Records",
+    "oldRole": "Dean of Students",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "REG-213",
+    "taskId": 2830,
+    "title": "Internal Controls",
+    "oldRole": "Dean of Students",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "REG-213",
+    "taskId": 2831,
+    "title": "FCPA Training",
+    "oldRole": "Dean of Students",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-214",
+    "taskId": 163,
+    "title": "Review DMCA Compliance",
+    "oldRole": "General Counsel",
+    "newRole": "Technology Transfer Officer"
+  },
+  {
+    "regKey": "REG-214",
+    "taskId": 3581,
+    "title": "compliance",
+    "oldRole": "General Counsel",
+    "newRole": "Technology Transfer Officer"
+  },
+  {
+    "regKey": "REG-214",
+    "taskId": 3582,
+    "title": "policy",
+    "oldRole": "General Counsel",
+    "newRole": "Technology Transfer Officer"
+  },
+  {
+    "regKey": "REG-214",
+    "taskId": 3583,
+    "title": "training",
+    "oldRole": "General Counsel",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-214",
+    "taskId": 3855,
+    "title": "Complete Annual Higher Education Act: Report",
+    "oldRole": "Technology Transfer Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-214",
+    "taskId": 164,
+    "title": "Update Copyright Policies",
+    "oldRole": "Library Director",
+    "newRole": "Technology Transfer Officer"
+  },
+  {
+    "regKey": "REG-214",
+    "taskId": 165,
+    "title": "Conduct Copyright Training",
+    "oldRole": "General Counsel",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-216",
+    "taskId": 166,
+    "title": "Review DMCA Compliance",
+    "oldRole": "General Counsel",
+    "newRole": "Technology Transfer Officer"
+  },
+  {
+    "regKey": "REG-216",
+    "taskId": 3584,
+    "title": "compliance",
+    "oldRole": "General Counsel",
+    "newRole": "Technology Transfer Officer"
+  },
+  {
+    "regKey": "REG-216",
+    "taskId": 3585,
+    "title": "policy",
+    "oldRole": "General Counsel",
+    "newRole": "Technology Transfer Officer"
+  },
+  {
+    "regKey": "REG-216",
+    "taskId": 3586,
+    "title": "training",
+    "oldRole": "General Counsel",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-216",
+    "taskId": 167,
+    "title": "Update Copyright Policies",
+    "oldRole": "Library Director",
+    "newRole": "Technology Transfer Officer"
+  },
+  {
+    "regKey": "REG-216",
+    "taskId": 168,
+    "title": "Conduct Copyright Training",
+    "oldRole": "General Counsel",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-218",
+    "taskId": 3857,
+    "title": "Conduct Non-Retaliation for Disclosure Self-Evaluation/Audit",
+    "oldRole": "Procurement Director",
+    "newRole": "Internal Auditor"
+  },
+  {
+    "regKey": "REG-222",
+    "taskId": 3861,
+    "title": "Conduct Small Business Act Self-Evaluation/Audit",
+    "oldRole": "Procurement Director",
+    "newRole": "Internal Auditor"
+  },
+  {
+    "regKey": "REG-223",
+    "taskId": 169,
+    "title": "Review DMCA Compliance",
+    "oldRole": "General Counsel",
+    "newRole": "Technology Transfer Officer"
+  },
+  {
+    "regKey": "REG-223",
+    "taskId": 3597,
+    "title": "compliance",
+    "oldRole": "General Counsel",
+    "newRole": "Technology Transfer Officer"
+  },
+  {
+    "regKey": "REG-223",
+    "taskId": 3598,
+    "title": "policy",
+    "oldRole": "General Counsel",
+    "newRole": "Technology Transfer Officer"
+  },
+  {
+    "regKey": "REG-223",
+    "taskId": 3599,
+    "title": "training",
+    "oldRole": "General Counsel",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-223",
+    "taskId": 170,
+    "title": "Update Copyright Policies",
+    "oldRole": "Library Director",
+    "newRole": "Technology Transfer Officer"
+  },
+  {
+    "regKey": "REG-223",
+    "taskId": 171,
+    "title": "Conduct Copyright Training",
+    "oldRole": "General Counsel",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-224",
+    "taskId": 172,
+    "title": "Review DMCA Compliance",
+    "oldRole": "General Counsel",
+    "newRole": "Technology Transfer Officer"
+  },
+  {
+    "regKey": "REG-224",
+    "taskId": 3600,
+    "title": "compliance",
+    "oldRole": "General Counsel",
+    "newRole": "Technology Transfer Officer"
+  },
+  {
+    "regKey": "REG-224",
+    "taskId": 3601,
+    "title": "policy",
+    "oldRole": "General Counsel",
+    "newRole": "Technology Transfer Officer"
+  },
+  {
+    "regKey": "REG-224",
+    "taskId": 3602,
+    "title": "training",
+    "oldRole": "General Counsel",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-224",
+    "taskId": 174,
+    "title": "Conduct Copyright Training",
+    "oldRole": "General Counsel",
+    "newRole": "Training Coordinator"
+  },
+  {
+    "regKey": "REG-225",
+    "taskId": 3603,
+    "title": "compliance",
+    "oldRole": "Procurement Director",
+    "newRole": "Export Control Officer"
+  },
+  {
+    "regKey": "REG-225",
+    "taskId": 3863,
+    "title": "Conduct Trade Sanctions Reform Self-Evaluation/Audit",
+    "oldRole": "Procurement Director",
+    "newRole": "Internal Auditor"
+  },
+  {
+    "regKey": "REG-229",
+    "taskId": 2859,
+    "title": "Notice Content",
+    "oldRole": "HR Director",
+    "newRole": "General Counsel"
+  },
+  {
+    "regKey": "REG-230",
+    "taskId": 229,
+    "title": "Verify ERISA Compliance",
+    "oldRole": "HR Director",
+    "newRole": "General Counsel"
+  },
+  {
+    "regKey": "REG-231",
+    "taskId": 232,
+    "title": "Verify ERISA Compliance",
+    "oldRole": "HR Director",
+    "newRole": "General Counsel"
+  },
+  {
+    "regKey": "REG-232",
+    "taskId": 2864,
+    "title": "Form 5500",
+    "oldRole": "HR Director",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "REG-235",
+    "taskId": 241,
+    "title": "Verify ERISA Compliance",
+    "oldRole": "HR Director",
+    "newRole": "General Counsel"
+  },
+  {
+    "regKey": "REG-236",
+    "taskId": 244,
+    "title": "Verify ERISA Compliance",
+    "oldRole": "HR Director",
+    "newRole": "General Counsel"
+  },
+  {
+    "regKey": "REG-239",
+    "taskId": 3630,
+    "title": "General",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-239",
+    "taskId": 3872,
+    "title": "Conduct Age Discrimination Employment Self-Evaluation/Audit",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-239",
+    "taskId": 2870,
+    "title": "No Age Discrimination",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-239",
+    "taskId": 2871,
+    "title": "ADEA Poster",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-239",
+    "taskId": 2872,
+    "title": "Waiver Requirements",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "General Counsel"
+  },
+  {
+    "regKey": "REG-239",
+    "taskId": 2873,
+    "title": "Benefit Plans",
+    "oldRole": "Title IX Coordinator",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-242",
+    "taskId": 2884,
+    "title": "Lawful Basis",
+    "oldRole": "IT Security Officer",
+    "newRole": "Privacy Officer"
+  },
+  {
+    "regKey": "REG-242",
+    "taskId": 2885,
+    "title": "Privacy Notice",
+    "oldRole": "IT Security Officer",
+    "newRole": "Privacy Officer"
+  },
+  {
+    "regKey": "REG-242",
+    "taskId": 2886,
+    "title": "Data Subject Rights",
+    "oldRole": "IT Security Officer",
+    "newRole": "Privacy Officer"
+  },
+  {
+    "regKey": "REG-242",
+    "taskId": 2887,
+    "title": "Data Processing Agreements",
+    "oldRole": "IT Security Officer",
+    "newRole": "General Counsel"
+  },
+  {
+    "regKey": "REG-242",
+    "taskId": 2889,
+    "title": "Transfer Mechanisms",
+    "oldRole": "IT Security Officer",
+    "newRole": "General Counsel"
+  },
+  {
+    "regKey": "REG-243",
+    "taskId": 2891,
+    "title": "No ULPs",
+    "oldRole": "HR Director",
+    "newRole": "General Counsel"
+  },
+  {
+    "regKey": "REG-243",
+    "taskId": 2893,
+    "title": "Bargaining Obligations",
+    "oldRole": "HR Director",
+    "newRole": "General Counsel"
+  },
+  {
+    "regKey": "REG-245",
+    "taskId": 3878,
+    "title": "Conduct Higher Education Act: Self-Evaluation/Audit",
+    "oldRole": "Communications Director",
+    "newRole": "Internal Auditor"
+  },
+  {
+    "regKey": "REG-245",
+    "taskId": 2901,
+    "title": "Annual Certification",
+    "oldRole": "Communications Director",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-246",
+    "taskId": 3637,
+    "title": "General",
+    "oldRole": "Government Relations",
+    "newRole": "Communications Director"
+  },
+  {
+    "regKey": "REG-246",
+    "taskId": 2902,
+    "title": "Disclosure Threshold",
+    "oldRole": "Government Relations",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "REG-246",
+    "taskId": 2903,
+    "title": "Disclosure Content",
+    "oldRole": "Government Relations",
+    "newRole": "Communications Director"
+  },
+  {
+    "regKey": "REG-246",
+    "taskId": 2904,
+    "title": "Filing Deadline",
+    "oldRole": "Government Relations",
+    "newRole": "Communications Director"
+  },
+  {
+    "regKey": "REG-246",
+    "taskId": 2905,
+    "title": "Record Retention",
+    "oldRole": "Government Relations",
+    "newRole": "Communications Director"
+  },
+  {
+    "regKey": "REG-247",
+    "taskId": 3879,
+    "title": "Conduct Internal Revenue Code: Self-Evaluation/Audit",
+    "oldRole": "Communications Director",
+    "newRole": "Internal Auditor"
+  },
+  {
+    "regKey": "REG-247",
+    "taskId": 2908,
+    "title": "Vehicle Donations",
+    "oldRole": "Communications Director",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "REG-247",
+    "taskId": 2909,
+    "title": "Noncash Property",
+    "oldRole": "Communications Director",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "REG-248",
+    "taskId": 3880,
+    "title": "Conduct Pension Protection Act Self-Evaluation/Audit",
+    "oldRole": "Communications Director",
+    "newRole": "Internal Auditor"
+  },
+  {
+    "regKey": "REG-248",
+    "taskId": 2910,
+    "title": "Funding Requirements",
+    "oldRole": "Communications Director",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "REG-248",
+    "taskId": 2911,
+    "title": "Disclosure to Participants",
+    "oldRole": "Communications Director",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-248",
+    "taskId": 2912,
+    "title": "Automatic Enrollment",
+    "oldRole": "Communications Director",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-248",
+    "taskId": 2913,
+    "title": "Investment Advice",
+    "oldRole": "Communications Director",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-249",
+    "taskId": 3881,
+    "title": "Conduct Philanthropy Protection Act Self-Evaluation/Audit",
+    "oldRole": "Communications Director",
+    "newRole": "Internal Auditor"
+  },
+  {
+    "regKey": "REG-249",
+    "taskId": 2914,
+    "title": "Securities Exemption",
+    "oldRole": "Communications Director",
+    "newRole": "General Counsel"
+  },
+  {
+    "regKey": "REG-249",
+    "taskId": 2915,
+    "title": "State Registration",
+    "oldRole": "Communications Director",
+    "newRole": "General Counsel"
+  },
+  {
+    "regKey": "REG-249",
+    "taskId": 2916,
+    "title": "Reserve Requirements",
+    "oldRole": "Communications Director",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "REG-251",
+    "taskId": 3641,
+    "title": "General",
+    "oldRole": "Registrar",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "REG-251",
+    "taskId": 2920,
+    "title": "ISBN Disclosure",
+    "oldRole": "Registrar",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "REG-251",
+    "taskId": 2921,
+    "title": "Timely Information",
+    "oldRole": "Registrar",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "REG-251",
+    "taskId": 2922,
+    "title": "Bundling Options",
+    "oldRole": "Registrar",
+    "newRole": "VP Academic Affairs"
+  }
+]

@@ -55,42 +55,42 @@ import {
 } from 'lucide-react';
 
 const CANONICAL_ROLE_ALIASES: Record<string, string[]> = {
-  "Compliance Officer": ["compliance", "institutional compliance officer", "director of compliance", "compliance reporting manager"],
-  "General Counsel": ["legal counsel", "legal", "university counsel"],
-  "CFO": ["chief financial officer", "controller", "accounting manager"],
-  "HR Director": ["human resources director", "hr", "benefits manager", "payroll manager"],
-  "Title IX Coordinator": ["title ix coordinator / general counsel", "hr/title ix"],
+  "Compliance Officer": ["athletic trainers", "authorized organizational representative", "authorized representatives", "cable operators", "certified remote pilot in command (rpic)", "communications / compliance officer", "compliance", "compliance officer / president", "compliance personnel", "compliance reporting manager", "compliance staff", "copyright agents", "copyright compliance officers", "designated agent", "designated responsible officer", "director of compliance", "eeo compliance officer", "employer representative", "external consultants", "general counsel / compliance officer", "high-level personnel with sufficient authority and resources", "hr director / compliance officer", "institutional agent", "institutional compliance officer", "institutional compliance officers", "institutional officials", "institutional representative", "institutional representatives", "medical review officer", "officials", "qualified personnel", "responsible compliance officer", "responsible compliance officers", "responsible institutional officials", "responsible personnel", "responsible staff", "section 1557 coordinator", "senior administrators", "third-party solicitors"],
+  "General Counsel": ["legal counsel", "legal", "university counsel", "legal counsel and compliance officer"],
+  "CFO": ["accounting manager", "chief financial officer", "controller", "tax compliance officer"],
+  "HR Director": ["benefits administration staff", "benefits manager", "hiring manager", "hr", "hr compliance officer", "hr staff", "hr/training", "human resources", "human resources director", "payroll manager", "supervisor"],
+  "Title IX Coordinator": ["title ix coordinator / general counsel", "title ix coordinator / student affairs", "hr/title ix", "general counsel / title ix coordinator"],
   "Clery Compliance Officer": [],
-  "Financial Aid Director": ["financial aid officer", "student financial services director", "student accounts manager"],
-  "IT Security Officer": ["ciso", "chief information security officer", "data protection officer", "it security manager"],
-  "Campus Police Chief": ["campus safety director", "public safety director", "security director"],
+  "Financial Aid Director": ["designated financial aid administrator", "designated title iv administrator", "financial aid appeals officer", "financial aid counselor", "financial aid officer", "financial aid officers", "financial aid personnel", "financial aid records manager", "financial aid staff", "financial aid verification coordinator", "qualified financial aid personnel", "student accounts manager", "student financial services director"],
+  "IT Security Officer": ["chief information officer", "chief information security officer", "ciso", "data protection officer", "data security officer", "hipaa security officer", "incident response manager", "information security", "information security coordinator", "information security manager", "it security", "it security manager", "security assessment team lead", "senior agency information security officer"],
+  "Campus Police Chief": ["campus police / campus security department", "campus police chief / emergency management director", "campus police/security", "campus safety", "campus safety director", "campus safety officers", "public safety director", "security director", "security officer"],
   "Registrar": ["records manager"],
-  "VP Academic Affairs": ["provost", "chief academic officer", "academic affairs dean"],
-  "VP Student Affairs": ["chief student affairs officer", "vice president for student affairs"],
-  "Dean of Students": ["student life director", "student conduct officer", "housing director"],
-  "Privacy Officer": ["chief privacy officer"],
-  "President": ["president/chancellor", "senior administration"],
-  "Disability Services Coordinator": ["disability services director", "ada coordinator", "section 504 coordinator"],
-  "Emergency Management Director": ["emergency response coordinator"],
-  "Facilities Director": ["facilities", "ehs director", "environmental health and safety director"],
-  "Environmental Compliance Officer": ["environmental compliance manager"],
-  "Fire Safety Officer": ["safety officer"],
-  "Export Control Officer": ["ofac compliance officer"],
-  "Research Compliance Officer": ["research integrity officer", "vice president for research"],
+  "VP Academic Affairs": ["academic advisor", "academic affairs", "academic affairs dean", "academic affairs director", "chief academic officer", "provost", "provosts"],
+  "VP Student Affairs": ["student affairs", "chief student affairs officer", "student affairs vice president", "vice president for student affairs", "student affairs assessment coordinator"],
+  "Dean of Students": ["dean of students / student affairs", "student life director", "student conduct officer", "greek life director", "student health director", "housing director", "residence life", "counseling center", "health services director", "community service coordinator", "health services", "student affairs"],
+  "Privacy Officer": ["chief privacy officer", "foia officers", "hipaa privacy officer"],
+  "President": ["chief administrator", "president / provost", "president/chancellor", "senior administration"],
+  "Disability Services Coordinator": ["disability services", "disability services director", "ada coordinator", "ada/504 coordinator", "section 504 coordinator", "accessibility coordinator"],
+  "Emergency Management Director": ["emergency management", "emergency response coordinator", "facility emergency coordinator"],
+  "Facilities Director": ["ehs director", "environmental health and safety director", "facilities", "facilities management"],
+  "Environmental Compliance Officer": ["certified pesticide applicators", "chemical hygiene officer", "competent persons", "dangerous goods safety advisor", "designated responsible individual", "environmental compliance manager", "environmental compliance specialist", "environmental health and safety personnel", "radiation safety officer", "responsible environmental health officers", "used oil management coordinator", "ust operators"],
+  "Fire Safety Officer": ["fire watch personnel", "safety officer"],
+  "Export Control Officer": ["export control officers", "ofac compliance officer"],
+  "Research Compliance Officer": ["clinical investigator", "co-investigators", "co-principal investigator", "covered clinical investigator", "grants management staff", "inventor", "investigators", "licensed practitioner", "nih administrators", "nsf personnel", "postdoctoral fellows", "principal investigator", "principal investigators", "research administrators", "research compliance", "research integrity officer", "research integrity officers", "responsible party", "sponsors", "teaching and research assistants", "vice president for research"],
   "Training Coordinator": ["training director"],
-  "Procurement Director": ["procurement manager", "procurement officer"],
-  "Internal Auditor": ["quality assurance manager", "risk management officer"],
-  "International Programs Director": [],
+  "Procurement Director": ["business development staff", "procurement", "procurement and legal staff", "procurement manager", "procurement officer", "procurement security officer", "procurement staff"],
+  "Internal Auditor": ["audit committee", "government auditor", "independent certified public accountant", "quality assurance manager", "risk management officer"],
+  "International Programs Director": ["alternate responsible officer", "backup dso", "designated school official", "international program directors", "principal designated school official", "responsible officer"],
   "Institutional Research Director": ["institutional research", "assessment coordinator"],
   "Library Director": [],
-  "Ethics Officer": [],
+  "Ethics Officer": ["designated agency ethics officials", "university chaplains"],
   "Communications Director": ["communications", "web services"],
   "Government Relations": [],
-  "Board Compensation Committee": [],
-  "Technology Transfer Officer": ["patent attorney", "grants administrator"],
+  "Board Compensation Committee": ["board members", "directors", "trustee", "trustees"],
+  "Technology Transfer Officer": ["director of industry relations", "grants administrator", "institutional personnel responsible for patent matters", "patent attorney"],
   "Title VI Coordinator": ["chief diversity officer"],
-  "Admissions Director": [],
-  "Curriculum Coordinator": ["teacher preparation program director"],
+  "Admissions Director": ["admissions and development staff", "admissions staff", "recruiters", "recruitment staff"],
+  "Curriculum Coordinator": ["teacher preparation program director", "special education program coordinator"],
 };
 
 const GROUP_COLORS: Record<string, string> = {
@@ -424,7 +424,7 @@ export function RoleAssignmentsSettings() {
           <p className="text-sm text-muted-foreground leading-relaxed">
             Regulations use hundreds of different titles for the same person (e.g. "CISO", "IT Security Manager",
             "Chief Information Security Officer"). EdSteward normalizes these into <strong>{assignments?.length || 36} canonical roles</strong>.
-            Assign each role once below, and every compliance task referencing any variant of that title automatically
+            Assign each role once below, and every compliance task referencing any of the 220+ variant titles automatically
             routes to the correct DRI. Click the arrow next to any role to see which titles it consolidates.
           </p>
         </div>
@@ -540,10 +540,11 @@ export function RoleAssignmentsSettings() {
                       </div>
                     ) : role.defaultEmail ? (
                       <div className="flex items-center gap-2">
-                        <Mail className="h-4 w-4 text-slate-400" />
+                        <Mail className="h-4 w-4 text-blue-400" />
                         <div>
-                          <div className="font-medium">{role.defaultName || 'External'}</div>
+                          <div className="font-medium">{role.defaultName || role.defaultEmail.split('@')[0]}</div>
                           <div className="text-sm text-muted-foreground">{role.defaultEmail}</div>
+                          <div className="text-xs text-blue-500">Will auto-link on first SSO login</div>
                         </div>
                       </div>
                     ) : (
@@ -694,22 +695,22 @@ export function RoleAssignmentsSettings() {
                 <span className="w-full border-t" />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">Or external email</span>
+                <span className="bg-background px-2 text-muted-foreground">Or assign by email (pre-login)</span>
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="role-external-email">External Email</Label>
+                <Label htmlFor="role-external-email">Email</Label>
                 <Input
                   id="role-external-email"
                   value={formData.defaultEmail}
                   onChange={(e) => setFormData(prev => ({ 
                     ...prev, 
                     defaultEmail: e.target.value,
-                    defaultUserId: e.target.value ? '' : prev.defaultUserId, // Clear user if email entered
+                    defaultUserId: e.target.value ? '' : prev.defaultUserId,
                   }))}
-                  placeholder="external@example.edu"
+                  placeholder="jane.doe@moravian.edu"
                   disabled={!!formData.defaultUserId}
                 />
               </div>
@@ -719,11 +720,14 @@ export function RoleAssignmentsSettings() {
                   id="role-external-name"
                   value={formData.defaultName}
                   onChange={(e) => setFormData(prev => ({ ...prev, defaultName: e.target.value }))}
-                  placeholder="John Doe"
+                  placeholder="Jane Doe"
                   disabled={!!formData.defaultUserId}
                 />
               </div>
             </div>
+            <p className="text-xs text-muted-foreground -mt-2">
+              Use this for Okta-assigned users who haven't logged in yet. When they first log in via SSO, their account automatically links to this role.
+            </p>
 
             <Separator />
 

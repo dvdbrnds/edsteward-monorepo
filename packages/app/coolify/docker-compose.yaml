@@ -243,9 +243,9 @@ services:
     volumes:
       - engine_postgres_data:/var/lib/postgresql/data
     command: ["postgres", "-c", "wal_level=logical", "-c", "max_connections=100"]
-    # TEMPORARY: Exposed for seeding. Re-comment after seed is done.
-    ports:
-      - "9433:5432"
+    # Uncomment for migration/seeding, re-comment after
+    # ports:
+    #   - "9433:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${ENGINE_DB_USER:-mcp_user} -d ${ENGINE_DB_NAME:-mcp_engine}"]
       interval: 10s

@@ -255,6 +255,15 @@ export function setupSamlAuth(app: Express) {
             tenantId,
             provider: idpType,
             roles: userData.roles,
+          });
+          
+          // Auto-link: if any role_assignments reference this user's email, upgrade to userId
+          try {
+            await userStorage.linkRoleAssignmentsByEmail(newUser.id, newUser.email);
+          } catch (linkErr) {
+            // Non-fatal — log and continue
+            console.warn(`[SAML] Could not auto-link role assignments for ${newUser.email}:`, linkErr);
+          }
             groups: userData.groups
           });
           return done(null, enhancedUser);

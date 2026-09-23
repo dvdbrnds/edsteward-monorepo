@@ -1,0 +1,6400 @@
+[
+  {
+    "regKey": "CA-001",
+    "taskId": 3631,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "CA-001",
+    "taskId": 2877,
+    "taskTitle": "Privacy Notice",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "CA-001",
+    "taskId": 2878,
+    "taskTitle": "Consumer Rights",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "CA-001",
+    "taskId": 2879,
+    "taskTitle": "Do Not Sell",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "CA-001",
+    "taskId": 2880,
+    "taskTitle": "Request Verification",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "CA-001",
+    "taskId": 2881,
+    "taskTitle": "Response Timeline",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "NJ-001",
+    "taskId": 6035,
+    "taskTitle": "Institutions must provide access to on-campus and off-campus mental health counseling services at no...",
+    "oldRole": "Compliance Officer",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "NJ-001",
+    "taskId": 6036,
+    "taskTitle": "Institutions cannot compel victims to participate in criminal proceedings, though they must inform v...",
+    "oldRole": "Compliance Officer",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "NJ-001",
+    "taskId": 6037,
+    "taskTitle": "Institutions must establish clear timelines for resolving sexual assault complaints, typically withi...",
+    "oldRole": "Compliance Officer",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "NJ-001",
+    "taskId": 6038,
+    "taskTitle": "Institutions must maintain detailed records of sexual assault reports, investigations, and outcomes ...",
+    "oldRole": "Compliance Officer",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "NJ-002",
+    "taskId": 5986,
+    "taskTitle": "Compliance Monitoring and Reporting",
+    "oldRole": "Compliance Officer",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "NJ-002",
+    "taskId": 5987,
+    "taskTitle": "Submit annual compliance reports",
+    "oldRole": "Compliance Officer",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "NJ-002",
+    "taskId": 5988,
+    "taskTitle": "Report significant institutional changes",
+    "oldRole": "Compliance Officer",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "NJ-002",
+    "taskId": 5989,
+    "taskTitle": "Participate in compliance site visits",
+    "oldRole": "Compliance Officer",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "NJ-003",
+    "taskId": 4574,
+    "taskTitle": "Documentation and Record Keeping Requirements",
+    "oldRole": "Compliance Officer",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "NJ-003",
+    "taskId": 4575,
+    "taskTitle": "Document all hazing incidents and investigations",
+    "oldRole": "Compliance Officer",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "NJ-003",
+    "taskId": 4576,
+    "taskTitle": "Track disciplinary actions and sanctions",
+    "oldRole": "Compliance Officer",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "NJ-003",
+    "taskId": 4577,
+    "taskTitle": "Monitor prevention program effectiveness",
+    "oldRole": "Compliance Officer",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "NJ-003",
+    "taskId": 4578,
+    "taskTitle": "Prepare annual compliance reports",
+    "oldRole": "Compliance Officer",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "NJ-005",
+    "taskId": 5900,
+    "taskTitle": "Compliance Monitoring and Audit Cooperation",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "NJ-005",
+    "taskId": 5901,
+    "taskTitle": "Provide access to student records during audits",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "NJ-005",
+    "taskId": 5902,
+    "taskTitle": "Address common audit findings proactively",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "NJ-005",
+    "taskId": 5903,
+    "taskTitle": "Implement corrective actions when required",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "NJ-005",
+    "taskId": 5912,
+    "taskTitle": "Institutional Authorization and Compliance Status",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "NJ-005",
+    "taskId": 5913,
+    "taskTitle": "Maintain current state approval status",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "NJ-005",
+    "taskId": 5914,
+    "taskTitle": "Comply with state authorization requirements",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "NJ-006",
+    "taskId": 5915,
+    "taskTitle": "Dependent children must be under age 26 and unmarried to maintain eligibility, with certain exceptio...",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "NJ-006",
+    "taskId": 5916,
+    "taskTitle": "These officials must complete required training programs and maintain current certification through ...",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "NJ-006",
+    "taskId": 5917,
+    "taskTitle": "Dependent applicants must provide additional documentation establishing their relationship to the qu...",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "NJ-006",
+    "taskId": 5918,
+    "taskTitle": "Institutions must verify student eligibility, academic progress, and enrollment status each semester",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "NJ-006",
+    "taskId": 5919,
+    "taskTitle": "Students receiving veterans' tuition benefits must maintain satisfactory academic progress as define...",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "NJ-006",
+    "taskId": 5920,
+    "taskTitle": "Institutions must provide clear guidance to veteran students regarding the interaction between state...",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "NJ-006",
+    "taskId": 5921,
+    "taskTitle": "Institutions must establish appeal procedures for veterans whose benefits are denied, suspended, or ...",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "NJ-006",
+    "taskId": 5922,
+    "taskTitle": "These procedures must provide due process protections, including written notification of adverse dec...",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "NJ-006",
+    "taskId": 5923,
+    "taskTitle": "Institutions must participate in statewide data collection efforts and submit required reports to th...",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "PA-001",
+    "taskId": 3690,
+    "taskTitle": "Complete Annual Pennsylvania Sexual Violence Report",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "PA-001",
+    "taskId": 1865,
+    "taskTitle": "Establish Sexual Violence Prevention Policy",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "PA-001",
+    "taskId": 1883,
+    "taskTitle": "Mandatory Reporter Compliance",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "PA-002",
+    "taskId": 4876,
+    "taskTitle": "Institutions must submit audited financial statements prepared by certified public accountants, main...",
+    "oldRole": "Compliance Officer",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "PA-002",
+    "taskId": 4877,
+    "taskTitle": "Faculty-to-student ratios must be maintained at reasonable levels to ensure quality instruction, and...",
+    "oldRole": "Compliance Officer",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "PA-002",
+    "taskId": 4878,
+    "taskTitle": "Institutions must maintain accurate transcripts, provide clear information about program requirement...",
+    "oldRole": "Compliance Officer",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "PA-002",
+    "taskId": 4879,
+    "taskTitle": "Institutions must submit renewal applications at least twelve months before expiration to ensure con...",
+    "oldRole": "Compliance Officer",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "PA-002",
+    "taskId": 4880,
+    "taskTitle": "Institutions must notify the Department within specified timeframes of any material changes to their...",
+    "oldRole": "Compliance Officer",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "PA-002",
+    "taskId": 4881,
+    "taskTitle": "Institutions must submit audited financial statements prepared by certified public accountants, main...",
+    "oldRole": "Compliance Officer",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "PA-002",
+    "taskId": 4882,
+    "taskTitle": "Faculty-to-student ratios must be maintained at reasonable levels to ensure quality instruction, and...",
+    "oldRole": "Compliance Officer",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "PA-002",
+    "taskId": 4883,
+    "taskTitle": "Institutions must maintain accurate transcripts, provide clear information about program requirement...",
+    "oldRole": "Compliance Officer",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "PA-002",
+    "taskId": 4884,
+    "taskTitle": "Institutions must submit renewal applications at least twelve months before expiration to ensure con...",
+    "oldRole": "Compliance Officer",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "PA-002",
+    "taskId": 4885,
+    "taskTitle": "Institutions must notify the Department within specified timeframes of any material changes to their...",
+    "oldRole": "Compliance Officer",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "PA-006",
+    "taskId": 3592,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "PA-006",
+    "taskId": 3859,
+    "taskTitle": "Complete Annual Pennsylvania Graduation Rates Report",
+    "oldRole": "Compliance Officer",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "PA-006",
+    "taskId": 2843,
+    "taskTitle": "Graduation Rate Calculation",
+    "oldRole": "Compliance Officer",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "PA-006",
+    "taskId": 2844,
+    "taskTitle": "State Reporting",
+    "oldRole": "Compliance Officer",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "PA-006",
+    "taskId": 2845,
+    "taskTitle": "Public Disclosure",
+    "oldRole": "Compliance Officer",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "PA-007",
+    "taskId": 3593,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "PA-007",
+    "taskId": 3860,
+    "taskTitle": "Complete Annual Pennsylvania Higher Education Report",
+    "oldRole": "Compliance Officer",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "PA-007",
+    "taskId": 2846,
+    "taskTitle": "State Approval",
+    "oldRole": "Compliance Officer",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "PA-007",
+    "taskId": 2847,
+    "taskTitle": "Program Approval",
+    "oldRole": "Compliance Officer",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "PA-007",
+    "taskId": 2848,
+    "taskTitle": "Compliance Reporting",
+    "oldRole": "Compliance Officer",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "PA-008",
+    "taskId": 3635,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "Dean of Students"
+  },
+  {
+    "regKey": "PA-008",
+    "taskId": 3876,
+    "taskTitle": "Complete Annual Pennsylvania Student Consumer Report",
+    "oldRole": "Compliance Officer",
+    "newRole": "Dean of Students"
+  },
+  {
+    "regKey": "PA-008",
+    "taskId": 3877,
+    "taskTitle": "Conduct Pennsylvania Student Consumer Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Dean of Students"
+  },
+  {
+    "regKey": "PA-008",
+    "taskId": 2894,
+    "taskTitle": "Consumer Disclosures",
+    "oldRole": "Compliance Officer",
+    "newRole": "Dean of Students"
+  },
+  {
+    "regKey": "PA-008",
+    "taskId": 2895,
+    "taskTitle": "Refund Policy",
+    "oldRole": "Compliance Officer",
+    "newRole": "Dean of Students"
+  },
+  {
+    "regKey": "PA-008",
+    "taskId": 2896,
+    "taskTitle": "Complaint Process",
+    "oldRole": "Compliance Officer",
+    "newRole": "Dean of Students"
+  },
+  {
+    "regKey": "PA-036",
+    "taskId": 4260,
+    "taskTitle": "§ 1099b(a)(4)(A), establishes critical standards that accrediting agencies must enforce to maintain ...",
+    "oldRole": "Compliance Officer",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "PA-036",
+    "taskId": 4261,
+    "taskTitle": "16, accrediting agencies must demonstrate they enforce standards requiring institutions to clearly d...",
+    "oldRole": "Compliance Officer",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "PA-036",
+    "taskId": 4262,
+    "taskTitle": "Agencies must provide evidence their standards address curriculum content, faculty qualifications, s...",
+    "oldRole": "Compliance Officer",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "PA-055",
+    "taskId": 4231,
+    "taskTitle": "Consent Definition (Section 2003-G.1)",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "PA-055",
+    "taskId": 4232,
+    "taskTitle": "Draft Consent Definition",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "PA-055",
+    "taskId": 4233,
+    "taskTitle": "Incorporate into Code of Conduct",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "PA-055",
+    "taskId": 4234,
+    "taskTitle": "Publish Definition",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "PA-055",
+    "taskId": 4238,
+    "taskTitle": "Notification of Rights (Section 2003-G(c))",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "PA-055",
+    "taskId": 4239,
+    "taskTitle": "Draft Rights Notification",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "PA-055",
+    "taskId": 4240,
+    "taskTitle": "Publish on Website",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "PA-055",
+    "taskId": 4241,
+    "taskTitle": "Make Available in Print",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "PA-055",
+    "taskId": 4242,
+    "taskTitle": "Memorandum of Understanding — Rape Crisis Center (Section 2007-G)",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "PA-055",
+    "taskId": 4243,
+    "taskTitle": "Identify Qualified Rape Crisis Center",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "PA-055",
+    "taskId": 4244,
+    "taskTitle": "Negotiate MOU Terms",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "PA-055",
+    "taskId": 4245,
+    "taskTitle": "Ensure Required Services",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "PA-055",
+    "taskId": 4246,
+    "taskTitle": "Execute MOU for Each Campus",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "PA-055",
+    "taskId": 4247,
+    "taskTitle": "Request Good-Faith Waiver if Needed",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "PA-055",
+    "taskId": 4248,
+    "taskTitle": "Memorandum of Understanding — Domestic Violence Program (Section 2007-G)",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "PA-055",
+    "taskId": 4249,
+    "taskTitle": "Identify Qualified DV Program",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "PA-055",
+    "taskId": 4250,
+    "taskTitle": "Negotiate MOU Terms",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "PA-055",
+    "taskId": 4251,
+    "taskTitle": "Execute MOU for Each Campus",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "PA-055",
+    "taskId": 4252,
+    "taskTitle": "Annual Attestation of Compliance (Section 2006-G)",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "PA-055",
+    "taskId": 4253,
+    "taskTitle": "Document Education Program Implementation",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "PA-055",
+    "taskId": 4254,
+    "taskTitle": "Document MOU Status",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "PA-055",
+    "taskId": 4255,
+    "taskTitle": "Document Follow-Up Programming",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "PA-055",
+    "taskId": 4256,
+    "taskTitle": "Submit Attestation to PA DOE",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "PA-055",
+    "taskId": 4257,
+    "taskTitle": "Employee Programming (Institutions Without Full-Time Students)",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "PA-055",
+    "taskId": 4258,
+    "taskTitle": "Develop Employee Education Program",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "PA-055",
+    "taskId": 4259,
+    "taskTitle": "Maintain Employee MOUs",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "PA-HEA-DAP",
+    "taskId": 4537,
+    "taskTitle": "Annual Distribution Requirements",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "PA-HEA-DAP",
+    "taskId": 4538,
+    "taskTitle": "Distribute standards of conduct to all enrolled students and employees",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "PA-HEA-DAP",
+    "taskId": 4539,
+    "taskTitle": "Include applicable federal, state, and local legal sanctions",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "PA-HEA-DAP",
+    "taskId": 4540,
+    "taskTitle": "Detail health risks associated with substance abuse",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "PA-HEA-DAP",
+    "taskId": 4541,
+    "taskTitle": "Specify institutional disciplinary sanctions and procedures",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "PA-HEA-DAP",
+    "taskId": 4547,
+    "taskTitle": "Documentation and Record Keeping",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "PA-HEA-DAP",
+    "taskId": 4548,
+    "taskTitle": "Maintain biennial review documentation",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "PA-HEA-DAP",
+    "taskId": 4549,
+    "taskTitle": "Document annual distribution activities",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "PA-HEA-DAP",
+    "taskId": 4550,
+    "taskTitle": "Track disciplinary actions and sanctions imposed",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-004",
+    "taskId": 3687,
+    "taskTitle": "Provide Required Notifications ",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-007",
+    "taskId": 3692,
+    "taskTitle": "Complete Annual Campus Sex Crimes Report",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-007",
+    "taskId": 1945,
+    "taskTitle": "Inter-departmental Coordination",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-007",
+    "taskId": 1949,
+    "taskTitle": "Policy Review Documentation",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-007",
+    "taskId": 1938,
+    "taskTitle": "Documentation of Compliance Efforts",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-009",
+    "taskId": 3697,
+    "taskTitle": "Conduct Title VI Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "REG-010",
+    "taskId": 3700,
+    "taskTitle": "Conduct Title VI Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-011",
+    "taskId": 3221,
+    "taskTitle": "Prohibition Awareness",
+    "oldRole": "Compliance Officer",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "REG-011",
+    "taskId": 3222,
+    "taskTitle": "Whistleblower Protection",
+    "oldRole": "Compliance Officer",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "REG-011",
+    "taskId": 3701,
+    "taskTitle": "Conduct False Claims Act Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "REG-011",
+    "taskId": 2114,
+    "taskTitle": "False Claims Awareness Training",
+    "oldRole": "Compliance Officer",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "REG-011",
+    "taskId": 2113,
+    "taskTitle": "Whistleblower Reporting Channel",
+    "oldRole": "Compliance Officer",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "REG-018",
+    "taskId": 4500,
+    "taskTitle": "Federal Compliance Monitoring and Reporting",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-018",
+    "taskId": 4501,
+    "taskTitle": "Respond to federal compliance reviews",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-018",
+    "taskId": 4502,
+    "taskTitle": "Maintain compliance documentation",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-018",
+    "taskId": 4503,
+    "taskTitle": "Submit required reports",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-018",
+    "taskId": 4504,
+    "taskTitle": "Monitor regulatory updates",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-023",
+    "taskId": 3367,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "REG-023",
+    "taskId": 3798,
+    "taskTitle": "Complete Annual Drug Free Schools Report",
+    "oldRole": "Compliance Officer",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "REG-023",
+    "taskId": 2665,
+    "taskTitle": "Annual Policy Distribution",
+    "oldRole": "Compliance Officer",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "REG-023",
+    "taskId": 2666,
+    "taskTitle": "Standards of Conduct",
+    "oldRole": "Compliance Officer",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "REG-023",
+    "taskId": 2667,
+    "taskTitle": "Legal Sanctions Description",
+    "oldRole": "Compliance Officer",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "REG-023",
+    "taskId": 2668,
+    "taskTitle": "Health Risks Description",
+    "oldRole": "Compliance Officer",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "REG-023",
+    "taskId": 2669,
+    "taskTitle": "Available Programs",
+    "oldRole": "Compliance Officer",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "REG-023",
+    "taskId": 2670,
+    "taskTitle": "Institutional Sanctions",
+    "oldRole": "Compliance Officer",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "REG-023",
+    "taskId": 2671,
+    "taskTitle": "Biennial Review",
+    "oldRole": "Compliance Officer",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "REG-023",
+    "taskId": 2672,
+    "taskTitle": "Violation Tracking",
+    "oldRole": "Compliance Officer",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "REG-023",
+    "taskId": 2673,
+    "taskTitle": "Sanction Consistency",
+    "oldRole": "Compliance Officer",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "REG-023",
+    "taskId": 2674,
+    "taskTitle": "Records Availability",
+    "oldRole": "Compliance Officer",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "REG-027",
+    "taskId": 4690,
+    "taskTitle": "Digital Platform Auditing",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-027",
+    "taskId": 4691,
+    "taskTitle": "Audit all university digital properties",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-027",
+    "taskId": 4692,
+    "taskTitle": "Assess educational outreach programs",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-027",
+    "taskId": 4693,
+    "taskTitle": "Review interactive features and tracking",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-027",
+    "taskId": 4694,
+    "taskTitle": "Coordinate with FERPA compliance",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-028",
+    "taskId": 4727,
+    "taskTitle": "Compliance Monitoring and Auditing",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-028",
+    "taskId": 4728,
+    "taskTitle": "Conduct quarterly surveillance activity audits",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-028",
+    "taskId": 4729,
+    "taskTitle": "Assess stored communications access controls",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-028",
+    "taskId": 4730,
+    "taskTitle": "Review law enforcement request handling",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-028",
+    "taskId": 4731,
+    "taskTitle": "Document compliance assessment findings",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-029",
+    "taskId": 3260,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-029",
+    "taskId": 3716,
+    "taskTitle": "Conduct Fair and Accurate Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-029",
+    "taskId": 2187,
+    "taskTitle": "Red Flags Rule Program",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-029",
+    "taskId": 2188,
+    "taskTitle": "Red Flags Identification",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-029",
+    "taskId": 2189,
+    "taskTitle": "Red Flags Detection Procedures",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-029",
+    "taskId": 2190,
+    "taskTitle": "Red Flags Response Procedures",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-029",
+    "taskId": 2191,
+    "taskTitle": "Program Board Approval",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-029",
+    "taskId": 2192,
+    "taskTitle": "Disposal Rule Compliance",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-029",
+    "taskId": 2193,
+    "taskTitle": "Receipt Truncation",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-029",
+    "taskId": 2194,
+    "taskTitle": "Staff Training on Red Flags",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-030",
+    "taskId": 4761,
+    "taskTitle": "Federal Reporting and Documentation",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-030",
+    "taskId": 4762,
+    "taskTitle": "Submit annual FISMA reports",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-030",
+    "taskId": 4763,
+    "taskTitle": "Maintain security assessment documentation",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-030",
+    "taskId": 4764,
+    "taskTitle": "Document continuous monitoring activities",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-030",
+    "taskId": 4765,
+    "taskTitle": "Prepare audit documentation",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-032",
+    "taskId": 4798,
+    "taskTitle": "Ongoing Compliance and Monitoring",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-032",
+    "taskId": 4799,
+    "taskTitle": "Perform annual security program evaluations and updates",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-032",
+    "taskId": 4800,
+    "taskTitle": "Train staff on GLBA requirements and data handling procedures",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-032",
+    "taskId": 4801,
+    "taskTitle": "Document all safeguards implementation and testing activities",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-032",
+    "taskId": 4802,
+    "taskTitle": "Establish ongoing monitoring systems",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-033",
+    "taskId": 4841,
+    "taskTitle": "Annual Breach Reporting and Documentation",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-033",
+    "taskId": 4842,
+    "taskTitle": "Maintain breach documentation system",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-033",
+    "taskId": 4843,
+    "taskTitle": "Submit annual HHS summary reports",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-033",
+    "taskId": 4844,
+    "taskTitle": "Document compliance efforts",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-033",
+    "taskId": 4845,
+    "taskTitle": "Prepare for OCR audits",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-034",
+    "taskId": 4846,
+    "taskTitle": "Universities must implement robust compliance programs addressing: registration requirements under 2...",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-034",
+    "taskId": 4847,
+    "taskTitle": "Universities must maintain current awareness of USML modifications and categorical exemption updates...",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-035",
+    "taskId": 4852,
+    "taskTitle": "Contract Notification Requirements",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-035",
+    "taskId": 4853,
+    "taskTitle": "Submit written notification for new contracts",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-035",
+    "taskId": 4854,
+    "taskTitle": "Report substantial contract modifications",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-035",
+    "taskId": 4855,
+    "taskTitle": "Report contract terminations immediately",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-035",
+    "taskId": 4856,
+    "taskTitle": "Maintain notification tracking system",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-037",
+    "taskId": 3723,
+    "taskTitle": "Conduct Export Administration Act Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-038",
+    "taskId": 5001,
+    "taskTitle": "Compliance Monitoring and Auditing",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-038",
+    "taskId": 5002,
+    "taskTitle": "Conduct periodic compliance audits of high-risk research programs",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-038",
+    "taskId": 5003,
+    "taskTitle": "Monitor regulatory updates from Bureau of Industry and Security",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-038",
+    "taskId": 5004,
+    "taskTitle": "Review and update export control procedures",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-038",
+    "taskId": 5005,
+    "taskTitle": "Maintain violation reporting procedures",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-040",
+    "taskId": 5105,
+    "taskTitle": "Fraud Detection and Reporting Procedures",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-040",
+    "taskId": 5106,
+    "taskTitle": "Establish referral procedures per 34 CFR § 668.16(g)",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-040",
+    "taskId": 5107,
+    "taskTitle": "Document suspected criminal conduct cases",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-040",
+    "taskId": 5108,
+    "taskTitle": "Train staff on fraud indicators",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-041",
+    "taskId": 5162,
+    "taskTitle": "Program Participation Agreement Compliance",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-041",
+    "taskId": 5163,
+    "taskTitle": "Monitor program participation agreement adherence",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-041",
+    "taskId": 5164,
+    "taskTitle": "Manage cohort default rate compliance",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-041",
+    "taskId": 5165,
+    "taskTitle": "Maintain required Title IV program records",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-041",
+    "taskId": 5166,
+    "taskTitle": "Coordinate with institutional compliance officers",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-041",
+    "taskId": 5167,
+    "taskTitle": "Corrective Action and Remediation",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-041",
+    "taskId": 5168,
+    "taskTitle": "Develop corrective action plans for audit findings",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-041",
+    "taskId": 5169,
+    "taskTitle": "Implement systemic improvements",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-041",
+    "taskId": 5170,
+    "taskTitle": "Monitor enhanced oversight requirements",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-042",
+    "taskId": 5204,
+    "taskTitle": "Student Recruitment and Marketing Documentation",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-042",
+    "taskId": 5205,
+    "taskTitle": "Maintain accurate records of all student recruitment materials per 34 CFR § 685.222",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-042",
+    "taskId": 5206,
+    "taskTitle": "Document all enrollment representations and promises made to prospective students",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-042",
+    "taskId": 5207,
+    "taskTitle": "Preserve contracts, enrollment agreements, and program disclosures",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-042",
+    "taskId": 5208,
+    "taskTitle": "Establish systematic review process for student communications",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-042",
+    "taskId": 5226,
+    "taskTitle": "Internal Controls and Monitoring Systems",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-042",
+    "taskId": 5227,
+    "taskTitle": "Implement robust internal controls for marketing and recruitment activities",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-042",
+    "taskId": 5228,
+    "taskTitle": "Conduct systematic review of student communications and promotional materials",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-042",
+    "taskId": 5229,
+    "taskTitle": "Monitor compliance with bifurcated framework requirements",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-042",
+    "taskId": 5230,
+    "taskTitle": "Establish early warning systems for potential borrower defense triggers",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-043",
+    "taskId": 3283,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-043",
+    "taskId": 3727,
+    "taskTitle": "Conduct Higher Education Act: Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-043",
+    "taskId": 2249,
+    "taskTitle": "Federal Funds Account",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-043",
+    "taskId": 2250,
+    "taskTitle": "Disbursement Timing",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-043",
+    "taskId": 2251,
+    "taskTitle": "Credit Balance Payments",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-043",
+    "taskId": 2252,
+    "taskTitle": "Excess Cash Return",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-043",
+    "taskId": 2253,
+    "taskTitle": "Reconciliation",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-043",
+    "taskId": 2254,
+    "taskTitle": "Late Disbursement Processing",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-044",
+    "taskId": 5280,
+    "taskTitle": "Sanctions Response and Recovery Planning",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-044",
+    "taskId": 5281,
+    "taskTitle": "Develop CDR improvement plans for at-risk institutions",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-044",
+    "taskId": 5282,
+    "taskTitle": "Implement provisional certification requirements",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-044",
+    "taskId": 5283,
+    "taskTitle": "Document eligibility recovery efforts",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-044",
+    "taskId": 5284,
+    "taskTitle": "Prepare fiscal responsibility enhancement plans",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-044",
+    "taskId": 5285,
+    "taskTitle": "Policy Development and Staff Training",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-044",
+    "taskId": 5286,
+    "taskTitle": "Develop comprehensive CDR compliance policies",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-044",
+    "taskId": 5287,
+    "taskTitle": "Train financial aid staff on CDR requirements",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-044",
+    "taskId": 5288,
+    "taskTitle": "Establish CDR reporting procedures",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-045",
+    "taskId": 5334,
+    "taskTitle": "Ongoing Compliance Monitoring and Reporting",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-045",
+    "taskId": 5335,
+    "taskTitle": "Submit annual compliance audits under 34 CFR Part 668 Subpart E",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-045",
+    "taskId": 5336,
+    "taskTitle": "Report material changes within 10 days per 34 CFR § 600.21",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-045",
+    "taskId": 5337,
+    "taskTitle": "Maintain continuous accreditation and state authorization",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-045",
+    "taskId": 5338,
+    "taskTitle": "Monitor administrative capability standards compliance",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-046",
+    "taskId": 5395,
+    "taskTitle": "Compliance Monitoring and Quality Assurance",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-046",
+    "taskId": 5396,
+    "taskTitle": "Conduct internal compliance reviews",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-046",
+    "taskId": 5397,
+    "taskTitle": "Monitor counseling completion rates",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-046",
+    "taskId": 5398,
+    "taskTitle": "Respond to federal monitoring activities",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-047",
+    "taskId": 5451,
+    "taskTitle": "Compliance Monitoring and Audit Preparation",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-047",
+    "taskId": 5452,
+    "taskTitle": "Conduct internal compliance reviews",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-047",
+    "taskId": 5453,
+    "taskTitle": "Prepare for federal program review audits",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-047",
+    "taskId": 5454,
+    "taskTitle": "Implement corrective actions for violations",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-047",
+    "taskId": 5455,
+    "taskTitle": "Monitor regulatory updates and guidance",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-048",
+    "taskId": 5514,
+    "taskTitle": "Federal Oversight Compliance",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-048",
+    "taskId": 5515,
+    "taskTitle": "Participate in program review audits",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-048",
+    "taskId": 5516,
+    "taskTitle": "Respond to compliance monitoring requests",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-048",
+    "taskId": 5517,
+    "taskTitle": "Implement corrective measures for non-compliance",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-048",
+    "taskId": 5518,
+    "taskTitle": "Report program changes to Department of Education",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-049",
+    "taskId": 5595,
+    "taskTitle": "Event-Triggered Notification Requirements",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-049",
+    "taskId": 5596,
+    "taskTitle": "Report ownership equity withdrawals exceeding 25%",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-049",
+    "taskId": 5597,
+    "taskTitle": "Report significant litigation exposure",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-049",
+    "taskId": 5598,
+    "taskTitle": "Report accreditation status changes",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-049",
+    "taskId": 5599,
+    "taskTitle": "Report ownership changes exceeding 25%",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-049",
+    "taskId": 5600,
+    "taskTitle": "Report adverse state licensing actions",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-052",
+    "taskId": 5671,
+    "taskTitle": "§ 1087e, institutions must verify borrower eligibility through comprehensive documentation requireme...",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-052",
+    "taskId": 5672,
+    "taskTitle": "For Parent PLUS loans, universities must verify the parent's citizenship status per 20 U",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-052",
+    "taskId": 5673,
+    "taskTitle": "Institutions must maintain current Cost of Attendance calculations per 20 U",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-052",
+    "taskId": 5674,
+    "taskTitle": "Schools must maintain Master Promissory Note records and provide entrance counseling per 20 U",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-052",
+    "taskId": 5675,
+    "taskTitle": "§ 1087e, institutions must verify borrower eligibility through comprehensive documentation requireme...",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-052",
+    "taskId": 5676,
+    "taskTitle": "For Parent PLUS loans, universities must verify the parent's citizenship status per 20 U",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-052",
+    "taskId": 5677,
+    "taskTitle": "Institutions must maintain current Cost of Attendance calculations per 20 U",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-052",
+    "taskId": 5678,
+    "taskTitle": "Schools must maintain Master Promissory Note records and provide entrance counseling per 20 U",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-053",
+    "taskId": 5693,
+    "taskTitle": "Documentation and Record-Keeping Requirements",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-053",
+    "taskId": 5694,
+    "taskTitle": "Maintain notification delivery records",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-053",
+    "taskId": 5695,
+    "taskTitle": "Document student acknowledgments and responses",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-053",
+    "taskId": 5696,
+    "taskTitle": "Prepare audit-ready documentation",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-053",
+    "taskId": 5697,
+    "taskTitle": "Implement six-year retention schedule",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-053",
+    "taskId": 5702,
+    "taskTitle": "Federal Compliance Monitoring and Reporting",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-053",
+    "taskId": 5703,
+    "taskTitle": "Conduct quarterly compliance assessments",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-053",
+    "taskId": 5704,
+    "taskTitle": "Monitor Federal Student Aid guidance updates",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-053",
+    "taskId": 5705,
+    "taskTitle": "Prepare for program review readiness",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-054",
+    "taskId": 5734,
+    "taskTitle": "Compliance Monitoring and Reporting",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-054",
+    "taskId": 5735,
+    "taskTitle": "Prepare for Department of Education program reviews",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-054",
+    "taskId": 5736,
+    "taskTitle": "Conduct internal compliance assessments",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-054",
+    "taskId": 5737,
+    "taskTitle": "Maintain federal capital contribution records",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-054",
+    "taskId": 5738,
+    "taskTitle": "Document compliance with 20 U.S.C. § 1087hh requirements",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-055",
+    "taskId": 3295,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-055",
+    "taskId": 3734,
+    "taskTitle": "Conduct Higher Education Act: Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-055",
+    "taskId": 2311,
+    "taskTitle": "Preferred Lender List",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-055",
+    "taskId": 2312,
+    "taskTitle": "Selection Criteria Disclosure",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-055",
+    "taskId": 2313,
+    "taskTitle": "Self-Certification Form",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-055",
+    "taskId": 2314,
+    "taskTitle": "Code of Conduct",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-055",
+    "taskId": 2315,
+    "taskTitle": "Revenue Sharing Prohibition",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-057",
+    "taskId": 5819,
+    "taskTitle": "Extended Retention for Special Circumstances",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-057",
+    "taskId": 5820,
+    "taskTitle": "Retain records subject to audit until resolution",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-057",
+    "taskId": 5821,
+    "taskTitle": "Maintain records under investigation until completion",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-057",
+    "taskId": 5822,
+    "taskTitle": "Keep dispute resolution records until final determination",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-057",
+    "taskId": 5827,
+    "taskTitle": "Department of Education Access and Review",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-057",
+    "taskId": 5828,
+    "taskTitle": "Ensure record accessibility for ED review",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-057",
+    "taskId": 5829,
+    "taskTitle": "Prepare for regular program reviews",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-057",
+    "taskId": 5830,
+    "taskTitle": "Maintain administrative compliance documentation",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-058",
+    "taskId": 5831,
+    "taskTitle": "Institutions must establish written policies addressing conflicts of interest, particularly regardin...",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-058",
+    "taskId": 5832,
+    "taskTitle": "Institutions must implement comprehensive compliance systems including annual third-party audits und...",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-058",
+    "taskId": 5833,
+    "taskTitle": "Institutions must establish written policies addressing conflicts of interest, particularly regardin...",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-058",
+    "taskId": 5834,
+    "taskTitle": "Institutions must implement comprehensive compliance systems including annual third-party audits und...",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-058",
+    "taskId": 5835,
+    "taskTitle": "Institutions of higher education also are required to ensure that they do not misrepresent their acc...",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-059",
+    "taskId": 3299,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-059",
+    "taskId": 3737,
+    "taskTitle": "Conduct International Emergency Economic Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-059",
+    "taskId": 2330,
+    "taskTitle": "Sanctions Screening",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-059",
+    "taskId": 2331,
+    "taskTitle": "SDN List Compliance",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-059",
+    "taskId": 2332,
+    "taskTitle": "Country Sanctions Compliance",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-059",
+    "taskId": 2333,
+    "taskTitle": "License Applications",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-059",
+    "taskId": 2334,
+    "taskTitle": "Sanctions Training",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-060",
+    "taskId": 5841,
+    "taskTitle": "Export Control Program Implementation",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-060",
+    "taskId": 5842,
+    "taskTitle": "Establish written export control policies",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-060",
+    "taskId": 5843,
+    "taskTitle": "Implement deemed export protocols",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-060",
+    "taskId": 5844,
+    "taskTitle": "Develop pre-publication review procedures",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-060",
+    "taskId": 5845,
+    "taskTitle": "Create foreign national screening protocols",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-060",
+    "taskId": 5861,
+    "taskTitle": "Violation Reporting and Disclosure",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-060",
+    "taskId": 5862,
+    "taskTitle": "Report violations to DDTC immediately",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-060",
+    "taskId": 5863,
+    "taskTitle": "Conduct internal violation assessments",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-060",
+    "taskId": 5864,
+    "taskTitle": "File annual activity reports",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-060",
+    "taskId": 5865,
+    "taskTitle": "Coordinate with legal counsel",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-061",
+    "taskId": 6031,
+    "taskTitle": "Higher education institutions receiving NSF awards exceeding $50,000 must maintain written policies ...",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-061",
+    "taskId": 6032,
+    "taskTitle": "Institutions must report substantiated misconduct findings to NSF within 30 days of final determinat...",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-061",
+    "taskId": 6033,
+    "taskTitle": "4\n- Maintain detailed documentation throughout all phases of proceedings\n- Provide due process prote...",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-061",
+    "taskId": 6034,
+    "taskTitle": "The revised standards will ensure that employers, when appropriate, must meet consistent requirement...",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-064",
+    "taskId": 3304,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-064",
+    "taskId": 3740,
+    "taskTitle": "Conduct Outside Earned Income Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-064",
+    "taskId": 2354,
+    "taskTitle": "Outside Activity Policy",
+    "oldRole": "Compliance Officer",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-064",
+    "taskId": 2355,
+    "taskTitle": "Prior Approval Process",
+    "oldRole": "Compliance Officer",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-064",
+    "taskId": 2356,
+    "taskTitle": "Conflict Review",
+    "oldRole": "Compliance Officer",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-064",
+    "taskId": 2357,
+    "taskTitle": "Annual Disclosure",
+    "oldRole": "Compliance Officer",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-066",
+    "taskId": 5953,
+    "taskTitle": "Key provisions mandate that Investigators with significant financial interests exceeding $5,000 in e...",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-066",
+    "taskId": 5954,
+    "taskTitle": "Higher education institutions must establish FCOI training requirements under 42 CFR § 50",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-066",
+    "taskId": 5955,
+    "taskTitle": "For identified FCOIs, institutions must develop and implement management plans within 60 days of ide...",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-066",
+    "taskId": 5956,
+    "taskTitle": "Institutions must report FCOIs to PHS awarding components prior to expenditure of funds and within 6...",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-066",
+    "taskId": 5957,
+    "taskTitle": "605(a)(5)\n\n## Compliance Monitoring\n- Conduct retrospective reviews when bias is identified\n- Mainta...",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-067",
+    "taskId": 5994,
+    "taskTitle": "Institutions must maintain comprehensive records of borrower communications and default prevention a...",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-068",
+    "taskId": 5995,
+    "taskTitle": "§ 1092(a), institutions must maintain qualified financial aid staff and make readily available throu...",
+    "oldRole": "Compliance Officer",
+    "newRole": "Dean of Students"
+  },
+  {
+    "regKey": "REG-069",
+    "taskId": 6019,
+    "taskTitle": "Event-Triggered Reporting Requirements",
+    "oldRole": "Compliance Officer",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "REG-069",
+    "taskId": 6020,
+    "taskTitle": "Report accreditation status changes",
+    "oldRole": "Compliance Officer",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "REG-069",
+    "taskId": 6021,
+    "taskTitle": "Report state sanctions immediately",
+    "oldRole": "Compliance Officer",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "REG-069",
+    "taskId": 6022,
+    "taskTitle": "Update public disclosures",
+    "oldRole": "Compliance Officer",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "REG-070",
+    "taskId": 6027,
+    "taskTitle": "Universities conducting research with dual-use technologies must ensure compliance with both TWEA re...",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-070",
+    "taskId": 6028,
+    "taskTitle": "Universities must implement robust screening procedures for students, researchers, visiting scholars...",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-070",
+    "taskId": 6029,
+    "taskTitle": "Universities must maintain comprehensive sanctions compliance programs including annual risk assessm...",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-070",
+    "taskId": 6030,
+    "taskTitle": "## Sanctions Screening Requirements\n- Screen all students, faculty, researchers, and institutional p...",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-071",
+    "taskId": 3311,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-071",
+    "taskId": 3747,
+    "taskTitle": "Conduct Fair Housing Act, Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-071",
+    "taskId": 2388,
+    "taskTitle": "Non-Discrimination Policy",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-071",
+    "taskId": 2389,
+    "taskTitle": "Housing Assignment",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-071",
+    "taskId": 2390,
+    "taskTitle": "Reasonable Accommodations",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-071",
+    "taskId": 2391,
+    "taskTitle": "Complaint Procedures",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-071",
+    "taskId": 2392,
+    "taskTitle": "Housing Staff Training",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-073",
+    "taskId": 3313,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-073",
+    "taskId": 3748,
+    "taskTitle": "Conduct Equal Employment Opportunity Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-073",
+    "taskId": 2398,
+    "taskTitle": "Affirmative Action Plan",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-073",
+    "taskId": 2399,
+    "taskTitle": "EEO Policy Statement",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-073",
+    "taskId": 2400,
+    "taskTitle": "Job Posting Requirements",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-073",
+    "taskId": 2401,
+    "taskTitle": "Applicant Tracking",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-073",
+    "taskId": 2402,
+    "taskTitle": "VETS-4212 Report",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-073",
+    "taskId": 2403,
+    "taskTitle": "EEO-1 Report",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-074",
+    "taskId": 3314,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-074",
+    "taskId": 2404,
+    "taskTitle": "D/E Rates Calculation",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-074",
+    "taskId": 2405,
+    "taskTitle": "Earnings Premium",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-074",
+    "taskId": 2406,
+    "taskTitle": "Financial Value Disclosure",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-074",
+    "taskId": 2407,
+    "taskTitle": "Program-Level Reporting",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-074",
+    "taskId": 2408,
+    "taskTitle": "Student Acknowledgment",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-074",
+    "taskId": 2409,
+    "taskTitle": "Improvement Plans",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-076",
+    "taskId": 3316,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-076",
+    "taskId": 3749,
+    "taskTitle": "Conduct The Equal Pay Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-076",
+    "taskId": 2415,
+    "taskTitle": "Equal Pay Compliance",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-076",
+    "taskId": 2416,
+    "taskTitle": "Job Content Analysis",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-076",
+    "taskId": 2417,
+    "taskTitle": "Pay Records",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-076",
+    "taskId": 2418,
+    "taskTitle": "Pay Equity Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-077",
+    "taskId": 3317,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-077",
+    "taskId": 3750,
+    "taskTitle": "Conduct The Family and Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-077",
+    "taskId": 2419,
+    "taskTitle": "FMLA Notice Posting",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-077",
+    "taskId": 2420,
+    "taskTitle": "Eligibility Determination",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-077",
+    "taskId": 2421,
+    "taskTitle": "Leave Entitlement",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-077",
+    "taskId": 2422,
+    "taskTitle": "Job Restoration",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-077",
+    "taskId": 2423,
+    "taskTitle": "Benefits Continuation",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-077",
+    "taskId": 2424,
+    "taskTitle": "Leave Records",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-077",
+    "taskId": 2425,
+    "taskTitle": "Certification Process",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-078",
+    "taskId": 3318,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-078",
+    "taskId": 3751,
+    "taskTitle": "Conduct America COMPETES Act Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-078",
+    "taskId": 2426,
+    "taskTitle": "Open Access Policy",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-078",
+    "taskId": 2427,
+    "taskTitle": "Research Security",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-078",
+    "taskId": 2428,
+    "taskTitle": "COI Disclosure",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-079",
+    "taskId": 3319,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-079",
+    "taskId": 3752,
+    "taskTitle": "Complete Annual Animal Welfare Act Report",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-079",
+    "taskId": 2429,
+    "taskTitle": "IACUC Establishment",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-079",
+    "taskId": 2430,
+    "taskTitle": "Protocol Review",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-079",
+    "taskId": 2431,
+    "taskTitle": "Semi-Annual Inspection",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-079",
+    "taskId": 2432,
+    "taskTitle": "Annual Report",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-079",
+    "taskId": 2433,
+    "taskTitle": "Veterinarian Designation",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-079",
+    "taskId": 2434,
+    "taskTitle": "Personnel Training",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-080",
+    "taskId": 3320,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-080",
+    "taskId": 3753,
+    "taskTitle": "Conduct Clinical Trials § Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-080",
+    "taskId": 2435,
+    "taskTitle": "Financial Disclosure Collection",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-080",
+    "taskId": 2436,
+    "taskTitle": "Equity Interest Disclosure",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-080",
+    "taskId": 2437,
+    "taskTitle": "Payment Disclosure",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-080",
+    "taskId": 2438,
+    "taskTitle": "FDA Submission",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-081",
+    "taskId": 3321,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-081",
+    "taskId": 3754,
+    "taskTitle": "Conduct Food and Drug Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-081",
+    "taskId": 2439,
+    "taskTitle": "ClinicalTrials.gov Registration",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-081",
+    "taskId": 2440,
+    "taskTitle": "Results Reporting",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-081",
+    "taskId": 2441,
+    "taskTitle": "Protocol Updates",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-081",
+    "taskId": 2442,
+    "taskTitle": "Responsible Party Designation",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-082",
+    "taskId": 3322,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-082",
+    "taskId": 3755,
+    "taskTitle": "Conduct Higher Education Act: Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-082",
+    "taskId": 2443,
+    "taskTitle": "Credit Hour Policy",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-082",
+    "taskId": 2444,
+    "taskTitle": "Accreditor Review",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-082",
+    "taskId": 2445,
+    "taskTitle": "Course-Level Documentation",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-082",
+    "taskId": 2446,
+    "taskTitle": "Distance Education Equivalency",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-083",
+    "taskId": 3323,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-083",
+    "taskId": 3756,
+    "taskTitle": "Conduct Higher Education Act: Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-083",
+    "taskId": 2447,
+    "taskTitle": "Compensation Review",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-083",
+    "taskId": 2448,
+    "taskTitle": "No Commission Payments",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-083",
+    "taskId": 2449,
+    "taskTitle": "Contract Review",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-083",
+    "taskId": 2450,
+    "taskTitle": "Documentation",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-084",
+    "taskId": 3324,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-084",
+    "taskId": 3757,
+    "taskTitle": "Conduct Higher Education Act: Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-084",
+    "taskId": 2451,
+    "taskTitle": "Marketing Review",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-084",
+    "taskId": 2452,
+    "taskTitle": "Outcome Claims",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-084",
+    "taskId": 2453,
+    "taskTitle": "Accreditation Disclosure",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-084",
+    "taskId": 2454,
+    "taskTitle": "Transfer Credit Accuracy",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-084",
+    "taskId": 2455,
+    "taskTitle": "Staff Training",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-085",
+    "taskId": 3325,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-085",
+    "taskId": 3758,
+    "taskTitle": "Conduct Higher Education Act: Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-085",
+    "taskId": 2456,
+    "taskTitle": "State Authorization Maintenance",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-085",
+    "taskId": 2457,
+    "taskTitle": "Complaint Process",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-085",
+    "taskId": 2458,
+    "taskTitle": "Distance Ed Authorization",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-085",
+    "taskId": 2459,
+    "taskTitle": "SARA Participation",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-085",
+    "taskId": 2460,
+    "taskTitle": "Authorization Documentation",
+    "oldRole": "Compliance Officer",
+    "newRole": "Financial Aid Director"
+  },
+  {
+    "regKey": "REG-086",
+    "taskId": 3326,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-086",
+    "taskId": 3759,
+    "taskTitle": "Conduct Native American Graves Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-086",
+    "taskId": 2461,
+    "taskTitle": "Collection Inventory",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-086",
+    "taskId": 2462,
+    "taskTitle": "Summary Preparation",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-086",
+    "taskId": 2463,
+    "taskTitle": "Tribal Consultation",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-086",
+    "taskId": 2464,
+    "taskTitle": "Repatriation Process",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-086",
+    "taskId": 2465,
+    "taskTitle": "Federal Notice",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-086",
+    "taskId": 2466,
+    "taskTitle": "Discovery Procedures",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-088",
+    "taskId": 3328,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-088",
+    "taskId": 3762,
+    "taskTitle": "Provide Required Notifications ",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-088",
+    "taskId": 3763,
+    "taskTitle": "Conduct OSHA Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-088",
+    "taskId": 2475,
+    "taskTitle": "Building Survey",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-088",
+    "taskId": 2476,
+    "taskTitle": "PEL Compliance",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-088",
+    "taskId": 2477,
+    "taskTitle": "Exposure Monitoring",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-088",
+    "taskId": 2478,
+    "taskTitle": "Regulated Areas",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-088",
+    "taskId": 2479,
+    "taskTitle": "Training",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-088",
+    "taskId": 2480,
+    "taskTitle": "Medical Surveillance",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-088",
+    "taskId": 2481,
+    "taskTitle": "Recordkeeping",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-089",
+    "taskId": 3329,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-089",
+    "taskId": 3764,
+    "taskTitle": "Provide Required Notifications ",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-089",
+    "taskId": 3765,
+    "taskTitle": "Conduct OSHA Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-089",
+    "taskId": 2482,
+    "taskTitle": "ACM Identification",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-089",
+    "taskId": 2483,
+    "taskTitle": "PEL Compliance",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-089",
+    "taskId": 2484,
+    "taskTitle": "Exposure Monitoring",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-089",
+    "taskId": 2485,
+    "taskTitle": "Warning Signage",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-089",
+    "taskId": 2486,
+    "taskTitle": "Training",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-089",
+    "taskId": 2487,
+    "taskTitle": "Operations and Maintenance",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-089",
+    "taskId": 2488,
+    "taskTitle": "Medical Surveillance",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-090",
+    "taskId": 3330,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-090",
+    "taskId": 3766,
+    "taskTitle": "Conduct OSHA Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-090",
+    "taskId": 2489,
+    "taskTitle": "Hazard Assessment",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-090",
+    "taskId": 2490,
+    "taskTitle": "PPE Selection",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-090",
+    "taskId": 2491,
+    "taskTitle": "PPE Training",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-090",
+    "taskId": 2492,
+    "taskTitle": "Written Certification",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-090",
+    "taskId": 2493,
+    "taskTitle": "PPE Provision",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-091",
+    "taskId": 3331,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-091",
+    "taskId": 3767,
+    "taskTitle": "Provide Required Notifications ",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-091",
+    "taskId": 3768,
+    "taskTitle": "Conduct OSHA Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-091",
+    "taskId": 2494,
+    "taskTitle": "Initial Exposure Assessment",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-091",
+    "taskId": 2495,
+    "taskTitle": "Exposure Monitoring",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-091",
+    "taskId": 2496,
+    "taskTitle": "PEL Compliance",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-091",
+    "taskId": 2497,
+    "taskTitle": "Medical Surveillance",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-091",
+    "taskId": 2498,
+    "taskTitle": "Training",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-091",
+    "taskId": 2499,
+    "taskTitle": "Hygiene Facilities",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-092",
+    "taskId": 3332,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-092",
+    "taskId": 3769,
+    "taskTitle": "Provide Required Notifications ",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-092",
+    "taskId": 3770,
+    "taskTitle": "Conduct OSHA Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-092",
+    "taskId": 2500,
+    "taskTitle": "Exposure Monitoring",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-092",
+    "taskId": 2501,
+    "taskTitle": "PEL Compliance",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-092",
+    "taskId": 2502,
+    "taskTitle": "Written Compliance Program",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-092",
+    "taskId": 2503,
+    "taskTitle": "Medical Surveillance",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-092",
+    "taskId": 2504,
+    "taskTitle": "Medical Removal",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-092",
+    "taskId": 2505,
+    "taskTitle": "Recordkeeping",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-093",
+    "taskId": 3333,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-093",
+    "taskId": 3771,
+    "taskTitle": "Conduct OSHA Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-093",
+    "taskId": 2506,
+    "taskTitle": "Fire Prevention",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-093",
+    "taskId": 2507,
+    "taskTitle": "Hot Work Permits",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-093",
+    "taskId": 2508,
+    "taskTitle": "Ventilation",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-093",
+    "taskId": 2509,
+    "taskTitle": "PPE",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-093",
+    "taskId": 2510,
+    "taskTitle": "Equipment Inspection",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-094",
+    "taskId": 3334,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-094",
+    "taskId": 3772,
+    "taskTitle": "Conduct OSHA Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-094",
+    "taskId": 2511,
+    "taskTitle": "Exposure Control Plan",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-094",
+    "taskId": 2512,
+    "taskTitle": "Exposure Determination",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-094",
+    "taskId": 2513,
+    "taskTitle": "Universal Precautions",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-094",
+    "taskId": 2514,
+    "taskTitle": "Engineering Controls",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-094",
+    "taskId": 2515,
+    "taskTitle": "Hepatitis B Vaccination",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-094",
+    "taskId": 2516,
+    "taskTitle": "Training",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-094",
+    "taskId": 2517,
+    "taskTitle": "Post-Exposure Evaluation",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-094",
+    "taskId": 2518,
+    "taskTitle": "Sharps Injury Log",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-098",
+    "taskId": 3338,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "REG-098",
+    "taskId": 3773,
+    "taskTitle": "Conduct Occupational Safety and Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "REG-098",
+    "taskId": 2161,
+    "taskTitle": "OSHA 300 Log Maintenance",
+    "oldRole": "Compliance Officer",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "REG-098",
+    "taskId": 2162,
+    "taskTitle": "OSHA 300A Annual Summary",
+    "oldRole": "Compliance Officer",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "REG-098",
+    "taskId": 2163,
+    "taskTitle": "Hazard Communication Program",
+    "oldRole": "Compliance Officer",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "REG-098",
+    "taskId": 2164,
+    "taskTitle": "OSHA Poster Display",
+    "oldRole": "Compliance Officer",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "REG-098",
+    "taskId": 2165,
+    "taskTitle": "Workplace Hazard Assessment",
+    "oldRole": "Compliance Officer",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "REG-098",
+    "taskId": 2166,
+    "taskTitle": "PPE Program",
+    "oldRole": "Compliance Officer",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "REG-098",
+    "taskId": 2167,
+    "taskTitle": "Emergency Action Plan",
+    "oldRole": "Compliance Officer",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "REG-098",
+    "taskId": 2168,
+    "taskTitle": "Fire Prevention Plan",
+    "oldRole": "Compliance Officer",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "REG-098",
+    "taskId": 2169,
+    "taskTitle": "Employee Safety Training",
+    "oldRole": "Compliance Officer",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "REG-098",
+    "taskId": 2170,
+    "taskTitle": "Recordkeeping Retention",
+    "oldRole": "Compliance Officer",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "REG-098",
+    "taskId": 2171,
+    "taskTitle": "Safety Committee",
+    "oldRole": "Compliance Officer",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "REG-098",
+    "taskId": 2172,
+    "taskTitle": "Regular Safety Inspections",
+    "oldRole": "Compliance Officer",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "REG-099",
+    "taskId": 3339,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-099",
+    "taskId": 3774,
+    "taskTitle": "Conduct Small Unmanned Aircraft Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-099",
+    "taskId": 2537,
+    "taskTitle": "Remote Pilot Certification",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-099",
+    "taskId": 2538,
+    "taskTitle": "Registration",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-099",
+    "taskId": 2539,
+    "taskTitle": "Operating Rules Compliance",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-099",
+    "taskId": 2540,
+    "taskTitle": "Airspace Authorization",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-099",
+    "taskId": 2541,
+    "taskTitle": "Drone Policy",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-100",
+    "taskId": 3340,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-100",
+    "taskId": 3775,
+    "taskTitle": "Conduct Affirmative Action/Equal Employment Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-100",
+    "taskId": 2542,
+    "taskTitle": "Affirmative Action Plan",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-100",
+    "taskId": 2543,
+    "taskTitle": "Workforce Analysis",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-100",
+    "taskId": 2544,
+    "taskTitle": "Availability Analysis",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-100",
+    "taskId": 2545,
+    "taskTitle": "Goal Setting",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-100",
+    "taskId": 2546,
+    "taskTitle": "Action-Oriented Programs",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-100",
+    "taskId": 2547,
+    "taskTitle": "Annual Update",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-101",
+    "taskId": 3341,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-101",
+    "taskId": 3776,
+    "taskTitle": "Conduct Communications Assistance for Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-101",
+    "taskId": 2548,
+    "taskTitle": "Capability Assessment",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-101",
+    "taskId": 2549,
+    "taskTitle": "Interception Capability",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-101",
+    "taskId": 2550,
+    "taskTitle": "Law Enforcement Interface",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-101",
+    "taskId": 2551,
+    "taskTitle": "Legal Counsel Coordination",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-102",
+    "taskId": 3342,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-102",
+    "taskId": 3777,
+    "taskTitle": "Complete Annual Controlled Substances Act Report",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-102",
+    "taskId": 2552,
+    "taskTitle": "DEA Registration",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-102",
+    "taskId": 2553,
+    "taskTitle": "Storage Security",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-102",
+    "taskId": 2554,
+    "taskTitle": "Inventory",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-102",
+    "taskId": 2555,
+    "taskTitle": "Recordkeeping",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-102",
+    "taskId": 2556,
+    "taskTitle": "Disposal",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-102",
+    "taskId": 2557,
+    "taskTitle": "Loss Reporting",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-103",
+    "taskId": 3343,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-103",
+    "taskId": 3778,
+    "taskTitle": "Conduct Controlling the Assault Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-103",
+    "taskId": 2558,
+    "taskTitle": "Accurate Header Information",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-103",
+    "taskId": 2559,
+    "taskTitle": "Subject Line Accuracy",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-103",
+    "taskId": 2560,
+    "taskTitle": "Opt-Out Mechanism",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-103",
+    "taskId": 2561,
+    "taskTitle": "Opt-Out Processing",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-103",
+    "taskId": 2562,
+    "taskTitle": "Physical Address",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-103",
+    "taskId": 2563,
+    "taskTitle": "Ad Identification",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-104",
+    "taskId": 3344,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-104",
+    "taskId": 3779,
+    "taskTitle": "Conduct Department of Education Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-104",
+    "taskId": 2564,
+    "taskTitle": "Grant Administration",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-104",
+    "taskId": 2565,
+    "taskTitle": "Financial Management",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-104",
+    "taskId": 2566,
+    "taskTitle": "Performance Reporting",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-104",
+    "taskId": 2567,
+    "taskTitle": "Procurement Standards",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-104",
+    "taskId": 2568,
+    "taskTitle": "Property Management",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-104",
+    "taskId": 2569,
+    "taskTitle": "Record Retention",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-105",
+    "taskId": 3345,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-105",
+    "taskId": 3780,
+    "taskTitle": "Conduct Electronic Communications Privacy Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-105",
+    "taskId": 2570,
+    "taskTitle": "Electronic Monitoring Policy",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-105",
+    "taskId": 2571,
+    "taskTitle": "Consent Documentation",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-105",
+    "taskId": 2572,
+    "taskTitle": "Access Controls",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-105",
+    "taskId": 2573,
+    "taskTitle": "Law Enforcement Response",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-106",
+    "taskId": 3346,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-106",
+    "taskId": 3781,
+    "taskTitle": "Conduct Equal Employment of Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-106",
+    "taskId": 2574,
+    "taskTitle": "Veterans AAP",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-106",
+    "taskId": 2575,
+    "taskTitle": "Job Listing",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-106",
+    "taskId": 2576,
+    "taskTitle": "Data Collection",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-106",
+    "taskId": 2577,
+    "taskTitle": "Benchmark",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-106",
+    "taskId": 2578,
+    "taskTitle": "VETS-4212",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-108",
+    "taskId": 3347,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-108",
+    "taskId": 3782,
+    "taskTitle": "Conduct FCC – Cable Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-108",
+    "taskId": 2582,
+    "taskTitle": "Registration",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-108",
+    "taskId": 2583,
+    "taskTitle": "Certification Renewal",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-108",
+    "taskId": 2584,
+    "taskTitle": "Signal Quality",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-109",
+    "taskId": 3348,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-109",
+    "taskId": 3783,
+    "taskTitle": "Conduct FCC – Fixed Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-109",
+    "taskId": 2585,
+    "taskTitle": "License Maintenance",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-109",
+    "taskId": 2586,
+    "taskTitle": "Frequency Coordination",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-109",
+    "taskId": 2587,
+    "taskTitle": "License Renewal",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-110",
+    "taskId": 3349,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-110",
+    "taskId": 3784,
+    "taskTitle": "Conduct FCC – Wireless Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-110",
+    "taskId": 2588,
+    "taskTitle": "License Maintenance",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-110",
+    "taskId": 2589,
+    "taskTitle": "Construction Requirements",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-110",
+    "taskId": 2590,
+    "taskTitle": "License Renewal",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-110",
+    "taskId": 2591,
+    "taskTitle": "Compliance with Rules",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-113",
+    "taskId": 3352,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-113",
+    "taskId": 3785,
+    "taskTitle": "Conduct Fraud Enforcement and Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-113",
+    "taskId": 2599,
+    "taskTitle": "False Claims Prevention",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-113",
+    "taskId": 2600,
+    "taskTitle": "Accurate Billing",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-113",
+    "taskId": 2601,
+    "taskTitle": "Retaliation Prohibition",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-114",
+    "taskId": 3353,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-114",
+    "taskId": 3786,
+    "taskTitle": "Conduct Genetic Information Non-Discrimination Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-114",
+    "taskId": 2602,
+    "taskTitle": "No Genetic Discrimination",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-114",
+    "taskId": 2603,
+    "taskTitle": "Acquisition Prohibition",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-114",
+    "taskId": 2604,
+    "taskTitle": "Confidentiality",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-114",
+    "taskId": 2605,
+    "taskTitle": "Safe Harbor Language",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-114",
+    "taskId": 2606,
+    "taskTitle": "Manager Training",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-115",
+    "taskId": 3354,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-115",
+    "taskId": 3787,
+    "taskTitle": "Conduct Hazardous Materials Transportation Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-115",
+    "taskId": 2607,
+    "taskTitle": "Hazmat Employee Training",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-115",
+    "taskId": 2608,
+    "taskTitle": "Shipping Papers",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-115",
+    "taskId": 2609,
+    "taskTitle": "Packaging Standards",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-115",
+    "taskId": 2610,
+    "taskTitle": "Marking and Labeling",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-115",
+    "taskId": 2611,
+    "taskTitle": "Training Records",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-116",
+    "taskId": 4285,
+    "taskTitle": "Documentation and Record Keeping",
+    "oldRole": "Compliance Officer",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "REG-116",
+    "taskId": 4286,
+    "taskTitle": "Maintain DHS information sharing records",
+    "oldRole": "Compliance Officer",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "REG-116",
+    "taskId": 4287,
+    "taskTitle": "Document cybersecurity training completion",
+    "oldRole": "Compliance Officer",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "REG-116",
+    "taskId": 4288,
+    "taskTitle": "Maintain vulnerability assessment records",
+    "oldRole": "Compliance Officer",
+    "newRole": "Clery Compliance Officer"
+  },
+  {
+    "regKey": "REG-117",
+    "taskId": 3356,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-117",
+    "taskId": 3789,
+    "taskTitle": "Conduct Junk Fax Prevention Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-117",
+    "taskId": 2615,
+    "taskTitle": "Prior Consent",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-117",
+    "taskId": 2616,
+    "taskTitle": "Opt-Out Notice",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-117",
+    "taskId": 2617,
+    "taskTitle": "Opt-Out Processing",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-118",
+    "taskId": 3357,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-118",
+    "taskId": 3790,
+    "taskTitle": "Conduct Lilly Ledbetter Fair Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-118",
+    "taskId": 2618,
+    "taskTitle": "Pay Equity Awareness",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-118",
+    "taskId": 2619,
+    "taskTitle": "Compensation Records",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-118",
+    "taskId": 2620,
+    "taskTitle": "Pay Audits",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-119",
+    "taskId": 3358,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-119",
+    "taskId": 3791,
+    "taskTitle": "Conduct No Electronic Theft Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-119",
+    "taskId": 2621,
+    "taskTitle": "Copyright Policy",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-119",
+    "taskId": 2622,
+    "taskTitle": "P2P Monitoring",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-119",
+    "taskId": 2623,
+    "taskTitle": "User Education",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-120",
+    "taskId": 3359,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-120",
+    "taskId": 3792,
+    "taskTitle": "Conduct Protection of Human Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-120",
+    "taskId": 2624,
+    "taskTitle": "IRB Establishment",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-120",
+    "taskId": 2625,
+    "taskTitle": "Protocol Review",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-120",
+    "taskId": 2626,
+    "taskTitle": "Informed Consent",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-120",
+    "taskId": 2627,
+    "taskTitle": "Continuing Review",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-120",
+    "taskId": 2628,
+    "taskTitle": "FWA Maintenance",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-120",
+    "taskId": 2629,
+    "taskTitle": "Vulnerable Populations",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-120",
+    "taskId": 2630,
+    "taskTitle": "IRB Records",
+    "oldRole": "Compliance Officer",
+    "newRole": "Research Compliance Officer"
+  },
+  {
+    "regKey": "REG-121",
+    "taskId": 3360,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-121",
+    "taskId": 3793,
+    "taskTitle": "Conduct Telemarketing Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-121",
+    "taskId": 2631,
+    "taskTitle": "Do Not Call Compliance",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-121",
+    "taskId": 2632,
+    "taskTitle": "Calling Hours",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-121",
+    "taskId": 2633,
+    "taskTitle": "Caller ID",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-121",
+    "taskId": 2634,
+    "taskTitle": "Internal DNC List",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-123",
+    "taskId": 3361,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-123",
+    "taskId": 3794,
+    "taskTitle": "Conduct Veterans’ employment emphasis Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-123",
+    "taskId": 2636,
+    "taskTitle": "Veterans AAP",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-123",
+    "taskId": 2637,
+    "taskTitle": "Job Listings",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-123",
+    "taskId": 2638,
+    "taskTitle": "VETS-4212 Filing",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-123",
+    "taskId": 2639,
+    "taskTitle": "Hiring Benchmark",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-125",
+    "taskId": 3363,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-125",
+    "taskId": 3795,
+    "taskTitle": "Conduct Chemical Facility Anti-Terrorism Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-125",
+    "taskId": 2646,
+    "taskTitle": "Top-Screen Submission",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-125",
+    "taskId": 2647,
+    "taskTitle": "SVA Completion",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-125",
+    "taskId": 2648,
+    "taskTitle": "Site Security Plan",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-125",
+    "taskId": 2649,
+    "taskTitle": "Personnel Surety",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-125",
+    "taskId": 2650,
+    "taskTitle": "COI Inventory",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-126",
+    "taskId": 3364,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-126",
+    "taskId": 3796,
+    "taskTitle": "Complete Annual Clean Air Act Report",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-126",
+    "taskId": 2651,
+    "taskTitle": "Air Permit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-126",
+    "taskId": 2652,
+    "taskTitle": "Emission Limits",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-126",
+    "taskId": 2653,
+    "taskTitle": "Monitoring and Recordkeeping",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-126",
+    "taskId": 2654,
+    "taskTitle": "Reporting",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-126",
+    "taskId": 2655,
+    "taskTitle": "Refrigerant Management",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-128",
+    "taskId": 3366,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-128",
+    "taskId": 3797,
+    "taskTitle": "Conduct Comprehensive Environmental Response, Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-128",
+    "taskId": 2661,
+    "taskTitle": "Release Reporting",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-128",
+    "taskId": 2662,
+    "taskTitle": "Site Investigation",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-128",
+    "taskId": 2663,
+    "taskTitle": "Remediation",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-128",
+    "taskId": 2664,
+    "taskTitle": "Due Diligence",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-130",
+    "taskId": 3800,
+    "taskTitle": "Conduct Drug Free Workplace Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-134",
+    "taskId": 3371,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-134",
+    "taskId": 3801,
+    "taskTitle": "Conduct Federal Insecticide, Fungicide Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-134",
+    "taskId": 2686,
+    "taskTitle": "Pesticide Registration",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-134",
+    "taskId": 2687,
+    "taskTitle": "Label Compliance",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-134",
+    "taskId": 2688,
+    "taskTitle": "Applicator Certification",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-134",
+    "taskId": 2689,
+    "taskTitle": "Recordkeeping",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-134",
+    "taskId": 2690,
+    "taskTitle": "Storage and Disposal",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-135",
+    "taskId": 3372,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-135",
+    "taskId": 3802,
+    "taskTitle": "Conduct Guarding and Use Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-135",
+    "taskId": 2691,
+    "taskTitle": "Tool Condition",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-135",
+    "taskId": 2692,
+    "taskTitle": "Guards",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-135",
+    "taskId": 2693,
+    "taskTitle": "PPE",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-135",
+    "taskId": 2694,
+    "taskTitle": "Training",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-137",
+    "taskId": 3374,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-137",
+    "taskId": 3803,
+    "taskTitle": "Conduct Higher Education Opportunity Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-137",
+    "taskId": 2698,
+    "taskTitle": "Textbook Information",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-137",
+    "taskId": 2699,
+    "taskTitle": "P2P File Sharing",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-137",
+    "taskId": 2700,
+    "taskTitle": "Fire Safety Report",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-137",
+    "taskId": 2701,
+    "taskTitle": "Missing Student Procedures",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-137",
+    "taskId": 2702,
+    "taskTitle": "Voter Registration",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-140",
+    "taskId": 3377,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-140",
+    "taskId": 3804,
+    "taskTitle": "Complete Annual Mandatory Reporting of Report",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-140",
+    "taskId": 2712,
+    "taskTitle": "Threshold Determination",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-140",
+    "taskId": 2713,
+    "taskTitle": "GHG Monitoring",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-140",
+    "taskId": 2714,
+    "taskTitle": "Annual Reporting",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-140",
+    "taskId": 2715,
+    "taskTitle": "Recordkeeping",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-141",
+    "taskId": 3378,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-141",
+    "taskId": 3805,
+    "taskTitle": "Conduct Motor Carrier Act Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-141",
+    "taskId": 2716,
+    "taskTitle": "Driver Qualifications",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-141",
+    "taskId": 2717,
+    "taskTitle": "Hours of Service",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-141",
+    "taskId": 2718,
+    "taskTitle": "Vehicle Inspection",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-141",
+    "taskId": 2719,
+    "taskTitle": "Driver Files",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-144",
+    "taskId": 3381,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-144",
+    "taskId": 3807,
+    "taskTitle": "Conduct Residential Lead-Based Paint Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-144",
+    "taskId": 2730,
+    "taskTitle": "Pre-1978 Disclosure",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-144",
+    "taskId": 2731,
+    "taskTitle": "Renovation Rule",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-144",
+    "taskId": 2732,
+    "taskTitle": "Certified Renovators",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-144",
+    "taskId": 2733,
+    "taskTitle": "Work Practices",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-146",
+    "taskId": 3383,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-146",
+    "taskId": 3808,
+    "taskTitle": "Conduct Standards For the Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-146",
+    "taskId": 2751,
+    "taskTitle": "Storage Standards",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-146",
+    "taskId": 2752,
+    "taskTitle": "Labeling",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-146",
+    "taskId": 2753,
+    "taskTitle": "Spill Response",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-146",
+    "taskId": 2754,
+    "taskTitle": "Proper Disposal",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-148",
+    "taskId": 3385,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-148",
+    "taskId": 3809,
+    "taskTitle": "Complete Annual Toxic Substances Control Report",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-148",
+    "taskId": 2760,
+    "taskTitle": "PCB Management",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-148",
+    "taskId": 2761,
+    "taskTitle": "Asbestos Requirements",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-148",
+    "taskId": 2762,
+    "taskTitle": "Lead Paint Requirements",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-148",
+    "taskId": 2763,
+    "taskTitle": "Chemical Inventory",
+    "oldRole": "Compliance Officer",
+    "newRole": "Environmental Compliance Officer"
+  },
+  {
+    "regKey": "REG-149",
+    "taskId": 3810,
+    "taskTitle": "Conduct Bankruptcy Abuse Prevention Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "REG-150",
+    "taskId": 3811,
+    "taskTitle": "Conduct Clayton Antitrust Act Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "REG-151",
+    "taskId": 3812,
+    "taskTitle": "Conduct Federal Unemployment Tax Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "REG-153",
+    "taskId": 3402,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "REG-153",
+    "taskId": 3813,
+    "taskTitle": "Conduct Higher Education Act: Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "REG-153",
+    "taskId": 2764,
+    "taskTitle": "Readmission Policy",
+    "oldRole": "Compliance Officer",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "REG-153",
+    "taskId": 2765,
+    "taskTitle": "Notification Procedures",
+    "oldRole": "Compliance Officer",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "REG-153",
+    "taskId": 2766,
+    "taskTitle": "Readmission Timeline",
+    "oldRole": "Compliance Officer",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "REG-153",
+    "taskId": 2767,
+    "taskTitle": "Same Status",
+    "oldRole": "Compliance Officer",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "REG-153",
+    "taskId": 2768,
+    "taskTitle": "Tuition Rate",
+    "oldRole": "Compliance Officer",
+    "newRole": "VP Academic Affairs"
+  },
+  {
+    "regKey": "REG-154",
+    "taskId": 3403,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-154",
+    "taskId": 3814,
+    "taskTitle": "Conduct Immigration and Nationality Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-154",
+    "taskId": 2769,
+    "taskTitle": "I-9 Completion",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-154",
+    "taskId": 2770,
+    "taskTitle": "I-9 Retention",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-154",
+    "taskId": 2771,
+    "taskTitle": "E-Verify",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-154",
+    "taskId": 2772,
+    "taskTitle": "Anti-Discrimination",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-154",
+    "taskId": 2773,
+    "taskTitle": "Visa Compliance",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-155",
+    "taskId": 3815,
+    "taskTitle": "Conduct Regulation E: Electronic Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "REG-156",
+    "taskId": 3816,
+    "taskTitle": "Conduct Sarbanes Oxley Act Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "REG-157",
+    "taskId": 3817,
+    "taskTitle": "Conduct Sherman Antitrust Act Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "REG-158",
+    "taskId": 3818,
+    "taskTitle": "Conduct Social Security Act Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "REG-159",
+    "taskId": 3420,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-159",
+    "taskId": 3819,
+    "taskTitle": "Complete Annual Student Exchange and Report",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-159",
+    "taskId": 2774,
+    "taskTitle": "SEVP Certification",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-159",
+    "taskId": 2775,
+    "taskTitle": "DSO Designation",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-159",
+    "taskId": 2776,
+    "taskTitle": "Student Registration",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-159",
+    "taskId": 2777,
+    "taskTitle": "Status Updates",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-159",
+    "taskId": 2778,
+    "taskTitle": "Address Updates",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-159",
+    "taskId": 2779,
+    "taskTitle": "Employment Authorization",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-159",
+    "taskId": 2780,
+    "taskTitle": "Recertification",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-160",
+    "taskId": 3820,
+    "taskTitle": "Conduct Tax Cuts and Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "REG-161",
+    "taskId": 3821,
+    "taskTitle": "Conduct Truth in Lending Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "REG-164",
+    "taskId": 3822,
+    "taskTitle": "Conduct Acts Affecting a Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-165",
+    "taskId": 3823,
+    "taskTitle": "Conduct Bribery of Public Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-167",
+    "taskId": 3824,
+    "taskTitle": "Conduct Cafeteria Plans 26 Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "REG-168",
+    "taskId": 3825,
+    "taskTitle": "Conduct Charitable Gift Annuity Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "REG-169",
+    "taskId": 3826,
+    "taskTitle": "Conduct Compensation to Members Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-170",
+    "taskId": 3827,
+    "taskTitle": "Conduct Consumer Credit Protection Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-173",
+    "taskId": 3469,
+    "taskTitle": "policy",
+    "oldRole": "Compliance Officer",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-173",
+    "taskId": 3470,
+    "taskTitle": "review",
+    "oldRole": "Compliance Officer",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-173",
+    "taskId": 3471,
+    "taskTitle": "training",
+    "oldRole": "Compliance Officer",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-173",
+    "taskId": 3828,
+    "taskTitle": "Conduct Ethics in Government Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-174",
+    "taskId": 3829,
+    "taskTitle": "Conduct Fair Labor Standards Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-175",
+    "taskId": 3830,
+    "taskTitle": "Conduct Federal Insurance Contributions Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-176",
+    "taskId": 3478,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-176",
+    "taskId": 3831,
+    "taskTitle": "Conduct Federal Sentencing Guidelines Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-176",
+    "taskId": 2781,
+    "taskTitle": "Compliance Program",
+    "oldRole": "Compliance Officer",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-176",
+    "taskId": 2782,
+    "taskTitle": "Oversight",
+    "oldRole": "Compliance Officer",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-176",
+    "taskId": 2783,
+    "taskTitle": "Training",
+    "oldRole": "Compliance Officer",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-176",
+    "taskId": 2784,
+    "taskTitle": "Monitoring",
+    "oldRole": "Compliance Officer",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-176",
+    "taskId": 2785,
+    "taskTitle": "Reporting Mechanism",
+    "oldRole": "Compliance Officer",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-176",
+    "taskId": 2786,
+    "taskTitle": "Enforcement",
+    "oldRole": "Compliance Officer",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-177",
+    "taskId": 3832,
+    "taskTitle": "Conduct Federal Unemployment Tax Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-180",
+    "taskId": 3833,
+    "taskTitle": "Complete Annual Honest Leadership and Report",
+    "oldRole": "Compliance Officer",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-181",
+    "taskId": 3493,
+    "taskTitle": "documentation",
+    "oldRole": "Compliance Officer",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-181",
+    "taskId": 3494,
+    "taskTitle": "review",
+    "oldRole": "Compliance Officer",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-181",
+    "taskId": 3495,
+    "taskTitle": "training",
+    "oldRole": "Compliance Officer",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-181",
+    "taskId": 3834,
+    "taskTitle": "Conduct House and Senate Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-184",
+    "taskId": 3504,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-184",
+    "taskId": 3835,
+    "taskTitle": "Conduct Internal Revenue Service: Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-184",
+    "taskId": 2787,
+    "taskTitle": "Annual Filing",
+    "oldRole": "Compliance Officer",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-184",
+    "taskId": 2788,
+    "taskTitle": "Governance Disclosure",
+    "oldRole": "Compliance Officer",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-184",
+    "taskId": 2789,
+    "taskTitle": "Compensation Reporting",
+    "oldRole": "Compliance Officer",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-184",
+    "taskId": 2790,
+    "taskTitle": "Public Availability",
+    "oldRole": "Compliance Officer",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-184",
+    "taskId": 2791,
+    "taskTitle": "Schedule A",
+    "oldRole": "Compliance Officer",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-188",
+    "taskId": 3515,
+    "taskTitle": "documentation",
+    "oldRole": "Compliance Officer",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-188",
+    "taskId": 3516,
+    "taskTitle": "review",
+    "oldRole": "Compliance Officer",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-188",
+    "taskId": 3517,
+    "taskTitle": "training",
+    "oldRole": "Compliance Officer",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-188",
+    "taskId": 3836,
+    "taskTitle": "Conduct Political Activities Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-189",
+    "taskId": 3837,
+    "taskTitle": "Conduct Public Disclosure of Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "REG-193",
+    "taskId": 3838,
+    "taskTitle": "Complete Annual Reporting of Payments Report",
+    "oldRole": "Compliance Officer",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "REG-194",
+    "taskId": 3839,
+    "taskTitle": "Conduct Restrictions on Former Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-195",
+    "taskId": 3840,
+    "taskTitle": "Conduct Salary of Government Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Ethics Officer"
+  },
+  {
+    "regKey": "REG-197",
+    "taskId": 3841,
+    "taskTitle": "Conduct Unrelated Business Income Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "CFO"
+  },
+  {
+    "regKey": "REG-199",
+    "taskId": 3842,
+    "taskTitle": "Conduct Anti-Kickback Act of Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Procurement Director"
+  },
+  {
+    "regKey": "REG-200",
+    "taskId": 3843,
+    "taskTitle": "Conduct Anti-discrimination laws for Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Procurement Director"
+  },
+  {
+    "regKey": "REG-201",
+    "taskId": 3558,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "Technology Transfer Officer"
+  },
+  {
+    "regKey": "REG-201",
+    "taskId": 3844,
+    "taskTitle": "Conduct Bayh-Dole Act of Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Technology Transfer Officer"
+  },
+  {
+    "regKey": "REG-201",
+    "taskId": 2795,
+    "taskTitle": "Invention Disclosure",
+    "oldRole": "Compliance Officer",
+    "newRole": "Technology Transfer Officer"
+  },
+  {
+    "regKey": "REG-201",
+    "taskId": 2796,
+    "taskTitle": "Title Election",
+    "oldRole": "Compliance Officer",
+    "newRole": "Technology Transfer Officer"
+  },
+  {
+    "regKey": "REG-201",
+    "taskId": 2797,
+    "taskTitle": "Patent Application",
+    "oldRole": "Compliance Officer",
+    "newRole": "Technology Transfer Officer"
+  },
+  {
+    "regKey": "REG-201",
+    "taskId": 2798,
+    "taskTitle": "Government License",
+    "oldRole": "Compliance Officer",
+    "newRole": "Technology Transfer Officer"
+  },
+  {
+    "regKey": "REG-201",
+    "taskId": 2799,
+    "taskTitle": "US Preference",
+    "oldRole": "Compliance Officer",
+    "newRole": "Technology Transfer Officer"
+  },
+  {
+    "regKey": "REG-201",
+    "taskId": 2800,
+    "taskTitle": "Marking",
+    "oldRole": "Compliance Officer",
+    "newRole": "Technology Transfer Officer"
+  },
+  {
+    "regKey": "REG-203",
+    "taskId": 3845,
+    "taskTitle": "Conduct Copyright Act Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Technology Transfer Officer"
+  },
+  {
+    "regKey": "REG-204",
+    "taskId": 3846,
+    "taskTitle": "Conduct Copyright Term Extension Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Technology Transfer Officer"
+  },
+  {
+    "regKey": "REG-205",
+    "taskId": 3847,
+    "taskTitle": "Conduct Davis-Bacon Act Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Procurement Director"
+  },
+  {
+    "regKey": "REG-206",
+    "taskId": 3571,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-206",
+    "taskId": 3848,
+    "taskTitle": "Conduct Digital Millennium Copyright Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-206",
+    "taskId": 2801,
+    "taskTitle": "Designated Agent",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-206",
+    "taskId": 2802,
+    "taskTitle": "Takedown Procedures",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-206",
+    "taskId": 2803,
+    "taskTitle": "Counter-Notice Process",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-206",
+    "taskId": 2804,
+    "taskTitle": "Repeat Infringer Policy",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-206",
+    "taskId": 2805,
+    "taskTitle": "Notice Posting",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-207",
+    "taskId": 3572,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-207",
+    "taskId": 3849,
+    "taskTitle": "Conduct Drug & Alcohol Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-207",
+    "taskId": 2806,
+    "taskTitle": "Testing Program",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-207",
+    "taskId": 2807,
+    "taskTitle": "Pre-Employment Testing",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-207",
+    "taskId": 2808,
+    "taskTitle": "Random Testing",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-207",
+    "taskId": 2809,
+    "taskTitle": "Post-Accident Testing",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-207",
+    "taskId": 2810,
+    "taskTitle": "SAP Referral",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-207",
+    "taskId": 2811,
+    "taskTitle": "MIS Reporting",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-208",
+    "taskId": 3850,
+    "taskTitle": "Conduct E-Verify Executive Order Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Procurement Director"
+  },
+  {
+    "regKey": "REG-209",
+    "taskId": 3576,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-209",
+    "taskId": 3851,
+    "taskTitle": "Conduct Employee Polygraph Protection Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-209",
+    "taskId": 2812,
+    "taskTitle": "Polygraph Prohibition",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-209",
+    "taskId": 2813,
+    "taskTitle": "Poster Display",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-209",
+    "taskId": 2814,
+    "taskTitle": "Limited Exception Compliance",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-210",
+    "taskId": 3577,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-210",
+    "taskId": 3852,
+    "taskTitle": "Conduct Fair Credit Reporting Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-210",
+    "taskId": 2815,
+    "taskTitle": "Disclosure and Authorization",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-210",
+    "taskId": 2816,
+    "taskTitle": "Pre-Adverse Action Notice",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-210",
+    "taskId": 2817,
+    "taskTitle": "Adverse Action Notice",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-210",
+    "taskId": 2818,
+    "taskTitle": "Permissible Purpose",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-210",
+    "taskId": 2819,
+    "taskTitle": "Disposal",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-210",
+    "taskId": 2820,
+    "taskTitle": "Certification to CRA",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-211",
+    "taskId": 3578,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-211",
+    "taskId": 3853,
+    "taskTitle": "Conduct Federal Volunteer Protection Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-211",
+    "taskId": 2821,
+    "taskTitle": "Volunteer Status",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-211",
+    "taskId": 2822,
+    "taskTitle": "Scope of Duties",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-211",
+    "taskId": 2823,
+    "taskTitle": "Volunteer Policies",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-213",
+    "taskId": 3580,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "Dean of Students"
+  },
+  {
+    "regKey": "REG-213",
+    "taskId": 3854,
+    "taskTitle": "Conduct Foreign Corrupt Practices Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Dean of Students"
+  },
+  {
+    "regKey": "REG-213",
+    "taskId": 2827,
+    "taskTitle": "Anti-Bribery Compliance",
+    "oldRole": "Compliance Officer",
+    "newRole": "Dean of Students"
+  },
+  {
+    "regKey": "REG-213",
+    "taskId": 2828,
+    "taskTitle": "Third-Party Due Diligence",
+    "oldRole": "Compliance Officer",
+    "newRole": "Dean of Students"
+  },
+  {
+    "regKey": "REG-213",
+    "taskId": 2829,
+    "taskTitle": "Accurate Books and Records",
+    "oldRole": "Compliance Officer",
+    "newRole": "Dean of Students"
+  },
+  {
+    "regKey": "REG-213",
+    "taskId": 2830,
+    "taskTitle": "Internal Controls",
+    "oldRole": "Compliance Officer",
+    "newRole": "Dean of Students"
+  },
+  {
+    "regKey": "REG-213",
+    "taskId": 2831,
+    "taskTitle": "FCPA Training",
+    "oldRole": "Compliance Officer",
+    "newRole": "Dean of Students"
+  },
+  {
+    "regKey": "REG-214",
+    "taskId": 3855,
+    "taskTitle": "Complete Annual Higher Education Act: Report",
+    "oldRole": "Compliance Officer",
+    "newRole": "Technology Transfer Officer"
+  },
+  {
+    "regKey": "REG-216",
+    "taskId": 3856,
+    "taskTitle": "Conduct Lanham Act Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Technology Transfer Officer"
+  },
+  {
+    "regKey": "REG-218",
+    "taskId": 3857,
+    "taskTitle": "Conduct Non-Retaliation for Disclosure Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Procurement Director"
+  },
+  {
+    "regKey": "REG-222",
+    "taskId": 3861,
+    "taskTitle": "Conduct Small Business Act Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Procurement Director"
+  },
+  {
+    "regKey": "REG-224",
+    "taskId": 3862,
+    "taskTitle": "Conduct Technology Education and Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Technology Transfer Officer"
+  },
+  {
+    "regKey": "REG-225",
+    "taskId": 3863,
+    "taskTitle": "Conduct Trade Sanctions Reform Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Procurement Director"
+  },
+  {
+    "regKey": "REG-226",
+    "taskId": 3606,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "Technology Transfer Officer"
+  },
+  {
+    "regKey": "REG-226",
+    "taskId": 3864,
+    "taskTitle": "Conduct Trademark Revision Act Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Technology Transfer Officer"
+  },
+  {
+    "regKey": "REG-226",
+    "taskId": 2849,
+    "taskTitle": "Trademark Registration",
+    "oldRole": "Compliance Officer",
+    "newRole": "Technology Transfer Officer"
+  },
+  {
+    "regKey": "REG-226",
+    "taskId": 2850,
+    "taskTitle": "Renewal",
+    "oldRole": "Compliance Officer",
+    "newRole": "Technology Transfer Officer"
+  },
+  {
+    "regKey": "REG-226",
+    "taskId": 2851,
+    "taskTitle": "Use in Commerce",
+    "oldRole": "Compliance Officer",
+    "newRole": "Technology Transfer Officer"
+  },
+  {
+    "regKey": "REG-227",
+    "taskId": 3607,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "Technology Transfer Officer"
+  },
+  {
+    "regKey": "REG-227",
+    "taskId": 3865,
+    "taskTitle": "Conduct U.S. Patent Act Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Technology Transfer Officer"
+  },
+  {
+    "regKey": "REG-227",
+    "taskId": 2852,
+    "taskTitle": "Invention Disclosure",
+    "oldRole": "Compliance Officer",
+    "newRole": "Technology Transfer Officer"
+  },
+  {
+    "regKey": "REG-227",
+    "taskId": 2853,
+    "taskTitle": "Patent Application",
+    "oldRole": "Compliance Officer",
+    "newRole": "Technology Transfer Officer"
+  },
+  {
+    "regKey": "REG-227",
+    "taskId": 2854,
+    "taskTitle": "Maintenance Fees",
+    "oldRole": "Compliance Officer",
+    "newRole": "Technology Transfer Officer"
+  },
+  {
+    "regKey": "REG-228",
+    "taskId": 3608,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "Technology Transfer Officer"
+  },
+  {
+    "regKey": "REG-228",
+    "taskId": 3866,
+    "taskTitle": "Conduct Visual Artists Rights Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Technology Transfer Officer"
+  },
+  {
+    "regKey": "REG-228",
+    "taskId": 2855,
+    "taskTitle": "Artist Rights",
+    "oldRole": "Compliance Officer",
+    "newRole": "Technology Transfer Officer"
+  },
+  {
+    "regKey": "REG-228",
+    "taskId": 2856,
+    "taskTitle": "Modification Notice",
+    "oldRole": "Compliance Officer",
+    "newRole": "Technology Transfer Officer"
+  },
+  {
+    "regKey": "REG-228",
+    "taskId": 2857,
+    "taskTitle": "Removal Process",
+    "oldRole": "Compliance Officer",
+    "newRole": "Technology Transfer Officer"
+  },
+  {
+    "regKey": "REG-229",
+    "taskId": 3609,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-229",
+    "taskId": 3867,
+    "taskTitle": "Conduct Worker Adjustment and Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-229",
+    "taskId": 2858,
+    "taskTitle": "60-Day Notice",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-229",
+    "taskId": 2859,
+    "taskTitle": "Notice Content",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-229",
+    "taskId": 2860,
+    "taskTitle": "State/Local Notice",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-229",
+    "taskId": 2861,
+    "taskTitle": "Threshold Monitoring",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-230",
+    "taskId": 3868,
+    "taskTitle": "Conduct Cafeteria Plan Regulations Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-231",
+    "taskId": 3869,
+    "taskTitle": "Conduct Consolidated Omnibus Budget Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-236",
+    "taskId": 3870,
+    "taskTitle": "Conduct Uniformed Services Employment Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-237",
+    "taskId": 3629,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-237",
+    "taskId": 3871,
+    "taskTitle": "Conduct Age Discrimination Act Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-237",
+    "taskId": 2867,
+    "taskTitle": "Non-Discrimination",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-237",
+    "taskId": 2868,
+    "taskTitle": "Complaint Procedures",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-237",
+    "taskId": 2869,
+    "taskTitle": "Policy Notice",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-239",
+    "taskId": 3630,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-239",
+    "taskId": 3872,
+    "taskTitle": "Conduct Age Discrimination Employment Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-239",
+    "taskId": 2870,
+    "taskTitle": "No Age Discrimination",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-239",
+    "taskId": 2871,
+    "taskTitle": "ADEA Poster",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-239",
+    "taskId": 2872,
+    "taskTitle": "Waiver Requirements",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-239",
+    "taskId": 2873,
+    "taskTitle": "Benefit Plans",
+    "oldRole": "Compliance Officer",
+    "newRole": "Title IX Coordinator"
+  },
+  {
+    "regKey": "REG-241",
+    "taskId": 3632,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-241",
+    "taskId": 3873,
+    "taskTitle": "Conduct Civil Service Reform Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-241",
+    "taskId": 2882,
+    "taskTitle": "Whistleblower Protections",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-241",
+    "taskId": 2883,
+    "taskTitle": "Merit Principles",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-242",
+    "taskId": 3633,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-242",
+    "taskId": 2884,
+    "taskTitle": "Lawful Basis",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-242",
+    "taskId": 2885,
+    "taskTitle": "Privacy Notice",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-242",
+    "taskId": 2886,
+    "taskTitle": "Data Subject Rights",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-242",
+    "taskId": 2887,
+    "taskTitle": "Data Processing Agreements",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-242",
+    "taskId": 2888,
+    "taskTitle": "Breach Notification",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-242",
+    "taskId": 2889,
+    "taskTitle": "Transfer Mechanisms",
+    "oldRole": "Compliance Officer",
+    "newRole": "IT Security Officer"
+  },
+  {
+    "regKey": "REG-243",
+    "taskId": 3634,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-243",
+    "taskId": 3874,
+    "taskTitle": "Conduct National Labor Relations Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-243",
+    "taskId": 2890,
+    "taskTitle": "Employee Rights",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-243",
+    "taskId": 2891,
+    "taskTitle": "No ULPs",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-243",
+    "taskId": 2892,
+    "taskTitle": "Poster Display",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-243",
+    "taskId": 2893,
+    "taskTitle": "Bargaining Obligations",
+    "oldRole": "Compliance Officer",
+    "newRole": "HR Director"
+  },
+  {
+    "regKey": "REG-245",
+    "taskId": 3636,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "Communications Director"
+  },
+  {
+    "regKey": "REG-245",
+    "taskId": 3878,
+    "taskTitle": "Conduct Higher Education Act: Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Communications Director"
+  },
+  {
+    "regKey": "REG-245",
+    "taskId": 2897,
+    "taskTitle": "Code of Conduct",
+    "oldRole": "Compliance Officer",
+    "newRole": "Communications Director"
+  },
+  {
+    "regKey": "REG-245",
+    "taskId": 2898,
+    "taskTitle": "Gift Ban",
+    "oldRole": "Compliance Officer",
+    "newRole": "Communications Director"
+  },
+  {
+    "regKey": "REG-245",
+    "taskId": 2899,
+    "taskTitle": "Revenue Sharing Ban",
+    "oldRole": "Compliance Officer",
+    "newRole": "Communications Director"
+  },
+  {
+    "regKey": "REG-245",
+    "taskId": 2900,
+    "taskTitle": "Advisory Board Rules",
+    "oldRole": "Compliance Officer",
+    "newRole": "Communications Director"
+  },
+  {
+    "regKey": "REG-245",
+    "taskId": 2901,
+    "taskTitle": "Annual Certification",
+    "oldRole": "Compliance Officer",
+    "newRole": "Communications Director"
+  },
+  {
+    "regKey": "REG-247",
+    "taskId": 3638,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "Communications Director"
+  },
+  {
+    "regKey": "REG-247",
+    "taskId": 3879,
+    "taskTitle": "Conduct Internal Revenue Code: Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Communications Director"
+  },
+  {
+    "regKey": "REG-247",
+    "taskId": 2906,
+    "taskTitle": "Written Acknowledgment",
+    "oldRole": "Compliance Officer",
+    "newRole": "Communications Director"
+  },
+  {
+    "regKey": "REG-247",
+    "taskId": 2907,
+    "taskTitle": "Quid Pro Quo Disclosure",
+    "oldRole": "Compliance Officer",
+    "newRole": "Communications Director"
+  },
+  {
+    "regKey": "REG-247",
+    "taskId": 2908,
+    "taskTitle": "Vehicle Donations",
+    "oldRole": "Compliance Officer",
+    "newRole": "Communications Director"
+  },
+  {
+    "regKey": "REG-247",
+    "taskId": 2909,
+    "taskTitle": "Noncash Property",
+    "oldRole": "Compliance Officer",
+    "newRole": "Communications Director"
+  },
+  {
+    "regKey": "REG-248",
+    "taskId": 3639,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "Communications Director"
+  },
+  {
+    "regKey": "REG-248",
+    "taskId": 3880,
+    "taskTitle": "Conduct Pension Protection Act Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Communications Director"
+  },
+  {
+    "regKey": "REG-248",
+    "taskId": 2910,
+    "taskTitle": "Funding Requirements",
+    "oldRole": "Compliance Officer",
+    "newRole": "Communications Director"
+  },
+  {
+    "regKey": "REG-248",
+    "taskId": 2911,
+    "taskTitle": "Disclosure to Participants",
+    "oldRole": "Compliance Officer",
+    "newRole": "Communications Director"
+  },
+  {
+    "regKey": "REG-248",
+    "taskId": 2912,
+    "taskTitle": "Automatic Enrollment",
+    "oldRole": "Compliance Officer",
+    "newRole": "Communications Director"
+  },
+  {
+    "regKey": "REG-248",
+    "taskId": 2913,
+    "taskTitle": "Investment Advice",
+    "oldRole": "Compliance Officer",
+    "newRole": "Communications Director"
+  },
+  {
+    "regKey": "REG-249",
+    "taskId": 3640,
+    "taskTitle": "General",
+    "oldRole": "Compliance Officer",
+    "newRole": "Communications Director"
+  },
+  {
+    "regKey": "REG-249",
+    "taskId": 3881,
+    "taskTitle": "Conduct Philanthropy Protection Act Self-Evaluation/Audit",
+    "oldRole": "Compliance Officer",
+    "newRole": "Communications Director"
+  },
+  {
+    "regKey": "REG-249",
+    "taskId": 2914,
+    "taskTitle": "Securities Exemption",
+    "oldRole": "Compliance Officer",
+    "newRole": "Communications Director"
+  },
+  {
+    "regKey": "REG-249",
+    "taskId": 2915,
+    "taskTitle": "State Registration",
+    "oldRole": "Compliance Officer",
+    "newRole": "Communications Director"
+  },
+  {
+    "regKey": "REG-249",
+    "taskId": 2916,
+    "taskTitle": "Reserve Requirements",
+    "oldRole": "Compliance Officer",
+    "newRole": "Communications Director"
+  }
+]

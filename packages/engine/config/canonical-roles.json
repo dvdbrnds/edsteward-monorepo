@@ -4,17 +4,55 @@
       "canonical": "Compliance Officer",
       "group": "Compliance",
       "aliases": [
-        "compliance", "institutional compliance officer", "director of compliance",
-        "compliance reporting manager", "compliance staff", "compliance officer / president",
-        "general counsel / compliance officer", "communications / compliance officer",
-        "hr director / compliance officer"
+        "athletic trainers",
+        "authorized organizational representative",
+        "authorized representatives",
+        "cable operators",
+        "certified remote pilot in command (rpic)",
+        "communications / compliance officer",
+        "compliance",
+        "compliance officer / president",
+        "compliance personnel",
+        "compliance reporting manager",
+        "compliance staff",
+        "copyright agents",
+        "copyright compliance officers",
+        "designated agent",
+        "designated responsible officer",
+        "director of compliance",
+        "eeo compliance officer",
+        "employer representative",
+        "external consultants",
+        "general counsel / compliance officer",
+        "high-level personnel with sufficient authority and resources",
+        "hr director / compliance officer",
+        "institutional agent",
+        "institutional compliance officer",
+        "institutional compliance officers",
+        "institutional officials",
+        "institutional representative",
+        "institutional representatives",
+        "medical review officer",
+        "officials",
+        "qualified personnel",
+        "responsible compliance officer",
+        "responsible compliance officers",
+        "responsible institutional officials",
+        "responsible personnel",
+        "responsible staff",
+        "section 1557 coordinator",
+        "senior administrators",
+        "team physicians",
+        "third-party solicitors"
       ]
     },
     {
       "canonical": "General Counsel",
       "group": "Legal",
       "aliases": [
-        "legal counsel", "legal", "university counsel",
+        "legal counsel",
+        "legal",
+        "university counsel",
         "legal counsel and compliance officer"
       ]
     },
@@ -22,15 +60,27 @@
       "canonical": "CFO",
       "group": "Finance",
       "aliases": [
-        "chief financial officer", "controller", "accounting manager"
+        "accounting manager",
+        "chief financial officer",
+        "controller",
+        "tax compliance officer"
       ]
     },
     {
       "canonical": "HR Director",
       "group": "Human Resources",
       "aliases": [
-        "human resources director", "human resources", "hr",
-        "benefits manager", "payroll manager", "hr/training", "hr staff"
+        "benefits administration staff",
+        "benefits manager",
+        "hiring manager",
+        "hr",
+        "hr compliance officer",
+        "hr staff",
+        "hr/training",
+        "human resources",
+        "human resources director",
+        "payroll manager",
+        "supervisor"
       ]
     },
     {
@@ -39,7 +89,8 @@
       "aliases": [
         "title ix coordinator / general counsel",
         "title ix coordinator / student affairs",
-        "hr/title ix", "general counsel / title ix coordinator"
+        "hr/title ix",
+        "general counsel / title ix coordinator"
       ]
     },
     {
@@ -51,33 +102,54 @@
       "canonical": "Financial Aid Director",
       "group": "Enrollment & Financial Aid",
       "aliases": [
-        "financial aid officer", "financial aid counselor",
-        "financial aid records manager", "financial aid verification coordinator",
-        "student financial services director", "financial aid appeals officer",
-        "student accounts manager"
+        "designated financial aid administrator",
+        "designated title iv administrator",
+        "financial aid appeals officer",
+        "financial aid counselor",
+        "financial aid officer",
+        "financial aid officers",
+        "financial aid personnel",
+        "financial aid records manager",
+        "financial aid staff",
+        "financial aid verification coordinator",
+        "qualified financial aid personnel",
+        "student accounts manager",
+        "student financial services director"
       ]
     },
     {
       "canonical": "IT Security Officer",
       "group": "Information Technology",
       "aliases": [
-        "ciso", "chief information security officer",
-        "it security manager", "information security manager",
-        "information security coordinator", "information security",
-        "chief information officer", "data protection officer",
-        "data security officer", "it security",
-        "security assessment team lead", "incident response manager"
+        "chief information officer",
+        "chief information security officer",
+        "ciso",
+        "data protection officer",
+        "data security officer",
+        "hipaa security officer",
+        "incident response manager",
+        "information security",
+        "information security coordinator",
+        "information security manager",
+        "it security",
+        "it security manager",
+        "security assessment team lead",
+        "senior agency information security officer"
       ]
     },
     {
       "canonical": "Campus Police Chief",
       "group": "Campus Safety",
       "aliases": [
-        "campus safety director", "campus safety",
-        "campus police/security", "security director",
-        "public safety director", "security officer",
         "campus police / campus security department",
-        "campus police chief / emergency management director"
+        "campus police chief / emergency management director",
+        "campus police/security",
+        "campus safety",
+        "campus safety director",
+        "campus safety officers",
+        "public safety director",
+        "security director",
+        "security officer"
       ]
     },
     {
@@ -91,16 +163,23 @@
       "canonical": "VP Academic Affairs",
       "group": "Academic Affairs",
       "aliases": [
-        "academic affairs", "provost", "chief academic officer",
-        "academic affairs dean", "academic affairs director"
+        "academic advisor",
+        "academic affairs",
+        "academic affairs dean",
+        "academic affairs director",
+        "chief academic officer",
+        "provost",
+        "provosts"
       ]
     },
     {
       "canonical": "VP Student Affairs",
       "group": "Student Affairs",
       "aliases": [
-        "student affairs", "chief student affairs officer",
-        "student affairs vice president", "vice president for student affairs",
+        "student affairs",
+        "chief student affairs officer",
+        "student affairs vice president",
+        "vice president for student affairs",
         "student affairs assessment coordinator"
       ]
     },
@@ -109,11 +188,16 @@
       "group": "Student Affairs",
       "aliases": [
         "dean of students / student affairs",
-        "student life director", "student conduct officer",
-        "greek life director", "student health director",
-        "housing director", "residence life",
-        "counseling center", "health services director",
-        "community service coordinator", "health services",
+        "student life director",
+        "student conduct officer",
+        "greek life director",
+        "student health director",
+        "housing director",
+        "residence life",
+        "counseling center",
+        "health services director",
+        "community service coordinator",
+        "health services",
         "student affairs"
       ]
     },
@@ -121,14 +205,18 @@
       "canonical": "Privacy Officer",
       "group": "Compliance",
       "aliases": [
-        "chief privacy officer"
+        "chief privacy officer",
+        "foia officers",
+        "hipaa privacy officer"
       ]
     },
     {
       "canonical": "President",
       "group": "Executive",
       "aliases": [
-        "president/chancellor", "president / provost",
+        "chief administrator",
+        "president / provost",
+        "president/chancellor",
         "senior administration"
       ]
     },
@@ -136,38 +224,56 @@
       "canonical": "Disability Services Coordinator",
       "group": "Student Services",
       "aliases": [
-        "disability services", "disability services director",
-        "ada coordinator", "ada/504 coordinator",
-        "section 504 coordinator", "accessibility coordinator"
+        "disability services",
+        "disability services director",
+        "ada coordinator",
+        "ada/504 coordinator",
+        "section 504 coordinator",
+        "accessibility coordinator"
       ]
     },
     {
       "canonical": "Emergency Management Director",
       "group": "Campus Safety",
       "aliases": [
-        "emergency response coordinator", "emergency management"
+        "emergency management",
+        "emergency response coordinator",
+        "facility emergency coordinator"
       ]
     },
     {
       "canonical": "Facilities Director",
       "group": "Operations",
       "aliases": [
-        "facilities", "ehs director",
-        "environmental health and safety director"
+        "ehs director",
+        "environmental health and safety director",
+        "facilities",
+        "facilities management"
       ]
     },
     {
       "canonical": "Environmental Compliance Officer",
       "group": "Compliance",
       "aliases": [
+        "certified pesticide applicators",
+        "chemical hygiene officer",
+        "competent persons",
+        "dangerous goods safety advisor",
+        "designated responsible individual",
         "environmental compliance manager",
-        "environmental compliance specialist"
+        "environmental compliance specialist",
+        "environmental health and safety personnel",
+        "radiation safety officer",
+        "responsible environmental health officers",
+        "used oil management coordinator",
+        "ust operators"
       ]
     },
     {
       "canonical": "Fire Safety Officer",
       "group": "Campus Safety",
       "aliases": [
+        "fire watch personnel",
         "safety officer"
       ]
     },
@@ -175,6 +281,7 @@
       "canonical": "Export Control Officer",
       "group": "Research & Compliance",
       "aliases": [
+        "export control officers",
         "ofac compliance officer"
       ]
     },
@@ -182,7 +289,26 @@
       "canonical": "Research Compliance Officer",
       "group": "Research & Compliance",
       "aliases": [
-        "research integrity officer", "research compliance",
+        "clinical investigator",
+        "co-investigators",
+        "co-principal investigator",
+        "covered clinical investigator",
+        "grants management staff",
+        "inventor",
+        "investigators",
+        "licensed practitioner",
+        "nih administrators",
+        "nsf personnel",
+        "postdoctoral fellows",
+        "principal investigator",
+        "principal investigators",
+        "research administrators",
+        "research compliance",
+        "research integrity officer",
+        "research integrity officers",
+        "responsible party",
+        "sponsors",
+        "teaching and research assistants",
         "vice president for research"
       ]
     },
@@ -197,28 +323,44 @@
       "canonical": "Procurement Director",
       "group": "Finance",
       "aliases": [
-        "procurement manager", "procurement officer",
-        "procurement staff", "procurement security officer",
-        "procurement"
+        "business development staff",
+        "procurement",
+        "procurement and legal staff",
+        "procurement manager",
+        "procurement officer",
+        "procurement security officer",
+        "procurement staff"
       ]
     },
     {
       "canonical": "Internal Auditor",
       "group": "Finance",
       "aliases": [
-        "quality assurance manager", "risk management officer"
+        "audit committee",
+        "government auditor",
+        "independent certified public accountant",
+        "quality assurance manager",
+        "risk management officer"
       ]
     },
     {
       "canonical": "International Programs Director",
       "group": "Academic Affairs",
-      "aliases": []
+      "aliases": [
+        "alternate responsible officer",
+        "backup dso",
+        "designated school official",
+        "international program directors",
+        "principal designated school official",
+        "responsible officer"
+      ]
     },
     {
       "canonical": "Institutional Research Director",
       "group": "Academic Affairs",
       "aliases": [
-        "institutional research", "assessment coordinator"
+        "institutional research",
+        "assessment coordinator"
       ]
     },
     {
@@ -229,13 +371,17 @@
     {
       "canonical": "Ethics Officer",
       "group": "Compliance",
-      "aliases": []
+      "aliases": [
+        "designated agency ethics officials",
+        "university chaplains"
+      ]
     },
     {
       "canonical": "Communications Director",
       "group": "Communications",
       "aliases": [
-        "communications", "web services"
+        "communications",
+        "web services"
       ]
     },
     {
@@ -246,14 +392,21 @@
     {
       "canonical": "Board Compensation Committee",
       "group": "Governance",
-      "aliases": []
+      "aliases": [
+        "board members",
+        "directors",
+        "trustee",
+        "trustees"
+      ]
     },
     {
       "canonical": "Technology Transfer Officer",
       "group": "Research & Compliance",
       "aliases": [
-        "patent attorney", "director of industry relations",
-        "grants administrator"
+        "director of industry relations",
+        "grants administrator",
+        "institutional personnel responsible for patent matters",
+        "patent attorney"
       ]
     },
     {
@@ -266,7 +419,12 @@
     {
       "canonical": "Admissions Director",
       "group": "Enrollment & Financial Aid",
-      "aliases": []
+      "aliases": [
+        "admissions and development staff",
+        "admissions staff",
+        "recruiters",
+        "recruitment staff"
+      ]
     },
     {
       "canonical": "Curriculum Coordinator",

@@ -12,6 +12,7 @@ import {
   syncControl,
   notificationQueue,
   versionConflicts,
+  roleAssignments,
   type EvidenceFile,
   type InsertEvidenceFile,
   type NoteHistory,
@@ -50,7 +51,7 @@ import type {
 // Import RegulationUpdate type from schema
 import { regulationUpdates, type RegulationUpdate, type InsertRegulationUpdate } from "@shared/schema";
 import { getDatabase, getDatabasePool } from "./services/database";
-import { eq, desc, or, like, sql } from "drizzle-orm";
+import { eq, desc, or, like, ilike, and, isNull, sql } from "drizzle-orm";
 import session from "express-session";
 import connectPg from "connect-pg-simple";
 // NOTE: Do NOT import { pool } from "./db" here — use this.pool for tenant isolation
@@ -75,6 +76,7 @@ export interface IStorage {
   getAllUsers(_tenantId?: string): Promise<User[]>;
   updateUser(_id: number, _user: Partial<InsertUser>, _tenantId?: string): Promise<User>;
   deleteUser(_id: number, _tenantId?: string): Promise<void>;
+  linkRoleAssignmentsByEmail(_userId: number, _email: string): Promise<number>;
 
   // Regulation methods
   getRegulations(): Promise<Regulation[]>;
@@ -1203,6 +1205,23 @@ export class DatabaseStorage implements IStorage {
       console.error(`Error in getUserByExternalId for ${externalId}:`, error);
       throw error;
     }
+  }
+
+  async linkRoleAssignmentsByEmail(userId: number, email: string): Promise<number> {
+    if (!email) return 0;
+    const result = await this.db.update(roleAssignments)
+      .set({ defaultUserId: userId, updatedAt: new Date() })
+      .where(
+        and(
+          ilike(roleAssignments.defaultEmail, email),
+          isNull(roleAssignments.defaultUserId)
+        )
+      )
+      .returning({ id: roleAssignments.id });
+    if (result.length > 0) {
+      console.log(`[SAML] Auto-linked ${result.length} role assignment(s) to user ${userId} (${email})`);
+    }
+    return result.length;
   }
 
   async createUser(insertUser: InsertUser, _tenantId?: string): Promise<User> {

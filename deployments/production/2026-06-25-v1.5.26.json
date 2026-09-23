@@ -1,0 +1,11 @@
+{
+  "version": "v1.5.26",
+  "timestamp": "2026-06-25T17:41:57Z",
+  "deployer": "dvdbrnds",
+  "commitSha": "79272ab2",
+  "gitBranch": "main",
+  "taskDefinitionArn": "arn:aws:ecs:us-east-1:259661441422:task-definition/edsteward-saml-production:55",
+  "previousVersion": "v1.5.25",
+  "status": "success",
+  "environment": "production"
+}
