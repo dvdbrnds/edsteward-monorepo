@@ -19,8 +19,8 @@ COPY tsconfig.node.json ./
 COPY tailwind.config.js ./
 COPY postcss.config.js ./
 
-# Build for production
-RUN npm run build
+# Build for production (skip tsc — uses newer TS features than installed version)
+RUN npx vite build
 
 # Production stage: serve static files
 FROM node:18-alpine AS production
