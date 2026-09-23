@@ -289,6 +289,9 @@ services:
       - DATABASE_URL=postgresql://${DB_USER:-edsteward}:${DB_PASSWORD:-edsteward_secure_2026}@postgres:5432/${DB_NAME:-edsteward}?sslmode=disable
       - SESSION_SECRET=${ADMIN_SESSION_SECRET:-}
       - REGISTRY_API_SECRET=${ADMIN_REGISTRY_API_SECRET:-}
+      - ADMIN_CONSOLE_PASSWORD=${ADMIN_CONSOLE_PASSWORD:-}
+      - ADMIN_CONSOLE_EMAIL=${ADMIN_CONSOLE_EMAIL:-admin@edsteward.ai}
+      - REGISTRY_API_URL=http://engine-registry:3010
     ports:
       - "9400:4000"
     depends_on:
