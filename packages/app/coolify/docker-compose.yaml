@@ -287,9 +287,8 @@ services:
       - NODE_ENV=production
       - ADMIN_PORT=4000
       - DATABASE_URL=postgresql://${DB_USER:-edsteward}:${DB_PASSWORD:-edsteward_secure_2026}@postgres:5432/${DB_NAME:-edsteward}?sslmode=disable
-      # -- Set in Coolify UI --
-      # SESSION_SECRET=
-      # REGISTRY_API_SECRET=
+      - SESSION_SECRET=${ADMIN_SESSION_SECRET:-}
+      - REGISTRY_API_SECRET=${ADMIN_REGISTRY_API_SECRET:-}
     ports:
       - "9400:4000"
     depends_on:
