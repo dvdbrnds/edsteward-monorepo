@@ -329,7 +329,8 @@ function setupAuthRoutes(app: Express): void {
   if (institutionConfig.authentication.samlEnabled) {
     app.get('/auth/saml', passport.authenticate('saml'));
 
-    app.post('/auth/saml/callback', (req: Request, res: Response, next: NextFunction) => {
+    // Accept callback with or without provider suffix (e.g., /auth/saml/callback/okta)
+    app.post('/auth/saml/callback/:provider?', (req: Request, res: Response, next: NextFunction) => {
       console.log('🔐 SAML callback received');
       passport.authenticate('saml', (err: Error | null, user: Express.User | false, info: { message?: string } | undefined) => {
         if (err) {
